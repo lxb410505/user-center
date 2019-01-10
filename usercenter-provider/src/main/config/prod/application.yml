@@ -1,0 +1,89 @@
+spring:
+  profiles:
+    active: prod
+  application: 
+    name: bpm-model-eureka
+  datasource: 
+    name: prod
+    url: jdbc:mysql://172.16.0.54:3306/x7_bpm_prod?serverTimezone=UTC&useSSL=false&&characterEncoding=UTF-8
+    username: root
+    password: 5tgbNHY^
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    filters: stat
+    maxActive: 20
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: select 1
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+    maxPoolPreparedStatementPerConnectionSize: 20
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    
+# Server settings (ServerProperties)
+server:
+  port: 8087
+  address: 0.0.0.0
+  sessionTimeout: 30
+  contextPath: /
+  session:
+    timeout: 30
+system: 
+  id: 
+    machineName: bpm-model
+   
+eureka:
+  client:
+    healthcheck:
+      enabled:  true
+    service-url:
+      defaultZone: http://${eureka.instance.hostname:eureka.ldnext.com}:${eureka.server.port:8761}/eureka/
+  server:
+    port: 8761
+  instance:
+    hostname: eureka.ldnext.com
+    prefer-ip-address: true
+    lease-expiration-duration-in-seconds: 30
+    lease-renewal-interval-in-seconds: 10
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}
+
+# feign配置
+feign:
+  hystrix:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 50000
+        readTimeout: 50000
+        loggerLevel: full
+        
+# 断路器配置
+hystrix:
+  metrics:
+    enabled: true    
+  command:    
+    default:    
+      execution:    
+        isolation:
+          strategy: SEMAPHORE   # THREAD  SEMAPHORE
+          semaphore:
+            maxConcurrentRequests: 200 # 默认情况下下面两个值都是10，也就是超过10个的并发会直接进入fallback方法，不会去真正请求
+          thread:    
+            timeoutInMilliseconds: 50000 #缺省为1000
+      fallback:
+        isolation:
+          semaphore:
+            maxConcurrentRequests: 200   # 默认情况下下面两个值都是10，也就是超过10个的并发会直接进入fallback方法，不会去真正请求
+            
+# 负载均衡配置
+ribbon:
+  eureka:
+    enabled: true   

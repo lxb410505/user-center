@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    platform: mysql
+    base: com.hypersmart.usercenter.controller
+  application:
+    name: usercenter-eureka
+
+system:
+  id:
+    machineName: usercenter
