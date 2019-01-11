@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.UcOrgMapper">
+
+    <resultMap id="UcOrg" type="com.hypersmart.usercenter.model.UcOrg">
+        <id jdbcType="VARCHAR" property="id" column="ID_"></id>
+        <result column="NAME_" jdbcType="VARCHAR" property="name"></result>
+        <result column="PARENT_ID_" jdbcType="VARCHAR" property="parentId"></result>
+        <result column="PATH_" jdbcType="VARCHAR" property="path"></result>
+    </resultMap>
+
+    <sql id="BaseAttribute">
+        ID_,NAME_,PARENT_ID_,PATH_
+    </sql>
+    <sql id="BaseTable">
+        uc_org
+    </sql>
+
+    <select id="getOrgList" resultMap="UcOrg">
+        select
+        <include refid="BaseAttribute"/>
+        from
+        <include refid="BaseTable"/>
+        where ID_ in
+        <foreach collection="orgUserList" item="item" open="(" close=")" separator=",">
+            #{item.orgId}
+        </foreach>
+    </select>
+
+    <select id="getChildrenOrg" resultMap="UcOrg">
+        select
+        <include refid="BaseAttribute"/>
+        from
+        <include refid="BaseTable"/>
+        where PATH_ like concat(#{path},"%")
+    </select>
+</mapper>

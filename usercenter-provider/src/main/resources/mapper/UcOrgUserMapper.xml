@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.UcOrgUserMapper">
+
+    <resultMap id="UcOrgUser" type="com.hypersmart.usercenter.model.UcOrgUser">
+        <id jdbcType="VARCHAR" property="id" column="ID_"></id>
+        <result column="ORG_ID_" jdbcType="VARCHAR" property="orgId"></result>
+        <result column="USER_ID_" jdbcType="VARCHAR" property="userId"></result>
+    </resultMap>
+
+    <sql id="BaseAttribute">
+        ID_,ORG_ID_,USER_ID_
+    </sql>
+    <sql id="BaseTable">
+        uc_org_user
+    </sql>
+
+    <select id="getUserOrg" resultMap="UcOrgUser">
+        select
+        <include refid="BaseAttribute"/>
+        from
+        <include refid="BaseTable"/>
+        where USER_ID_ = #{userId}
+    </select>
+
+</mapper>

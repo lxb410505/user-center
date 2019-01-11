@@ -7,7 +7,7 @@ spring:
       maxRequestSize: 1024MB
   datasource:
     name: dev
-    url: jdbc:mysql://172.16.0.54:3306/x7_portal_dev?serverTimezone=UTC&useSSL=false&&characterEncoding=UTF-8
+    url: jdbc:mysql://172.16.0.54:3306/x7_uc_dev?serverTimezone=UTC&useSSL=false&&characterEncoding=UTF-8
     username: root
     password: 5tgbNHY^
     # 使用druid数据源
