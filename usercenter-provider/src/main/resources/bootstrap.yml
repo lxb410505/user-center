@@ -3,8 +3,8 @@ spring:
     platform: mysql
     base: com.hypersmart.usercenter.controller
   application:
-    name: usercenter-eureka
+    name: user-center-eureka
 
 system:
   id:
-    machineName: usercenter
+    machineName: user-center
