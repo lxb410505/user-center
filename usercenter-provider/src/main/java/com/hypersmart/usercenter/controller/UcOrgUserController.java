@@ -4,11 +4,12 @@ import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
+import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcUserService;
-import com.hypersmart.usercenter.utils.CurrentUserOrg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import com.hypersmart.framework.model.ResponseData;
@@ -20,6 +21,7 @@ import javax.annotation.Resource;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,9 +55,20 @@ public class UcOrgUserController extends BaseController {
     public PageList<UcUser> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
 
         //根据用户信息获取用户所属组织
-        CurrentUserOrg currentUserOrg = new CurrentUserOrg();
-        List<UcOrg> list = currentUserOrg.getUserOrg();
-
+        IUser user =  ContextUtil.getCurrentUser();
+        List<UcOrgUser> refList = ucOrgUserService.getUserOrg("1012");
+        List<UcOrg> returnList = ucOrgService.getOrg(refList);
+        List<UcOrg> list = new ArrayList<>();
+        List<String> idList = new ArrayList<>();
+        for(UcOrg ucOrg :returnList){
+            List<UcOrg> orgs = ucOrgService.getChildrenOrg(ucOrg);
+            for(UcOrg org :orgs){
+                if(!idList.contains(org.getId())){
+                    idList.add(org.getId());
+                    list.add(org);
+                }
+            }
+        }
         //获取查询参数
         Map<String,Object> map = queryFilter.getParams();
         if(null != map){
@@ -106,10 +119,15 @@ public class UcOrgUserController extends BaseController {
                     str = str+","+page.getRows().get(i).getUserId();
                 }
             }
-            queryFilter.addFilter("id",str,QueryOP.IN);
+            query = QueryFilter.build();
+            query.setParams(map);
+            query.setPageBean(queryFilter.getPageBean());
+            query.addFilter("id",str,QueryOP.IN);
+        }else{
+            return new PageList<>();
         }
         //根据人员id获取管家列表
-        return this.ucUserService.query(queryFilter);
+        return this.ucUserService.query(query);
     }
 
     @GetMapping({"/get/{id}"})

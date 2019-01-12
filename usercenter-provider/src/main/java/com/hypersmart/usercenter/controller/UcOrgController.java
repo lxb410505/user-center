@@ -1,13 +1,15 @@
 package com.hypersmart.usercenter.controller;
 
 import com.hypersmart.base.controller.BaseController;
-import com.hypersmart.base.model.CommonResult;
-import com.hypersmart.base.query.PageList;
+import com.hypersmart.base.query.FieldRelation;
 import com.hypersmart.base.query.QueryFilter;
-import com.hypersmart.base.util.StringUtil;
+import com.hypersmart.base.query.QueryOP;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
+import com.hypersmart.uc.api.model.IUser;
+import com.hypersmart.usercenter.model.UcOrgUser;
+import com.hypersmart.usercenter.service.UcOrgUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import com.hypersmart.framework.model.ResponseData;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,10 @@ import javax.annotation.Resource;
 
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.service.UcOrgService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 组织架构
@@ -30,10 +36,64 @@ public class UcOrgController extends BaseController {
     @Resource
         UcOrgService ucOrgService;
 
+    @Resource
+    UcOrgUserService ucOrgUserService;
+
     @PostMapping({"/list"})
     @ApiOperation(value = "组织架构数据列表}", httpMethod = "POST", notes = "获取组织架构列表")
-    public PageList<UcOrg> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
-        return this.ucOrgService.query(queryFilter);
+    public List<UcOrg> list( @RequestBody  Map<String,String> map) {
+        QueryFilter queryFilter =QueryFilter.build();
+        IUser user =  ContextUtil.getCurrentUser();
+        List<UcOrgUser> list = ucOrgUserService.getUserOrg("1012");
+        List<UcOrg> returnList = ucOrgService.getOrg(list);
+        List<UcOrg> set = new ArrayList<>();
+        List<String> idList = new ArrayList<>();
+        for(UcOrg ucOrg :returnList){
+            List<UcOrg> orgs = ucOrgService.getChildrenOrg(ucOrg);
+            for(UcOrg org :orgs){
+                if(!idList.contains(org.getId())){
+                    idList.add(org.getId());
+                    set.add(org);
+                }
+            }
+        }
+        String str = "";
+        for(int i=0;i<set.size();i++){
+            if(i==0){
+                str = set.get(i).getId();
+            }else{
+                str = str + "," + set.get(i).getId();
+            }
+        }
+        queryFilter.addFilter("id",str, QueryOP.IN,FieldRelation.AND);
+        if(null != map && null != map.get("parentId")) {
+            if("".equals(map.get("parentId"))){
+                map.put("parentId","0");
+            }
+            queryFilter.addFilter("parentId",map.get("parentId"), QueryOP.EQUAL,FieldRelation.AND);
+            return this.ucOrgService.query(queryFilter).getRows();
+        }
+        return new ArrayList<>();
+    }
+
+    @PostMapping({"/getByList"})
+    @ApiOperation(value = "根据组织id集合获取组织信息}", httpMethod = "POST", notes = "根据组织id集合获取组织信息")
+    public List<UcOrg> getByList( @RequestBody  Map<String,List<String>> map) {
+        QueryFilter queryFilter =QueryFilter.build();
+
+        if(null != map && null != map.get("list")) {
+            String ids = "";
+            for(int i=0;i<map.get("list").size();i++){
+                if(i==0){
+                    ids = map.get("list").get(i);
+                }else{
+                    ids = ids + "," + map.get("list").get(i);
+                }
+            }
+            queryFilter.addFilter("id",ids, QueryOP.IN,FieldRelation.AND);
+            return this.ucOrgService.query(queryFilter).getRows();
+        }
+        return new ArrayList<>();
     }
 
     @GetMapping({"/get/{id}"})
