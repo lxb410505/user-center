@@ -43,20 +43,58 @@ public class UcOrgController extends BaseController {
     @ApiOperation(value = "组织架构数据列表}", httpMethod = "POST", notes = "获取组织架构列表")
     public List<UcOrg> list( @RequestBody  Map<String,String> map) {
         QueryFilter queryFilter =QueryFilter.build();
+        //获取当前用户
         IUser user =  ContextUtil.getCurrentUser();
-        List<UcOrgUser> list = ucOrgUserService.getUserOrg("1012");
-        List<UcOrg> returnList = ucOrgService.getOrg(list);
-        List<UcOrg> set = new ArrayList<>();
-        List<String> idList = new ArrayList<>();
+        //根据用户查询人与组织关系
+        List<UcOrgUser> list = ucOrgUserService.getUserOrg("981011");
+        String orgIds = "";
+        for(int i=0;i<list.size();i++){
+            if(i==0){
+                orgIds = list.get(i).getOrgId();
+            }else{
+                orgIds = orgIds+","+list.get(i).getOrgId();
+            }
+        }
+        //根据组织id获取组织信息
+        QueryFilter orgQuery = QueryFilter.build();
+        orgQuery.addFilter("id",orgIds,QueryOP.IN);
+        List<UcOrg> returnList = ucOrgService.query(orgQuery).getRows();
+        //根据组织获取子级
+        List<UcOrg> set = returnList;
         for(UcOrg ucOrg :returnList){
-            List<UcOrg> orgs = ucOrgService.getChildrenOrg(ucOrg);
+            QueryFilter childQuery = QueryFilter.build();
+            childQuery.addFilter("path",ucOrg.getPath(), QueryOP.RIGHT_LIKE);
+            List<UcOrg> orgs = ucOrgService.query(childQuery).getRows();
             for(UcOrg org :orgs){
-                if(!idList.contains(org.getId())){
-                    idList.add(org.getId());
+                if(!returnList.contains(org)){
                     set.add(org);
                 }
             }
         }
+        List<UcOrg> tempList = set;
+        //根据组织查询父级组织
+        for(UcOrg ucOrg : tempList){
+            String [] paths = ucOrg.getPath().split(".");
+            for(int i=0;i<paths.length;i++){
+                String path = "";
+                for(int j=0;j<=i;j++){
+                    if(j==0){
+                        path = paths[j];
+                    }else{
+                        path = path +"."+paths[j];
+                    }
+                }
+                QueryFilter query = QueryFilter.build();
+                query.addFilter("path",path,QueryOP.EQUAL);
+                List<UcOrg> voList = ucOrgService.query(query).getRows();
+                for(UcOrg vo:voList){
+                    if(!set.contains(vo)){
+                        set.add(vo);
+                    }
+                }
+            }
+        }
+        //拼接组织id
         String str = "";
         for(int i=0;i<set.size();i++){
             if(i==0){

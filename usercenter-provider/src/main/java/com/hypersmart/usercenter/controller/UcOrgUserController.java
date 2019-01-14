@@ -1,6 +1,7 @@
 package com.hypersmart.usercenter.controller;
 
 import com.hypersmart.base.controller.BaseController;
+import com.hypersmart.base.query.FieldRelation;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
@@ -122,7 +123,8 @@ public class UcOrgUserController extends BaseController {
             query = QueryFilter.build();
             query.setParams(map);
             query.setPageBean(queryFilter.getPageBean());
-            query.addFilter("id",str,QueryOP.IN);
+            query.addFilter("id",str,QueryOP.IN,FieldRelation.AND);
+            query.addFilter("IS_DELE_",1,QueryOP.EQUAL,FieldRelation.AND);
         }else{
             return new PageList<>();
         }

@@ -4,6 +4,7 @@ import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.base.util.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +16,8 @@ import javax.annotation.Resource;
 
 import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.usercenter.service.UcUserService;
+
+import java.util.List;
 
 /**
  * 用户管理
@@ -34,6 +37,14 @@ public class UcUserController extends BaseController {
     @ApiOperation(value = "用户管理数据列表}", httpMethod = "POST", notes = "获取用户管理列表")
     public PageList<UcUser> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
         return this.ucUserService.query(queryFilter);
+    }
+
+    @PostMapping({"/allList"})
+    @ApiOperation(value = "用户管理数据列表}", httpMethod = "POST", notes = "获取用户管理列表")
+    public List<UcUser> allList() {
+        QueryFilter queryFilter = QueryFilter.build();
+        queryFilter.addFilter("IS_DELE_",1, QueryOP.EQUAL);
+        return this.ucUserService.query(queryFilter).getRows();
     }
 
     @GetMapping({"/get/{id}"})
