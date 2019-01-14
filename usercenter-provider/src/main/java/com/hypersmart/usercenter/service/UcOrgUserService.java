@@ -17,5 +17,7 @@ import java.util.List;
 public interface UcOrgUserService extends IGenericService<String, UcOrgUser> {
 
     List<UcOrgUser> getUserOrg(String userId);
+
+    List<String> getPostIdByjobCode(String joCode);
 }
 

@@ -8,12 +8,13 @@ import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.model.UcOrg;
+import com.hypersmart.usercenter.model.UcOrgPost;
 import com.hypersmart.usercenter.model.UcUser;
+import com.hypersmart.usercenter.service.UcOrgPostService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import com.hypersmart.framework.model.ResponseData;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +48,9 @@ public class UcOrgUserController extends BaseController {
     @Resource
     UcOrgService ucOrgService;
 
+    @Resource
+    UcOrgPostService ucOrgPostService;
+
     @PostMapping({"/list"})
     @ApiOperation(value = "用户组织关系数据列表}", httpMethod = "POST", notes = "获取用户组织关系列表")
     public PageList<UcOrgUser> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
@@ -53,20 +58,48 @@ public class UcOrgUserController extends BaseController {
     }
     @PostMapping({"/queryList"})
     @ApiOperation(value = "用户组织关系数据列表}", httpMethod = "POST", notes = "获取用户组织关系列表")
-    public PageList<UcUser> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+    public PageList<Map<String,String>> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
 
         //根据用户信息获取用户所属组织
         IUser user =  ContextUtil.getCurrentUser();
-        List<UcOrgUser> refList = ucOrgUserService.getUserOrg("1012");
-        List<UcOrg> returnList = ucOrgService.getOrg(refList);
-        List<UcOrg> list = new ArrayList<>();
-        List<String> idList = new ArrayList<>();
+        //获取用户组织关系
+        List<UcOrgUser> refList = ucOrgUserService.getUserOrg("461066");
+        String orgIds = "";
+        for(int i=0;i<refList.size();i++){
+            if(i==0){
+                orgIds = refList.get(i).getOrgId();
+            }else{
+                orgIds = orgIds+","+refList.get(i).getOrgId();
+            }
+        }
+        //根据组织id获取组织信息
+        QueryFilter orgQuery = QueryFilter.build();
+        orgQuery.addFilter("id",orgIds,QueryOP.IN);
+        List<UcOrg> returnList = ucOrgService.query(orgQuery).getRows();
+        List<UcOrg> orgList = new ArrayList<>();
+        //判断获取的组织等级
         for(UcOrg ucOrg :returnList){
-            List<UcOrg> orgs = ucOrgService.getChildrenOrg(ucOrg);
-            for(UcOrg org :orgs){
-                if(!idList.contains(org.getId())){
-                    idList.add(org.getId());
-                    list.add(org);
+            //获取当前用户关联组织的第四级别
+            if(ucOrg.getPath().split("\\.").length>6){
+                //不记录当前组织
+                continue;
+            }else if(ucOrg.getPath().split("\\.").length==5){
+                //直接记录--》分期
+                if(!orgList.contains(ucOrg)){
+                    orgList.add(ucOrg);
+                }
+            }else{
+                //根据地块获取分期
+                QueryFilter temp = QueryFilter.build();
+                temp.addFilter("path",ucOrg.getPath(),QueryOP.RIGHT_LIKE);
+                List<UcOrg> tempList = ucOrgService.query(temp).getRows();
+                for(UcOrg vo :tempList){
+                    String[] str = vo.getPath().split("\\.");
+                    if(str.length==5){
+                        if(!orgList.contains(vo)){
+                            orgList.add(vo);
+                        }
+                    }
                 }
             }
         }
@@ -90,46 +123,105 @@ public class UcOrgUserController extends BaseController {
             if(null != ucOrg){
                 List<UcOrg> ucList = ucOrgService.getChildrenOrg(ucOrg);
                 for(int i=0;i<ucList.size();i++){
-                    if(!list.contains(ucList.get(i))){
+                    if(!orgList.contains(ucList.get(i))){
                         ucList.remove(i);
                     }
                 }
-                list = ucList;
+                orgList = ucList;
             }
             queryFilter.setParams(map);
         }
 
         String orgId = "";
-        for(int i=0;i<list.size();i++){
+        for(int i=0;i<orgList.size();i++){
             if(i==0){
-                orgId = list.get(i).getId();
+                orgId = orgList.get(i).getId();
             }else{
-                orgId = orgId + "," + list.get(i).getId();
+                orgId = orgId + "," + orgList.get(i).getId();
             }
         }
-        queryFilter.addFilter("orgId",orgId,QueryOP.IN);
+        queryFilter.addFilter("orgId",orgId,QueryOP.IN,FieldRelation.AND);
+
+        //获取管家的postId
+        List<String> postIds = ucOrgUserService.getPostIdByjobCode("guanjia");
+        String postId = "";
+        Map<String,UcOrgPost> postMap = new HashMap<>();
+        for(int i=0;i<postIds.size();i++){
+            UcOrgPost ucOrgPost = ucOrgPostService.get(postIds.get(i));
+            postMap.put(ucOrgPost.getId(),ucOrgPost);
+            if(i==0){
+                postId = postIds.get(i);
+            }else{
+                postId = postId +","+ postIds.get(i);
+            }
+        }
+        queryFilter.addFilter("posId",postId,QueryOP.IN,FieldRelation.AND);
 
         //根据查询参数查询区域人员关系
-        QueryFilter query = queryFilter;
-        query.setPageBean(null);
         PageList<UcOrgUser> page = this.ucOrgUserService.query(queryFilter);
+
+        orgQuery = QueryFilter.build();
+        orgQuery.addFilter("id",orgId,QueryOP.IN,FieldRelation.AND);
+        List<UcOrg> orgs = ucOrgService.query(orgQuery).getRows();
+        Map<String,UcOrg> orgMaps = new HashMap<>();
+        for(UcOrg ucOrg:orgs){
+            orgMaps.put(ucOrg.getId(),ucOrg);
+        }
+
+        QueryFilter query = QueryFilter.build();
+        //查询出人员与组织的关系
         if(null != page && null != page.getRows() && page.getRows().size()>0){
             String str="";
             for(int i=0;i<page.getRows().size();i++){
                 if(i==0){
+                    str = page.getRows().get(i).getUserId();
+                }else{
                     str = str+","+page.getRows().get(i).getUserId();
                 }
             }
-            query = QueryFilter.build();
             query.setParams(map);
             query.setPageBean(queryFilter.getPageBean());
             query.addFilter("id",str,QueryOP.IN,FieldRelation.AND);
-            query.addFilter("IS_DELE_",1,QueryOP.EQUAL,FieldRelation.AND);
+            query.addFilter("IS_DELE_",0,QueryOP.EQUAL,FieldRelation.AND);
         }else{
             return new PageList<>();
         }
-        //根据人员id获取管家列表
-        return this.ucUserService.query(query);
+        //查询人员
+        PageList<UcUser> userPage = this.ucUserService.query(query);
+        Map<String,UcUser> userMap = new HashMap<>();
+        for(UcUser ucUser :userPage.getRows()){
+            userMap.put(ucUser.getId(),ucUser);
+        }
+
+        //循环人员与组织关系
+        List<Map<String,String>> list = new ArrayList<>();
+        for(int i=0;i<page.getRows().size();i++){
+           Map<String,String> returnMap = new HashMap<>();
+           UcOrgUser ucOrgUser = page.getRows().get(i);
+           UcUser ucUser = userMap.get(ucOrgUser.getUserId());
+           UcOrg ucOrg = orgMaps.get(ucOrgUser.getOrgId());
+           UcOrgPost post = postMap.get(ucOrgUser.getPosId());
+            if(null != ucUser && null !=ucOrg && null != post){
+                returnMap.put("id",ucUser.getId());
+                returnMap.put("account",ucUser.getAccount());
+                returnMap.put("houseKeeperName",ucUser.getFullname());
+                returnMap.put("mobilePhone",ucUser.getMobile());
+                returnMap.put("divideId",ucOrg.getId());
+                returnMap.put("divide",ucOrg.getName());
+                String str[] = ucOrg.getPathName().split("/");
+                returnMap.put("area",str[1]);
+                returnMap.put("project",str[2]);
+                returnMap.put("plot",str[3]);
+                returnMap.put("level",post.getPosName());
+                list.add(returnMap);
+            }
+        }
+        PageList<Map<String,String>> pageList = new PageList<>();
+        pageList.setTotal(page.getPage());
+        pageList.setTotal(page.getTotal());
+        pageList.setPageSize(page.getPageSize());
+        pageList.setRows(list);
+        return pageList;
     }
 
     @GetMapping({"/get/{id}"})

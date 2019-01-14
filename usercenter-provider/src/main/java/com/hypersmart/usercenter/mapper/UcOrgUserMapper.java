@@ -18,4 +18,6 @@ import java.util.List;
 public interface UcOrgUserMapper extends GenericMapper<UcOrgUser> {
 
     List<UcOrgUser> getUserOrg(@Param("userId") String userId);
+
+    List<String> getPostIdByjobCode(@Param("code") String joCode);
 }

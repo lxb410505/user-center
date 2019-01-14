@@ -46,7 +46,7 @@ public class UcOrgController extends BaseController {
         //获取当前用户
         IUser user =  ContextUtil.getCurrentUser();
         //根据用户查询人与组织关系
-        List<UcOrgUser> list = ucOrgUserService.getUserOrg("981011");
+        List<UcOrgUser> list = ucOrgUserService.getUserOrg("1012");
         String orgIds = "";
         for(int i=0;i<list.size();i++){
             if(i==0){
@@ -60,20 +60,23 @@ public class UcOrgController extends BaseController {
         orgQuery.addFilter("id",orgIds,QueryOP.IN);
         List<UcOrg> returnList = ucOrgService.query(orgQuery).getRows();
         //根据组织获取子级
-        List<UcOrg> set = returnList;
+        List<UcOrg> set = new ArrayList<>();
         for(UcOrg ucOrg :returnList){
             QueryFilter childQuery = QueryFilter.build();
             childQuery.addFilter("path",ucOrg.getPath(), QueryOP.RIGHT_LIKE);
             List<UcOrg> orgs = ucOrgService.query(childQuery).getRows();
             for(UcOrg org :orgs){
-                if(!returnList.contains(org)){
+                if(!set.contains(org)){
                     set.add(org);
                 }
             }
         }
-        List<UcOrg> tempList = set;
+        List<UcOrg> tempList = new ArrayList<>();
+        for(UcOrg ucOrg :set){
+            tempList.add(ucOrg);
+        }
         //根据组织查询父级组织
-        for(UcOrg ucOrg : tempList){
+        for(UcOrg ucOrg : set){
             String [] paths = ucOrg.getPath().split(".");
             for(int i=0;i<paths.length;i++){
                 String path = "";
@@ -89,18 +92,18 @@ public class UcOrgController extends BaseController {
                 List<UcOrg> voList = ucOrgService.query(query).getRows();
                 for(UcOrg vo:voList){
                     if(!set.contains(vo)){
-                        set.add(vo);
+                        tempList.add(vo);
                     }
                 }
             }
         }
         //拼接组织id
         String str = "";
-        for(int i=0;i<set.size();i++){
+        for(int i=0;i<tempList.size();i++){
             if(i==0){
-                str = set.get(i).getId();
+                str = tempList.get(i).getId();
             }else{
-                str = str + "," + set.get(i).getId();
+                str = str + "," + tempList.get(i).getId();
             }
         }
         queryFilter.addFilter("id",str, QueryOP.IN,FieldRelation.AND);

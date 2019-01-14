@@ -24,4 +24,11 @@
         where USER_ID_ = #{userId}
     </select>
 
+    <select id="getPostIdByjobCode" resultType="java.lang.String">
+        select p.ID_
+        from uc_org_post p
+        join  uc_org_job j on p.JOB_ID_ = j.ID_
+        where j.CODE_ = #{code}
+    </select>
+
 </mapper>

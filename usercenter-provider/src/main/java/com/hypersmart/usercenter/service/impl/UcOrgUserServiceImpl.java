@@ -32,4 +32,9 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
     public List<UcOrgUser> getUserOrg(String userId) {
         return ucOrgUserMapper.getUserOrg(userId);
     }
+
+    @Override
+    public List<String> getPostIdByjobCode(String joCode) {
+        return ucOrgUserMapper.getPostIdByjobCode(joCode);
+    }
 }
