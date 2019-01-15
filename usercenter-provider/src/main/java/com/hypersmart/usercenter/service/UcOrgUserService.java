@@ -5,6 +5,7 @@ import com.hypersmart.framework.service.IGenericService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户组织关系
@@ -19,5 +20,7 @@ public interface UcOrgUserService extends IGenericService<String, UcOrgUser> {
     List<UcOrgUser> getUserOrg(String userId);
 
     List<String> getPostIdByjobCode(String joCode);
+
+    List<Map<String,String>> quertList(Map<String,String> map);
 }
 

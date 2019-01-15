@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户组织关系
@@ -20,4 +21,6 @@ public interface UcOrgUserMapper extends GenericMapper<UcOrgUser> {
     List<UcOrgUser> getUserOrg(@Param("userId") String userId);
 
     List<String> getPostIdByjobCode(@Param("code") String joCode);
+
+    List<Map<String, String>> quertList(Map<String, String> map);
 }

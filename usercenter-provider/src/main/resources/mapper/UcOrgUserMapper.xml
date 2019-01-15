@@ -31,4 +31,34 @@
         where j.CODE_ = #{code}
     </select>
 
+    <select id="quertList" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT * from (
+        select u.ID_ as houseKeeperId,
+        uou.ID_ as id,
+        u.FULLNAME_ as fullName,u.MOBILE_ mobile,u.ACCOUNT_ as account,post.ID_ as `postId`,post.POS_NAME_ as posName,
+        org_lv4.NAME_ as area,
+        org_lv3.NAME_ as project,
+        org_lv2.NAME_ as plot,
+        org.NAME_ as divide,
+        org_lv4.ID_ as areaId,
+        org_lv3.ID_ as projectId,
+        org_lv2.ID_ as plotId,
+        org.ID_ as divideId
+        from uc_user u
+        join uc_org_user uou on u.ID_ = uou.USER_ID_
+        join uc_org org on uou.ORG_ID_ = org.ID_
+        join uc_org org_lv2 on org.PARENT_ID_ = org_lv2.ID_
+        join uc_org org_lv3 on org_lv2.PARENT_ID_ = org_lv3.ID_
+        join uc_org org_lv4 on org_lv3.PARENT_ID_ = org_lv4.ID_
+        join uc_org_post post on uou.POS_ID_ =  post.ID_ ) a
+        <where>
+            <if test="whereSql!=null">
+                ${whereSql}
+            </if>
+        </where>
+        <if test="orderBySql!=null">
+            ORDER BY ${orderBySql}
+        </if>
+    </select>
+
 </mapper>

@@ -101,3 +101,6 @@ system:
     path: e:\attachment
   bpm:
     engineName: eip7
+
+grid:
+  code: guanjia

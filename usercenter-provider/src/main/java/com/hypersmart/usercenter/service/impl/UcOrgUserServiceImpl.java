@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户组织关系
@@ -36,5 +37,10 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
     @Override
     public List<String> getPostIdByjobCode(String joCode) {
         return ucOrgUserMapper.getPostIdByjobCode(joCode);
+    }
+
+    @Override
+    public List<Map<String, String>> quertList(Map<String, String> map) {
+        return ucOrgUserMapper.quertList(map);
     }
 }
