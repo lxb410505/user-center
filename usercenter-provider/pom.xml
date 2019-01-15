@@ -16,6 +16,11 @@
     <name>usercenter-provider</name>
     <description>usercenter-provider</description>
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
         <!-- Spring boot 测试 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

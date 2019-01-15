@@ -140,6 +140,9 @@ public class UcOrgUserController extends BaseController {
                 orgId = orgId + "," + orgList.get(i).getId();
             }
         }
+        if("".equals(orgId)){
+            return new PageList<>();
+        }
         queryFilter.addFilter("orgId",orgId,QueryOP.IN,FieldRelation.AND);
 
         //获取管家的postId
@@ -154,6 +157,9 @@ public class UcOrgUserController extends BaseController {
             }else{
                 postId = postId +","+ postIds.get(i);
             }
+        }
+        if("".equals(postId)){
+            return new PageList<>();
         }
         queryFilter.addFilter("posId",postId,QueryOP.IN,FieldRelation.AND);
 
@@ -202,7 +208,8 @@ public class UcOrgUserController extends BaseController {
            UcOrg ucOrg = orgMaps.get(ucOrgUser.getOrgId());
            UcOrgPost post = postMap.get(ucOrgUser.getPosId());
             if(null != ucUser && null !=ucOrg && null != post){
-                returnMap.put("id",ucUser.getId());
+                returnMap.put("id",ucOrgUser.getId());
+                returnMap.put("houseKeeperId",ucUser.getId());
                 returnMap.put("account",ucUser.getAccount());
                 returnMap.put("houseKeeperName",ucUser.getFullname());
                 returnMap.put("mobilePhone",ucUser.getMobile());

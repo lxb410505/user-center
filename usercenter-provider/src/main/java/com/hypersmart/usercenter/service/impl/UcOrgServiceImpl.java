@@ -20,7 +20,8 @@ import java.util.List;
 @Service("ucOrgServiceImpl")
 public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements UcOrgService {
 
-    private UcOrgMapper ucOrgMapper;
+    @Autowired
+    UcOrgMapper ucOrgMapper;
 
     public UcOrgServiceImpl(UcOrgMapper mapper) {
         super(mapper);
