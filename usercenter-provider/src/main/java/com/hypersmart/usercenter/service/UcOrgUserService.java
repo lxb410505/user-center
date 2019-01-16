@@ -1,5 +1,7 @@
 package com.hypersmart.usercenter.service;
 
+import com.hypersmart.base.query.PageList;
+import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.framework.service.IGenericService;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,6 @@ public interface UcOrgUserService extends IGenericService<String, UcOrgUser> {
 
     List<String> getPostIdByjobCode(String joCode);
 
-    List<Map<String,String>> quertList(Map<String,String> map);
+    PageList<Map<String,Object>> quertList(QueryFilter queryFilter);
 }
 
