@@ -22,5 +22,4 @@ public interface UcOrgUserMapper extends GenericMapper<UcOrgUser> {
 
     List<String> getPostIdByjobCode(@Param("code") String joCode);
 
-    List<Map<String, Object>> quertList(Map<String, Object> map);
 }

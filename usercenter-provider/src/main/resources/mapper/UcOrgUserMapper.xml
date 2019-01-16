@@ -31,42 +31,4 @@
         where j.CODE_ = #{code}
     </select>
 
-    <select id="quertList" parameterType="java.util.Map" resultType="java.util.Map">
-        SELECT * from (
-        select
-        u.ID_ AS houseKeeperId,
-        uou.ID_ AS id,
-        u.FULLNAME_ AS fullName,
-        u.MOBILE_ AS mobile,
-        u.ACCOUNT_ AS account,
-        post.ID_ AS `postId`,
-        post.POS_NAME_ AS posName,
-        org_lv4.NAME_ AS areaName,
-        org_lv3.NAME_ AS projectName,
-        org_lv2.NAME_ AS plotName,
-        org.NAME_ AS divideName,
-        org_lv4.ID_ AS areaId,
-        org_lv3.ID_ AS projectId,
-        org_lv2.ID_ AS plotId,
-        org.ID_ AS divideId
-        from uc_user u
-        join uc_org_user uou on u.ID_ = uou.USER_ID_
-        join uc_org org on uou.ORG_ID_ = org.ID_
-        join uc_org org_lv2 on org.PARENT_ID_ = org_lv2.ID_
-        join uc_org org_lv3 on org_lv2.PARENT_ID_ = org_lv3.ID_
-        join uc_org org_lv4 on org_lv3.PARENT_ID_ = org_lv4.ID_
-        join uc_org_post post on uou.POS_ID_ =  post.ID_
-        join uc_org_job uoj on post.JOB_ID_ = uoj.ID_
-        join uc_demension dem on org.DEM_ID_ = dem.ID_ and  org_lv2.DEM_ID_ = dem.ID_ and  org_lv3.DEM_ID_ = dem.ID_ and  org_lv4.DEM_ID_ = dem.ID_
-        where uoj.CODE_ = 'guanjia' and dem.CODE_ = 'smsf' and org.LEVEL_ = 4) a
-        <where>
-            <if test="whereSql!=null">
-                ${whereSql}
-            </if>
-        </where>
-        <if test="orderBySql!=null">
-            ORDER BY ${orderBySql}
-        </if>
-    </select>
-
 </mapper>

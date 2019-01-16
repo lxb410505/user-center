@@ -4,6 +4,9 @@ import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.framework.mapper.GenericMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * 用户管理
  * 
@@ -14,4 +17,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UcUserMapper extends GenericMapper<UcUser> {
 
+    List<Map<String, Object>> quertList(Map<String, Object> map);
 }
