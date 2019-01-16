@@ -6,8 +6,8 @@ spring:
       maxFileSize: 100MB
       maxRequestSize: 1024MB
   datasource:
-    name: dev
-    url: jdbc:mysql://172.16.0.108:3306/x7_uc_dev?serverTimezone=UTC&useSSL=false&&characterEncoding=UTF-8
+    name: ${spring.profiles.active}
+    url: jdbc:mysql://db.ldnext.com:3306/x7_uc_dev?serverTimezone=UTC&useSSL=false&&characterEncoding=UTF-8
     username: root
     password: 5tgbNHY^
     # 使用druid数据源

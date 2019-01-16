@@ -14,9 +14,7 @@ import com.hypersmart.usercenter.service.UcOrgUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 用户组织关系
@@ -76,18 +74,32 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         QueryFilter queryOrg = QueryFilter.build();
         if(null != ucOrgUsersList && ucOrgUsersList.size()>0){
             queryOrg.addFilter("id",orgIds,QueryOP.IN,FieldRelation.AND);
-            queryOrg.addFilter("level",4,QueryOP.EQUAL,FieldRelation.AND);
+//            queryOrg.addFilter("level",4,QueryOP.EQUAL,FieldRelation.AND);
         }else{
             return new PageList<>();
         }
         PageList<UcOrg> orgList =  ucOrgService.query(queryOrg);
-        if(null != orgList.getRows() && orgList.getRows().size()>0){
+        Map<String,UcOrg> map = new HashMap<>();
+        for(UcOrg ucOrg:orgList.getRows()){
+            QueryFilter ucorgQuery = QueryFilter.build();
+            ucorgQuery.addFilter("path",ucOrg.getPath(),QueryOP.RIGHT_LIKE,FieldRelation.AND);
+            ucorgQuery.addFilter("level",4,QueryOP.EQUAL,FieldRelation.AND);
+            PageList<UcOrg> divideList = ucOrgService.query(ucorgQuery);
+            if(null != divideList && null != divideList.getRows() && divideList.getRows().size()>0){
+                for(int i=0;i< divideList.getRows().size();i++){
+                    UcOrg temp = divideList.getRows().get(i);
+                    map.put(temp.getId(),temp);
+                }
+            }
+        }
+        Set<String> set = map.keySet();
+        if(null != set && set.size()>0){
             String divideId = "";
-            for(int i=0;i<orgList.getRows().size();i++){
-                if(i==0){
-                    divideId = orgList.getRows().get(i).getId();
+            for(String index: set){
+                if("".equals(divideId)){
+                    divideId = index;
                 }else{
-                    divideId = divideId +","+ orgList.getRows().get(i).getId();
+                    divideId = divideId +","+ index;
                 }
             }
             queryFilter.addFilter("divideId", divideId, QueryOP.IN, FieldRelation.AND);

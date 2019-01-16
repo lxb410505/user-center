@@ -46,7 +46,7 @@ public class UcOrgController extends BaseController {
         //获取当前用户
         IUser user =  ContextUtil.getCurrentUser();
         //根据用户查询人与组织关系
-        List<UcOrgUser> list = ucOrgUserService.getUserOrg("1012");
+        List<UcOrgUser> list = ucOrgUserService.getUserOrg(user.getUserId());
         String orgIds = "";
         for(int i=0;i<list.size();i++){
             if(i==0){

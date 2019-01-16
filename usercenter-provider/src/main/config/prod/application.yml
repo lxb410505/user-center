@@ -4,8 +4,8 @@ spring:
   application: 
     name: bpm-model-eureka
   datasource: 
-    name: prod
-    url: jdbc:mysql://172.16.0.54:3306/x7_bpm_prod?serverTimezone=UTC&useSSL=false&&characterEncoding=UTF-8
+    name: ${spring.profiles.active}
+    url: jdbc:mysql://db.ldnext.com:3306/x7_bpm_prod?serverTimezone=UTC&useSSL=false&&characterEncoding=UTF-8
     username: root
     password: 5tgbNHY^
     # 使用druid数据源
