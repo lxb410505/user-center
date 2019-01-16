@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hypersmart.grid.mapper.GridBasicInfoHistoryAfterMapper">
+    <resultMap id="BaseResultMap" type="com.hypersmart.usercenter.model.GridBasicInfoHistoryAfter">
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="grid_history_id" jdbcType="VARCHAR" property="gridHistoryId" />
+        <result column="grid_id" jdbcType="VARCHAR" property="gridId" />
+        <result column="grid_code" jdbcType="VARCHAR" property="gridCode" />
+        <result column="grid_name" jdbcType="VARCHAR" property="gridName" />
+        <result column="grid_type" jdbcType="VARCHAR" property="gridType" />
+        <result column="grid_range" jdbcType="OTHER" property="gridRange" />
+        <result column="grid_remark" jdbcType="VARCHAR" property="gridRemark" />
+        <result column="area_id" jdbcType="VARCHAR" property="areaId" />
+        <result column="area_code" jdbcType="VARCHAR" property="areaCode" />
+        <result column="area_name" jdbcType="VARCHAR" property="areaName" />
+        <result column="project_id" jdbcType="VARCHAR" property="projectId" />
+        <result column="project_code" jdbcType="VARCHAR" property="projectCode" />
+        <result column="project_name" jdbcType="VARCHAR" property="projectName" />
+        <result column="massif_id" jdbcType="VARCHAR" property="massifId" />
+        <result column="massif_code" jdbcType="VARCHAR" property="massifCode" />
+        <result column="massif_name" jdbcType="VARCHAR" property="massifName" />
+        <result column="staging_id" jdbcType="VARCHAR" property="stagingId" />
+        <result column="staging_code" jdbcType="VARCHAR" property="stagingCode" />
+        <result column="staging_name" jdbcType="VARCHAR" property="stagingName" />
+        <result column="housekeeper_history_id" jdbcType="VARCHAR" property="housekeeperHistoryId" />
+        <result column="format_attribute" jdbcType="VARCHAR" property="formatAttribute" />
+        <result column="creation_date" jdbcType="TIMESTAMP" property="creationDate" />
+        <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+        <result column="updation_date" jdbcType="TIMESTAMP" property="updationDate" />
+        <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+        <result column="row_time" jdbcType="TIMESTAMP" property="rowTime" />
+        <result column="row_version" jdbcType="TIMESTAMP" property="rowVersion" />
+        <result column="tenant_id" jdbcType="VARCHAR" property="tenantId" />
+        <result column="enabled_flag" jdbcType="TINYINT" property="enabledFlag" />
+        <result column="is_deleted" jdbcType="TINYINT" property="isDeleted" />
+        <result column="spare_column_id" jdbcType="VARCHAR" property="spareColumnId" />
+        <result column="spare_column_code" jdbcType="VARCHAR" property="spareColumnCode" />
+        <result column="spare_column_name" jdbcType="VARCHAR" property="spareColumnName" />
+    </resultMap>
+    <sql id="BaseTable">
+    grid_basic_info_history_after
+    </sql>
+    <!--<sql id="BaseColumns">-->
+    <!--</sql>-->
+    <!--<sql id="GenerationType">-->
+    <!--DB_UUID ( select replace(uuid(),'-','') from dual )-->
+    <!--</sql>-->
+
+    <select id="findDataByGridId" resultMap="BaseResultMap">
+        select a.*
+        from <include refid="BaseTable" /> a
+        where a.grid_id = #{gridId}
+        and a.enabled_flag = 1
+        and a.is_deleted = 0
+        order by a.creation_date desc
+        limit 1;
+    </select>
+</mapper>
