@@ -7,6 +7,7 @@ import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
+import com.hypersmart.usercenter.mapper.UcUserMapper;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.UcOrgService;
