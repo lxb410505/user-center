@@ -47,6 +47,9 @@ public class UcOrgController extends BaseController {
         IUser user =  ContextUtil.getCurrentUser();
         //根据用户查询人与组织关系
         List<UcOrgUser> list = ucOrgUserService.getUserOrg(user.getUserId());
+        if(null==list || list.size()<=0){
+            return new ArrayList<>();
+        }
         String orgIds = "";
         for(int i=0;i<list.size();i++){
             if(i==0){
@@ -105,6 +108,9 @@ public class UcOrgController extends BaseController {
             }else{
                 str = str + "," + tempList.get(i).getId();
             }
+        }
+        if("".equals(str)){
+            return new ArrayList<>();
         }
         queryFilter.addFilter("id",str, QueryOP.IN,FieldRelation.AND);
         if(null != map && null != map.get("parentId")) {

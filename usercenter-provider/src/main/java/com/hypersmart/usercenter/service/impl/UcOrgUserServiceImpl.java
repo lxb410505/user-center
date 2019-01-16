@@ -7,6 +7,7 @@ import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
+import com.hypersmart.usercenter.mapper.UcUserMapper;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.UcOrgService;
@@ -28,6 +29,9 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
 
     @Autowired
     UcOrgUserMapper ucOrgUserMapper;
+
+    @Autowired
+    UcUserMapper ucUserMapper;
 
     @Autowired
     UcOrgService ucOrgService;
@@ -74,7 +78,6 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         QueryFilter queryOrg = QueryFilter.build();
         if(null != ucOrgUsersList && ucOrgUsersList.size()>0){
             queryOrg.addFilter("id",orgIds,QueryOP.IN,FieldRelation.AND);
-//            queryOrg.addFilter("level",4,QueryOP.EQUAL,FieldRelation.AND);
         }else{
             return new PageList<>();
         }
@@ -83,7 +86,7 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         for(UcOrg ucOrg:orgList.getRows()){
             QueryFilter ucorgQuery = QueryFilter.build();
             ucorgQuery.addFilter("path",ucOrg.getPath(),QueryOP.RIGHT_LIKE,FieldRelation.AND);
-            ucorgQuery.addFilter("level",4,QueryOP.EQUAL,FieldRelation.AND);
+            ucorgQuery.addFilter("level",5,QueryOP.EQUAL,FieldRelation.AND);
             PageList<UcOrg> divideList = ucOrgService.query(ucorgQuery);
             if(null != divideList && null != divideList.getRows() && divideList.getRows().size()>0){
                 for(int i=0;i< divideList.getRows().size();i++){
@@ -102,7 +105,7 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
                     divideId = divideId +","+ index;
                 }
             }
-            queryFilter.addFilter("divideId", divideId, QueryOP.IN, FieldRelation.AND);
+            queryFilter.addFilter("divideId", divideId, QueryOP.IN, FieldRelation.AND,"two");
         }else{
             return new PageList<>();
         }
@@ -122,9 +125,7 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
             PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
                     pageBean.showTotal());
         }
-        List<Map<String,Object>> query = this.ucOrgUserMapper.quertList(queryFilter.getParams());
-        return new PageList(query);
-
-
+        List<Map<String,Object>> query = this.ucUserMapper.quertList(queryFilter.getParams());
+        return new PageList<>(query);
     }
 }
