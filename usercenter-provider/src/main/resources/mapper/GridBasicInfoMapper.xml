@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.hypersmart.grid.mapper.GridBasicInfoMapper">
+<mapper namespace="com.hypersmart.usercenter.mapper.GridBasicInfoMapper">
     <resultMap id="DtoResultMap" type="com.hypersmart.usercenter.dto.GridBasicInfoDTO">
         <id column="id" jdbcType="VARCHAR" property="id" />
         <result column="grid_code" jdbcType="VARCHAR" property="gridCode" />
@@ -104,7 +104,7 @@
     <select id="quertList" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT * from (
         select
-        g.id as gridId,
+        g.id as id,
         g.grid_code AS  gridCode,
         g.grid_name AS gridName,
         g.grid_type AS gridType,

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.hypersmart.grid.mapper.GridBasicInfoHistoryAfterMapper">
+<mapper namespace="com.hypersmart.usercenter.mapper.GridBasicInfoHistoryAfterMapper">
     <resultMap id="BaseResultMap" type="com.hypersmart.usercenter.model.GridBasicInfoHistoryAfter">
         <id column="id" jdbcType="VARCHAR" property="id" />
         <result column="grid_history_id" jdbcType="VARCHAR" property="gridHistoryId" />
