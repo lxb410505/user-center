@@ -12,7 +12,9 @@ import com.hypersmart.usercenter.constant.GridTypeConstants;
 import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
 import com.hypersmart.usercenter.mapper.GridBasicInfoMapper;
+import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
 import com.hypersmart.usercenter.model.GridBasicInfo;
+import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.GridBasicInfoHistoryService;
 import com.hypersmart.usercenter.service.GridBasicInfoService;
@@ -53,7 +55,11 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
     private UcOrgUserFeign ucOrgUserFeign;
 
     @Autowired
+    UcOrgUserMapper ucOrgUserMapper;
+
+    @Autowired
     UcOrgService ucOrgService;
+
 
     public GridBasicInfoServiceImpl(GridBasicInfoMapper mapper) {
         super(mapper);
@@ -72,7 +78,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         //1、根据用户信息获取用户所属组织
         IUser user = ContextUtil.getCurrentUser();
         //获取用户组织关系
-        List<UcOrgUser> ucOrgUsersList = this.getUserOrg(user.getUserId());
+        List<UcOrgUser> ucOrgUsersList = this.ucOrgUserMapper.getUserOrg(user.getUserId());
 
         //2、查找ucOrgUsersList 对应的组织下的分期，将分期id的集合作为quertList的条件。
         String orgIds = "";
@@ -175,11 +181,12 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 orgIdList.add(gridBasicInfo.getProjectId());
                 orgIdList.add(gridBasicInfo.getMassifId());
                 orgIdList.add(gridBasicInfo.getStagingId());
-                if (!StringUtils.isEmpty(gridBasicInfo.getCityId()))
+                if (!StringUtils.isEmpty(gridBasicInfo.getCityId())) {
                     //存储管家id集合
                     if (!StringUtils.isEmpty(gridBasicInfo.getHousekeeperId())) {
                         housekeeperIdList.add(gridBasicInfo.getHousekeeperId());
                     }
+                }
             }
         }
         //管家入参
