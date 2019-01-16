@@ -123,7 +123,7 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
                     pageBean.showTotal());
         }
         List<Map<String,Object>> query = this.ucOrgUserMapper.quertList(queryFilter.getParams());
-        return new PageList(query);
+        return new PageList<>(query);
 
 
     }
