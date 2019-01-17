@@ -104,11 +104,11 @@
     <select id="quertList" parameterType="java.util.Map" resultType="java.util.Map">
         select * from (
         select g.id as id,
-        g.grid_range as rank,
-        g.grid_name as girdName,
-        g.grid_type as girdType,
+        g.grid_range as gridRange,
+        g.grid_name as gridName,
+        g.grid_type as gridType,
         g.grid_code as gridCode,
-        g.grid_remark as remark,
+        g.grid_remark as gridRemark,
         g.area_id as areaId,
         g.project_id as projectId,
         g.city_id as cityId,
@@ -123,7 +123,7 @@
         (select org.NAME_ from uc_org org where ID_ = g.city_id) as cityName,
         (select org.NAME_ from uc_org org where ID_ = g.massif_id) as massifName,
         (select org.NAME_ from uc_org org where ID_ = g.staging_id) as stagingName,
-        k.fullName as fullName
+        k.fullName as housekeeperName
         from grid_basic_info g LEFT JOIN (SELECT
         u.ID_ AS houseKeeperId,
         uou.ID_ AS id,
