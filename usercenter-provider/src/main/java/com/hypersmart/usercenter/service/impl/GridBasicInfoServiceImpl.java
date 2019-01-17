@@ -1,5 +1,7 @@
 package com.hypersmart.usercenter.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.query.*;
@@ -11,9 +13,11 @@ import com.hypersmart.usercenter.constant.GridErrorCode;
 import com.hypersmart.usercenter.constant.GridTypeConstants;
 import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
+import com.hypersmart.usercenter.dto.GridRangeInfo;
 import com.hypersmart.usercenter.mapper.GridBasicInfoMapper;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
 import com.hypersmart.usercenter.model.GridBasicInfo;
+import com.hypersmart.usercenter.model.GridRange;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.GridBasicInfoHistoryService;
@@ -22,6 +26,7 @@ import com.hypersmart.mdm.feign.UcOrgFeignService;
 import com.hypersmart.mdm.feign.UcOrgUserFeign;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
+import com.hypersmart.usercenter.service.GridRangeService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,6 +64,9 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
     @Autowired
     UcOrgService ucOrgService;
+
+    @Autowired
+    GridRangeService gridRangeService;
 
 
     public GridBasicInfoServiceImpl(GridBasicInfoMapper mapper) {
@@ -151,13 +159,6 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
      */
     @Override
     public PageList<GridBasicInfoDTO> selectGridBasicInfo(QueryFilter queryFilter) {
-//        QueryField queryFieldInit = new QueryField();
-//        queryFieldInit.setProperty("isDeleted");
-//        queryFieldInit.setValue(0);
-//        queryFieldInit.setOperation(QueryOP.EQUAL);
-//        queryFieldInit.setRelation(FieldRelation.AND);
-//        queryFilter.getQuerys().add(queryFieldInit);
-
 
         queryFilter.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND);
 
@@ -332,6 +333,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         gridBasicInfoDTO.setGridCode(gridBasicInfo.getGridCode());
         gridBasicInfoDTO.setGridType(gridBasicInfo.getGridType());
         gridBasicInfoDTO.setGridRemark(gridBasicInfo.getGridRemark());
+        gridBasicInfoDTO.setGridRange(gridBasicInfo.getGridRange());
         gridBasicInfoDTO.setFormatAttribute(gridBasicInfo.getFormatAttribute());
         gridBasicInfoDTO.setHousekeeperId(gridBasicInfo.getHousekeeperId());
         gridBasicInfoDTO.setCreatedBy(gridBasicInfo.getCreatedBy());
@@ -381,8 +383,15 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
             gridBasicInfo.setFormatAttribute(gridBasicInfoDTO.getFormatAttribute());
             gridBasicInfo.setCreationDate(new Date());
             gridBasicInfo.setUpdationDate(new Date());
+            //网格范围
+            gridBasicInfo.setGridRange(gridBasicInfoDTO.getGridRange());
             //新增
             num = this.insertSelective(gridBasicInfo);
+            //网格覆盖范围表记录
+            if(GridTypeConstants.BUILDING_GRID.equals(gridBasicInfoDTO.getGridType()) && !StringUtils.isEmpty(gridBasicInfoDTO.getGridRange())) {
+                //记录数据
+                gridRangeService.recordRange(gridBasicInfoDTO.getGridRange(),gridBasicInfo.getId());
+            }
         }
         if (num < 1) {
             gridErrorCode = GridErrorCode.INSERT_EXCEPTION;
@@ -475,6 +484,14 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         gridBasicInfo.setUpdateTimes(gridBasicInfoOld.getUpdateTimes() + 1);
         gridBasicInfo.setUpdationDate(new Date());
         num = this.updateSelective(gridBasicInfo);
+
+        //网格覆盖范围表记录
+        if(!StringUtils.isEmpty(gridBasicInfoDTO.getGridRange())) {
+            //删除旧的网格覆盖范围数据
+            gridRangeService.deleteRangeByGridId(gridBasicInfoDTO.getId());
+            //记录数据
+            gridRangeService.recordRange(gridBasicInfoDTO.getGridRange(),gridBasicInfoDTO.getId());
+        }
         if (num < 1) {
             gridErrorCode = GridErrorCode.UPDATE_EXCEPTION;
         }
@@ -513,6 +530,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 if (gridBasicInfoOld.getEnabledFlag().equals(1)) {
                     gridBasicInfoList.add(gridBasicInfo);
                 }
+                //删除旧的网格覆盖范围数据
+                gridRangeService.deleteRangeByGridId(gridBasicInfoBO.getId());
             }
         }
         //批量更新
@@ -557,6 +576,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 if (gridBasicInfoOld.getIsDeleted().equals(0)) {
                     gridBasicInfoList.add(gridBasicInfo);
                 }
+                //删除旧的网格覆盖范围数据
+                gridRangeService.deleteRangeByGridId(gridBasicInfoBO.getId());
             }
         }
         //批量更新
