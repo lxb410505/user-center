@@ -102,44 +102,49 @@
     </select>
 
     <select id="quertList" parameterType="java.util.Map" resultType="java.util.Map">
-        SELECT * from (
-        select
-        g.id as id,
-        g.grid_code AS  gridCode,
-        g.grid_name AS gridName,
-        g.grid_type AS gridType,
-        g.grid_remark AS gridRemark,
-        g.format_attribute AS formatAttribute,
+        select * from (
+        select g.id as id,
+        g.grid_range as rank,
+        g.grid_name as girdName,
+        g.grid_type as girdType,
+        g.grid_code as gridCode,
+        g.grid_remark as remark,
+        g.area_id as areaId,
+        g.project_id as projectId,
+        g.city_id as cityId,
+        g.massif_id as massifId,
+        g.staging_id as stagingId,
+        g.staging_id as divideId,
+        g.housekeeper_id as housekeeperId,
+        g.format_attribute as formatAttribute,
+        g.enabled_flag as enabledFlag,
+        (select org.NAME_ from uc_org org where ID_ = g.area_id) as areaName,
+        (select org.NAME_ from uc_org org where ID_ = g.project_id) as projectName,
+        (select org.NAME_ from uc_org org where ID_ = g.city_id) as cityName,
+        (select org.NAME_ from uc_org org where ID_ = g.massif_id) as massifName,
+        (select org.NAME_ from uc_org org where ID_ = g.staging_id) as stagingName,
+        k.fullName as fullName
+        from grid_basic_info g LEFT JOIN (SELECT
         u.ID_ AS houseKeeperId,
+        uou.ID_ AS id,
         u.FULLNAME_ AS fullName,
         u.MOBILE_ AS mobile,
         u.ACCOUNT_ AS account,
         post.ID_ AS `postId`,
         post.POS_NAME_ AS posName,
-        org_lv5.NAME_ AS areaName,
-        org_lv4.NAME_ AS cityNamme,
-        org_lv3.NAME_ AS projectName,
-        org_lv2.NAME_ AS plotName,
         org.NAME_ AS divideName,
-        org_lv5.ID_ AS areaId,
-        org_lv4.ID_ AS cityId,
-        org_lv3.ID_ AS projectId,
-        org_lv2.ID_ AS plotId,
         org.ID_ AS divideId
-        from grid_basic_info g
-        join uc_user u on g.housekeeper_id = u.ID_
-        join uc_org_user uou on u.ID_ = uou.USER_ID_
-        join uc_org org on uou.ORG_ID_ = org.ID_
-        join uc_org org_lv2 on org.PARENT_ID_ = org_lv2.ID_
-        join uc_org org_lv3 on org_lv2.PARENT_ID_ = org_lv3.ID_
-        join uc_org org_lv4 on org_lv3.PARENT_ID_ = org_lv4.ID_
-        join uc_org org_lv5 on org_lv4.PARENT_ID_ = org_lv5.ID_
-        join uc_org_post post on uou.POS_ID_ =  post.ID_
-        join uc_org_job uoj on post.JOB_ID_ = uoj.ID_
-        join uc_demension dem on org.DEM_ID_ = dem.ID_ and  org_lv2.DEM_ID_ = dem.ID_ and  org_lv3.DEM_ID_ = dem.ID_
-
-        and  org_lv4.DEM_ID_ = dem.ID_ and org_lv5.DEM_ID_ = dem.ID_
-        where uoj.CODE_ = 'guanjia' and dem.CODE_ = 'smsf' and org.LEVEL_ = 5) a
+        FROM
+        uc_user u
+        JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+        JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
+        JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
+        JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
+        WHERE
+        uoj.CODE_ = 'guanjia'
+        AND dem.CODE_ = 'smsf'
+        AND org.LEVEL_ = 5) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
