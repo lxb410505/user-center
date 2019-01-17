@@ -1,7 +1,10 @@
 package com.hypersmart.usercenter.service;
 
+import com.hypersmart.usercenter.bo.GridRangeBO;
 import com.hypersmart.usercenter.model.GridRange;
 import com.hypersmart.framework.service.IGenericService;
+
+import java.util.List;
 
 /**
  * 网格覆盖范围表
@@ -24,6 +27,14 @@ public interface GridRangeService extends IGenericService<String, GridRange> {
      * @return
      */
     Integer recordRange(String gridRangeRecord,String gridId);
+
+    /**
+     * 获取所有覆盖范围
+     * @param gridRangeBO
+     * @return
+     */
+
+    List<String> getAllRange(GridRangeBO gridRangeBO);
 
 }
 

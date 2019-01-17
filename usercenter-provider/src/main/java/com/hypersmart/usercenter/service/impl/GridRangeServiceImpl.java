@@ -2,12 +2,14 @@ package com.hypersmart.usercenter.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.hypersmart.framework.service.GenericService;
+import com.hypersmart.usercenter.bo.GridRangeBO;
 import com.hypersmart.usercenter.dto.GridRangeInfo;
 import com.hypersmart.usercenter.mapper.GridRangeMapper;
 import com.hypersmart.usercenter.model.GridRange;
 import com.hypersmart.usercenter.service.GridRangeService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -70,5 +72,26 @@ public class GridRangeServiceImpl extends GenericService<String, GridRange> impl
             num = this.insertBatch(gridRangeList);
         }
         return num;
+    }
+
+    /**
+     * 获取所有覆盖范围
+     * @param gridRangeBO
+     * @return
+     */
+    @Override
+    public List<String> getAllRange(GridRangeBO gridRangeBO) {
+        List<String> stringList = new ArrayList<>();
+        if(gridRangeBO == null || StringUtils.isEmpty(gridRangeBO.getGridId())) {
+            List<GridRange> gridRangeList = this.getAll();
+            if(!CollectionUtils.isEmpty(gridRangeList)) {
+                for(GridRange gridRange : gridRangeList) {
+                    if("2".equals(gridRange.getRangeType())) {
+                        stringList.add(gridRange.getResourceId());
+                    }
+                }
+            }
+        }
+        return stringList;
     }
 }
