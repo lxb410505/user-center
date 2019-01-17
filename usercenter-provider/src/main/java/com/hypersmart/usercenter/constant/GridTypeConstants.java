@@ -7,7 +7,7 @@ package com.hypersmart.usercenter.constant;
  */
 public class GridTypeConstants {
 
-    public static final String BUILDING_GRID = "building_type";
+    public static final String BUILDING_GRID = "building_grid";
 
     public static final String PUBLIC_AREA_GRID = "public_area_grid";
 
