@@ -14,7 +14,7 @@
         post.ID_ AS `postId`,
         post.POS_NAME_ AS posName,
         org_lv5.NAME_ AS areaName,
-        org_lv4.NAME_ AS cityNamme,
+        org_lv4.NAME_ AS cityName,
         org_lv3.NAME_ AS projectName,
         org_lv2.NAME_ AS plotName,
         org.NAME_ AS divideName,
