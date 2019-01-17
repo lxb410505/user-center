@@ -180,6 +180,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 //存储组织id集合
                 orgIdList.add(gridBasicInfo.getAreaId());
                 orgIdList.add(gridBasicInfo.getProjectId());
+                orgIdList.add(gridBasicInfo.getCityId());
                 orgIdList.add(gridBasicInfo.getMassifId());
                 orgIdList.add(gridBasicInfo.getStagingId());
                 if (!StringUtils.isEmpty(gridBasicInfo.getCityId())) {
@@ -369,6 +370,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
             GridBasicInfo gridBasicInfo = new GridBasicInfo();
             gridBasicInfo.setId(UUID.randomUUID().toString());
             gridBasicInfo.setAreaId(gridBasicInfoDTO.getAreaId());
+            gridBasicInfo.setCityId(gridBasicInfoDTO.getCityId());
             gridBasicInfo.setProjectId(gridBasicInfoDTO.getProjectId());
             gridBasicInfo.setMassifId(gridBasicInfoDTO.getMassifId());
             gridBasicInfo.setStagingId(gridBasicInfoDTO.getStagingId());
