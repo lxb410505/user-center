@@ -1,0 +1,285 @@
+package com.hypersmart.usercenter.controller;
+
+
+import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.hypersmart.base.controller.BaseController;
+import com.hypersmart.base.model.CommonResult;
+import com.hypersmart.base.query.PageList;
+import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.usercenter.bo.GridBasicInfoBO;
+import com.hypersmart.usercenter.bo.HouseKeeperBO;
+import com.hypersmart.usercenter.constant.GridErrorCode;
+import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
+import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
+import com.hypersmart.usercenter.model.GridBasicInfo;
+import com.hypersmart.usercenter.service.GridBasicInfoService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+
+/**
+ * 网格基础信息表
+ *
+ * @author fangyuan
+ * @email fyass***.163.com
+ * @date 2019-01-10 11:23:58
+ */
+@RestController
+@RequestMapping(value = {"/grid-api/grid-basic-info"}, produces = {"application/json;charset=UTF-8"})
+@Api(tags = {"gridBasicInfoController"})
+public class GridBasicInfoController extends BaseController {
+    @Resource
+    GridBasicInfoService gridBasicInfoService;
+
+
+    @Autowired
+    private com.hypersmart.mdm.feign.UcOrgUserFeign ucOrgUserFeign;
+
+
+
+    @PostMapping({"/queryList"})
+    @ApiOperation(value = "用户组织关系数据列表}", httpMethod = "POST", notes = "获取用户组织关系列表")
+    public PageList<Map<String, Object>> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+        return this.gridBasicInfoService.quertList(queryFilter);
+    }
+
+    /**
+     * 查询网格信息
+     * @param queryFilter
+     * @return
+     */
+    @PostMapping({"/list"})
+    @ApiOperation(value = "网格基础信息表数据列表}", httpMethod = "POST", notes = "获取网格基础信息表列表")
+    public PageList<GridBasicInfoDTO> search(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+        PageList<GridBasicInfoDTO> gridBasicInfoDTOList = gridBasicInfoService.selectGridBasicInfo(queryFilter);
+        return gridBasicInfoDTOList;
+    }
+
+    /**
+     * 新增网格
+     *
+     * @param gridBasicInfoDTO
+     * @return
+     */
+    @PostMapping({"/save"})
+    @ApiOperation(value = "新增网格基础信息表信息", httpMethod = "POST", notes = "保存网格基础信息表")
+    public CommonResult<String> create(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
+        CommonResult commonResult = new CommonResult();
+        GridErrorCode gridErrorCode = gridBasicInfoService.create(gridBasicInfoDTO);
+        if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
+            commonResult.setState(true);
+            commonResult.setMessage("新增成功！");
+        } else {
+            commonResult.setState(false);
+            commonResult.setMessage(gridErrorCode.getMessage());
+        }
+        return commonResult;
+    }
+
+    /**
+     * 编辑网格
+     *
+     * @param gridBasicInfoDTO
+     * @return
+     */
+    @PostMapping({"/update"})
+    @ApiOperation(value = "更新指定id的 网格基础信息表 信息（更新全部信息）", httpMethod = "POST", notes = "更新指定id的 网格基础信息表 信息（更新全部信息）")
+    public CommonResult<String> edit(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
+        CommonResult commonResult = new CommonResult();
+        GridErrorCode gridErrorCode = gridBasicInfoService.edit(gridBasicInfoDTO);
+        if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
+            commonResult.setState(true);
+            commonResult.setMessage("修改成功！");
+        } else {
+            commonResult.setState(false);
+            commonResult.setMessage(gridErrorCode.getMessage());
+        }
+        return commonResult;
+    }
+
+    /**
+     * 获取指定id的网格
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping({"/getGridById/{id}"})
+    @ApiOperation(value = "网格基础信息表数据列表", httpMethod = "GET", notes = "获取单个网格基础信息表记录")
+    public GridBasicInfoDTO getGridById(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {
+        return gridBasicInfoService.getGridById(id);
+    }
+
+    /**
+     * 更换管家
+     *
+     * @param gridBasicInfoDTO
+     * @return
+     */
+    @PostMapping({"/changeHousekeeper"})
+    @ApiOperation(value = "变更网格管家", httpMethod = "POST", notes = "变更网格管家")
+    public CommonResult<String> changeHousekeeper(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
+        CommonResult commonResult = new CommonResult();
+        GridErrorCode gridErrorCode = gridBasicInfoService.changeHousekeeper(gridBasicInfoDTO);
+        if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
+            commonResult.setState(true);
+            commonResult.setMessage("变更管家成功！");
+        } else {
+            commonResult.setState(false);
+            commonResult.setMessage(gridErrorCode.getMessage());
+        }
+        return commonResult;
+    }
+
+    /**
+     * 更换映射楼栋
+     * @param gridBasicInfoDTO
+     * @return
+     */
+    @PostMapping({"/changeRange"})
+    @ApiOperation(value = "变更映射楼栋", httpMethod = "POST", notes = "变更映射楼栋")
+    public CommonResult<String> changeRange(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
+        CommonResult commonResult = new CommonResult();
+        GridErrorCode gridErrorCode = gridBasicInfoService.changeRange(gridBasicInfoDTO);
+        if(GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
+            commonResult.setState(true);
+            commonResult.setMessage("变更映射楼栋成功！");
+        } else {
+            commonResult.setState(false);
+            commonResult.setMessage("变更映射楼栋失败");
+        }
+        return commonResult;
+    }
+
+
+    /**
+     * 批量禁用网格
+     *
+     * @param gridBasicInfoBO
+     * @return
+     */
+    @PostMapping({"/disable"})
+    @ApiOperation(value = "禁用网格基础信息表记录", httpMethod = "POST", notes = "禁用网格基础信息表记录")
+    public CommonResult<String> disable(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoBO gridBasicInfoBO) {
+        CommonResult commonResult = new CommonResult();
+        GridErrorCode gridErrorCode = gridBasicInfoService.disableGridList(gridBasicInfoBO);
+        if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
+            commonResult.setState(true);
+            commonResult.setMessage("停用成功！");
+        } else {
+            commonResult.setState(false);
+            commonResult.setMessage("停用失败");
+        }
+        return commonResult;
+    }
+
+    /**
+     * 批量删除网格
+     *
+     * @param gridBasicInfoBO
+     * @return
+     */
+    @PostMapping({"/delete"})
+    @ApiOperation(value = "删除网格基础信息表记录", httpMethod = "POST", notes = "删除网格基础信息表记录")
+    public CommonResult<String> delete(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoBO gridBasicInfoBO) {
+        CommonResult commonResult = new CommonResult();
+        GridErrorCode gridErrorCode = gridBasicInfoService.deleteGridList(gridBasicInfoBO);
+        if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
+            commonResult.setState(true);
+            commonResult.setMessage("批量删除成功！");
+        } else {
+            commonResult.setState(false);
+            commonResult.setMessage("删除失败");
+        }
+        return commonResult;
+    }
+
+
+    @PostMapping({"/getHouseKeeper"})
+    @ApiOperation(value = "管家列表", httpMethod = "POST", notes = "管家列表")
+    public PageList<JsonNode> listHouseKeeper(@ApiParam(name = "queryFilter", value = "查询条件") @RequestBody QueryFilter queryFilter) {
+        PageList<JsonNode> pageList = ucOrgUserFeign.queryList(queryFilter);
+        if (pageList != null && pageList.getRows() != null && pageList.getRows().size() > 0) {
+            List<HouseKeeperBO> houseKeeperBOList = new ArrayList<>();
+            for (JsonNode jsonNode : pageList.getRows()) {
+                HouseKeeperBO houseKeeperBO = new HouseKeeperBO();
+                houseKeeperBO.setDivideId(jsonNode.get("divideId").asText());
+                houseKeeperBO.setHouseKeeperId(jsonNode.get("houseKeeperId").asText());
+                houseKeeperBOList.add(houseKeeperBO);
+            }
+
+            List<GridBasicInfoSimpleDTO> list = gridBasicInfoService.getGridBasicInfoByHouseKeeperIds(houseKeeperBOList);
+
+            if (list != null && list.size() > 0){
+                for (JsonNode jsonNode : pageList.getRows()) {
+                    ObjectNode objectNode = (ObjectNode) jsonNode;
+                    Map<String, List<GridBasicInfoSimpleDTO>> map = list.stream()
+                            .filter(gridBasicInfoSimpleDTO -> (jsonNode.get("houseKeeperId").asText().equals(gridBasicInfoSimpleDTO.getHousekeeperId())))
+                            .collect(Collectors.toList()).stream().collect(Collectors.groupingBy(GridBasicInfoSimpleDTO::getStagingId));
+                    String jsonStr = JSON.toJSONString(map.get(jsonNode.get("divideId").asText()));
+                    ObjectMapper mapper = new ObjectMapper();
+                    try {
+                        JsonNode jn = mapper.readTree(jsonStr);
+                        objectNode.set("gridList",jn);
+                        //objectNode.putPOJO(map.get(jsonNode.get("divide").asText()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return pageList;
+    }
+
+
+    @PostMapping({"/associatedGrid"})
+    @ApiOperation(value = "关联网格", httpMethod = "POST", notes = "关联网格")
+    public List<GridBasicInfo> associatedGrid(@ApiParam(name = "gridBasicInfoBO", value = "网格id和管家id") @RequestBody List<GridBasicInfoBO> gridBasicInfoBOList) {
+        List<String> gridIdList = new ArrayList<>();
+        for (GridBasicInfoBO gridBasicInfoBO : gridBasicInfoBOList){
+            gridIdList.add(gridBasicInfoBO.getId());
+        }
+        String[] gridIdArray = new String[gridIdList.size()];
+        gridIdList.toArray(gridIdArray);
+        List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getByIds(gridIdArray);
+        if (gridBasicInfoList != null && gridBasicInfoList.size() > 0){
+            for (GridBasicInfo gridBasicInfo : gridBasicInfoList){
+                gridBasicInfo.setHousekeeperId(gridBasicInfoBOList.get(0).getHousekeeperId());
+            }
+        }
+
+        gridBasicInfoService.updateBatch(gridBasicInfoList);
+        return gridBasicInfoList;
+    }
+
+    @PostMapping({"/disassociatedGrid"})
+    @ApiOperation(value = "取消关联网格", httpMethod = "POST", notes = "取消关联网格")
+    public List<GridBasicInfo> disassociatedGrid(@ApiParam(name = "gridBasicInfoBO", value = "网格id") @RequestBody List<GridBasicInfoBO> gridBasicInfoBOList) {
+        List<String> gridIdList = new ArrayList<>();
+        for (GridBasicInfoBO gridBasicInfoBO : gridBasicInfoBOList){
+            gridIdList.add(gridBasicInfoBO.getId());
+        }
+        String[] gridIdArray = new String[gridIdList.size()];
+        gridIdList.toArray(gridIdArray);
+        List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getByIds(gridIdArray);
+        if (gridBasicInfoList != null && gridBasicInfoList.size() > 0){
+            for (GridBasicInfo gridBasicInfo : gridBasicInfoList){
+                gridBasicInfo.setHousekeeperId(null);
+            }
+        }
+        gridBasicInfoService.updateBatch(gridBasicInfoList);
+        return gridBasicInfoList;
+    }
+}

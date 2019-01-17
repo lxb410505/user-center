@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.GridBasicInfoMapper">
+    <resultMap id="DtoResultMap" type="com.hypersmart.usercenter.dto.GridBasicInfoDTO">
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="grid_code" jdbcType="VARCHAR" property="gridCode" />
+        <result column="grid_name" jdbcType="VARCHAR" property="gridName" />
+        <result column="grid_type" jdbcType="VARCHAR" property="gridType" />
+        <result column="grid_range" jdbcType="VARCHAR" property="gridRange" />
+        <result column="grid_remark" jdbcType="VARCHAR" property="gridRemark" />
+        <result column="area_id" jdbcType="VARCHAR" property="areaId" />
+        <result column="city_id" jdbcType="VARCHAR" property="cityId" />
+        <result column="project_id" jdbcType="VARCHAR" property="projectId" />
+        <result column="massif_id" jdbcType="VARCHAR" property="massifId" />
+        <result column="staging_id" jdbcType="VARCHAR" property="stagingId" />
+        <result column="housekeeper_id" jdbcType="VARCHAR" property="housekeeperId" />
+        <result column="update_times" jdbcType="VARCHAR" property="updateTimes" />
+        <result column="format_attribute" jdbcType="VARCHAR" property="formatAttribute" />
+        <result column="creation_date" jdbcType="TIMESTAMP" property="creationDate" />
+        <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+        <result column="enabled_flag" jdbcType="TINYINT" property="enabledFlag" />
+    </resultMap>
+
+    <resultMap id="SimpleDTOMap" type="com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO">
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="grid_name" jdbcType="VARCHAR" property="gridName" />
+        <result column="staging_id" jdbcType="VARCHAR" property="stagingId" />
+        <result column="housekeeper_id" jdbcType="VARCHAR" property="housekeeperId" />
+    </resultMap>
+    <sql id="BaseTable">
+    grid_basic_info
+    </sql>
+
+    <!--查询-->
+    <select id="searchGridList" resultMap="DtoResultMap" parameterType="com.hypersmart.usercenter.bo.GridBasicInfoBO">
+        SELECT
+        a.id,
+        a.project_id,
+        a.area_id,
+        a.massif_id,
+        a.staging_id,
+        a.city_id,
+        a.grid_code,
+        a.grid_name,
+        a.grid_type,
+        a.grid_range,
+        a.grid_remark,
+        a.update_times,
+        a.format_attribute,
+        a.housekeeper_id,
+        a.created_by,
+        a.creation_date,
+        a.enabled_flag
+        FROM
+        grid_basic_info a
+        where
+        a.is_deleted = 0
+        <if test="areaId != null and areaId != ''">
+            and a.area_id = #{areaId}
+        </if>
+        <if test="projectId != null and projectId != ''">
+            and a.project_id = #{projectId}
+        </if>
+        <if test="massifId != null and massifId != ''">
+            and a.massif_id = #{massifId}
+        </if>
+        <if test="stagingId != null and stagingId != ''">
+            and a.staging_id = #{stagingId}
+        </if>
+        <if test="gridCode != null and gridCode != ''">
+            and INSTR(a.grid_code,#{gridCode}) > 0
+        </if>
+        <if test="gridName !=null and gridName !=''">
+            and INSTR(a.grid_name,#{gridName})>0
+        </if>
+        <if test="gridType !=null and gridType !=''">
+            and a.grid_type = gridType
+        </if>
+        <if test="formatAttribute !=null and formatAttribute !=''">
+            and a.format_attribute = formatAttribute
+        </if>
+        order by a.creation_date desc
+    </select>
+
+    <select id="getGridBasicInfoByHouseKeeperIds" resultMap="SimpleDTOMap" >
+        SELECT
+        a.id,
+        a.grid_name,
+        a.staging_id,
+        a.housekeeper_id
+        FROM
+        grid_basic_info a
+        where
+        a.is_deleted = 0
+        and a.enabled_flag = 1
+        and
+        <foreach collection="houseKeeperBO" index="index" item="houseKeeper" open="(" separator="or" close=")">
+            (a.housekeeper_id =#{houseKeeper.houseKeeperId} and a.staging_id = #{houseKeeper.divideId})
+        </foreach>
+        order by a.creation_date desc
+    </select>
+
+    <select id="quertList" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT * from (
+        select
+        g.id as id,
+        g.grid_code AS  gridCode,
+        g.grid_name AS gridName,
+        g.grid_type AS gridType,
+        g.grid_remark AS gridRemark,
+        g.format_attribute AS formatAttribute,
+        u.ID_ AS houseKeeperId,
+        u.FULLNAME_ AS fullName,
+        u.MOBILE_ AS mobile,
+        u.ACCOUNT_ AS account,
+        post.ID_ AS `postId`,
+        post.POS_NAME_ AS posName,
+        org_lv5.NAME_ AS areaName,
+        org_lv4.NAME_ AS cityNamme,
+        org_lv3.NAME_ AS projectName,
+        org_lv2.NAME_ AS plotName,
+        org.NAME_ AS divideName,
+        org_lv5.ID_ AS areaId,
+        org_lv4.ID_ AS cityId,
+        org_lv3.ID_ AS projectId,
+        org_lv2.ID_ AS plotId,
+        org.ID_ AS divideId
+        from grid_basic_info g
+        join uc_user u on g.housekeeper_id = u.ID_
+        join uc_org_user uou on u.ID_ = uou.USER_ID_
+        join uc_org org on uou.ORG_ID_ = org.ID_
+        join uc_org org_lv2 on org.PARENT_ID_ = org_lv2.ID_
+        join uc_org org_lv3 on org_lv2.PARENT_ID_ = org_lv3.ID_
+        join uc_org org_lv4 on org_lv3.PARENT_ID_ = org_lv4.ID_
+        join uc_org org_lv5 on org_lv4.PARENT_ID_ = org_lv5.ID_
+        join uc_org_post post on uou.POS_ID_ =  post.ID_
+        join uc_org_job uoj on post.JOB_ID_ = uoj.ID_
+        join uc_demension dem on org.DEM_ID_ = dem.ID_ and  org_lv2.DEM_ID_ = dem.ID_ and  org_lv3.DEM_ID_ = dem.ID_
+
+        and  org_lv4.DEM_ID_ = dem.ID_ and org_lv5.DEM_ID_ = dem.ID_
+        where uoj.CODE_ = 'guanjia' and dem.CODE_ = 'smsf' and org.LEVEL_ = 5) a
+        <where>
+            <if test="whereSql!=null">
+                ${whereSql}
+            </if>
+        </where>
+        <if test="orderBySql!=null">
+            ORDER BY ${orderBySql}
+        </if>
+    </select>
+
+</mapper>
