@@ -3,6 +3,8 @@ package com.hypersmart.usercenter.mapper;
 import com.hypersmart.framework.mapper.GenericMapper;
 import com.hypersmart.usercenter.model.GridRange;
 
+import java.util.List;
+
 /**
  * 网格覆盖范围表
  * 
@@ -13,5 +15,7 @@ import com.hypersmart.usercenter.model.GridRange;
 public interface GridRangeMapper extends GenericMapper<GridRange> {
 
     Integer deleteRangeByGridId(String gridId);
+
+    List<GridRange> getRanged(String gridId);
 
 }

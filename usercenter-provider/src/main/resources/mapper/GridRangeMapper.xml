@@ -7,4 +7,8 @@
         delete from grid_range where grid_id = #{gridId}
     </delete>
 
+    <select id="getRanged" parameterType="java.lang.String" resultType="com.hypersmart.usercenter.model.GridRange">
+        select range_type as rangeType,resource_id as resourceId from grid_range where grid_id != #{gridId}
+    </select>
+
 </mapper>

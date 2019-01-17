@@ -485,13 +485,14 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         gridBasicInfo.setUpdationDate(new Date());
         num = this.updateSelective(gridBasicInfo);
 
-        //网格覆盖范围表记录
-        if(!StringUtils.isEmpty(gridBasicInfoDTO.getGridRange())) {
-            //删除旧的网格覆盖范围数据
-            gridRangeService.deleteRangeByGridId(gridBasicInfoDTO.getId());
-            //记录数据
-            gridRangeService.recordRange(gridBasicInfoDTO.getGridRange(),gridBasicInfoDTO.getId());
-        }
+//        //网格覆盖范围表记录
+//        if(!StringUtils.isEmpty(gridBasicInfoDTO.getGridRange())) {
+//
+//        }
+        //删除旧的网格覆盖范围数据
+        gridRangeService.deleteRangeByGridId(gridBasicInfoDTO.getId());
+        //记录数据
+        gridRangeService.recordRange(gridBasicInfoDTO.getGridRange(),gridBasicInfoDTO.getId());
         if (num < 1) {
             gridErrorCode = GridErrorCode.UPDATE_EXCEPTION;
         }
