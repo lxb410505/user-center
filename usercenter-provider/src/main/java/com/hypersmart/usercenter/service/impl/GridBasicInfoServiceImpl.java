@@ -75,7 +75,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
     @Override
     public PageList<Map<String, Object>> quertList(QueryFilter queryFilter) {
-
+        queryFilter.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND);
         /**
          * 1、查询当前登录人所在的所有分期（uc_org.LEVEL_ = 4）的管家信息：
          *    接口返回以下信息：区域、项目、地块、分期、管家名称、管家手机号、岗位等级
