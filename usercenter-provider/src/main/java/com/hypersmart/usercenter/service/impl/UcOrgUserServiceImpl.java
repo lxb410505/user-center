@@ -14,6 +14,7 @@ import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.*;
 
@@ -127,5 +128,16 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         }
         List<Map<String,Object>> query = this.ucUserMapper.quertList(queryFilter.getParams());
         return new PageList<>(query);
+    }
+
+    @Override
+    public UcOrgUser getByUserIdAndOrgId(String housekeeperId, String stagingId) {
+        Example example = new Example(UcOrgUser.class);
+        example.createCriteria().andEqualTo("userId",housekeeperId).andEqualTo("orgId",stagingId);
+        List<UcOrgUser> list = this.ucOrgUserMapper.selectByExample(example);
+        if (list != null && list.size() > 0){
+            return list.get(0);
+        }
+        return null;
     }
 }

@@ -1,8 +1,12 @@
 package com.hypersmart.usercenter.service;
 
+import com.hypersmart.base.query.PageList;
+import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.framework.service.IGenericService;
 import com.hypersmart.usercenter.constant.GridErrorCode;
 import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
+import com.hypersmart.usercenter.dto.GridBasicInfoHistoryDTO;
+import com.hypersmart.usercenter.model.GridBasicInfo;
 import com.hypersmart.usercenter.model.GridBasicInfoHistory;
 
 /**
@@ -18,6 +22,8 @@ public interface GridBasicInfoHistoryService extends IGenericService<String, Gri
      * @param gridBasicInfoDTO
      * @return
      */
-    GridErrorCode saveGridBasicInfoHistory(GridBasicInfoDTO gridBasicInfoDTO);
+    GridErrorCode saveGridBasicInfoHistory(GridBasicInfo gridBasicInfoDTO);
+
+    PageList<GridBasicInfoHistoryDTO> queryList(QueryFilter queryFilter);
 }
 

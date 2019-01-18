@@ -144,7 +144,19 @@ public class GridBasicInfoHistoryDTO extends GenericDTO<String> implements Seria
      */	
 	private String tenantId;
 
-	
+    /**
+     * 网格变更类型
+     */
+	private String gridChangeType;
+
+    public String getGridChangeType() {
+        return gridChangeType;
+    }
+
+    public void setGridChangeType(String gridChangeType) {
+        this.gridChangeType = gridChangeType;
+    }
+
     public GridBasicInfoHistoryDTO() {
     }	
 
