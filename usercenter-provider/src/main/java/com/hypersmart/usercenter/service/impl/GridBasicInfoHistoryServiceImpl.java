@@ -51,6 +51,9 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
     private UcOrgUserService ucOrgUserService;
 
     @Autowired
+    private UcOrgPostService ucOrgPostService;
+
+    @Autowired
     private GridBasicInfoHistoryMapper gridBasicInfoHistoryMapper;
 
     public GridBasicInfoHistoryServiceImpl(GridBasicInfoHistoryMapper mapper) {
@@ -83,10 +86,14 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                     housekeeperHistory.setUserId(ucUser.getId());
                     housekeeperHistory.setUserName(ucUser.getFullname());
                     UcOrgUser ucOrgUser = ucOrgUserService.getByUserIdAndOrgId(beforeGrid.getHousekeeperId(),beforeGrid.getStagingId());
-                    if (ucOrgUser != null ){
-
+                    if (ucOrgUser != null && StringUtils.isNotRealEmpty(ucOrgUser.getPosId())){
+                        UcOrgPost ucOrgPost = ucOrgPostService.get(ucOrgUser.getPosId());
+                        if (ucOrgPost != null){
+                            if ("".equals(ucOrgPost.getPostKey())){
+                                housekeeperHistory.setUserLevel(null);
+                            }
+                        }
                     }
-                    housekeeperHistory.setUserLevel(null);
                     housekeeperHistoryService.insert(housekeeperHistory);
                     before_housekeeper_history_id = housekeeperHistory.getId();
                 }
@@ -209,10 +216,14 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                         housekeeperHistory.setUserId(ucUser.getId());
                         housekeeperHistory.setUserName(ucUser.getFullname());
                         UcOrgUser ucOrgUser = ucOrgUserService.getByUserIdAndOrgId(gridBasicInfoDTO.getHousekeeperId(),beforeGrid.getStagingId());
-                        if (ucOrgUser != null ){
-
+                        if (ucOrgUser != null && StringUtils.isNotRealEmpty(ucOrgUser.getPosId())){
+                            UcOrgPost ucOrgPost = ucOrgPostService.get(ucOrgUser.getPosId());
+                            if (ucOrgPost != null){
+                                if ("".equals(ucOrgPost.getPostKey())){
+                                    housekeeperHistory.setUserLevel(null);
+                                }
+                            }
                         }
-                        housekeeperHistory.setUserLevel(null);
                         housekeeperHistoryService.insert(housekeeperHistory);
                         after_housekeeper_history_id = housekeeperHistory.getId();
                     }
