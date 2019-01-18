@@ -160,6 +160,26 @@ public class GridBasicInfoHistoryDTO extends GenericDTO<String> implements Seria
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date creationDate;
 
+    private String housekeeperName;
+
+    private String updatedByName;
+
+    public String getHousekeeperName() {
+        return housekeeperName;
+    }
+
+    public void setHousekeeperName(String housekeeperName) {
+        this.housekeeperName = housekeeperName;
+    }
+
+    public String getUpdatedByName() {
+        return updatedByName;
+    }
+
+    public void setUpdatedByName(String updatedByName) {
+        this.updatedByName = updatedByName;
+    }
+
     public Date getCreationDate() {
         return creationDate;
     }
