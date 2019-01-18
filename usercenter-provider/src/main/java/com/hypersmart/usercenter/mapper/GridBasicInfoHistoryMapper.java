@@ -1,7 +1,11 @@
 package com.hypersmart.usercenter.mapper;
 
 import com.hypersmart.framework.mapper.GenericMapper;
+import com.hypersmart.usercenter.dto.GridBasicInfoHistoryDTO;
 import com.hypersmart.usercenter.model.GridBasicInfoHistory;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 网格基础信息历史表-变化前快照
@@ -12,4 +16,5 @@ import com.hypersmart.usercenter.model.GridBasicInfoHistory;
  */
 public interface GridBasicInfoHistoryMapper extends GenericMapper<GridBasicInfoHistory> {
 
+    List<GridBasicInfoHistoryDTO> queryList(Map<String, Object> params);
 }

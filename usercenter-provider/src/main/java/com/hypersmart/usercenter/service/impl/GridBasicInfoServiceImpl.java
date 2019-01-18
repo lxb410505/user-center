@@ -415,9 +415,9 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
             //获取对应id旧的的网格数据
             GridBasicInfo gridBasicInfoOld = this.get(gridBasicInfoDTO.getId());
-            //历史数据存储(变更前) Todo
+            /*//历史数据存储(变更前) Todo
             //历史数据存储(变更后) Todo
-            gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfoDTO);
+            gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfoDTO);*/
             //修改网格
             GridBasicInfo gridBasicInfo = new GridBasicInfo();
             gridBasicInfo.setId(gridBasicInfoDTO.getId());

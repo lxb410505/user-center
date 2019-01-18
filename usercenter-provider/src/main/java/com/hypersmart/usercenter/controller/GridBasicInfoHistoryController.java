@@ -1,8 +1,14 @@
 package com.hypersmart.usercenter.controller;
 
 import com.hypersmart.base.controller.BaseController;
+import com.hypersmart.base.query.PageList;
+import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.usercenter.dto.GridBasicInfoHistoryDTO;
+import com.hypersmart.usercenter.model.GridBasicInfoHistory;
 import com.hypersmart.usercenter.service.GridBasicInfoHistoryService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -33,5 +39,10 @@ public class GridBasicInfoHistoryController extends BaseController {
 //        return this.gridBasicInfoHistoryService.get(id);
 //    }
 
+    @PostMapping({"/list"})
+    @ApiOperation(value = "根据网格id获得网格基础信息历史表-变化前快照数据列表}", httpMethod = "POST", notes = "根据网格id获得获取网格基础信息历史表-变化前快照列表")
+    public PageList<GridBasicInfoHistoryDTO> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+        return this.gridBasicInfoHistoryService.queryList(queryFilter);
+    }
 
 }

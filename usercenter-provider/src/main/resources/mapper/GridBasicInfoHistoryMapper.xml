@@ -32,9 +32,46 @@
         <result column="tenant_id" jdbcType="VARCHAR" property="tenantId" />
         <result column="enabled_flag" jdbcType="TINYINT" property="enabledFlag" />
         <result column="is_deleted" jdbcType="TINYINT" property="isDeleted" />
-        <result column="spare_column_id" jdbcType="VARCHAR" property="spareColumnId" />
-        <result column="spare_column_code" jdbcType="VARCHAR" property="spareColumnCode" />
-        <result column="spare_column_name" jdbcType="VARCHAR" property="spareColumnName" />
+        <result column="city_id" jdbcType="VARCHAR" property="cityId" />
+        <result column="city_code" jdbcType="VARCHAR" property="cityCode" />
+        <result column="city_name" jdbcType="VARCHAR" property="cityName" />
+    </resultMap>
+    <resultMap id="DTOResultMap" type="com.hypersmart.usercenter.dto.GridBasicInfoHistoryDTO">
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="grid_id" jdbcType="VARCHAR" property="gridId" />
+        <result column="grid_code" jdbcType="VARCHAR" property="gridCode" />
+        <result column="grid_name" jdbcType="VARCHAR" property="gridName" />
+        <result column="grid_type" jdbcType="VARCHAR" property="gridType" />
+        <result column="grid_range" jdbcType="OTHER" property="gridRange" />
+        <result column="grid_remark" jdbcType="VARCHAR" property="gridRemark" />
+        <result column="area_id" jdbcType="VARCHAR" property="areaId" />
+        <result column="area_code" jdbcType="VARCHAR" property="areaCode" />
+        <result column="area_name" jdbcType="VARCHAR" property="areaName" />
+        <result column="project_id" jdbcType="VARCHAR" property="projectId" />
+        <result column="project_code" jdbcType="VARCHAR" property="projectCode" />
+        <result column="project_name" jdbcType="VARCHAR" property="projectName" />
+        <result column="massif_id" jdbcType="VARCHAR" property="massifId" />
+        <result column="massif_code" jdbcType="VARCHAR" property="massifCode" />
+        <result column="massif_name" jdbcType="VARCHAR" property="massifName" />
+        <result column="staging_id" jdbcType="VARCHAR" property="stagingId" />
+        <result column="staging_code" jdbcType="VARCHAR" property="stagingCode" />
+        <result column="staging_name" jdbcType="VARCHAR" property="stagingName" />
+        <result column="housekeeper_history_id" jdbcType="VARCHAR" property="housekeeperHistoryId" />
+        <result column="format_attribute" jdbcType="VARCHAR" property="formatAttribute" />
+        <result column="creation_date" jdbcType="TIMESTAMP" property="creationDate" />
+        <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+        <result column="updation_date" jdbcType="TIMESTAMP" property="updationDate" />
+        <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+        <result column="row_time" jdbcType="TIMESTAMP" property="rowTime" />
+        <result column="row_version" jdbcType="TIMESTAMP" property="rowVersion" />
+        <result column="tenant_id" jdbcType="VARCHAR" property="tenantId" />
+        <result column="enabled_flag" jdbcType="TINYINT" property="enabledFlag" />
+        <result column="is_deleted" jdbcType="TINYINT" property="isDeleted" />
+        <result column="city_id" jdbcType="VARCHAR" property="cityId" />
+        <result column="city_code" jdbcType="VARCHAR" property="cityCode" />
+        <result column="city_name" jdbcType="VARCHAR" property="cityName" />
+        <result column="city_name" jdbcType="VARCHAR" property="cityName" />
+        <result column="grid_change_type" jdbcType="VARCHAR" property="gridChangeType" />
     </resultMap>
     <sql id="BaseTable">
     grid_basic_info_history
@@ -44,5 +81,53 @@
     <!--<sql id="GenerationType">-->
     <!--DB_UUID ( select replace(uuid(),'-','') from dual )-->
     <!--</sql>-->
-
+    <select id="queryList" resultMap="DTOResultMap" >
+        SELECT
+        a.id,
+        a.grid_id,
+        a.grid_code,
+        a.grid_name,
+        a.grid_type,
+        a.grid_range,
+        a.grid_remark,
+        a.area_id,
+        a.area_code,
+        a.area_name,
+        a.project_id,
+        a.project_code,
+        a.project_name,
+        a.massif_id,
+        a.massif_code,
+        a.massif_name,
+        a.staging_id,
+        a.staging_code,
+        a.staging_name,
+        a.housekeeper_history_id,
+        a.format_attribute,
+        a.creation_date,
+        a.created_by,
+        a.updation_date,
+        a.updated_by,
+        a.row_time,
+        a.row_version,
+        a.tenant_id,
+        a.enabled_flag,
+        a.is_deleted,
+        a.city_id,
+        a.city_code,
+        a.city_name,
+        b.grid_change_type
+        FROM
+        grid_basic_info_history a
+        left join grid_history_change_type_ref b
+        on a.id = b.grid_history_id
+        <where>
+            <if test="whereSql!=null">
+                ${whereSql}
+            </if>
+        </where>
+        <if test="orderBySql!=null">
+            ORDER BY ${orderBySql}
+        </if>
+    </select>
 </mapper>

@@ -12,11 +12,13 @@ import com.hypersmart.usercenter.constant.GridErrorCode;
 import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
 import com.hypersmart.usercenter.model.GridBasicInfo;
+import com.hypersmart.usercenter.service.GridBasicInfoHistoryService;
 import com.hypersmart.usercenter.service.GridBasicInfoService;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +46,9 @@ public class GridBasicInfoController extends BaseController {
 
     @Autowired
     private UcOrgUserService ucOrgUserService;
+
+    @Autowired
+    private GridBasicInfoHistoryService gridBasicInfoHistoryService;
 
 
 
@@ -128,6 +133,9 @@ public class GridBasicInfoController extends BaseController {
     @PostMapping({"/changeHousekeeper"})
     @ApiOperation(value = "变更网格管家", httpMethod = "POST", notes = "变更网格管家")
     public CommonResult<String> changeHousekeeper(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
+        GridBasicInfo gridBasicInfo = new GridBasicInfo();
+        BeanUtils.copyProperties(gridBasicInfoDTO,gridBasicInfo);
+        gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo);
         CommonResult commonResult = new CommonResult();
         GridErrorCode gridErrorCode = gridBasicInfoService.changeHousekeeper(gridBasicInfoDTO);
         if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
@@ -148,6 +156,9 @@ public class GridBasicInfoController extends BaseController {
     @PostMapping({"/changeRange"})
     @ApiOperation(value = "变更映射楼栋", httpMethod = "POST", notes = "变更映射楼栋")
     public CommonResult<String> changeRange(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
+        GridBasicInfo gridBasicInfo = new GridBasicInfo();
+        BeanUtils.copyProperties(gridBasicInfoDTO,gridBasicInfo);
+        gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo);
         CommonResult commonResult = new CommonResult();
         GridErrorCode gridErrorCode = gridBasicInfoService.changeRange(gridBasicInfoDTO);
         if(GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
@@ -229,6 +240,9 @@ public class GridBasicInfoController extends BaseController {
                 }
             }
         }
+        if (pageList.getRows() == null){
+            pageList.setRows(new ArrayList<>());
+        }
         return pageList;
     }
 
@@ -239,6 +253,9 @@ public class GridBasicInfoController extends BaseController {
         List<String> gridIdList = new ArrayList<>();
         for (GridBasicInfoBO gridBasicInfoBO : gridBasicInfoBOList){
             gridIdList.add(gridBasicInfoBO.getId());
+            GridBasicInfo gridBasicInfo = gridBasicInfoService.get(gridBasicInfoBO.getId());
+            gridBasicInfo.setHousekeeperId(gridBasicInfoBO.getHousekeeperId());
+            gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo);
         }
         String[] gridIdArray = new String[gridIdList.size()];
         gridIdList.toArray(gridIdArray);
@@ -259,6 +276,9 @@ public class GridBasicInfoController extends BaseController {
         List<String> gridIdList = new ArrayList<>();
         for (GridBasicInfoBO gridBasicInfoBO : gridBasicInfoBOList){
             gridIdList.add(gridBasicInfoBO.getId());
+            GridBasicInfo gridBasicInfo = gridBasicInfoService.get(gridBasicInfoBO.getId());
+            gridBasicInfo.setHousekeeperId(gridBasicInfoBO.getHousekeeperId());
+            gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo);
         }
         String[] gridIdArray = new String[gridIdList.size()];
         gridIdList.toArray(gridIdArray);
