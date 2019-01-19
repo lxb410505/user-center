@@ -80,7 +80,20 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         if(null != ucOrgUsersList && ucOrgUsersList.size()>0){
             queryOrg.addFilter("id",orgIds,QueryOP.IN,FieldRelation.AND);
         }else{
-            return new PageList<>();
+            PageList<Map<String, Object>> pageList = new PageList();
+            pageList.setTotal(0);
+            if(BeanUtils.isEmpty(queryFilter.getPageBean())){
+                pageList.setPage(1);
+                pageList.setPageSize(10);
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0);
+            }else{
+                pageList.setPage(queryFilter.getPageBean().getPage());
+                pageList.setPageSize(queryFilter.getPageBean().getPageSize());
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0);
+            }
+            return pageList;
         }
         PageList<UcOrg> orgList =  ucOrgService.query(queryOrg);
         Map<String,UcOrg> map = new HashMap<>();
@@ -108,7 +121,20 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
             }
             queryFilter.addFilter("divideId", divideId, QueryOP.IN, FieldRelation.AND,"two");
         }else{
-            return new PageList<>();
+            PageList<Map<String, Object>> pageList = new PageList();
+            pageList.setTotal(0);
+            if(BeanUtils.isEmpty(queryFilter.getPageBean())){
+                pageList.setPage(1);
+                pageList.setPageSize(10);
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0);
+            }else{
+                pageList.setPage(queryFilter.getPageBean().getPage());
+                pageList.setPageSize(queryFilter.getPageBean().getPageSize());
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0);
+            }
+            return pageList;
         }
 
         //===============================================================================================
