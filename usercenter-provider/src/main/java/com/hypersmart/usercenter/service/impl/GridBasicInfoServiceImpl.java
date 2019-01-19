@@ -75,7 +75,6 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
     @Override
     public PageList<Map<String, Object>> quertList(QueryFilter queryFilter) {
-        queryFilter.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND);
         /**
          * 1、查询当前登录人所在的所有分期（uc_org.LEVEL_ = 4）的管家信息：
          *    接口返回以下信息：区域、项目、地块、分期、管家名称、管家手机号、岗位等级
@@ -101,7 +100,20 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         if(null != ucOrgUsersList && ucOrgUsersList.size()>0){
             queryOrg.addFilter("id",orgIds,QueryOP.IN,FieldRelation.AND);
         }else{
-            return new PageList<>();
+            PageList<Map<String, Object>> pageList = new PageList();
+            pageList.setTotal(0);
+            if(BeanUtils.isEmpty(queryFilter.getPageBean())){
+                pageList.setPage(1);
+                pageList.setPageSize(10);
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0);
+            }else{
+                pageList.setPage(queryFilter.getPageBean().getPage());
+                pageList.setPageSize(queryFilter.getPageBean().getPageSize());
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0);
+            }
+            return pageList;
         }
         PageList<UcOrg> orgList =  ucOrgService.query(queryOrg);
         Map<String,UcOrg> map = new HashMap<>();
@@ -129,8 +141,23 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
             }
             queryFilter.addFilter("divideId", divideId, QueryOP.IN, FieldRelation.AND,"two");
         }else{
-            return new PageList<>();
+            PageList<Map<String, Object>> pageList = new PageList();
+            pageList.setTotal(0);
+            if(BeanUtils.isEmpty(queryFilter.getPageBean())){
+                pageList.setPage(1);
+                pageList.setPageSize(10);
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0);
+            }else{
+                pageList.setPage(queryFilter.getPageBean().getPage());
+                pageList.setPageSize(queryFilter.getPageBean().getPageSize());
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0);
+            }
+            return pageList;
         }
+
+        queryFilter.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND,"three");
 
         //===============================================================================================
         PageBean pageBean = queryFilter.getPageBean();
