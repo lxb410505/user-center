@@ -117,7 +117,7 @@
         g.staging_id as divideId,
         g.housekeeper_id as housekeeperId,
         g.format_attribute as formatAttribute,
-        g.enabled_flag as enabledFlag,
+        concat('',g.enabled_flag,'') as enabledFlag,
         g.is_deleted as isDeleted,
         (select org.NAME_ from uc_org org where ID_ = g.area_id) as areaName,
         (select org.NAME_ from uc_org org where ID_ = g.project_id) as projectName,
