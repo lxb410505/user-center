@@ -136,7 +136,7 @@ public class GridBasicInfoController extends BaseController {
         GridBasicInfo gridBasicInfo = new GridBasicInfo();
         BeanUtils.copyProperties(gridBasicInfoDTO,gridBasicInfo);
         gridBasicInfo.setId(gridBasicInfoDTO.getId());
-        gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo);
+        gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo,0);
         CommonResult commonResult = new CommonResult();
         GridErrorCode gridErrorCode = gridBasicInfoService.changeHousekeeper(gridBasicInfoDTO);
         if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
@@ -160,7 +160,7 @@ public class GridBasicInfoController extends BaseController {
         GridBasicInfo gridBasicInfo = new GridBasicInfo();
         BeanUtils.copyProperties(gridBasicInfoDTO,gridBasicInfo);
         gridBasicInfo.setId(gridBasicInfoDTO.getId());
-        gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo);
+        gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo,1);
         CommonResult commonResult = new CommonResult();
         GridErrorCode gridErrorCode = gridBasicInfoService.changeRange(gridBasicInfoDTO);
         if(GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
@@ -257,7 +257,7 @@ public class GridBasicInfoController extends BaseController {
             gridIdList.add(gridBasicInfoBO.getId());
             GridBasicInfo gridBasicInfo = gridBasicInfoService.get(gridBasicInfoBO.getId());
             gridBasicInfo.setHousekeeperId(gridBasicInfoBO.getHousekeeperId());
-            gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo);
+            gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo,0);
         }
         String[] gridIdArray = new String[gridIdList.size()];
         gridIdList.toArray(gridIdArray);
@@ -280,7 +280,7 @@ public class GridBasicInfoController extends BaseController {
             gridIdList.add(gridBasicInfoBO.getId());
             GridBasicInfo gridBasicInfo = gridBasicInfoService.get(gridBasicInfoBO.getId());
             gridBasicInfo.setHousekeeperId(gridBasicInfoBO.getHousekeeperId());
-            gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo);
+            gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo,0);
         }
         String[] gridIdArray = new String[gridIdList.size()];
         gridIdList.toArray(gridIdArray);
