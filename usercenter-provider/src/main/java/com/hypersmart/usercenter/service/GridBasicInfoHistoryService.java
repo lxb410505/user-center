@@ -17,12 +17,12 @@ import com.hypersmart.usercenter.model.GridBasicInfoHistory;
  * @date 2019-01-11 10:03:42
  */
 public interface GridBasicInfoHistoryService extends IGenericService<String, GridBasicInfoHistory> {
-    /**
+    /**changeType  0:管家变更     1:覆盖范围变更
      * 保存网格历史
      * @param gridBasicInfoDTO
      * @return
      */
-    GridErrorCode saveGridBasicInfoHistory(GridBasicInfo gridBasicInfoDTO);
+    GridErrorCode saveGridBasicInfoHistory(GridBasicInfo gridBasicInfoDTO, Integer changeType);
 
     PageList<GridBasicInfoHistoryDTO> queryList(QueryFilter queryFilter);
 }

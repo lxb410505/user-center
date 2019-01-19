@@ -65,7 +65,7 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
 
 
     @Override
-    public GridErrorCode saveGridBasicInfoHistory(GridBasicInfo gridBasicInfoDTO) {
+    public GridErrorCode saveGridBasicInfoHistory(GridBasicInfo gridBasicInfoDTO,Integer changeType) {
         GridErrorCode gridErrorCode = GridErrorCode.UNKOWN_EXCEPTION;
         IUser user = ContextUtil.getCurrentUser();
         Integer num = 0;
@@ -78,6 +78,13 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
             }
             String before_housekeeper_history_id = null;
             String after_housekeeper_history_id = null;
+           /* changeType  0:管家变更     1:覆盖范围变更
+              一开始没有管家  后来也没有管家             管家表里不入数据（范围变更）
+              一开始有管家    后来有管家（管家没变）     管家表入一条数据（范围变更）
+              一开始有管家    后来有管家（管家变更）     管家表入两条数据           （管家变更）
+              一开始没有管家  后来有管家                 管家表里入后来的管家的数据  (管家变更)
+              一开始有管家    后来没有管家               管家表入一开始的管家数据   （管家变更）*/
+
             if (StringUtils.isNotRealEmpty(beforeGrid.getHousekeeperId())) {
                 UcUser ucUser = ucUserService.get(beforeGrid.getHousekeeperId());
                 if (ucUser != null) {
@@ -177,8 +184,7 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                 //变更管家 还是变更覆盖范围
                 //String after_housekeeper_history_id = null;
                 Boolean housekeeperChange = false;
-                if (StringUtils.isNotRealEmpty(gridBasicInfoDTO.getHousekeeperId())) {
-                    if (gridBasicInfoDTO.getHousekeeperId() != beforeGrid.getHousekeeperId()) {
+                    if (changeType == 0) {
                         //管家变更
                         //调用管家接口获取管家数据，记录housekeeper_history获取after_housekeeper_history_id
                         housekeeperChange = true;
@@ -206,52 +212,38 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                         gridHistoryChangeTypeRef.setCreatedBy(user.getUserId());
                         gridHistoryChangeTypeRefService.insert(gridHistoryChangeTypeRef);
                     }
-                } else {
-                    //是否是 管家与网格解除绑定操作
-                    if (beforeGrid.getHousekeeperId() != null) {
-                        //网格和管家解除绑定
-                        housekeeperChange = true;
-                        GridHistoryChangeTypeRef gridHistoryChangeTypeRef = new GridHistoryChangeTypeRef();
-                        gridHistoryChangeTypeRef.setGridHistoryId(gridBasicInfoHistory.getId());
-                        gridHistoryChangeTypeRef.setEnabledFlag(1);
-                        gridHistoryChangeTypeRef.setIsDeleted(0);
-                        gridHistoryChangeTypeRef.setGridChangeType("housekeeper_change");
-                        gridHistoryChangeTypeRef.setCreationDate(new Date());
-                        gridHistoryChangeTypeRef.setUpdationDate(new Date());
-                        gridHistoryChangeTypeRef.setCreatedBy(user.getUserId());
-                        gridHistoryChangeTypeRef.setUpdatedBy(user.getUserId());
-                        gridHistoryChangeTypeRefService.insert(gridHistoryChangeTypeRef);
-                    }
-                }
 
-                if (!housekeeperChange && StringUtils.isNotRealEmpty(before_housekeeper_history_id)) {
+
+                if (changeType == 1) {
                     after_housekeeper_history_id = before_housekeeper_history_id;
-                } else if (StringUtils.isNotRealEmpty(gridBasicInfoDTO.getHousekeeperId())) {
-                    UcUser ucUser = ucUserService.get(gridBasicInfoDTO.getHousekeeperId());
-                    if (ucUser != null) {
-                        HousekeeperHistory housekeeperHistory = new HousekeeperHistory();
-                        housekeeperHistory.setEmail(ucUser.getEmail());
-                        housekeeperHistory.setIsDeleted(0);
-                        housekeeperHistory.setEnabledFlag(1);
-                        housekeeperHistory.setMobilePhone(ucUser.getMobile());
-                        housekeeperHistory.setUserAccount(ucUser.getAccount());
-                        housekeeperHistory.setUserId(ucUser.getId());
-                        housekeeperHistory.setUserName(ucUser.getFullname());
-                        UcOrgUser ucOrgUser = ucOrgUserService.getByUserIdAndOrgId(gridBasicInfoDTO.getHousekeeperId(),beforeGrid.getStagingId());
-                        if (ucOrgUser != null && StringUtils.isNotRealEmpty(ucOrgUser.getPosId())){
-                            UcOrgPost ucOrgPost = ucOrgPostService.get(ucOrgUser.getPosId());
-                            if (ucOrgPost != null){
-                                if ("".equals(ucOrgPost.getPostKey())){
-                                    housekeeperHistory.setUserLevel(null);
+                } else{
+                    if (StringUtils.isNotRealEmpty(gridBasicInfoDTO.getHousekeeperId())){
+                        UcUser ucUser = ucUserService.get(gridBasicInfoDTO.getHousekeeperId());
+                        if (ucUser != null) {
+                            HousekeeperHistory housekeeperHistory = new HousekeeperHistory();
+                            housekeeperHistory.setEmail(ucUser.getEmail());
+                            housekeeperHistory.setIsDeleted(0);
+                            housekeeperHistory.setEnabledFlag(1);
+                            housekeeperHistory.setMobilePhone(ucUser.getMobile());
+                            housekeeperHistory.setUserAccount(ucUser.getAccount());
+                            housekeeperHistory.setUserId(ucUser.getId());
+                            housekeeperHistory.setUserName(ucUser.getFullname());
+                            UcOrgUser ucOrgUser = ucOrgUserService.getByUserIdAndOrgId(gridBasicInfoDTO.getHousekeeperId(),beforeGrid.getStagingId());
+                            if (ucOrgUser != null && StringUtils.isNotRealEmpty(ucOrgUser.getPosId())){
+                                UcOrgPost ucOrgPost = ucOrgPostService.get(ucOrgUser.getPosId());
+                                if (ucOrgPost != null){
+                                    if ("".equals(ucOrgPost.getPostKey())){
+                                        housekeeperHistory.setUserLevel(null);
+                                    }
                                 }
                             }
+                            housekeeperHistory.setCreationDate(new Date());
+                            housekeeperHistory.setUpdationDate(new Date());
+                            housekeeperHistory.setCreatedBy(user.getUserId());
+                            housekeeperHistory.setUpdatedBy(user.getUserId());
+                            housekeeperHistoryService.insert(housekeeperHistory);
+                            after_housekeeper_history_id = housekeeperHistory.getId();
                         }
-                        housekeeperHistory.setCreationDate(new Date());
-                        housekeeperHistory.setUpdationDate(new Date());
-                        housekeeperHistory.setCreatedBy(user.getUserId());
-                        housekeeperHistory.setUpdatedBy(user.getUserId());
-                        housekeeperHistoryService.insert(housekeeperHistory);
-                        after_housekeeper_history_id = housekeeperHistory.getId();
                     }
                 }
 
