@@ -97,5 +97,8 @@
         <if test="orderBySql!=null">
             ORDER BY ${orderBySql}
         </if>
+        <if test="orderBySql == null">
+            order by creationDate desc
+        </if>
     </select>
 </mapper>
