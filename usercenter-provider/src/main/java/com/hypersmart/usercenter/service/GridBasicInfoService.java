@@ -31,12 +31,19 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
      */
     PageList<GridBasicInfoDTO> selectGridBasicInfo(QueryFilter queryFilter);
 
+//    /**
+//     * 根据id获取网格
+//     * @param id
+//     * @return
+//     */
+//    GridBasicInfoDTO getGridById(String id);
+
     /**
-     * 根据id获取网格
+     * 获取指定id的网格信息
      * @param id
      * @return
      */
-    GridBasicInfoDTO getGridById(String id);
+    Map<String,Object> getGridById(String id);
 
     /**
      * 新增网格

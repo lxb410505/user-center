@@ -272,6 +272,90 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         return gridBasicInfoDTOPageList;
     }
 
+//    /**
+//     * 根据id获取网格
+//     *
+//     * @param id
+//     * @return
+//     */
+//    @Override
+//    public GridBasicInfoDTO getGridById(String id) {
+//        GridBasicInfo gridBasicInfo = this.get(id);
+//        //存储组织id集合
+//        Set<String> orgIdList = new HashSet<>();
+//        //存储管家id集合
+//        orgIdList.add(gridBasicInfo.getAreaId());
+//        orgIdList.add(gridBasicInfo.getProjectId());
+//        orgIdList.add(gridBasicInfo.getMassifId());
+//        orgIdList.add(gridBasicInfo.getStagingId());
+//        orgIdList.add(gridBasicInfo.getCityId());
+//        //管家入参
+//        Map<String, String> housekeeperMap = new HashMap<>();
+//        //存储管家List
+//        PageList<JsonNode> pageList = new PageList<>();
+//        if (!StringUtils.isEmpty(gridBasicInfo.getHousekeeperId())) {
+//            QueryField queryField = new QueryField();
+//            QueryFilter queryFilterQ = QueryFilter.build();
+//            List<QueryField> querys = new ArrayList<>();
+//            queryField.setProperty("houseKeeperId");
+//            queryField.setValue(gridBasicInfo.getHousekeeperId());
+//            queryField.setOperation(QueryOP.EQUAL);
+//            queryField.setRelation(FieldRelation.AND);
+//            querys.add(queryField);
+//            queryFilterQ.setQuerys(querys);
+//            pageList = ucOrgUserFeign.queryList(queryFilterQ);
+//        }
+//
+//        //组织入参
+//        Map<String, String> orgMap = new HashMap<>();
+//        Map<String, List<String>> orgQueryMap = new HashMap<>();
+//        orgQueryMap.put("list", new ArrayList<>(orgIdList));
+//
+//        //组织集合
+//        List<JsonNode> orgList = ucOrgFeignService.getByList(orgQueryMap);
+//        if (!CollectionUtils.isEmpty(orgList)) {
+//            for (JsonNode jsonNode : orgList) {
+//                JsonNode s = jsonNode.get("id");
+//                String orgId = s.asText();
+//                if (!StringUtils.isEmpty(id)) {
+//                    orgMap.put(orgId, jsonNode.get("name").asText());
+//                }
+//            }
+//        }
+//        //返回DTO
+//        GridBasicInfoDTO gridBasicInfoDTO = new GridBasicInfoDTO();
+//        gridBasicInfoDTO.setId(gridBasicInfo.getId());
+//        gridBasicInfoDTO.setAreaId(gridBasicInfo.getAreaId());
+//        gridBasicInfoDTO.setProjectId(gridBasicInfo.getProjectId());
+//        gridBasicInfoDTO.setMassifId(gridBasicInfo.getMassifId());
+//        gridBasicInfoDTO.setStagingId(gridBasicInfo.getStagingId());
+//        gridBasicInfoDTO.setCityId(gridBasicInfo.getCityId());
+//        gridBasicInfoDTO.setGridName(gridBasicInfo.getGridName());
+//        gridBasicInfoDTO.setGridCode(gridBasicInfo.getGridCode());
+//        gridBasicInfoDTO.setGridType(gridBasicInfo.getGridType());
+//        gridBasicInfoDTO.setGridRemark(gridBasicInfo.getGridRemark());
+//        gridBasicInfoDTO.setGridRange(gridBasicInfo.getGridRange());
+//        gridBasicInfoDTO.setFormatAttribute(gridBasicInfo.getFormatAttribute());
+//        gridBasicInfoDTO.setHousekeeperId(gridBasicInfo.getHousekeeperId());
+//        gridBasicInfoDTO.setCreatedBy(gridBasicInfo.getCreatedBy());
+//        gridBasicInfoDTO.setCreationDate(gridBasicInfo.getCreationDate());
+//        gridBasicInfoDTO.setEnabledFlag(gridBasicInfo.getEnabledFlag());
+//        //返回组织数据
+//        if (orgMap != null) {
+//            gridBasicInfoDTO.setAreaName(orgMap.get(gridBasicInfoDTO.getAreaId()));
+//            gridBasicInfoDTO.setProjectName(orgMap.get(gridBasicInfoDTO.getProjectId()));
+//            gridBasicInfoDTO.setMassifName(orgMap.get(gridBasicInfoDTO.getMassifId()));
+//            gridBasicInfoDTO.setStagingName(orgMap.get(gridBasicInfoDTO.getStagingId()));
+//            gridBasicInfoDTO.setCityName(orgMap.get(gridBasicInfoDTO.getCityId()));
+//        }
+//        //返回管家信息
+//        if (pageList != null && !CollectionUtils.isEmpty(pageList.getRows())) {
+//            JsonNode jsonNode = pageList.getRows().get(0);
+//            gridBasicInfoDTO.setHousekeeperName(jsonNode.get("fullName").asText());
+//        }
+//        return gridBasicInfoDTO;
+//    }
+
     /**
      * 根据id获取网格
      *
@@ -279,81 +363,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
      * @return
      */
     @Override
-    public GridBasicInfoDTO getGridById(String id) {
-        GridBasicInfo gridBasicInfo = this.get(id);
-        //存储组织id集合
-        Set<String> orgIdList = new HashSet<>();
-        //存储管家id集合
-        orgIdList.add(gridBasicInfo.getAreaId());
-        orgIdList.add(gridBasicInfo.getProjectId());
-        orgIdList.add(gridBasicInfo.getMassifId());
-        orgIdList.add(gridBasicInfo.getStagingId());
-        orgIdList.add(gridBasicInfo.getCityId());
-        //管家入参
-        Map<String, String> housekeeperMap = new HashMap<>();
-        //存储管家List
-        PageList<JsonNode> pageList = new PageList<>();
-        if (!StringUtils.isEmpty(gridBasicInfo.getHousekeeperId())) {
-            QueryField queryField = new QueryField();
-            QueryFilter queryFilterQ = QueryFilter.build();
-            List<QueryField> querys = new ArrayList<>();
-            queryField.setProperty("houseKeeperId");
-            queryField.setValue(gridBasicInfo.getHousekeeperId());
-            queryField.setOperation(QueryOP.EQUAL);
-            queryField.setRelation(FieldRelation.AND);
-            querys.add(queryField);
-            queryFilterQ.setQuerys(querys);
-            pageList = ucOrgUserFeign.queryList(queryFilterQ);
-        }
-
-        //组织入参
-        Map<String, String> orgMap = new HashMap<>();
-        Map<String, List<String>> orgQueryMap = new HashMap<>();
-        orgQueryMap.put("list", new ArrayList<>(orgIdList));
-
-        //组织集合
-        List<JsonNode> orgList = ucOrgFeignService.getByList(orgQueryMap);
-        if (!CollectionUtils.isEmpty(orgList)) {
-            for (JsonNode jsonNode : orgList) {
-                JsonNode s = jsonNode.get("id");
-                String orgId = s.asText();
-                if (!StringUtils.isEmpty(id)) {
-                    orgMap.put(orgId, jsonNode.get("name").asText());
-                }
-            }
-        }
-        //返回DTO
-        GridBasicInfoDTO gridBasicInfoDTO = new GridBasicInfoDTO();
-        gridBasicInfoDTO.setId(gridBasicInfo.getId());
-        gridBasicInfoDTO.setAreaId(gridBasicInfo.getAreaId());
-        gridBasicInfoDTO.setProjectId(gridBasicInfo.getProjectId());
-        gridBasicInfoDTO.setMassifId(gridBasicInfo.getMassifId());
-        gridBasicInfoDTO.setStagingId(gridBasicInfo.getStagingId());
-        gridBasicInfoDTO.setCityId(gridBasicInfo.getCityId());
-        gridBasicInfoDTO.setGridName(gridBasicInfo.getGridName());
-        gridBasicInfoDTO.setGridCode(gridBasicInfo.getGridCode());
-        gridBasicInfoDTO.setGridType(gridBasicInfo.getGridType());
-        gridBasicInfoDTO.setGridRemark(gridBasicInfo.getGridRemark());
-        gridBasicInfoDTO.setGridRange(gridBasicInfo.getGridRange());
-        gridBasicInfoDTO.setFormatAttribute(gridBasicInfo.getFormatAttribute());
-        gridBasicInfoDTO.setHousekeeperId(gridBasicInfo.getHousekeeperId());
-        gridBasicInfoDTO.setCreatedBy(gridBasicInfo.getCreatedBy());
-        gridBasicInfoDTO.setCreationDate(gridBasicInfo.getCreationDate());
-        gridBasicInfoDTO.setEnabledFlag(gridBasicInfo.getEnabledFlag());
-        //返回组织数据
-        if (orgMap != null) {
-            gridBasicInfoDTO.setAreaName(orgMap.get(gridBasicInfoDTO.getAreaId()));
-            gridBasicInfoDTO.setProjectName(orgMap.get(gridBasicInfoDTO.getProjectId()));
-            gridBasicInfoDTO.setMassifName(orgMap.get(gridBasicInfoDTO.getMassifId()));
-            gridBasicInfoDTO.setStagingName(orgMap.get(gridBasicInfoDTO.getStagingId()));
-            gridBasicInfoDTO.setCityName(orgMap.get(gridBasicInfoDTO.getCityId()));
-        }
-        //返回管家信息
-        if (pageList != null && !CollectionUtils.isEmpty(pageList.getRows())) {
-            JsonNode jsonNode = pageList.getRows().get(0);
-            gridBasicInfoDTO.setHousekeeperName(jsonNode.get("fullName").asText());
-        }
-        return gridBasicInfoDTO;
+    public Map<String,Object> getGridById(String id) {
+        return gridBasicInfoMapper.getGridById(id);
     }
 
     /**

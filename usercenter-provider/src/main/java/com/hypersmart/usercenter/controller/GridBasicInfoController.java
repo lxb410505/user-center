@@ -120,7 +120,7 @@ public class GridBasicInfoController extends BaseController {
      */
     @GetMapping({"/getGridById/{id}"})
     @ApiOperation(value = "网格基础信息表数据列表", httpMethod = "GET", notes = "获取单个网格基础信息表记录")
-    public GridBasicInfoDTO getGridById(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {
+    public Map<String,Object> getGridById(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {
         return gridBasicInfoService.getGridById(id);
     }
 

@@ -35,4 +35,11 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
      * @return
      */
     List<GridBasicInfoSimpleDTO> getGridBasicInfoByHouseKeeperIds(@Param("houseKeeperBO") List<HouseKeeperBO> houseKeeperBO);
+
+    /**
+     * 获取指定id的网格信息
+     * @param id
+     * @return
+     */
+    Map<String, Object> getGridById(String id);
 }
