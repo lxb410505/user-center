@@ -135,6 +135,7 @@ public class GridBasicInfoController extends BaseController {
     public CommonResult<String> changeHousekeeper(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
         GridBasicInfo gridBasicInfo = new GridBasicInfo();
         BeanUtils.copyProperties(gridBasicInfoDTO,gridBasicInfo);
+        gridBasicInfo.setId(gridBasicInfoDTO.getId());
         gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo);
         CommonResult commonResult = new CommonResult();
         GridErrorCode gridErrorCode = gridBasicInfoService.changeHousekeeper(gridBasicInfoDTO);
@@ -158,6 +159,7 @@ public class GridBasicInfoController extends BaseController {
     public CommonResult<String> changeRange(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
         GridBasicInfo gridBasicInfo = new GridBasicInfo();
         BeanUtils.copyProperties(gridBasicInfoDTO,gridBasicInfo);
+        gridBasicInfo.setId(gridBasicInfoDTO.getId());
         gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo);
         CommonResult commonResult = new CommonResult();
         GridErrorCode gridErrorCode = gridBasicInfoService.changeRange(gridBasicInfoDTO);
