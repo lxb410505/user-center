@@ -7,6 +7,8 @@ import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.framework.utils.StringUtils;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
+import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.constant.GridErrorCode;
 import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridBasicInfoHistoryDTO;
@@ -16,6 +18,7 @@ import com.hypersmart.usercenter.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +67,7 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
     @Override
     public GridErrorCode saveGridBasicInfoHistory(GridBasicInfo gridBasicInfoDTO) {
         GridErrorCode gridErrorCode = GridErrorCode.UNKOWN_EXCEPTION;
+        IUser user = ContextUtil.getCurrentUser();
         Integer num = 0;
         if (gridBasicInfoDTO != null) {
             //之前网格记录
@@ -94,6 +98,10 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                             }
                         }
                     }
+                    housekeeperHistory.setCreationDate(new Date());
+                    housekeeperHistory.setCreatedBy(user.getUserId());
+                    housekeeperHistory.setUpdationDate(new Date());
+                    housekeeperHistory.setUpdatedBy(user.getUserId());
                     housekeeperHistoryService.insert(housekeeperHistory);
                     before_housekeeper_history_id = housekeeperHistory.getId();
                 }
@@ -157,8 +165,10 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
             gridBasicInfoHistory.setFormatAttribute(beforeGrid.getFormatAttribute());
             gridBasicInfoHistory.setEnabledFlag(1);
             gridBasicInfoHistory.setIsDeleted(0);
-
-
+            gridBasicInfoHistory.setCreationDate(new Date());
+            gridBasicInfoHistory.setUpdationDate(new Date());
+            gridBasicInfoHistory.setCreatedBy(user.getUserId());
+            gridBasicInfoHistory.setUpdatedBy(user.getUserId());
             //新增
             num = this.insertSelective(gridBasicInfoHistory);
 
@@ -177,6 +187,10 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                         gridHistoryChangeTypeRef.setEnabledFlag(1);
                         gridHistoryChangeTypeRef.setIsDeleted(0);
                         gridHistoryChangeTypeRef.setGridChangeType("housekeeper_change");
+                        gridHistoryChangeTypeRef.setCreationDate(new Date());
+                        gridHistoryChangeTypeRef.setUpdationDate(new Date());
+                        gridHistoryChangeTypeRef.setCreatedBy(user.getUserId());
+                        gridHistoryChangeTypeRef.setUpdatedBy(user.getUserId());
                         gridHistoryChangeTypeRefService.insert(gridHistoryChangeTypeRef);
                     } else {
                         //网格覆盖范围变更
@@ -186,6 +200,10 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                         gridHistoryChangeTypeRef.setEnabledFlag(1);
                         gridHistoryChangeTypeRef.setIsDeleted(0);
                         gridHistoryChangeTypeRef.setGridChangeType("grid_range_change");
+                        gridHistoryChangeTypeRef.setCreationDate(new Date());
+                        gridHistoryChangeTypeRef.setUpdationDate(new Date());
+                        gridHistoryChangeTypeRef.setUpdatedBy(user.getUserId());
+                        gridHistoryChangeTypeRef.setCreatedBy(user.getUserId());
                         gridHistoryChangeTypeRefService.insert(gridHistoryChangeTypeRef);
                     }
                 } else {
@@ -198,6 +216,10 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                         gridHistoryChangeTypeRef.setEnabledFlag(1);
                         gridHistoryChangeTypeRef.setIsDeleted(0);
                         gridHistoryChangeTypeRef.setGridChangeType("housekeeper_change");
+                        gridHistoryChangeTypeRef.setCreationDate(new Date());
+                        gridHistoryChangeTypeRef.setUpdationDate(new Date());
+                        gridHistoryChangeTypeRef.setCreatedBy(user.getUserId());
+                        gridHistoryChangeTypeRef.setUpdatedBy(user.getUserId());
                         gridHistoryChangeTypeRefService.insert(gridHistoryChangeTypeRef);
                     }
                 }
@@ -224,6 +246,10 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                                 }
                             }
                         }
+                        housekeeperHistory.setCreationDate(new Date());
+                        housekeeperHistory.setUpdationDate(new Date());
+                        housekeeperHistory.setCreatedBy(user.getUserId());
+                        housekeeperHistory.setUpdatedBy(user.getUserId());
                         housekeeperHistoryService.insert(housekeeperHistory);
                         after_housekeeper_history_id = housekeeperHistory.getId();
                     }
@@ -288,6 +314,10 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                 gridBasicInfoHistoryAfter.setFormatAttribute(gridBasicInfoDTO.getFormatAttribute());
                 gridBasicInfoHistoryAfter.setEnabledFlag(1);
                 gridBasicInfoHistoryAfter.setIsDeleted(0);
+                gridBasicInfoHistoryAfter.setCreationDate(new Date());
+                gridBasicInfoHistoryAfter.setUpdationDate(new Date());
+                gridBasicInfoHistoryAfter.setCreatedBy(user.getUserId());
+                gridBasicInfoHistoryAfter.setUpdatedBy(user.getUserId());
                 gridBasicInfoHistoryAfterService.insert(gridBasicInfoHistoryAfter);
             }
         }
