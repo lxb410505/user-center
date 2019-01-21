@@ -14,6 +14,7 @@ import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.*;
 
@@ -79,7 +80,20 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         if(null != ucOrgUsersList && ucOrgUsersList.size()>0){
             queryOrg.addFilter("id",orgIds,QueryOP.IN,FieldRelation.AND);
         }else{
-            return new PageList<>();
+            PageList<Map<String, Object>> pageList = new PageList();
+            pageList.setTotal(0);
+            if(BeanUtils.isEmpty(queryFilter.getPageBean())){
+                pageList.setPage(1);
+                pageList.setPageSize(10);
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0);
+            }else{
+                pageList.setPage(queryFilter.getPageBean().getPage());
+                pageList.setPageSize(queryFilter.getPageBean().getPageSize());
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0);
+            }
+            return pageList;
         }
         PageList<UcOrg> orgList =  ucOrgService.query(queryOrg);
         Map<String,UcOrg> map = new HashMap<>();
@@ -107,7 +121,20 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
             }
             queryFilter.addFilter("divideId", divideId, QueryOP.IN, FieldRelation.AND,"two");
         }else{
-            return new PageList<>();
+            PageList<Map<String, Object>> pageList = new PageList();
+            pageList.setTotal(0);
+            if(BeanUtils.isEmpty(queryFilter.getPageBean())){
+                pageList.setPage(1);
+                pageList.setPageSize(10);
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0);
+            }else{
+                pageList.setPage(queryFilter.getPageBean().getPage());
+                pageList.setPageSize(queryFilter.getPageBean().getPageSize());
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0);
+            }
+            return pageList;
         }
 
         //===============================================================================================
@@ -127,5 +154,16 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         }
         List<Map<String,Object>> query = this.ucUserMapper.quertList(queryFilter.getParams());
         return new PageList<>(query);
+    }
+
+    @Override
+    public UcOrgUser getByUserIdAndOrgId(String housekeeperId, String stagingId) {
+        Example example = new Example(UcOrgUser.class);
+        example.createCriteria().andEqualTo("userId",housekeeperId).andEqualTo("orgId",stagingId);
+        List<UcOrgUser> list = this.ucOrgUserMapper.selectByExample(example);
+        if (list != null && list.size() > 0){
+            return list.get(0);
+        }
+        return null;
     }
 }

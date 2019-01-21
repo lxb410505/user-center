@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.GridRangeMapper">
+
+    <delete id="deleteRangeByGridId" parameterType="java.lang.String">
+        delete from grid_range where grid_id = #{gridId}
+    </delete>
+
+    <select id="getRanged" parameterType="java.lang.String" resultType="com.hypersmart.usercenter.model.GridRange">
+        select range_type as rangeType,resource_id as resourceId from grid_range where grid_id != #{gridId}
+    </select>
+
+</mapper>

@@ -1,9 +1,6 @@
 package com.hypersmart.usercenter.controller;
 
 
-import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
@@ -15,15 +12,17 @@ import com.hypersmart.usercenter.constant.GridErrorCode;
 import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
 import com.hypersmart.usercenter.model.GridBasicInfo;
+import com.hypersmart.usercenter.service.GridBasicInfoHistoryService;
 import com.hypersmart.usercenter.service.GridBasicInfoService;
+import com.hypersmart.usercenter.service.UcOrgUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,10 @@ public class GridBasicInfoController extends BaseController {
 
 
     @Autowired
-    private com.hypersmart.mdm.feign.UcOrgUserFeign ucOrgUserFeign;
+    private UcOrgUserService ucOrgUserService;
+
+    @Autowired
+    private GridBasicInfoHistoryService gridBasicInfoHistoryService;
 
 
 
@@ -118,7 +120,7 @@ public class GridBasicInfoController extends BaseController {
      */
     @GetMapping({"/getGridById/{id}"})
     @ApiOperation(value = "网格基础信息表数据列表", httpMethod = "GET", notes = "获取单个网格基础信息表记录")
-    public GridBasicInfoDTO getGridById(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {
+    public Map<String,Object> getGridById(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {
         return gridBasicInfoService.getGridById(id);
     }
 
@@ -131,6 +133,10 @@ public class GridBasicInfoController extends BaseController {
     @PostMapping({"/changeHousekeeper"})
     @ApiOperation(value = "变更网格管家", httpMethod = "POST", notes = "变更网格管家")
     public CommonResult<String> changeHousekeeper(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
+        GridBasicInfo gridBasicInfo = new GridBasicInfo();
+        BeanUtils.copyProperties(gridBasicInfoDTO,gridBasicInfo);
+        gridBasicInfo.setId(gridBasicInfoDTO.getId());
+        gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo,0);
         CommonResult commonResult = new CommonResult();
         GridErrorCode gridErrorCode = gridBasicInfoService.changeHousekeeper(gridBasicInfoDTO);
         if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
@@ -151,6 +157,10 @@ public class GridBasicInfoController extends BaseController {
     @PostMapping({"/changeRange"})
     @ApiOperation(value = "变更映射楼栋", httpMethod = "POST", notes = "变更映射楼栋")
     public CommonResult<String> changeRange(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
+        GridBasicInfo gridBasicInfo = new GridBasicInfo();
+        BeanUtils.copyProperties(gridBasicInfoDTO,gridBasicInfo);
+        gridBasicInfo.setId(gridBasicInfoDTO.getId());
+        gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo,1);
         CommonResult commonResult = new CommonResult();
         GridErrorCode gridErrorCode = gridBasicInfoService.changeRange(gridBasicInfoDTO);
         if(GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
@@ -209,36 +219,31 @@ public class GridBasicInfoController extends BaseController {
 
     @PostMapping({"/getHouseKeeper"})
     @ApiOperation(value = "管家列表", httpMethod = "POST", notes = "管家列表")
-    public PageList<JsonNode> listHouseKeeper(@ApiParam(name = "queryFilter", value = "查询条件") @RequestBody QueryFilter queryFilter) {
-        PageList<JsonNode> pageList = ucOrgUserFeign.queryList(queryFilter);
+    public PageList<Map<String,Object>> listHouseKeeper(@ApiParam(name = "queryFilter", value = "查询条件") @RequestBody QueryFilter queryFilter) {
+        PageList<Map<String,Object>> pageList = ucOrgUserService.quertList(queryFilter);
         if (pageList != null && pageList.getRows() != null && pageList.getRows().size() > 0) {
             List<HouseKeeperBO> houseKeeperBOList = new ArrayList<>();
-            for (JsonNode jsonNode : pageList.getRows()) {
+            for (Map<String,Object> objectMap : pageList.getRows()) {
                 HouseKeeperBO houseKeeperBO = new HouseKeeperBO();
-                houseKeeperBO.setDivideId(jsonNode.get("divideId").asText());
-                houseKeeperBO.setHouseKeeperId(jsonNode.get("houseKeeperId").asText());
+                houseKeeperBO.setDivideId(objectMap.get("divideId").toString());
+                houseKeeperBO.setHouseKeeperId(objectMap.get("houseKeeperId").toString());
                 houseKeeperBOList.add(houseKeeperBO);
             }
 
             List<GridBasicInfoSimpleDTO> list = gridBasicInfoService.getGridBasicInfoByHouseKeeperIds(houseKeeperBOList);
 
             if (list != null && list.size() > 0){
-                for (JsonNode jsonNode : pageList.getRows()) {
-                    ObjectNode objectNode = (ObjectNode) jsonNode;
+                for (Map<String,Object> m : pageList.getRows()) {
                     Map<String, List<GridBasicInfoSimpleDTO>> map = list.stream()
-                            .filter(gridBasicInfoSimpleDTO -> (jsonNode.get("houseKeeperId").asText().equals(gridBasicInfoSimpleDTO.getHousekeeperId())))
+                            .filter(gridBasicInfoSimpleDTO -> (m.get("houseKeeperId").toString().equals(gridBasicInfoSimpleDTO.getHousekeeperId())))
                             .collect(Collectors.toList()).stream().collect(Collectors.groupingBy(GridBasicInfoSimpleDTO::getStagingId));
-                    String jsonStr = JSON.toJSONString(map.get(jsonNode.get("divideId").asText()));
-                    ObjectMapper mapper = new ObjectMapper();
-                    try {
-                        JsonNode jn = mapper.readTree(jsonStr);
-                        objectNode.set("gridList",jn);
-                        //objectNode.putPOJO(map.get(jsonNode.get("divide").asText()));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    List<GridBasicInfoSimpleDTO> gridBasicInfoSimpleDTOList = map.get(m.get("divideId").toString());
+                    m.put("gridList",gridBasicInfoSimpleDTOList);
                 }
             }
+        }
+        if (pageList.getRows() == null){
+            pageList.setRows(new ArrayList<>());
         }
         return pageList;
     }
@@ -250,6 +255,9 @@ public class GridBasicInfoController extends BaseController {
         List<String> gridIdList = new ArrayList<>();
         for (GridBasicInfoBO gridBasicInfoBO : gridBasicInfoBOList){
             gridIdList.add(gridBasicInfoBO.getId());
+            GridBasicInfo gridBasicInfo = gridBasicInfoService.get(gridBasicInfoBO.getId());
+            gridBasicInfo.setHousekeeperId(gridBasicInfoBO.getHousekeeperId());
+            gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo,0);
         }
         String[] gridIdArray = new String[gridIdList.size()];
         gridIdList.toArray(gridIdArray);
@@ -270,6 +278,9 @@ public class GridBasicInfoController extends BaseController {
         List<String> gridIdList = new ArrayList<>();
         for (GridBasicInfoBO gridBasicInfoBO : gridBasicInfoBOList){
             gridIdList.add(gridBasicInfoBO.getId());
+            GridBasicInfo gridBasicInfo = gridBasicInfoService.get(gridBasicInfoBO.getId());
+            gridBasicInfo.setHousekeeperId(gridBasicInfoBO.getHousekeeperId());
+            gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo,0);
         }
         String[] gridIdArray = new String[gridIdList.size()];
         gridIdList.toArray(gridIdArray);

@@ -32,9 +32,9 @@
         <result column="tenant_id" jdbcType="VARCHAR" property="tenantId" />
         <result column="enabled_flag" jdbcType="TINYINT" property="enabledFlag" />
         <result column="is_deleted" jdbcType="TINYINT" property="isDeleted" />
-        <result column="spare_column_id" jdbcType="VARCHAR" property="spareColumnId" />
-        <result column="spare_column_code" jdbcType="VARCHAR" property="spareColumnCode" />
-        <result column="spare_column_name" jdbcType="VARCHAR" property="spareColumnName" />
+        <result column="city_id" jdbcType="VARCHAR" property="cityId" />
+        <result column="city_code" jdbcType="VARCHAR" property="cityCode" />
+        <result column="city_name" jdbcType="VARCHAR" property="cityName" />
     </resultMap>
     <sql id="BaseTable">
     grid_basic_info_history
@@ -44,5 +44,61 @@
     <!--<sql id="GenerationType">-->
     <!--DB_UUID ( select replace(uuid(),'-','') from dual )-->
     <!--</sql>-->
-
+    <select id="queryList" resultType="com.hypersmart.usercenter.dto.GridBasicInfoHistoryDTO" >
+        select * from (
+        SELECT
+        a.id as id,
+        a.grid_id as gridId,
+        a.grid_code as gridCode,
+        a.grid_name as gridName,
+        a.grid_type as gridType,
+        a.grid_range as gridRange,
+        a.grid_remark as gridRemark,
+        a.area_id as areaId,
+        a.area_code as areaCode,
+        a.area_name as areaName,
+        a.project_id as projectId,
+        a.project_code as projectCode,
+        a.project_name as projectName,
+        a.massif_id as massifId,
+        a.massif_code as massifCode,
+        a.massif_name as massifName,
+        a.staging_id as stagingId,
+        a.staging_code as staging,
+        a.staging_name as stagingName,
+        a.housekeeper_history_id as housekeeperHistoryId,
+        a.format_attribute as formatAttribute,
+        a.creation_date as creationDate,
+        a.created_by as createdBy,
+        a.updation_date as updationDate,
+        a.updated_by as updatedBy,
+        a.enabled_flag as enabledFlag,
+        a.is_deleted as isDeleted,
+        a.city_id as cityId,
+        a.city_code as cityCode,
+        a.city_name as cityName,
+        b.grid_change_type as gridChangeType,
+        c.user_name as housekeeperName,
+        d.FULLNAME_  as updatedByName
+        FROM
+        grid_basic_info_history a
+        left join grid_history_change_type_ref b
+        on a.id = b.grid_history_id
+        left join housekeeper_history c
+        on c.id = a.housekeeper_history_id
+        left join uc_user d
+        on  d.ID_ = a.updated_by
+        ) as t
+        <where>
+            <if test="whereSql!=null">
+                ${whereSql}
+            </if>
+        </where>
+        <if test="orderBySql!=null">
+            ORDER BY ${orderBySql}
+        </if>
+        <if test="orderBySql == null">
+            order by creationDate desc
+        </if>
+    </select>
 </mapper>

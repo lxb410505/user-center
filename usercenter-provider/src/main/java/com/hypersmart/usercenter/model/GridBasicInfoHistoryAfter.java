@@ -26,7 +26,7 @@ public class GridBasicInfoHistoryAfter implements Serializable{
 private static final long serialVersionUID=1L;
 
     @Id
-    @KeySql(genId = com.hypersmart.base.id.genId.Suid.class)
+    @KeySql(genId = com.hypersmart.base.id.genId.UUIdGenId.class)
     @Column(name = "id")
     @ApiModelProperty("网格历史变更后主键")
     private String id;
@@ -167,7 +167,7 @@ private static final long serialVersionUID=1L;
     @ApiModelProperty("冗余所属城市编码")
     private String cityCode;
 
-    @Column(name = "project_name")
+    @Column(name = "city_name")
     @ApiModelProperty("冗余所属城市名称")
     private String cityName;
 
