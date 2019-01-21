@@ -13,7 +13,11 @@ import com.hypersmart.framework.model.GenericBO;
 
 public class GridRangeBO extends GenericBO{
 
+    //网格id
     private String gridId;
+
+    //分期id
+    private String stagingId;
 
     public String getGridId() {
         return gridId;
@@ -21,5 +25,13 @@ public class GridRangeBO extends GenericBO{
 
     public void setGridId(String gridId) {
         this.gridId = gridId;
+    }
+
+    public String getStagingId() {
+        return stagingId;
+    }
+
+    public void setStagingId(String stagingId) {
+        this.stagingId = stagingId;
     }
 }

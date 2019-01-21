@@ -33,8 +33,8 @@ public class GridRangeController extends BaseController {
     GridRangeService gridRangeService;
 
     @PostMapping({"/getAllRange"})
-    @ApiOperation(value = "获取所有已经绑定的楼栋}", httpMethod = "POST", notes = "获取所有已经绑定的楼栋")
-    public List<String> getAllRange(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody GridRangeBO gridRangeBO) {
+    @ApiOperation(value = "获取所有已经绑定网格的楼栋}", httpMethod = "POST", notes = "获取所有已经绑定网格的楼栋")
+    public List<String> getAllRange(@ApiParam(name = "gridRangeBO", value = "查询对象") @RequestBody GridRangeBO gridRangeBO) {
         return this.gridRangeService.getAllRange(gridRangeBO);
     }
 }

@@ -32,57 +32,6 @@
     grid_basic_info
     </sql>
 
-    <!--查询-->
-    <select id="searchGridList" resultMap="DtoResultMap" parameterType="com.hypersmart.usercenter.bo.GridBasicInfoBO">
-        SELECT
-        a.id,
-        a.project_id,
-        a.area_id,
-        a.massif_id,
-        a.staging_id,
-        a.city_id,
-        a.grid_code,
-        a.grid_name,
-        a.grid_type,
-        a.grid_range,
-        a.grid_remark,
-        a.update_times,
-        a.format_attribute,
-        a.housekeeper_id,
-        a.created_by,
-        a.creation_date,
-        a.enabled_flag
-        FROM
-        grid_basic_info a
-        where
-        a.is_deleted = 0
-        <if test="areaId != null and areaId != ''">
-            and a.area_id = #{areaId}
-        </if>
-        <if test="projectId != null and projectId != ''">
-            and a.project_id = #{projectId}
-        </if>
-        <if test="massifId != null and massifId != ''">
-            and a.massif_id = #{massifId}
-        </if>
-        <if test="stagingId != null and stagingId != ''">
-            and a.staging_id = #{stagingId}
-        </if>
-        <if test="gridCode != null and gridCode != ''">
-            and INSTR(a.grid_code,#{gridCode}) > 0
-        </if>
-        <if test="gridName !=null and gridName !=''">
-            and INSTR(a.grid_name,#{gridName})>0
-        </if>
-        <if test="gridType !=null and gridType !=''">
-            and a.grid_type = gridType
-        </if>
-        <if test="formatAttribute !=null and formatAttribute !=''">
-            and a.format_attribute = formatAttribute
-        </if>
-        order by a.creation_date desc
-    </select>
-
     <select id="getGridBasicInfoByHouseKeeperIds" resultMap="SimpleDTOMap" >
         SELECT
         a.id,
@@ -119,6 +68,7 @@
         g.format_attribute as formatAttribute,
         concat('',g.enabled_flag,'') as enabledFlag,
         g.is_deleted as isDeleted,
+        g.creation_date as creationDate,
         (select org.NAME_ from uc_org org where ID_ = g.area_id) as areaName,
         (select org.NAME_ from uc_org org where ID_ = g.project_id) as projectName,
         (select org.NAME_ from uc_org org where ID_ = g.city_id) as cityName,
