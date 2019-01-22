@@ -23,6 +23,8 @@ public interface UcOrgUserService extends IGenericService<String, UcOrgUser> {
 
     List<String> getPostIdByjobCode(String joCode);
 
+    PageList<Map<String,Object>> quertListFive(QueryFilter queryFilter);
+
     PageList<Map<String,Object>> quertList(QueryFilter queryFilter);
 
     UcOrgUser getByUserIdAndOrgId(String housekeeperId, String stagingId);

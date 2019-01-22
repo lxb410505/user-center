@@ -108,6 +108,13 @@ public class UcOrgController extends BaseController {
         return new ArrayList<>();
     }
 
+
+    @GetMapping({"/userList"})
+    @ApiOperation(value = "组织架构数据列表}", httpMethod = "POST", notes = "获取组织架构列表")
+    public List<UcOrg> userList() {
+       return ucOrgService.getUserOrgList();
+    }
+
     @PostMapping({"/getByList"})
     @ApiOperation(value = "根据组织id集合获取组织信息}", httpMethod = "POST", notes = "根据组织id集合获取组织信息")
     public List<UcOrg> getByList( @RequestBody  Map<String,List<String>> map) {

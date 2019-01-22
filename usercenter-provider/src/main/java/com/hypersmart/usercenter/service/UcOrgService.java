@@ -20,5 +20,7 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
     List<UcOrg> getOrg(List<UcOrgUser> list);
 
     List<UcOrg> getChildrenOrg(UcOrg ucOrg);
+
+    List<UcOrg> getUserOrgList();
 }
 
