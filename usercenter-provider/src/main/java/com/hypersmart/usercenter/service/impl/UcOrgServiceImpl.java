@@ -82,7 +82,11 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
                     ids.add(org.getId());
                 }
             }
-            set.add(ucOrg);
+            if(!ids.contains(ucOrg.getId())){
+                ucOrg.setDisabled("1");
+                set.add(ucOrg);
+                ids.add(ucOrg.getId());
+            }
         }
         //根据组织查询父级组织
         for(UcOrg ucOrg : returnList){
