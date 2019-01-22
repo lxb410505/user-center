@@ -22,6 +22,6 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
 
     List<UcOrg> getChildrenOrg(UcOrg ucOrg);
 
-    List<UcOrg> getUserOrgList(IUser iUser);
+    List<UcOrg> getUserOrgList(String userId);
 }
 

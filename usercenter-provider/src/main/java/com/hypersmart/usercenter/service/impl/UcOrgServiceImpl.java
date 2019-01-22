@@ -49,10 +49,10 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     }
 
     @Override
-    public List<UcOrg> getUserOrgList(IUser user) {
+    public List<UcOrg> getUserOrgList(String userId) {
         QueryFilter queryFilter =QueryFilter.build();
         //根据用户查询人与组织关系
-        List<UcOrgUser> list = ucOrgUserService.getUserOrg(user.getUserId());
+        List<UcOrgUser> list = ucOrgUserService.getUserOrg(userId);
         if(null==list || list.size()<=0){
             return new ArrayList<>();
         }
