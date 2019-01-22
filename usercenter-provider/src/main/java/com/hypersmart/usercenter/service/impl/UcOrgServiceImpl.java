@@ -1,13 +1,20 @@
 package com.hypersmart.usercenter.service.impl;
 
+import com.hypersmart.base.query.FieldRelation;
+import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.framework.service.GenericService;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
+import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.mapper.UcOrgMapper;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.UcOrgService;
+import com.hypersmart.usercenter.service.UcOrgUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,6 +30,9 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     @Autowired
     UcOrgMapper ucOrgMapper;
 
+    @Autowired
+    UcOrgUserService ucOrgUserService;
+
     public UcOrgServiceImpl(UcOrgMapper mapper) {
         super(mapper);
         this.ucOrgMapper = mapper;
@@ -36,5 +46,62 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     @Override
     public List<UcOrg> getChildrenOrg(UcOrg ucOrg) {
         return ucOrgMapper.getChildrenOrg(ucOrg);
+    }
+
+    @Override
+    public List<UcOrg> getUserOrgList() {
+        QueryFilter queryFilter =QueryFilter.build();
+        //获取当前用户
+        IUser user =  ContextUtil.getCurrentUser();
+        //根据用户查询人与组织关系
+        List<UcOrgUser> list = ucOrgUserService.getUserOrg(user.getUserId());
+        if(null==list || list.size()<=0){
+            return new ArrayList<>();
+        }
+        String orgIds = "";
+        for(int i=0;i<list.size();i++){
+            if(i==0){
+                orgIds = list.get(i).getOrgId();
+            }else{
+                orgIds = orgIds+","+list.get(i).getOrgId();
+            }
+        }
+        //根据组织id获取组织信息
+        QueryFilter orgQuery = QueryFilter.build();
+        orgQuery.addFilter("id",orgIds,QueryOP.IN,FieldRelation.AND);
+        List<UcOrg> returnList = this.query(orgQuery).getRows();
+        //根据组织获取子级
+        List<UcOrg> set = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
+        for(UcOrg ucOrg :returnList){
+            QueryFilter childQuery = QueryFilter.build();
+            childQuery.addFilter("path",ucOrg.getPath(), QueryOP.RIGHT_LIKE,FieldRelation.AND);
+            List<UcOrg> orgs = this.query(childQuery).getRows();
+            for(UcOrg org :orgs){
+                if(!ids.contains(org.getId())){
+                    org.setDisabled("1");
+                    set.add(org);
+                    ids.add(org.getId());
+                }
+            }
+            set.add(ucOrg);
+        }
+        //根据组织查询父级组织
+        for(UcOrg ucOrg : returnList){
+            String [] paths = ucOrg.getPath().split("\\.");
+            for(int i=0;i<paths.length;i++){
+                QueryFilter query = QueryFilter.build();
+                query.addFilter("id",paths[i],QueryOP.EQUAL,FieldRelation.AND);
+                List<UcOrg> voList = this.query(query).getRows();
+                for(UcOrg vo:voList){
+                    if(!ids.contains(vo.getId())){
+                        vo.setDisabled("2");
+                        set.add(vo);
+                        ids.add(vo.getId());
+                    }
+                }
+            }
+        }
+        return set;
     }
 }
