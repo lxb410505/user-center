@@ -82,12 +82,7 @@ public class GridRangeServiceImpl extends GenericService<String, GridRange> impl
     @Override
     public List<String> getAllRange(GridRangeBO gridRangeBO) {
         List<String> stringList = new ArrayList<>();
-        List<GridRange> gridRangeList = new ArrayList<>();
-        if(StringUtils.isEmpty(gridRangeBO.getGridId())) {
-            gridRangeList = this.getAll();
-        } else {
-            gridRangeList = gridRangeMapper.getRanged(gridRangeBO.getGridId());
-        }
+        List<GridRange> gridRangeList = gridRangeMapper.getRange(gridRangeBO);
         if(!CollectionUtils.isEmpty(gridRangeList)) {
             for(GridRange gridRange : gridRangeList) {
                 if("2".equals(gridRange.getRangeType())) {

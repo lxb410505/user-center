@@ -22,21 +22,14 @@ import java.util.Map;
  */
 public interface GridBasicInfoService extends IGenericService<String, GridBasicInfo> {
 
-    PageList<Map<String,Object>> quertList(QueryFilter queryFilter);
 
     /**
-     * 查询网格信息
+     * 网格分页查询
      * @param queryFilter
      * @return
      */
-    PageList<GridBasicInfoDTO> selectGridBasicInfo(QueryFilter queryFilter);
+    PageList<Map<String,Object>> quertList(QueryFilter queryFilter);
 
-//    /**
-//     * 根据id获取网格
-//     * @param id
-//     * @return
-//     */
-//    GridBasicInfoDTO getGridById(String id);
 
     /**
      * 获取指定id的网格信息

@@ -51,23 +51,15 @@ public class GridBasicInfoController extends BaseController {
     private GridBasicInfoHistoryService gridBasicInfoHistoryService;
 
 
-
-    @PostMapping({"/queryList"})
-    @ApiOperation(value = "用户组织关系数据列表}", httpMethod = "POST", notes = "获取用户组织关系列表")
-    public PageList<Map<String, Object>> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
-        return this.gridBasicInfoService.quertList(queryFilter);
-    }
-
     /**
-     * 查询网格信息
+     *分页查询
      * @param queryFilter
      * @return
      */
     @PostMapping({"/list"})
-    @ApiOperation(value = "网格基础信息表数据列表}", httpMethod = "POST", notes = "获取网格基础信息表列表")
-    public PageList<GridBasicInfoDTO> search(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
-        PageList<GridBasicInfoDTO> gridBasicInfoDTOList = gridBasicInfoService.selectGridBasicInfo(queryFilter);
-        return gridBasicInfoDTOList;
+    @ApiOperation(value = "用户组织关系数据列表}", httpMethod = "POST", notes = "获取用户组织关系列表")
+    public PageList<Map<String, Object>> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+        return this.gridBasicInfoService.quertList(queryFilter);
     }
 
     /**
