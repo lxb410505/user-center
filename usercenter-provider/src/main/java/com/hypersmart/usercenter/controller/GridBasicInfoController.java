@@ -6,6 +6,7 @@ import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.bo.GridBasicInfoBO;
 import com.hypersmart.usercenter.bo.HouseKeeperBO;
 import com.hypersmart.usercenter.constant.GridErrorCode;
@@ -256,6 +257,7 @@ public class GridBasicInfoController extends BaseController {
         List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getByIds(gridIdArray);
         if (gridBasicInfoList != null && gridBasicInfoList.size() > 0){
             for (GridBasicInfo gridBasicInfo : gridBasicInfoList){
+                gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
                 gridBasicInfo.setHousekeeperId(gridBasicInfoBOList.get(0).getHousekeeperId());
             }
         }
@@ -279,6 +281,7 @@ public class GridBasicInfoController extends BaseController {
         List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getByIds(gridIdArray);
         if (gridBasicInfoList != null && gridBasicInfoList.size() > 0){
             for (GridBasicInfo gridBasicInfo : gridBasicInfoList){
+                gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
                 gridBasicInfo.setHousekeeperId(null);
             }
         }
