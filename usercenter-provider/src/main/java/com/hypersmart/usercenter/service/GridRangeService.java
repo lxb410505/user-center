@@ -18,7 +18,7 @@ public interface GridRangeService extends IGenericService<String, GridRange> {
     /**
      * 删除历史记录
      */
-    Integer deleteRangeByGridId(String gridId);
+    Integer deleteRangeByGridIds(String[] ids);
 
 
     /**

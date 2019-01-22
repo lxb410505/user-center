@@ -230,10 +230,16 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
             }
             gridBasicInfo.setGridRemark(gridBasicInfoDTO.getGridRemark());
             gridBasicInfo.setGridType(gridBasicInfoDTO.getGridType());
-            gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
+            if("".equals(gridBasicInfoDTO.getHousekeeperId())) {
+                gridBasicInfo.setHousekeeperId(null);
+            } else {
+                gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
+            }
             gridBasicInfo.setFormatAttribute(gridBasicInfoDTO.getFormatAttribute());
             gridBasicInfo.setCreationDate(new Date());
             gridBasicInfo.setUpdationDate(new Date());
+            gridBasicInfo.setCreatedBy(ContextUtil.getCurrentUser().getUserId());
+            gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
             //网格范围
             gridBasicInfo.setGridRange(gridBasicInfoDTO.getGridRange());
             //新增
@@ -276,6 +282,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
             //只要记录历史记录updateTimes都加1
             gridBasicInfo.setUpdateTimes(gridBasicInfoOld.getUpdateTimes() + 1);
             gridBasicInfo.setUpdationDate(new Date());
+            gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
             num = this.updateSelective(gridBasicInfo);
         }
         if (num < 1) {
@@ -303,9 +310,14 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         //变更管家
         GridBasicInfo gridBasicInfo = new GridBasicInfo();
         gridBasicInfo.setId(gridBasicInfoDTO.getId());
-        gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
+        if("".equals(gridBasicInfoDTO.getHousekeeperId())) {
+            gridBasicInfo.setHousekeeperId(null);
+        } else {
+            gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
+        }
         gridBasicInfo.setUpdateTimes(gridBasicInfoOld.getUpdateTimes() + 1);
         gridBasicInfo.setUpdationDate(new Date());
+        gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
         num = this.updateSelective(gridBasicInfo);
         if (num < 1) {
             gridErrorCode = GridErrorCode.UPDATE_EXCEPTION;
@@ -334,14 +346,17 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         gridBasicInfo.setGridRange(gridBasicInfoDTO.getGridRange());
         gridBasicInfo.setUpdateTimes(gridBasicInfoOld.getUpdateTimes() + 1);
         gridBasicInfo.setUpdationDate(new Date());
+        gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
         num = this.updateSelective(gridBasicInfo);
 
 //        //网格覆盖范围表记录
 //        if(!StringUtils.isEmpty(gridBasicInfoDTO.getGridRange())) {
 //
 //        }
+        String[] ids = new String[1];
+        ids[0] = gridBasicInfoDTO.getId();
         //删除旧的网格覆盖范围数据
-        gridRangeService.deleteRangeByGridId(gridBasicInfoDTO.getId());
+        gridRangeService.deleteRangeByGridIds(ids);
         //记录数据
         gridRangeService.recordRange(gridBasicInfoDTO.getGridRange(),gridBasicInfoDTO.getId());
         if (num < 1) {
@@ -359,37 +374,12 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
     @Override
     public GridErrorCode disableGridList(GridBasicInfoBO gridBasicInfoBO) {
         GridErrorCode gridErrorCode = GridErrorCode.SUCCESS;
+        gridBasicInfoBO.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
         Integer num = 0;
-        //获取对应id旧的的网格数据
-        GridBasicInfo gridBasicInfoOld = new GridBasicInfo();
-        List<GridBasicInfo> gridBasicInfoList = new ArrayList<>();
-        //循环更新数据
-        if (gridBasicInfoBO.getIds() != null && gridBasicInfoBO.getIds().length > 0) {
-            for (String id : gridBasicInfoBO.getIds()) {
-                gridBasicInfoOld = this.get(id);
-                //历史数据存储(变更前) Todo
-                //历史数据存储(变更后) Todo
-                GridBasicInfo gridBasicInfo = new GridBasicInfo();
-                gridBasicInfo.setId(id);
-                gridBasicInfo.setEnabledFlag(0);
-                gridBasicInfo.setUpdateTimes(gridBasicInfoOld.getUpdateTimes() + 1);
-                gridBasicInfo.setUpdationDate(new Date());
-                //如果是楼栋网格则释放映射信息
-                if (GridTypeConstants.BUILDING_GRID.equals(gridBasicInfoOld.getGridType())) {
-                    gridBasicInfo.setGridRange(null);
-                }
-                //只禁用已启用的
-                if (gridBasicInfoOld.getEnabledFlag().equals(1)) {
-                    gridBasicInfoList.add(gridBasicInfo);
-                }
-                //删除旧的网格覆盖范围数据
-                gridRangeService.deleteRangeByGridId(gridBasicInfoBO.getId());
-            }
-        }
-        //批量更新
-        if (!CollectionUtils.isEmpty(gridBasicInfoList)) {
-            num = this.updateBatchSelective(gridBasicInfoList);
-        }
+        //主表更新
+        num = gridBasicInfoMapper.disableGridInfo(gridBasicInfoBO);
+        //范围表更新
+        gridRangeService.deleteRangeByGridIds(gridBasicInfoBO.getIds());
         if (num < 1) {
             gridErrorCode = GridErrorCode.DISABLE_EXCEPTION;
         }
@@ -406,51 +396,17 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
     public GridErrorCode deleteGridList(GridBasicInfoBO gridBasicInfoBO) {
         GridErrorCode gridErrorCode = GridErrorCode.SUCCESS;
         Integer num = 0;
-        //获取对应id旧的的网格数据
-        GridBasicInfo gridBasicInfoOld = new GridBasicInfo();
-        List<GridBasicInfo> gridBasicInfoList = new ArrayList<>();
-        //循环更新数据
-        if (gridBasicInfoBO.getIds() != null && gridBasicInfoBO.getIds().length > 0) {
-            for (String id : gridBasicInfoBO.getIds()) {
-                gridBasicInfoOld = this.get(id);
-                //历史数据存储(变更前) Todo
-                //历史数据存储(变更后) Todo
-                GridBasicInfo gridBasicInfo = new GridBasicInfo();
-                gridBasicInfo.setId(id);
-                gridBasicInfo.setIsDeleted(1);
-                gridBasicInfo.setUpdateTimes(gridBasicInfoOld.getUpdateTimes() + 1);
-                gridBasicInfo.setUpdationDate(new Date());
-                //如果是楼栋网格则释放映射信息
-                if (GridTypeConstants.BUILDING_GRID.equals(gridBasicInfoOld.getGridType())) {
-                    gridBasicInfo.setGridRange(null);
-                }
-                //只删除未删除的
-                if (gridBasicInfoOld.getIsDeleted().equals(0)) {
-                    gridBasicInfoList.add(gridBasicInfo);
-                }
-                //删除旧的网格覆盖范围数据
-                gridRangeService.deleteRangeByGridId(gridBasicInfoBO.getId());
-            }
-        }
-        //批量更新
-        if (!CollectionUtils.isEmpty(gridBasicInfoList)) {
-            num = this.updateBatchSelective(gridBasicInfoList);
-        }
+        gridBasicInfoBO.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
+        //主表更新
+        num = gridBasicInfoMapper.deleteGridInfo(gridBasicInfoBO);
+        //范围表更新
+        gridRangeService.deleteRangeByGridIds(gridBasicInfoBO.getIds());
         if (num < 1) {
             gridErrorCode = GridErrorCode.DELETE_EXCEPTION;
         }
         return gridErrorCode;
     }
 
-    /**
-     * 组装返回数据
-     *
-     * @param gridBasicInfoDTOList
-     * @param query
-     */
-    private void assembleData(List<GridBasicInfoDTO> gridBasicInfoDTOList, GridBasicInfoBO query) {
-
-    }
 
     @Override
     public List<GridBasicInfoSimpleDTO> getGridBasicInfoByHouseKeeperIds(List<HouseKeeperBO> houseKeeperBO) {
