@@ -22,7 +22,7 @@
         from
         <include refid="BaseTable"/>
         where USER_ID_ = #{userId}
-        and  IS_DELE_ = 1
+        and  IS_DELE_ = 0
     </select>
 
     <select id="getPostIdByjobCode" resultType="java.lang.String">
