@@ -153,4 +153,22 @@
         where id = #{id}
     </select>
 
+    <update id="disableGridInfo" parameterType="com.hypersmart.usercenter.bo.GridBasicInfoBO">
+        update grid_basic_info
+        set enabled_flag = 0, grid_range = null, update_times = update_times + 1, updated_by = #{updatedBy}
+        where id in
+        <foreach collection="ids" index="index" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="deleteGridInfo" parameterType="com.hypersmart.usercenter.bo.GridBasicInfoBO">
+        update grid_basic_info
+        set is_deleted = 1, grid_range = null, update_times = update_times + 1, updated_by = #{updatedBy}
+        where id in
+        <foreach collection="ids" index="index" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
 </mapper>

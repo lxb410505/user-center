@@ -46,6 +46,8 @@ public class GridBasicInfoBO extends GenericBO{
     //业态属性：商办、住宅、公寓等
     private String formatAttribute;
 
+    private String updatedBy;
+
     public String getGridCode() {
         return gridCode;
     }
@@ -132,5 +134,13 @@ public class GridBasicInfoBO extends GenericBO{
 
     public void setCityId(String cityId) {
         this.cityId = cityId;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 }

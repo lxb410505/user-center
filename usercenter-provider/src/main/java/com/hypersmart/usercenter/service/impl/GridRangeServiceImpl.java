@@ -38,8 +38,8 @@ public class GridRangeServiceImpl extends GenericService<String, GridRange> impl
      * 删除历史记录
      */
     @Override
-    public Integer deleteRangeByGridId(String gridId) {
-        return gridRangeMapper.deleteRangeByGridId(gridId);
+    public Integer deleteRangeByGridIds(String[] ids) {
+        return gridRangeMapper.deleteRangeByGridIds(ids);
     }
 
     /**

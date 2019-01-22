@@ -3,6 +3,7 @@ package com.hypersmart.usercenter.mapper;
 import com.hypersmart.framework.mapper.GenericMapper;
 import com.hypersmart.usercenter.bo.GridRangeBO;
 import com.hypersmart.usercenter.model.GridRange;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -17,10 +18,10 @@ public interface GridRangeMapper extends GenericMapper<GridRange> {
 
     /**
      * 删除覆盖范围
-     * @param gridId
+     * @param ids
      * @return
      */
-    Integer deleteRangeByGridId(String gridId);
+    Integer deleteRangeByGridIds(@Param("ids") String[] ids);
 
     /**
      * 获取分期下所有覆盖范围
