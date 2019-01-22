@@ -17,5 +17,7 @@ import java.util.Map;
 @Mapper
 public interface UcUserMapper extends GenericMapper<UcUser> {
 
-    List<Map<String, Object>> quertList(Map<String, Object> map);
+    List<Map<String, Object>> quertListFive(Map<String, Object> map);
+
+    List<Map<String, Object>> quertListFour(Map<String, Object> map);
 }
