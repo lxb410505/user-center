@@ -109,9 +109,9 @@ public class UcOrgController extends BaseController {
     }
 
 
-    @PostMapping({"/userList"})
+    @GetMapping({"/userList/{id}"})
     @ApiOperation(value = "组织架构数据列表}", httpMethod = "POST", notes = "获取组织架构列表")
-    public List<UcOrg> userList(@RequestBody String userId) {
+    public List<UcOrg> userList(@PathVariable("id") String userId) {
        return ucOrgService.getUserOrgList(userId);
     }
 
