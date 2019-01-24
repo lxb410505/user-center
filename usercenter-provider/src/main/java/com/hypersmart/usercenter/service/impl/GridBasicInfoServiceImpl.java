@@ -202,7 +202,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
             List<String> rangeList = gridRangeService.getAllRange(gridRangeBO);
             objectMap.put("allRange",rangeList);
         }
-        return gridBasicInfoMapper.getGridById(id);
+        return objectMap;
     }
 
     /**
