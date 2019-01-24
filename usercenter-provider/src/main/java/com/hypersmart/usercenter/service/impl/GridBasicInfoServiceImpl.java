@@ -122,7 +122,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         for(UcOrg ucOrg:orgList.getRows()){
             QueryFilter ucorgQuery = QueryFilter.build();
             ucorgQuery.addFilter("path",ucOrg.getPath(),QueryOP.RIGHT_LIKE,FieldRelation.AND);
-            ucorgQuery.addFilter("level",5,QueryOP.EQUAL,FieldRelation.AND);
+            ucorgQuery.addFilter("level",4,QueryOP.EQUAL,FieldRelation.AND);
             PageList<UcOrg> divideList = ucOrgService.query(ucorgQuery);
             if(null != divideList && null != divideList.getRows() && divideList.getRows().size()>0){
                 for(int i=0;i< divideList.getRows().size();i++){
@@ -221,7 +221,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
             gridBasicInfo.setAreaId(gridBasicInfoDTO.getAreaId());
             gridBasicInfo.setCityId(gridBasicInfoDTO.getCityId());
             gridBasicInfo.setProjectId(gridBasicInfoDTO.getProjectId());
-            gridBasicInfo.setMassifId(gridBasicInfoDTO.getMassifId());
+//            gridBasicInfo.setMassifId(gridBasicInfoDTO.getMassifId());
             gridBasicInfo.setStagingId(gridBasicInfoDTO.getStagingId());
             gridBasicInfo.setGridCode(gridBasicInfoDTO.getGridCode());
             gridBasicInfo.setGridName(gridBasicInfoDTO.getGridName());

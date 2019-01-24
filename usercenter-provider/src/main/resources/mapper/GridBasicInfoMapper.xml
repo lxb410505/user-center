@@ -61,7 +61,6 @@
         g.area_id as areaId,
         g.project_id as projectId,
         g.city_id as cityId,
-        g.massif_id as massifId,
         g.staging_id as stagingId,
         g.staging_id as divideId,
         g.housekeeper_id as housekeeperId,
@@ -72,7 +71,6 @@
         (select org.NAME_ from uc_org org where ID_ = g.area_id) as areaName,
         (select org.NAME_ from uc_org org where ID_ = g.project_id) as projectName,
         (select org.NAME_ from uc_org org where ID_ = g.city_id) as cityName,
-        (select org.NAME_ from uc_org org where ID_ = g.massif_id) as massifName,
         (select org.NAME_ from uc_org org where ID_ = g.staging_id) as stagingName,
         k.fullName as housekeeperName
         from grid_basic_info g LEFT JOIN (SELECT
@@ -95,7 +93,7 @@
         WHERE
         uoj.CODE_ = 'guanjia'
         AND dem.CODE_ = 'smsf'
-        AND org.LEVEL_ = 5) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
+        AND org.LEVEL_ = 4) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
@@ -117,7 +115,6 @@
         g.area_id as areaId,
         g.project_id as projectId,
         g.city_id as cityId,
-        g.massif_id as massifId,
         g.staging_id as stagingId,
         g.staging_id as divideId,
         g.housekeeper_id as housekeeperId,
@@ -126,7 +123,6 @@
         (select org.NAME_ from uc_org org where ID_ = g.area_id) as areaName,
         (select org.NAME_ from uc_org org where ID_ = g.project_id) as projectName,
         (select org.NAME_ from uc_org org where ID_ = g.city_id) as cityName,
-        (select org.NAME_ from uc_org org where ID_ = g.massif_id) as massifName,
         (select org.NAME_ from uc_org org where ID_ = g.staging_id) as stagingName,
         k.fullName as housekeeperName
         from grid_basic_info g LEFT JOIN (SELECT
@@ -149,7 +145,7 @@
         WHERE
         uoj.CODE_ = 'guanjia'
         AND dem.CODE_ = 'smsf'
-        AND org.LEVEL_ = 5) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
+        AND org.LEVEL_ = 4) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
         where id = #{id}
     </select>
 
