@@ -32,57 +32,6 @@
     grid_basic_info
     </sql>
 
-    <!--查询-->
-    <select id="searchGridList" resultMap="DtoResultMap" parameterType="com.hypersmart.usercenter.bo.GridBasicInfoBO">
-        SELECT
-        a.id,
-        a.project_id,
-        a.area_id,
-        a.massif_id,
-        a.staging_id,
-        a.city_id,
-        a.grid_code,
-        a.grid_name,
-        a.grid_type,
-        a.grid_range,
-        a.grid_remark,
-        a.update_times,
-        a.format_attribute,
-        a.housekeeper_id,
-        a.created_by,
-        a.creation_date,
-        a.enabled_flag
-        FROM
-        grid_basic_info a
-        where
-        a.is_deleted = 0
-        <if test="areaId != null and areaId != ''">
-            and a.area_id = #{areaId}
-        </if>
-        <if test="projectId != null and projectId != ''">
-            and a.project_id = #{projectId}
-        </if>
-        <if test="massifId != null and massifId != ''">
-            and a.massif_id = #{massifId}
-        </if>
-        <if test="stagingId != null and stagingId != ''">
-            and a.staging_id = #{stagingId}
-        </if>
-        <if test="gridCode != null and gridCode != ''">
-            and INSTR(a.grid_code,#{gridCode}) > 0
-        </if>
-        <if test="gridName !=null and gridName !=''">
-            and INSTR(a.grid_name,#{gridName})>0
-        </if>
-        <if test="gridType !=null and gridType !=''">
-            and a.grid_type = gridType
-        </if>
-        <if test="formatAttribute !=null and formatAttribute !=''">
-            and a.format_attribute = formatAttribute
-        </if>
-        order by a.creation_date desc
-    </select>
-
     <select id="getGridBasicInfoByHouseKeeperIds" resultMap="SimpleDTOMap" >
         SELECT
         a.id,
@@ -112,17 +61,16 @@
         g.area_id as areaId,
         g.project_id as projectId,
         g.city_id as cityId,
-        g.massif_id as massifId,
         g.staging_id as stagingId,
         g.staging_id as divideId,
         g.housekeeper_id as housekeeperId,
         g.format_attribute as formatAttribute,
         concat('',g.enabled_flag,'') as enabledFlag,
         g.is_deleted as isDeleted,
+        g.creation_date as creationDate,
         (select org.NAME_ from uc_org org where ID_ = g.area_id) as areaName,
         (select org.NAME_ from uc_org org where ID_ = g.project_id) as projectName,
         (select org.NAME_ from uc_org org where ID_ = g.city_id) as cityName,
-        (select org.NAME_ from uc_org org where ID_ = g.massif_id) as massifName,
         (select org.NAME_ from uc_org org where ID_ = g.staging_id) as stagingName,
         k.fullName as housekeeperName
         from grid_basic_info g LEFT JOIN (SELECT
@@ -145,7 +93,7 @@
         WHERE
         uoj.CODE_ = 'guanjia'
         AND dem.CODE_ = 'smsf'
-        AND org.LEVEL_ = 5) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
+        AND org.LEVEL_ = 4) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
@@ -167,7 +115,6 @@
         g.area_id as areaId,
         g.project_id as projectId,
         g.city_id as cityId,
-        g.massif_id as massifId,
         g.staging_id as stagingId,
         g.staging_id as divideId,
         g.housekeeper_id as housekeeperId,
@@ -176,7 +123,6 @@
         (select org.NAME_ from uc_org org where ID_ = g.area_id) as areaName,
         (select org.NAME_ from uc_org org where ID_ = g.project_id) as projectName,
         (select org.NAME_ from uc_org org where ID_ = g.city_id) as cityName,
-        (select org.NAME_ from uc_org org where ID_ = g.massif_id) as massifName,
         (select org.NAME_ from uc_org org where ID_ = g.staging_id) as stagingName,
         k.fullName as housekeeperName
         from grid_basic_info g LEFT JOIN (SELECT
@@ -199,8 +145,26 @@
         WHERE
         uoj.CODE_ = 'guanjia'
         AND dem.CODE_ = 'smsf'
-        AND org.LEVEL_ = 5) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
+        AND org.LEVEL_ = 4) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
         where id = #{id}
     </select>
+
+    <update id="disableGridInfo" parameterType="com.hypersmart.usercenter.bo.GridBasicInfoBO">
+        update grid_basic_info
+        set enabled_flag = 0, grid_range = null, update_times = update_times + 1, updated_by = #{updatedBy}
+        where id in
+        <foreach collection="ids" index="index" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="deleteGridInfo" parameterType="com.hypersmart.usercenter.bo.GridBasicInfoBO">
+        update grid_basic_info
+        set is_deleted = 1, grid_range = null, update_times = update_times + 1, updated_by = #{updatedBy}
+        where id in
+        <foreach collection="ids" index="index" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
 
 </mapper>

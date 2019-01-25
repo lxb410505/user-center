@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.service;
 
+import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.framework.service.IGenericService;
 import com.hypersmart.usercenter.model.UcOrgUser;
@@ -20,5 +21,7 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
     List<UcOrg> getOrg(List<UcOrgUser> list);
 
     List<UcOrg> getChildrenOrg(UcOrg ucOrg);
+
+    List<UcOrg> getUserOrgList(String userId);
 }
 

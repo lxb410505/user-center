@@ -60,53 +60,38 @@ public class UcOrgController extends BaseController {
         }
         //根据组织id获取组织信息
         QueryFilter orgQuery = QueryFilter.build();
-        orgQuery.addFilter("id",orgIds,QueryOP.IN);
+        orgQuery.addFilter("id",orgIds,QueryOP.IN,FieldRelation.AND);
         List<UcOrg> returnList = ucOrgService.query(orgQuery).getRows();
         //根据组织获取子级
         List<UcOrg> set = new ArrayList<>();
         for(UcOrg ucOrg :returnList){
             QueryFilter childQuery = QueryFilter.build();
-            childQuery.addFilter("path",ucOrg.getPath(), QueryOP.RIGHT_LIKE);
+            childQuery.addFilter("path",ucOrg.getPath(), QueryOP.RIGHT_LIKE,FieldRelation.AND);
             List<UcOrg> orgs = ucOrgService.query(childQuery).getRows();
             for(UcOrg org :orgs){
-                if(!set.contains(org)){
-                    set.add(org);
-                }
+                set.add(org);
             }
-        }
-        List<UcOrg> tempList = new ArrayList<>();
-        for(UcOrg ucOrg :set){
-            tempList.add(ucOrg);
+            set.add(ucOrg);
         }
         //根据组织查询父级组织
-        for(UcOrg ucOrg : set){
-            String [] paths = ucOrg.getPath().split(".");
+        for(UcOrg ucOrg : returnList){
+            String [] paths = ucOrg.getPath().split("\\.");
             for(int i=0;i<paths.length;i++){
-                String path = "";
-                for(int j=0;j<=i;j++){
-                    if(j==0){
-                        path = paths[j];
-                    }else{
-                        path = path +"."+paths[j];
-                    }
-                }
                 QueryFilter query = QueryFilter.build();
-                query.addFilter("path",path,QueryOP.EQUAL);
+                query.addFilter("id",paths[i],QueryOP.EQUAL,FieldRelation.AND);
                 List<UcOrg> voList = ucOrgService.query(query).getRows();
                 for(UcOrg vo:voList){
-                    if(!set.contains(vo)){
-                        tempList.add(vo);
-                    }
+                    set.add(vo);
                 }
             }
         }
         //拼接组织id
         String str = "";
-        for(int i=0;i<tempList.size();i++){
+        for(int i=0;i<set.size();i++){
             if(i==0){
-                str = tempList.get(i).getId();
+                str = set.get(i).getId();
             }else{
-                str = str + "," + tempList.get(i).getId();
+                str = str + "," + set.get(i).getId();
             }
         }
         if("".equals(str)){
@@ -121,6 +106,13 @@ public class UcOrgController extends BaseController {
             return this.ucOrgService.query(queryFilter).getRows();
         }
         return new ArrayList<>();
+    }
+
+
+    @GetMapping({"/userList/{id}"})
+    @ApiOperation(value = "组织架构数据列表}", httpMethod = "POST", notes = "获取组织架构列表")
+    public List<UcOrg> userList(@PathVariable("id") String userId) {
+       return ucOrgService.getUserOrgList(userId);
     }
 
     @PostMapping({"/getByList"})

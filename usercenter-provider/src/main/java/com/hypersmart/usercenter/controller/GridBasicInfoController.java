@@ -6,6 +6,7 @@ import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.bo.GridBasicInfoBO;
 import com.hypersmart.usercenter.bo.HouseKeeperBO;
 import com.hypersmart.usercenter.constant.GridErrorCode;
@@ -51,23 +52,15 @@ public class GridBasicInfoController extends BaseController {
     private GridBasicInfoHistoryService gridBasicInfoHistoryService;
 
 
-
-    @PostMapping({"/queryList"})
-    @ApiOperation(value = "用户组织关系数据列表}", httpMethod = "POST", notes = "获取用户组织关系列表")
-    public PageList<Map<String, Object>> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
-        return this.gridBasicInfoService.quertList(queryFilter);
-    }
-
     /**
-     * 查询网格信息
+     *分页查询
      * @param queryFilter
      * @return
      */
     @PostMapping({"/list"})
-    @ApiOperation(value = "网格基础信息表数据列表}", httpMethod = "POST", notes = "获取网格基础信息表列表")
-    public PageList<GridBasicInfoDTO> search(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
-        PageList<GridBasicInfoDTO> gridBasicInfoDTOList = gridBasicInfoService.selectGridBasicInfo(queryFilter);
-        return gridBasicInfoDTOList;
+    @ApiOperation(value = "用户组织关系数据列表}", httpMethod = "POST", notes = "获取用户组织关系列表")
+    public PageList<Map<String, Object>> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+        return this.gridBasicInfoService.quertList(queryFilter);
     }
 
     /**
@@ -264,6 +257,7 @@ public class GridBasicInfoController extends BaseController {
         List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getByIds(gridIdArray);
         if (gridBasicInfoList != null && gridBasicInfoList.size() > 0){
             for (GridBasicInfo gridBasicInfo : gridBasicInfoList){
+                gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
                 gridBasicInfo.setHousekeeperId(gridBasicInfoBOList.get(0).getHousekeeperId());
             }
         }
@@ -287,6 +281,7 @@ public class GridBasicInfoController extends BaseController {
         List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getByIds(gridIdArray);
         if (gridBasicInfoList != null && gridBasicInfoList.size() > 0){
             for (GridBasicInfo gridBasicInfo : gridBasicInfoList){
+                gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
                 gridBasicInfo.setHousekeeperId(null);
             }
         }

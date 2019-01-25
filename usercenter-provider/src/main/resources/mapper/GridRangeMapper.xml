@@ -3,12 +3,24 @@
 
 <mapper namespace="com.hypersmart.usercenter.mapper.GridRangeMapper">
 
-    <delete id="deleteRangeByGridId" parameterType="java.lang.String">
-        delete from grid_range where grid_id = #{gridId}
+    <delete id="deleteRangeByGridIds">
+        delete from grid_range
+        where grid_id in
+        <foreach collection="ids" index="index" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
     </delete>
 
-    <select id="getRanged" parameterType="java.lang.String" resultType="com.hypersmart.usercenter.model.GridRange">
-        select range_type as rangeType,resource_id as resourceId from grid_range where grid_id != #{gridId}
+    <select id="getRange" parameterType="com.hypersmart.usercenter.bo.GridRangeBO" resultType="com.hypersmart.usercenter.model.GridRange">
+        select
+        a.range_type as rangeType,a.resource_id as resourceId
+        from grid_range a
+        inner join grid_basic_info b
+        on a.grid_id = b.id
+        where b.staging_id = #{stagingId}
+        <if test="gridId!=null and gridId !=''">
+            and a.grid_id != #{gridId}
+        </if>
     </select>
 
 </mapper>

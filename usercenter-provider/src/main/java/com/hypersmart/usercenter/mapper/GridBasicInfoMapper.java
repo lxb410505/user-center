@@ -20,14 +20,13 @@ import java.util.Map;
  */
 public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
 
-    List<Map<String, Object>> quertList(Map<String, Object> map);
-
     /**
-     * 查询
-     * @param query
+     * 网格分页查询
+     * @param map
      * @return
      */
-    List<GridBasicInfoDTO> searchGridList(GridBasicInfoBO query);
+    List<Map<String, Object>> quertList(Map<String, Object> map);
+
 
     /**
      * 根据管家id和分期id获得 网格id和名称
@@ -42,4 +41,18 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
      * @return
      */
     Map<String, Object> getGridById(String id);
+
+    /**
+     * 禁用网格
+     * @param gridBasicInfoBO
+     * @return
+     */
+    Integer disableGridInfo(GridBasicInfoBO gridBasicInfoBO);
+
+    /**
+     * 删除网格
+     * @param gridBasicInfoBO
+     * @return
+     */
+    Integer deleteGridInfo(GridBasicInfoBO gridBasicInfoBO);
 }

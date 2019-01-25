@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -85,6 +86,8 @@ public class UcOrg implements Serializable {
     @ApiModelProperty("级别")
     private Integer level;
 
+    @Transient
+    private String disabled;
 
     public void setId(String id) {
         this.id = id;
@@ -188,6 +191,14 @@ public class UcOrg implements Serializable {
 
     public void setLevel(Integer level) {
         this.level = level;
+    }
+
+    public String getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(String disabled) {
+        this.disabled = disabled;
     }
 
     public String toString() {
