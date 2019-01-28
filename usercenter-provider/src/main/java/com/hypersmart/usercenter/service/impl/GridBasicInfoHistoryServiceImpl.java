@@ -100,8 +100,14 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                     if (ucOrgUser != null && StringUtils.isNotRealEmpty(ucOrgUser.getPosId())){
                         UcOrgPost ucOrgPost = ucOrgPostService.get(ucOrgUser.getPosId());
                         if (ucOrgPost != null){
-                            if ("".equals(ucOrgPost.getPostKey())){
-                                housekeeperHistory.setUserLevel(null);
+                            if ("junior".equals(ucOrgPost.getPostKey())){
+                                housekeeperHistory.setUserLevel("junior");
+                            }
+                            if ("intermediate".equals(ucOrgPost.getPostKey())){
+                                housekeeperHistory.setUserLevel("intermediate");
+                            }
+                            if ("senior".equals(ucOrgPost.getPostKey())){
+                                housekeeperHistory.setUserLevel("senior");
                             }
                         }
                     }
@@ -232,8 +238,14 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                             if (ucOrgUser != null && StringUtils.isNotRealEmpty(ucOrgUser.getPosId())){
                                 UcOrgPost ucOrgPost = ucOrgPostService.get(ucOrgUser.getPosId());
                                 if (ucOrgPost != null){
-                                    if ("".equals(ucOrgPost.getPostKey())){
-                                        housekeeperHistory.setUserLevel(null);
+                                    if ("junior".equals(ucOrgPost.getPostKey())){
+                                        housekeeperHistory.setUserLevel("junior");
+                                    }
+                                    if ("intermediate".equals(ucOrgPost.getPostKey())){
+                                        housekeeperHistory.setUserLevel("intermediate");
+                                    }
+                                    if ("senior".equals(ucOrgPost.getPostKey())){
+                                        housekeeperHistory.setUserLevel("senior");
                                     }
                                 }
                             }
