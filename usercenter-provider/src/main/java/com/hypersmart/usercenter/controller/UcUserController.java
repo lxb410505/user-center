@@ -72,6 +72,8 @@ public class UcUserController extends BaseController {
                 IUser iUser = ContextUtil.getCurrentUser();
                 Map<String, String> map = iUser.getAttributes();
                 map.put("currentOrg",orgId);
+                iUser.setAttributes(map);
+                ContextUtil.setCurrentUser(iUser);
                 commonResult.setState(true);
             }
         }catch (Exception e){
