@@ -35,13 +35,12 @@ public class UserCurrentOrgHistoryController extends BaseController {
     @Resource
         UserCurrentOrgHistoryService userCurrentOrgHistoryService;
 
-    @RequestMapping("setCurrentOrg")
+    @PostMapping("setCurrentOrg")
     public CommonResult<String> setCurrentOrg(@RequestBody UserCurrentOrgHistory user){
         CommonResult<String> commonResult = new CommonResult<>();
         try{
             QueryFilter queryFilter = QueryFilter.build();
             queryFilter.addFilter("userId",user.getUserId(), QueryOP.EQUAL,FieldRelation.AND);
-            queryFilter.addFilter("orgId",user.getOrgId(),QueryOP.EQUAL,FieldRelation.AND);
             List<UserCurrentOrgHistory> list = userCurrentOrgHistoryService.query(queryFilter).getRows();
             if(null != list && list.size()>0){
                 UserCurrentOrgHistory history = list.get(0);
@@ -55,6 +54,26 @@ public class UserCurrentOrgHistoryController extends BaseController {
                 history.setOrgId(user.getOrgId());
                 history.setUpdateTime(new Date());
                 userCurrentOrgHistoryService.insert(history);
+            }
+            commonResult.setState(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            commonResult.setState(false);
+        }
+        return commonResult;
+    }
+
+    @GetMapping("getCurrentOrg/{userId}")
+    public CommonResult<String> getCurrentOrg(@PathVariable String userId){
+        CommonResult<String> commonResult = new CommonResult<>();
+        try{
+            QueryFilter queryFilter = QueryFilter.build();
+            queryFilter.addFilter("userId",userId, QueryOP.EQUAL,FieldRelation.AND);
+            List<UserCurrentOrgHistory> list = userCurrentOrgHistoryService.query(queryFilter).getRows();
+            if(null != list && list.size()>0){
+                commonResult.setValue(list.get(0).getOrgId());
+            }else{
+                commonResult.setValue("");
             }
             commonResult.setState(true);
         }catch (Exception e){
