@@ -1,12 +1,14 @@
 spring:
   profiles:
     active: prod
-  application: 
-    name: bpm-model-eureka
-  datasource: 
+  http:
+    multipart:
+      maxFileSize: 100MB
+      maxRequestSize: 1024MB
+  datasource:
     name: ${spring.profiles.active}
-    url: jdbc:mysql://db.ldnext.com:3306/x7_bpm_prod?serverTimezone=UTC&useSSL=false&&characterEncoding=UTF-8
-    username: root
+    url: jdbc:mysql://smcloud.rwlb.rds.aliyuncs.com:3306/uc?serverTimezone=UTC&useSSL=false&&characterEncoding=UTF-8
+    username: smcloud
     password: 5tgbNHY^
     # 使用druid数据源
     type: com.alibaba.druid.pool.DruidDataSource
@@ -26,19 +28,20 @@ spring:
     maxOpenPreparedStatements: 20
     maxPoolPreparedStatementPerConnectionSize: 20
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
-    
+#mapper:
+#  not-empty: true
+#  before: true
+#  mappers:
+#    - com.hypersmart.framework.mapper.GenericMapper
 # Server settings (ServerProperties)
 server:
-  port: 8087
+  port: 8899
   address: 0.0.0.0
   sessionTimeout: 30
   contextPath: /
   session:
     timeout: 30
-system: 
-  id: 
-    machineName: bpm-model
-   
+
 eureka:
   client:
     healthcheck:
@@ -64,26 +67,40 @@ feign:
         connectTimeout: 50000
         readTimeout: 50000
         loggerLevel: full
-        
+
 # 断路器配置
 hystrix:
   metrics:
-    enabled: true    
-  command:    
-    default:    
-      execution:    
+    enabled: true
+  command:
+    default:
+      execution:
         isolation:
           strategy: SEMAPHORE   # THREAD  SEMAPHORE
           semaphore:
             maxConcurrentRequests: 200 # 默认情况下下面两个值都是10，也就是超过10个的并发会直接进入fallback方法，不会去真正请求
-          thread:    
+          thread:
             timeoutInMilliseconds: 50000 #缺省为1000
       fallback:
         isolation:
           semaphore:
             maxConcurrentRequests: 200   # 默认情况下下面两个值都是10，也就是超过10个的并发会直接进入fallback方法，不会去真正请求
-            
+
 # 负载均衡配置
 ribbon:
   eureka:
-    enabled: true   
+    enabled: true
+
+system:
+  id:
+    machineName: bpm-model
+    idBase: 1000
+    increaseBound: 10000
+  attachment:
+    type: folder
+    path: e:\attachment
+  bpm:
+    engineName: eip7
+
+grid:
+  code: guanjia
