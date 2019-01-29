@@ -13,15 +13,15 @@
         u.ACCOUNT_ AS account,
         post.ID_ AS `postId`,
         post.POS_NAME_ AS posName,
-        org_lv5.NAME_ AS areaName,
-        org_lv4.NAME_ AS cityName,
-        org_lv3.NAME_ AS projectName,
-        org_lv2.NAME_ AS plotName,
+        org_lv5.NAME_ AS corpName,
+        org_lv4.NAME_ AS areaName,
+        org_lv3.NAME_ AS cityName,
+        org_lv2.NAME_ AS projectName,
         org.NAME_ AS divideName,
-        org_lv5.ID_ AS areaId,
-        org_lv4.ID_ AS cityId,
-        org_lv3.ID_ AS projectId,
-        org_lv2.ID_ AS plotId,
+        org_lv5.ID_ AS corpId,
+        org_lv4.ID_ AS areaId,
+        org_lv3.ID_ AS cityId,
+        org_lv2.ID_ AS projectId,
         org.ID_ AS divideId
         from uc_user u
         join uc_org_user uou on u.ID_ = uou.USER_ID_
