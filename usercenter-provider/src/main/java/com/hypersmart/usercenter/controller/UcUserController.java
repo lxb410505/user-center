@@ -62,9 +62,9 @@ public class UcUserController extends BaseController {
         return this.ucUserService.get(id);
     }
 
-    @GetMapping({"/setCurrentOrg/{id}"})
+    @GetMapping({"/setCurrentOrg/{orgId}"})
     @ApiOperation(value = "设置当前组织", httpMethod = "GET", notes = "设置当前组织")
-    public CommonResult<String> setCurrentOrg(@PathVariable String orgId) {
+    public CommonResult<String> setCurrentOrg(@PathVariable("orgId") String orgId) {
         CommonResult<String> commonResult = new CommonResult<>();
         try{
             UcOrg ucorg = ucOrgService.get(orgId);
