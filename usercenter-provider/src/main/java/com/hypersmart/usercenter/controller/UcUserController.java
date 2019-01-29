@@ -6,6 +6,10 @@ import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.base.util.StringUtil;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
+import com.hypersmart.uc.api.model.IUser;
+import com.hypersmart.usercenter.model.UcOrg;
+import com.hypersmart.usercenter.service.UcOrgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import com.hypersmart.framework.model.ResponseData;
@@ -13,11 +17,13 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.naming.Context;
 
 import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.usercenter.service.UcUserService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户管理
@@ -32,6 +38,9 @@ import java.util.List;
 public class UcUserController extends BaseController {
     @Resource
         UcUserService ucUserService;
+
+    @Resource
+    UcOrgService ucOrgService;
 
     @PostMapping({"/list"})
     @ApiOperation(value = "用户管理数据列表}", httpMethod = "POST", notes = "获取用户管理列表")
@@ -51,6 +60,24 @@ public class UcUserController extends BaseController {
     @ApiOperation(value = "用户管理数据列表", httpMethod = "GET", notes = "获取单个用户管理记录")
     public UcUser get(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {
         return this.ucUserService.get(id);
+    }
+
+    @GetMapping({"/setCurrentOrg/{id}"})
+    @ApiOperation(value = "设置当前组织", httpMethod = "GET", notes = "设置当前组织")
+    public CommonResult<String> setCurrentOrg(@PathVariable String orgId) {
+        CommonResult<String> commonResult = new CommonResult<>();
+        try{
+            UcOrg ucorg = ucOrgService.get(orgId);
+            if(null != ucorg){
+                IUser iUser = ContextUtil.getCurrentUser();
+                Map<String, String> map = iUser.getAttributes();
+                map.put("currentOrg",orgId);
+                commonResult.setState(true);
+            }
+        }catch (Exception e){
+            commonResult.setState(false);
+        }
+        return commonResult;
     }
 
 
