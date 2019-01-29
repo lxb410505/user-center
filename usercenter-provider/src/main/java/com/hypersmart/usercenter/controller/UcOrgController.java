@@ -1,9 +1,7 @@
 package com.hypersmart.usercenter.controller;
 
 import com.hypersmart.base.controller.BaseController;
-import com.hypersmart.base.query.FieldRelation;
-import com.hypersmart.base.query.QueryFilter;
-import com.hypersmart.base.query.QueryOP;
+import com.hypersmart.base.query.*;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.model.UcOrgUser;
@@ -103,6 +101,12 @@ public class UcOrgController extends BaseController {
                 map.put("parentId","0");
             }
             queryFilter.addFilter("parentId",map.get("parentId"), QueryOP.EQUAL,FieldRelation.AND);
+            List<FieldSort> sortList = new ArrayList<>();
+            FieldSort fieldSort = new FieldSort();
+            fieldSort.setDirection(Direction.ASC);
+            fieldSort.setProperty("orderNo");
+            sortList.add(fieldSort);
+            queryFilter.setSorter(sortList);
             return this.ucOrgService.query(queryFilter).getRows();
         }
         return new ArrayList<>();
