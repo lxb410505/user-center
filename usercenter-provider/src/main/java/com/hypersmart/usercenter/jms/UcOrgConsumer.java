@@ -70,6 +70,26 @@ public class UcOrgConsumer {
                     gridBasicInfo.setEnabledFlag(1);
                     gridBasicInfo.setIsDeleted(0);
                     gridBasicInfoService.insert(gridBasicInfo);
+                    GridBasicInfo gridBasicInfo1 = new GridBasicInfo();
+                    gridBasicInfo1.setId(UUID.randomUUID().toString());
+                    gridBasicInfo1.setGridCode("WGS001");
+                    gridBasicInfo1.setGridName("服务中心网格");
+                    gridBasicInfo1.setGridType("service_center_grid");
+                    if (len - 4 >= 0){
+                        gridBasicInfo1.setAreaId(idArray[len - 4]);
+                    }
+                    if (len - 3 >= 0){
+                        gridBasicInfo1.setCityId(idArray[len - 3]);
+                    }
+                    if (len - 2 >=0){
+                        gridBasicInfo1.setProjectId(idArray[len - 2]);
+                    }
+                    gridBasicInfo1.setStagingId(orgId);
+                    gridBasicInfo1.setCreationDate(new Date());
+                    gridBasicInfo1.setUpdationDate(new Date());
+                    gridBasicInfo1.setEnabledFlag(1);
+                    gridBasicInfo1.setIsDeleted(0);
+                    gridBasicInfoService.insert(gridBasicInfo1);
                 }
             }
         } catch (Exception e) {
