@@ -36,7 +36,18 @@
         join uc_demension dem on
         org.DEM_ID_ = dem.ID_ and  org_lv2.DEM_ID_ = dem.ID_ and  org_lv3.DEM_ID_ = dem.ID_
         and  org_lv4.DEM_ID_ = dem.ID_ and org_lv5.DEM_ID_ = dem.ID_
-        where uoj.CODE_ = 'guanjia' and dem.CODE_ = 'smsf' and org.LEVEL_ = 4) a
+        where uoj.CODE_ = 'guanjia' and dem.CODE_ = 'smsf' and org.LEVEL_ = 4
+        and u.IS_DELE_ = 0
+        and uou.IS_DELE_ = 0
+        and org.IS_DELE_ = 0
+        and org_lv2.IS_DELE_ = 0
+        and org_lv3.IS_DELE_ = 0
+        and org_lv4.IS_DELE_ = 0
+        and org_lv5.IS_DELE_ = 0
+        and post.IS_DELE_ = 0
+        and uoj.IS_DELE_ = 0
+        and dem.IS_DELE_ = 0
+        ) a
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
