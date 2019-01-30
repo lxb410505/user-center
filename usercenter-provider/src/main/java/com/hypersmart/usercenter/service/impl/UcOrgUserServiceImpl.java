@@ -3,7 +3,9 @@ package com.hypersmart.usercenter.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
+import com.hypersmart.base.util.ContextUtils;
 import com.hypersmart.framework.service.GenericService;
+import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
@@ -61,14 +63,26 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
          *    支持排序的字段：区域、项目、地块、分期、管家名称、管家手机号、岗位等级
          *
          */
+        Object orgId = ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
+
+        if (orgId != null) {
+            queryFilter.addFilter("divideId", orgId.toString(), QueryOP.IN, FieldRelation.AND, "two");
+        } else {
+            PageList<Map<String, Object>> pageList = new PageList();
+            pageList.setTotal(0);
+            pageList.setPage(1);
+            pageList.setPageSize(10);
+            pageList.setRows(new ArrayList<>());
+            return pageList;
+        }
 
         //1、根据用户信息获取用户所属组织
-        IUser user = ContextUtil.getCurrentUser();
+        //IUser user = ContextUtil.getCurrentUser();
         //获取用户组织关系
-        List<UcOrgUser> ucOrgUsersList = this.getUserOrg(user.getUserId());
+        //List<UcOrgUser> ucOrgUsersList = this.getUserOrg(user.getUserId());
 
         //2、查找ucOrgUsersList 对应的组织下的分期，将分期id的集合作为quertList的条件。
-        String orgIds = "";
+       /* String orgIds = "";
         for (int i = 0; i < ucOrgUsersList.size(); i++) {
             if (i == 0) {
                 orgIds = ucOrgUsersList.get(i).getOrgId();
@@ -135,8 +149,16 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
                 pageList.setTotal(0);
             }
             return pageList;
-        }
-
+        }*/
+//        if (StringUtils.isRealEmpty(ContextUtil.getCurrentUser().getAttributes().get("currentOrg"))) {
+//            IUser iUser = ContextUtil.getCurrentUser();
+//            PageList<Map<String, Object>> pageList = new PageList();
+//            pageList.setTotal(0);
+//            pageList.setPage(1);
+//            pageList.setPageSize(10);
+//            pageList.setRows(new ArrayList<>());
+//            return pageList;
+//        }
         //===============================================================================================
         PageBean pageBean = queryFilter.getPageBean();
         if (BeanUtils.isEmpty(pageBean)) {
@@ -152,9 +174,10 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
             PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
                     pageBean.showTotal());
         }
-        List<Map<String,Object>> query = this.ucUserMapper.quertListFive(queryFilter.getParams());
+        List<Map<String, Object>> query = this.ucUserMapper.quertListFive(queryFilter.getParams());
         return new PageList<>(query);
     }
+
     public PageList<Map<String, Object>> quertList(QueryFilter queryFilter) {
 
         /**
@@ -179,17 +202,17 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
             }
         }
         QueryFilter queryOrg = QueryFilter.build();
-        if(null != ucOrgUsersList && ucOrgUsersList.size()>0){
-            queryOrg.addFilter("id",orgIds,QueryOP.IN,FieldRelation.AND);
-        }else{
+        if (null != ucOrgUsersList && ucOrgUsersList.size() > 0) {
+            queryOrg.addFilter("id", orgIds, QueryOP.IN, FieldRelation.AND);
+        } else {
             PageList<Map<String, Object>> pageList = new PageList();
             pageList.setTotal(0);
-            if(BeanUtils.isEmpty(queryFilter.getPageBean())){
+            if (BeanUtils.isEmpty(queryFilter.getPageBean())) {
                 pageList.setPage(1);
                 pageList.setPageSize(10);
                 pageList.setRows(new ArrayList<>());
                 pageList.setTotal(0);
-            }else{
+            } else {
                 pageList.setPage(queryFilter.getPageBean().getPage());
                 pageList.setPageSize(queryFilter.getPageBean().getPageSize());
                 pageList.setRows(new ArrayList<>());
@@ -197,40 +220,40 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
             }
             return pageList;
         }
-        PageList<UcOrg> orgList =  ucOrgService.query(queryOrg);
-        Map<String,UcOrg> map = new HashMap<>();
-        for(UcOrg ucOrg:orgList.getRows()){
+        PageList<UcOrg> orgList = ucOrgService.query(queryOrg);
+        Map<String, UcOrg> map = new HashMap<>();
+        for (UcOrg ucOrg : orgList.getRows()) {
             QueryFilter ucorgQuery = QueryFilter.build();
-            ucorgQuery.addFilter("path",ucOrg.getPath(),QueryOP.RIGHT_LIKE,FieldRelation.AND);
-            ucorgQuery.addFilter("level",4,QueryOP.EQUAL,FieldRelation.AND);
+            ucorgQuery.addFilter("path", ucOrg.getPath(), QueryOP.RIGHT_LIKE, FieldRelation.AND);
+            ucorgQuery.addFilter("level", 4, QueryOP.EQUAL, FieldRelation.AND);
             PageList<UcOrg> divideList = ucOrgService.query(ucorgQuery);
-            if(null != divideList && null != divideList.getRows() && divideList.getRows().size()>0){
-                for(int i=0;i< divideList.getRows().size();i++){
+            if (null != divideList && null != divideList.getRows() && divideList.getRows().size() > 0) {
+                for (int i = 0; i < divideList.getRows().size(); i++) {
                     UcOrg temp = divideList.getRows().get(i);
-                    map.put(temp.getId(),temp);
+                    map.put(temp.getId(), temp);
                 }
             }
         }
         Set<String> set = map.keySet();
-        if(null != set && set.size()>0){
+        if (null != set && set.size() > 0) {
             String divideId = "";
-            for(String index: set){
-                if("".equals(divideId)){
+            for (String index : set) {
+                if ("".equals(divideId)) {
                     divideId = index;
-                }else{
-                    divideId = divideId +","+ index;
+                } else {
+                    divideId = divideId + "," + index;
                 }
             }
-            queryFilter.addFilter("divideId", divideId, QueryOP.IN, FieldRelation.AND,"two");
-        }else{
+            queryFilter.addFilter("divideId", divideId, QueryOP.IN, FieldRelation.AND, "two");
+        } else {
             PageList<Map<String, Object>> pageList = new PageList();
             pageList.setTotal(0);
-            if(BeanUtils.isEmpty(queryFilter.getPageBean())){
+            if (BeanUtils.isEmpty(queryFilter.getPageBean())) {
                 pageList.setPage(1);
                 pageList.setPageSize(10);
                 pageList.setRows(new ArrayList<>());
                 pageList.setTotal(0);
-            }else{
+            } else {
                 pageList.setPage(queryFilter.getPageBean().getPage());
                 pageList.setPageSize(queryFilter.getPageBean().getPageSize());
                 pageList.setRows(new ArrayList<>());
@@ -254,16 +277,16 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
             PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
                     pageBean.showTotal());
         }
-        List<Map<String,Object>> query = this.ucUserMapper.quertListFour(queryFilter.getParams());
+        List<Map<String, Object>> query = this.ucUserMapper.quertListFour(queryFilter.getParams());
         return new PageList<>(query);
     }
 
     @Override
     public UcOrgUser getByUserIdAndOrgId(String housekeeperId, String stagingId) {
         Example example = new Example(UcOrgUser.class);
-        example.createCriteria().andEqualTo("userId",housekeeperId).andEqualTo("orgId",stagingId);
+        example.createCriteria().andEqualTo("userId", housekeeperId).andEqualTo("orgId", stagingId);
         List<UcOrgUser> list = this.ucOrgUserMapper.selectByExample(example);
-        if (list != null && list.size() > 0){
+        if (list != null && list.size() > 0) {
             return list.get(0);
         }
         return null;
