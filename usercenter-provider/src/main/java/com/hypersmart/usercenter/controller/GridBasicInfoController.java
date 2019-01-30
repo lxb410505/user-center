@@ -213,7 +213,7 @@ public class GridBasicInfoController extends BaseController {
     @PostMapping({"/getHouseKeeper"})
     @ApiOperation(value = "管家列表", httpMethod = "POST", notes = "管家列表")
     public PageList<Map<String,Object>> listHouseKeeper(@ApiParam(name = "queryFilter", value = "查询条件") @RequestBody QueryFilter queryFilter) {
-        PageList<Map<String,Object>> pageList = ucOrgUserService.quertList(queryFilter);
+        PageList<Map<String,Object>> pageList = ucOrgUserService.quertListFive(queryFilter);
         if (pageList != null && pageList.getRows() != null && pageList.getRows().size() > 0) {
             List<HouseKeeperBO> houseKeeperBOList = new ArrayList<>();
             for (Map<String,Object> objectMap : pageList.getRows()) {

@@ -12,16 +12,17 @@
         u.MOBILE_ AS mobile,
         u.ACCOUNT_ AS account,
         post.ID_ AS `postId`,
+        post.POST_KEY_ AS `postKey`,
         post.POS_NAME_ AS posName,
-        org_lv5.NAME_ AS areaName,
-        org_lv4.NAME_ AS cityName,
-        org_lv3.NAME_ AS projectName,
-        org_lv2.NAME_ AS plotName,
+        org_lv5.NAME_ AS corpName,
+        org_lv4.NAME_ AS areaName,
+        org_lv3.NAME_ AS cityName,
+        org_lv2.NAME_ AS projectName,
         org.NAME_ AS divideName,
-        org_lv5.ID_ AS areaId,
-        org_lv4.ID_ AS cityId,
-        org_lv3.ID_ AS projectId,
-        org_lv2.ID_ AS plotId,
+        org_lv5.ID_ AS corpId,
+        org_lv4.ID_ AS areaId,
+        org_lv3.ID_ AS cityId,
+        org_lv2.ID_ AS projectId,
         org.ID_ AS divideId
         from uc_user u
         join uc_org_user uou on u.ID_ = uou.USER_ID_
@@ -35,7 +36,7 @@
         join uc_demension dem on
         org.DEM_ID_ = dem.ID_ and  org_lv2.DEM_ID_ = dem.ID_ and  org_lv3.DEM_ID_ = dem.ID_
         and  org_lv4.DEM_ID_ = dem.ID_ and org_lv5.DEM_ID_ = dem.ID_
-        where uoj.CODE_ = 'guanjia' and dem.CODE_ = 'smsf' and org.LEVEL_ = 5) a
+        where uoj.CODE_ = 'guanjia' and dem.CODE_ = 'smsf' and org.LEVEL_ = 4) a
         <where>
             <if test="whereSql!=null">
                 ${whereSql}

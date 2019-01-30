@@ -3,6 +3,7 @@ package com.hypersmart.usercenter.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
+import com.hypersmart.base.util.ContextUtils;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.usercenter.bo.GridBasicInfoBO;
 import com.hypersmart.usercenter.bo.GridRangeBO;
@@ -160,6 +161,21 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 //            }
 //            return pageList;
 //        }
+
+
+        Object orgId = ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
+
+        if (orgId != null) {
+            queryFilter.addFilter("stagingId", orgId.toString(), QueryOP.EQUAL, FieldRelation.AND, "two");
+        } else {
+            PageList<Map<String, Object>> pageList = new PageList();
+            pageList.setTotal(0);
+            pageList.setPage(1);
+            pageList.setPageSize(10);
+            pageList.setRows(new ArrayList<>());
+            return pageList;
+        }
+
         //只展示is_deleted为0的数据
         queryFilter.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND,"three");
         //根据创建时间倒叙排序
