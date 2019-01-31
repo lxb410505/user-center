@@ -63,7 +63,7 @@ public class UcOrgUserController extends BaseController {
     @PostMapping({"/queryList"})
     @ApiOperation(value = "用户组织关系数据列表}", httpMethod = "POST", notes = "获取用户组织关系列表")
     public PageList<Map<String, Object>> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
-        return this.ucOrgUserService.quertList(queryFilter);
+        return this.ucOrgUserService.quertListFive(queryFilter);
     }
 
     @GetMapping({"/get/{id}"})
