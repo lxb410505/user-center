@@ -93,7 +93,7 @@
         WHERE
         uoj.CODE_ = 'guanjia'
         AND dem.CODE_ = 'smsf'
-        AND org.LEVEL_ = 4) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
+        AND org.GRADE_ = 'ORG_DiKuai') as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
@@ -145,7 +145,7 @@
         WHERE
         uoj.CODE_ = 'guanjia'
         AND dem.CODE_ = 'smsf'
-        AND org.LEVEL_ = 4) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
+        AND org.GRADE_ = 'ORG_DiKuai') as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
         where id = #{id}
     </select>
 
