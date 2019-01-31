@@ -15,7 +15,9 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import javax.jms.TextMessage;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -49,41 +51,41 @@ public class UcOrgConsumer {
                     UcOrg ucOrg = ucOrgService.get(orgId);
                     String idPath = ucOrg.getPath();
                     String[] idArray = idPath.split("\\.");
-                    Integer len = idArray.length;
                     GridBasicInfo gridBasicInfo = new GridBasicInfo();
+                    GridBasicInfo gridBasicInfo1 = new GridBasicInfo();
                     gridBasicInfo.setId(UUID.randomUUID().toString());
                     gridBasicInfo.setGridCode("WGP001");
                     gridBasicInfo.setGridName("公区网格");
                     gridBasicInfo.setGridType("public_area_grid");
-                    if (len - 4 >= 0){
-                        gridBasicInfo.setAreaId(idArray[len - 4]);
-                    }
-                    if (len - 3 >= 0){
-                        gridBasicInfo.setCityId(idArray[len - 3]);
-                    }
-                    if (len - 2 >=0){
-                        gridBasicInfo.setProjectId(idArray[len - 2]);
-                    }
                     gridBasicInfo.setStagingId(orgId);
+                    List<UcOrg> ucOrgs = ucOrgService.getByIds(idArray);
+                    for (UcOrg org : ucOrgs) {
+                        if (StringUtils.isNotRealEmpty(org.getGrade())) {
+                            switch (org.getGrade()) {
+                                case "ORG_XiangMu":
+                                    gridBasicInfo.setProjectId(org.getId());
+                                    gridBasicInfo1.setProjectId(org.getId());
+                                    break;
+                                case "ORG_ChengQu":
+                                    gridBasicInfo.setCityId(org.getId());
+                                    gridBasicInfo1.setCityId(org.getId());
+                                    break;
+                                case "ORG_QuYu":
+                                    gridBasicInfo.setAreaId(org.getId());
+                                    gridBasicInfo1.setAreaId(org.getId());
+                                    break;
+                            }
+                        }
+                    }
                     gridBasicInfo.setCreationDate(new Date());
                     gridBasicInfo.setUpdationDate(new Date());
                     gridBasicInfo.setEnabledFlag(1);
                     gridBasicInfo.setIsDeleted(0);
                     gridBasicInfoService.insert(gridBasicInfo);
-                    GridBasicInfo gridBasicInfo1 = new GridBasicInfo();
                     gridBasicInfo1.setId(UUID.randomUUID().toString());
                     gridBasicInfo1.setGridCode("WGS001");
                     gridBasicInfo1.setGridName("服务中心网格");
                     gridBasicInfo1.setGridType("service_center_grid");
-                    if (len - 4 >= 0){
-                        gridBasicInfo1.setAreaId(idArray[len - 4]);
-                    }
-                    if (len - 3 >= 0){
-                        gridBasicInfo1.setCityId(idArray[len - 3]);
-                    }
-                    if (len - 2 >=0){
-                        gridBasicInfo1.setProjectId(idArray[len - 2]);
-                    }
                     gridBasicInfo1.setStagingId(orgId);
                     gridBasicInfo1.setCreationDate(new Date());
                     gridBasicInfo1.setUpdationDate(new Date());
