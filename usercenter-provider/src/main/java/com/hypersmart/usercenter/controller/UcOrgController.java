@@ -37,6 +37,14 @@ public class UcOrgController extends BaseController {
     @Resource
     UcOrgUserService ucOrgUserService;
 
+
+    @PostMapping({"/queryList"})
+    @ApiOperation(value = "组织架构数据列表}", httpMethod = "POST", notes = "获取组织架构列表")
+    public PageList<UcOrg> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+        return this.ucOrgService.query(queryFilter);
+    }
+
+
     @PostMapping({"/list"})
     @ApiOperation(value = "组织架构数据列表}", httpMethod = "POST", notes = "获取组织架构列表")
     public List<UcOrg> list( @RequestBody  Map<String,String> map) {
