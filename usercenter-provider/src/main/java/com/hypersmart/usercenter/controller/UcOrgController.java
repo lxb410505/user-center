@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.service.UcOrgService;
+import tk.mybatis.mapper.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,17 @@ public class UcOrgController extends BaseController {
     @Resource
     UcOrgUserService ucOrgUserService;
 
+
+    @GetMapping({"/queryParent"})
+    @ApiOperation(value = "组织架构数据列表}", httpMethod = "GET", notes = "获取组织架构列表")
+    public UcOrg queryParent(@ApiParam(name = "queryFilter", value = "查询对象") @RequestParam String id) {
+        UcOrg ucOrg = ucOrgService.get(id);
+        if(null != ucOrg && StringUtil.isNotEmpty(ucOrg.getParentId())){
+            UcOrg parentOrg = ucOrgService.get(ucOrg.getParentId());
+            return parentOrg;
+        }
+        return null;
+    }
 
     @PostMapping({"/queryList"})
     @ApiOperation(value = "组织架构数据列表}", httpMethod = "POST", notes = "获取组织架构列表")
