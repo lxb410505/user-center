@@ -13,5 +13,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public interface UcUserService extends IGenericService<String, UcUser> {
+
+    UcUser getUserByUnitId(String unitId,String unitType);
 }
 
