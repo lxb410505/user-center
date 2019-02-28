@@ -2,6 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.hypersmart.usercenter.mapper.UcUserMapper">
+    <resultMap id="baseMap" type="com.hypersmart.usercenter.model.UcUser">
+        <id property="id" jdbcType="VARCHAR" column="ID_"></id>
+        <result column="FULL_NAME_" jdbcType="VARCHAR" property="fullname"></result>
+    </resultMap>
 
     <select id="quertListFive" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT * from (
@@ -98,9 +102,9 @@
         </if>
     </select>
 
-    <select id="getUserByUnitId" resultType="com.hypersmart.usercenter.model.UcUser">
+    <select id="getUserByUnitId" resultMap="baseMap">
         SELECT
-            *
+            ID_,FULLNAME_
         FROM
             uc_user
         WHERE

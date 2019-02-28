@@ -27,6 +27,6 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
 
     @Override
     public UcUser getUserByUnitId(String unitId,String unitType) {
-        return null;
+        return ucUserMapper.getUserByUnitId(unitId,unitType);
     }
 }
