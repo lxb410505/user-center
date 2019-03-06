@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.ContextUtils;
+import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.usercenter.bo.GridBasicInfoBO;
 import com.hypersmart.usercenter.bo.GridRangeBO;
@@ -166,7 +167,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         Object orgId = ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
 
         if (orgId != null) {
-            queryFilter.addFilter("stagingId", orgId.toString(), QueryOP.EQUAL, FieldRelation.AND, "two");
+            queryFilter.getParams().put("massifId",orgId.toString());
         } else {
             PageList<Map<String, Object>> pageList = new PageList();
             pageList.setTotal(0);
@@ -176,8 +177,6 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
             return pageList;
         }
 
-        //只展示is_deleted为0的数据
-        queryFilter.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND,"three");
         //根据创建时间倒叙排序
         List<FieldSort> fieldSortList = queryFilter.getSorter();
         FieldSort fieldSort = new FieldSort();
@@ -228,6 +227,15 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         GridErrorCode gridErrorCode = GridErrorCode.SUCCESS;
         Integer num = 0;
         if (gridBasicInfoDTO != null) {
+            //判断房产是否已经被覆盖
+            if(StringUtil.isNotEmpty(gridBasicInfoDTO.getGridRange())) {
+                boolean flag = gridRangeService.judgeExistHouse(gridBasicInfoDTO.getGridRange(),null,gridBasicInfoDTO.getStagingId());
+                if(flag) {
+                    gridErrorCode = GridErrorCode.INSERT_EXCEPTION;
+                    gridErrorCode.setMessage("存在已被覆盖的房产信息！");
+                    return gridErrorCode;
+                }
+            }
             GridBasicInfo gridBasicInfo = new GridBasicInfo();
             gridBasicInfo.setId(UUID.randomUUID().toString());
             gridBasicInfo.setAreaId(gridBasicInfoDTO.getAreaId());
@@ -248,6 +256,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
             }
             gridBasicInfo.setFormatAttribute(gridBasicInfoDTO.getFormatAttribute());
+            gridBasicInfo.setSecondFormatAttribute(gridBasicInfoDTO.getSecondFormatAttribute());
+            gridBasicInfo.setThirdFormatAttribute(gridBasicInfoDTO.getThirdFormatAttribute());
             gridBasicInfo.setCreationDate(new Date());
             gridBasicInfo.setUpdationDate(new Date());
             gridBasicInfo.setCreatedBy(ContextUtil.getCurrentUser().getUserId());
@@ -291,6 +301,16 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
             gridBasicInfo.setGridName(gridBasicInfoDTO.getGridName());
             gridBasicInfo.setGridRemark(gridBasicInfoDTO.getGridRemark());
             gridBasicInfo.setFormatAttribute(gridBasicInfoDTO.getFormatAttribute());
+            if(StringUtil.isEmpty(gridBasicInfoDTO.getSecondFormatAttribute())) {
+                gridBasicInfo.setSecondFormatAttribute("");
+            } else {
+                gridBasicInfo.setSecondFormatAttribute(gridBasicInfoDTO.getSecondFormatAttribute());
+            }
+            if(StringUtil.isEmpty(gridBasicInfoDTO.getThirdFormatAttribute())) {
+                gridBasicInfo.setThirdFormatAttribute("");
+            } else {
+                gridBasicInfo.setThirdFormatAttribute(gridBasicInfoDTO.getThirdFormatAttribute());
+            }
             //只要记录历史记录updateTimes都加1
             gridBasicInfo.setUpdateTimes(gridBasicInfoOld.getUpdateTimes() + 1);
             gridBasicInfo.setUpdationDate(new Date());
@@ -349,9 +369,15 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         Integer num = 0;
         //获取对应id旧的的网格数据
         GridBasicInfo gridBasicInfoOld = this.get(gridBasicInfoDTO.getId());
-        //历史数据存储(变更前) Todo
-        //历史数据存储(变更后) Todo
-        //楼栋数据存储 Todo
+        //判断房产是否已经被覆盖
+        if(StringUtil.isNotEmpty(gridBasicInfoDTO.getGridRange())) {
+            boolean flag = gridRangeService.judgeExistHouse(gridBasicInfoDTO.getGridRange(),gridBasicInfoDTO.getId(),gridBasicInfoOld.getStagingId());
+            if(flag) {
+                gridErrorCode = GridErrorCode.INSERT_EXCEPTION;
+                gridErrorCode.setMessage("存在已被覆盖的房产信息！");
+                return gridErrorCode;
+            }
+        }
         //变更楼栋
         GridBasicInfo gridBasicInfo = new GridBasicInfo();
         gridBasicInfo.setId(gridBasicInfoDTO.getId());

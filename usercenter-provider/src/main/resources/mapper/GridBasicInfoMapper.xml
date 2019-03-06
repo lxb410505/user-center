@@ -65,6 +65,8 @@
         g.staging_id as divideId,
         g.housekeeper_id as housekeeperId,
         g.format_attribute as formatAttribute,
+        g.second_format_attribute as secondFormatAttribute,
+        g.third_format_attribute as thirdFormatAttribute,
         concat('',g.enabled_flag,'') as enabledFlag,
         g.is_deleted as isDeleted,
         g.creation_date as creationDate,
@@ -95,7 +97,7 @@
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
-        ) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
+        ) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId where g.staging_id = #{massifId} and g.is_deleted = 0) as t
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
@@ -107,7 +109,6 @@
     </select>
 
     <select id="getGridById" parameterType="java.lang.String" resultType="java.util.Map">
-        select * from (
         select g.id as id,
         g.grid_range as gridRange,
         g.grid_name as gridName,
@@ -121,6 +122,8 @@
         g.staging_id as divideId,
         g.housekeeper_id as housekeeperId,
         g.format_attribute as formatAttribute,
+        g.second_format_attribute as secondFormatAttribute,
+        g.third_format_attribute as thirdFormatAttribute,
         concat('',g.enabled_flag,'') as enabledFlag,
         (select org.NAME_ from uc_org org where ID_ = g.area_id) as areaName,
         (select org.NAME_ from uc_org org where ID_ = g.project_id) as projectName,
@@ -149,8 +152,8 @@
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
-        ) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId) as t
-        where id = #{id}
+        ) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId
+        where g.id = #{id}
     </select>
 
     <update id="disableGridInfo" parameterType="com.hypersmart.usercenter.bo.GridBasicInfoBO">

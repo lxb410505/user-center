@@ -12,10 +12,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * 网格覆盖范围表
@@ -85,11 +82,43 @@ public class GridRangeServiceImpl extends GenericService<String, GridRange> impl
         List<GridRange> gridRangeList = gridRangeMapper.getRange(gridRangeBO);
         if(!CollectionUtils.isEmpty(gridRangeList)) {
             for(GridRange gridRange : gridRangeList) {
-                if("2".equals(gridRange.getRangeType())) {
+                if("3".equals(gridRange.getRangeType())) {
                     stringList.add(gridRange.getResourceId());
                 }
             }
         }
         return stringList;
     }
+
+    /**
+     * 判断房产是否已经被覆盖
+     * @param gridRangeRecord
+     * @return
+     */
+    @Override
+    public boolean judgeExistHouse(String gridRangeRecord, String gridId, String stagingId) {
+        GridRangeBO gridRangeBO = new GridRangeBO();
+        gridRangeBO.setGridId(gridId);
+        gridRangeBO.setStagingId(stagingId);
+        List<GridRange> gridRangeList = gridRangeMapper.getRange(gridRangeBO);
+        Map<String,GridRange>  gridRangeMap = new HashMap<>();
+        if(!CollectionUtils.isEmpty(gridRangeList)) {
+            for(GridRange gridRange : gridRangeList) {
+                if("3".equals(gridRange.getRangeType())) {
+                    gridRangeMap.put(gridRange.getResourceId(),gridRange);
+                }
+            }
+        }
+        JSONArray jsonArray = JSONArray.parseArray(gridRangeRecord);
+        List<GridRangeInfo> gridRangeInfoList = jsonArray.toJavaList(GridRangeInfo.class);
+        if(!CollectionUtils.isEmpty(gridRangeInfoList)) {
+            for(GridRangeInfo gridRangeInfo : gridRangeInfoList) {
+                if(gridRangeInfo.getLevel().equals(3) && gridRangeMap.get(gridRangeInfo.getId()) != null) {
+                 return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }
