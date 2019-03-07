@@ -115,6 +115,14 @@ private static final long serialVersionUID=1L;
     @ApiModelProperty("业态属性：商办、住宅、公寓等")
     private String formatAttribute;
 
+    @Column(name = "second_format_attribute")
+    @ApiModelProperty("二级业态属性")
+    private String secondFormatAttribute;
+
+    @Column(name = "third_format_attribute")
+    @ApiModelProperty("三级业态属性")
+    private String thirdFormatAttribute;
+
     @Column(name = "creation_date")
     @ApiModelProperty("首次创建时间")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -441,5 +449,21 @@ private static final long serialVersionUID=1L;
 
     public void setCityName(String cityName) {
         this.cityName = cityName;
+    }
+
+    public String getSecondFormatAttribute() {
+        return secondFormatAttribute;
+    }
+
+    public void setSecondFormatAttribute(String secondFormatAttribute) {
+        this.secondFormatAttribute = secondFormatAttribute;
+    }
+
+    public String getThirdFormatAttribute() {
+        return thirdFormatAttribute;
+    }
+
+    public void setThirdFormatAttribute(String thirdFormatAttribute) {
+        this.thirdFormatAttribute = thirdFormatAttribute;
     }
 }
