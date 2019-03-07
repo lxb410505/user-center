@@ -193,12 +193,6 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                     pageBean.showTotal());
         }
 
-        if (BeanUtils.isEmpty(pageBean)) {
-            PageHelper.startPage(1, Integer.MAX_VALUE, false);
-        } else {
-            PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
-                    pageBean.showTotal());
-        }
         List<Map<String,Object>> query = this.gridBasicInfoMapper.quertList(queryFilter.getParams());
         return new PageList<>(query);
     }
