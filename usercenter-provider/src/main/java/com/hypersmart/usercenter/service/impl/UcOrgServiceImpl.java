@@ -49,6 +49,10 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     }
 
     @Override
+    /**
+     *  获取用户权限列表
+     *  diasbled:1->有权限 2：->无权限只能查看
+     * */
     public List<UcOrg> getUserOrgList(String userId) {
         QueryFilter queryFilter =QueryFilter.build();
         //根据用户查询人与组织关系

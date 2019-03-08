@@ -18,6 +18,7 @@ import com.hypersmart.usercenter.service.UcOrgService;
 import tk.mybatis.mapper.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,76 @@ public class UcOrgController extends BaseController {
 
     @Resource
     UcOrgUserService ucOrgUserService;
+
+    /*
+    *   根据地块id与当前用户信息，获取它及它以上的组织信息
+    *
+    * */
+    @GetMapping("/getUcOrgsByorgId")
+    public List<UcOrg> getUcOrgsByorgId(@RequestParam("orgId") String orgId){
+        String userId = ContextUtil.getCurrentUserId();
+        UcOrg ucOrg = null;
+        if(null!= orgId && !"".equals(orgId)){
+            ucOrg = ucOrgService.get(orgId);
+            if(null== ucOrg){
+                return  new ArrayList<>();
+            }
+        }else{
+            return new ArrayList<>();
+        }
+        List<UcOrg> list = ucOrgService.getUserOrgList(userId);
+        //根据地块id查询字段
+        List<String> idList = new ArrayList<>();
+        Map<String,Integer> map = new HashMap<>();
+        String ids = "";
+        for(int i=0;i<list.size();i++){
+            UcOrg uc = list.get(i);
+            if(!idList.contains(uc.getId())){
+                idList.add(uc.getId());
+                map.put(uc.getId(),i);
+            }
+            if("".equals(ids)){
+                ids = uc.getId();
+            }else{
+                ids = ids +","+uc.getId();
+            }
+        }
+        //根据ids查询组织，同时根据传递的orgID判断
+        QueryFilter queryFilter = QueryFilter.build();
+        queryFilter.addFilter("id",ids, QueryOP.IN,FieldRelation.AND);
+        queryFilter.addFilter("path",ucOrg.getPath(), QueryOP.LEFT_LIKE,FieldRelation.AND);
+        PageList<UcOrg> page = ucOrgService.query(queryFilter);
+        if(null == page || null == page.getRows() || page.getRows().size()<=0){
+            return new ArrayList<>();
+        }
+        List<UcOrg> returnList = new ArrayList<>();
+        List<UcOrg> queryList = page.getRows();
+        for(UcOrg vo : queryList){
+            if(map.get(vo.getId()) != null){
+                   returnList.add(list.get(map.get(vo.getId())));
+            }
+        }
+        List<UcOrg> set = new ArrayList<>();
+        List<String> returnIds = new ArrayList<>();
+        for(UcOrg temp : returnList){
+            String [] paths = temp.getPath().split("\\.");
+            for(int i=0;i<paths.length;i++){
+                QueryFilter query = QueryFilter.build();
+                query.addFilter("id",paths[i],QueryOP.EQUAL,FieldRelation.AND);
+                query.addFilter("isDele","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
+                List<UcOrg> voList = ucOrgService.query(query).getRows();
+                for(UcOrg vo:voList){
+                    if(!returnIds.contains(vo.getId())){
+                        vo.setDisabled("2");
+                        set.add(vo);
+                        returnIds.add(vo.getId());
+                    }
+                }
+            }
+        }
+        return set;
+    }
+
 
 
     @GetMapping({"/queryParent"})
