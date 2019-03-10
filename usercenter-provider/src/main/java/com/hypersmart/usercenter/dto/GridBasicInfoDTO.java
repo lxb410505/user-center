@@ -71,8 +71,14 @@ public class GridBasicInfoDTO extends GenericDTO<String> implements Serializable
     //网格更新次数：只记录产生过历史记录/工单的次数"
     private Integer updateTimes;
 
-    //业态属性：商办、住宅、公寓等
+    //一级业态属性
     private String formatAttribute;
+
+    //二级业态属性
+    private String secondFormatAttribute;
+
+    //三级业态属性
+    private String thirdFormatAttribute;
 
     private String formatAttributeName;
 
@@ -341,5 +347,21 @@ public class GridBasicInfoDTO extends GenericDTO<String> implements Serializable
 
     public void setCityName(String cityName) {
         this.cityName = cityName;
+    }
+
+    public String getSecondFormatAttribute() {
+        return secondFormatAttribute;
+    }
+
+    public void setSecondFormatAttribute(String secondFormatAttribute) {
+        this.secondFormatAttribute = secondFormatAttribute;
+    }
+
+    public String getThirdFormatAttribute() {
+        return thirdFormatAttribute;
+    }
+
+    public void setThirdFormatAttribute(String thirdFormatAttribute) {
+        this.thirdFormatAttribute = thirdFormatAttribute;
     }
 }

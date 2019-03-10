@@ -36,5 +36,12 @@ public interface GridRangeService extends IGenericService<String, GridRange> {
 
     List<String> getAllRange(GridRangeBO gridRangeBO);
 
+    /**
+     * 判断房产是否已经被覆盖
+     * @param gridRangeRecord
+     * @return
+     */
+    boolean judgeExistHouse(String gridRangeRecord,String gridId, String stagingId);
+
 }
 

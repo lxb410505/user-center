@@ -176,6 +176,8 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
             }
             gridBasicInfoHistory.setHousekeeperHistoryId(before_housekeeper_history_id);
             gridBasicInfoHistory.setFormatAttribute(beforeGrid.getFormatAttribute());
+            gridBasicInfoHistory.setSecondFormatAttribute(beforeGrid.getSecondFormatAttribute());
+            gridBasicInfoHistory.setThirdFormatAttribute(beforeGrid.getThirdFormatAttribute());
             gridBasicInfoHistory.setEnabledFlag(1);
             gridBasicInfoHistory.setIsDeleted(0);
             gridBasicInfoHistory.setCreationDate(new Date());
@@ -316,6 +318,8 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                 }
                 gridBasicInfoHistoryAfter.setHousekeeperHistoryId(after_housekeeper_history_id);
                 gridBasicInfoHistoryAfter.setFormatAttribute(gridBasicInfoDTO.getFormatAttribute());
+                gridBasicInfoHistoryAfter.setSecondFormatAttribute(gridBasicInfoDTO.getSecondFormatAttribute());
+                gridBasicInfoHistoryAfter.setThirdFormatAttribute(gridBasicInfoDTO.getThirdFormatAttribute());
                 gridBasicInfoHistoryAfter.setEnabledFlag(1);
                 gridBasicInfoHistoryAfter.setIsDeleted(0);
                 gridBasicInfoHistoryAfter.setCreationDate(new Date());

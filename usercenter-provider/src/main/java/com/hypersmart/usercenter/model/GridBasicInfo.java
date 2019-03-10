@@ -83,8 +83,16 @@ private static final long serialVersionUID=1L;
     private Integer updateTimes;
 
     @Column(name = "format_attribute")
-    @ApiModelProperty("业态属性：商办、住宅、公寓等")
+    @ApiModelProperty("一级业态属性")
     private String formatAttribute;
+
+    @Column(name = "second_format_attribute")
+    @ApiModelProperty("二级业态属性")
+    private String secondFormatAttribute;
+
+    @Column(name = "third_format_attribute")
+    @ApiModelProperty("三级业态属性")
+    private String thirdFormatAttribute;
 
     @Column(name = "creation_date")
     @ApiModelProperty("首次创建时间")
@@ -312,6 +320,22 @@ private static final long serialVersionUID=1L;
 
     public void setIsDeleted(Integer isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public String getSecondFormatAttribute() {
+        return secondFormatAttribute;
+    }
+
+    public void setSecondFormatAttribute(String secondFormatAttribute) {
+        this.secondFormatAttribute = secondFormatAttribute;
+    }
+
+    public String getThirdFormatAttribute() {
+        return thirdFormatAttribute;
+    }
+
+    public void setThirdFormatAttribute(String thirdFormatAttribute) {
+        this.thirdFormatAttribute = thirdFormatAttribute;
     }
 
     public String toString(){
