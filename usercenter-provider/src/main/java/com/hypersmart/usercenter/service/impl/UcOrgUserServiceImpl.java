@@ -177,7 +177,7 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         UcOrg ucOrg = ucOrgService.get(orgId.toString());
         if(null!= ucOrg){
             String path = ucOrg.getPath();
-            String pathpli = path.replaceAll(".","");
+            String pathpli = path.replace(".","");
             int num = path.length()-pathpli.length();
             List<Map<String, Object>> query = new ArrayList<>();
             switch (num){
