@@ -22,5 +22,10 @@ public interface UcUserMapper extends GenericMapper<UcUser> {
 
     List<Map<String, Object>> quertListFour(Map<String, Object> map);
 
+    List<Map<String, Object>> quertListThree(Map<String, Object> map);
+
+    List<Map<String, Object>> quertListTwo(Map<String, Object> map);
+
+
     UcUser getUserByUnitId(@Param("unitId") String unitId,@Param("unitType")String unitType);
 }

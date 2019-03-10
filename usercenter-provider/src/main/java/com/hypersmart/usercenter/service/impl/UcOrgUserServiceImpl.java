@@ -174,8 +174,30 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
             PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
                     pageBean.showTotal());
         }
-        List<Map<String, Object>> query = this.ucUserMapper.quertListFive(queryFilter.getParams());
-        return new PageList<>(query);
+        UcOrg ucOrg = ucOrgService.get(orgId.toString());
+        if(null!= ucOrg){
+            String path = ucOrg.getPath();
+            String pathpli = path.replaceAll(".","");
+            int num = path.length()-pathpli.length();
+            List<Map<String, Object>> query = new ArrayList<>();
+            switch (num){
+                case 3:
+                    query= this.ucUserMapper.quertListTwo(queryFilter.getParams());
+                    break;
+                case 4:
+                    query= this.ucUserMapper.quertListThree(queryFilter.getParams());
+                    break;
+                case 5:
+                    query= this.ucUserMapper.quertListFour(queryFilter.getParams());
+                    break;
+                case 6:
+                    query= this.ucUserMapper.quertListFive(queryFilter.getParams());
+                    break;
+            }
+            return new PageList<>(query);
+        }else{
+            return new PageList<>(new ArrayList<>());
+        }
     }
 
     public PageList<Map<String, Object>> quertList(QueryFilter queryFilter) {
