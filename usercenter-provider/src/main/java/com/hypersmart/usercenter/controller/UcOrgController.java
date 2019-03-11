@@ -4,9 +4,7 @@ import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.query.*;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
-import com.hypersmart.usercenter.model.UcOrgUser;
-import com.hypersmart.usercenter.model.UserIdGrade;
-import com.hypersmart.usercenter.model.UserIdParentId;
+import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
-import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.service.UcOrgService;
 import tk.mybatis.mapper.util.StringUtil;
 
@@ -227,6 +224,14 @@ public class UcOrgController extends BaseController {
         String userId=userIdGrade.getUserId();
         String grade=userIdGrade.getGrade();
         return ucOrgService.queryByGrade(userId,grade);
+    }
+
+    //根据组织id查询所有子节点的组织信息
+    @PostMapping({"/queryChildrenByOrgId"})
+    public List<UcOrg> queryChildrenByOrgId(@RequestBody OrgIdGrade orgIdGrade) {
+        String orgId=orgIdGrade.getOrgId();
+        String grade=orgIdGrade.getGrade();
+        return ucOrgService.queryChildrenByOrgId(orgId,grade);
     }
 
     @PostMapping({"/getByList"})
