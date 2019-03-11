@@ -132,8 +132,8 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         }
         //根据组织id获取组织信息
         QueryFilter orgQuery = QueryFilter.build();
-        orgQuery.addFilter("id", orgIds, QueryOP.IN, FieldRelation.AND);
-        orgQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+        orgQuery.addFilter("id",orgIds,QueryOP.IN,FieldRelation.AND);
+        orgQuery.addFilter("isDele","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
         List<UcOrg> returnList = this.query(orgQuery).getRows();
         //根据组织获取子级
         List<UcOrg> set = new ArrayList<>();
@@ -141,17 +141,22 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         if(StringUtils.isEmpty(parentOrgId)){
             parentOrgId="0";
         }
-        for (UcOrg ucOrg : returnList) {
+        for(UcOrg ucOrg :returnList){
             QueryFilter childQuery = QueryFilter.build();
-            childQuery.addFilter("parentId", parentOrgId, QueryOP.EQUAL, FieldRelation.AND);
-            childQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+            childQuery.addFilter("path",ucOrg.getPath(), QueryOP.RIGHT_LIKE,FieldRelation.AND);
+            childQuery.addFilter("isDele","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
             List<UcOrg> orgs = this.query(childQuery).getRows();
-            for (UcOrg org : orgs) {
-                if (!ids.contains(org.getId())) {
+            for(UcOrg org :orgs){
+                if(!ids.contains(org.getId())&&org.getParentId().equals(parentOrgId)){
                     org.setDisabled("1");
                     set.add(org);
                     ids.add(org.getId());
                 }
+            }
+            if(!ids.contains(ucOrg.getId())&&ucOrg.getParentId().equals(parentOrgId)){
+                ucOrg.setDisabled("1");
+                set.add(ucOrg);
+                ids.add(ucOrg.getId());
             }
         }
         return set;
