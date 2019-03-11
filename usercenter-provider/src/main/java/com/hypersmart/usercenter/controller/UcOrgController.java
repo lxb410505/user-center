@@ -5,6 +5,7 @@ import com.hypersmart.base.query.*;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.model.UcOrgUser;
+import com.hypersmart.usercenter.model.User;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +13,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.persistence.Id;
 
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.service.UcOrgService;
@@ -205,9 +207,18 @@ public class UcOrgController extends BaseController {
 
 
     @GetMapping({"/userList/{id}"})
-    @ApiOperation(value = "组织架构数据列表}", httpMethod = "POST", notes = "获取组织架构列表")
+    @ApiOperation(value = "组织架构数据列表}", httpMethod = "GET", notes = "获取组织架构列表")
     public List<UcOrg> userList(@PathVariable("id") String userId) {
        return ucOrgService.getUserOrgList(userId);
+    }
+
+
+    //分层显示
+    @PostMapping({"/userGradeList"})
+    public List<UcOrg> userGradeList(@RequestBody User user) {
+        String userId=user.getUserId();
+        String parentOrgId=user.getParentOrgId();
+        return ucOrgService.getUserOrgGradeList(userId,parentOrgId);
     }
 
     @PostMapping({"/getByList"})
