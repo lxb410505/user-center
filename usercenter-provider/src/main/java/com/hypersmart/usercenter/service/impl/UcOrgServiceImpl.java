@@ -213,7 +213,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     @Override
     public List<UcOrg> queryChildrenByOrgId(String orgId, String grade) {
         QueryFilter childQuery = QueryFilter.build();
-        childQuery.addFilter("path",orgId, QueryOP.LIKE,FieldRelation.AND);
+        childQuery.addFilter("path",orgId, QueryOP.LEFT_LIKE,FieldRelation.AND);
         childQuery.addFilter("id",orgId, QueryOP.NOT_EQUAL,FieldRelation.AND);
         childQuery.addFilter("grade",grade, QueryOP.EQUAL,FieldRelation.AND);
         childQuery.addFilter("isDele","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
