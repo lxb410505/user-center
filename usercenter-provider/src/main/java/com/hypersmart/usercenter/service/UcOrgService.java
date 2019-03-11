@@ -27,5 +27,7 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
     List<UcOrg> queryChildrenByUserId(String userId,String parentOrgId);
 
     List<UcOrg> queryByGrade(String userId,String grade);
+
+    List<UcOrg> queryChildrenByOrgId(String orgId,String grade);
 }
 
