@@ -210,7 +210,7 @@ public class UcOrgController extends BaseController {
     }
 
 
-    //根据userId和组织父级id查询组织信息
+    //根据用户Id和组织父级id查询组织信息
     @PostMapping({"/queryChildrenByUserId"})
     public List<UcOrg> queryChildrenByUserId(@RequestBody UserIdParentId userIdParentId) {
         String userId=userIdParentId.getUserId();
