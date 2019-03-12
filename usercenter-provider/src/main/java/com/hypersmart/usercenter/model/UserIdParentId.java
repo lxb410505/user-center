@@ -1,13 +1,13 @@
 package com.hypersmart.usercenter.model;
 
-public class User {
+public class UserIdParentId {
     private String userId;
     private String parentOrgId;
 
-    public User() {
+    public UserIdParentId() {
     }
 
-    public User(String userId, String parentOrgId) {
+    public UserIdParentId(String userId, String parentOrgId) {
         this.userId = userId;
         this.parentOrgId = parentOrgId;
     }

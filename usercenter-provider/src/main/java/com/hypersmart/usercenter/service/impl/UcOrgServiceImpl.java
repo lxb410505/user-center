@@ -115,7 +115,8 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         return set;
     }
 
-    public List<UcOrg> getUserOrgGradeList(String userId,String parentOrgId) {
+    //根据userId和组织父级id查询组织信息
+    public List<UcOrg> queryChildrenByUserId(String userId,String parentOrgId) {
         QueryFilter queryFilter = QueryFilter.build();
         //根据用户查询人与组织关系
         List<UcOrgUser> list = ucOrgUserService.getUserOrg(userId);
@@ -144,21 +145,69 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         for(UcOrg ucOrg :returnList){
             QueryFilter childQuery = QueryFilter.build();
             childQuery.addFilter("path",ucOrg.getPath(), QueryOP.RIGHT_LIKE,FieldRelation.AND);
+            childQuery.addFilter("parentId",parentOrgId, QueryOP.RIGHT_LIKE,FieldRelation.AND);
             childQuery.addFilter("isDele","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
             List<UcOrg> orgs = this.query(childQuery).getRows();
             for(UcOrg org :orgs){
-                if(!ids.contains(org.getId())&&org.getParentId().equals(parentOrgId)){
-                    org.setDisabled("1");
+                if(!ids.contains(org.getId())){
+//                    org.setDisabled("1");
                     set.add(org);
                     ids.add(org.getId());
                 }
             }
-            if(!ids.contains(ucOrg.getId())&&ucOrg.getParentId().equals(parentOrgId)){
-                ucOrg.setDisabled("1");
-                set.add(ucOrg);
-                ids.add(ucOrg.getId());
+        }
+        return set;
+    }
+
+    //根据组织级别查询组织信息
+    public List<UcOrg> queryByGrade(String userId,String grade) {
+        QueryFilter queryFilter = QueryFilter.build();
+        //根据用户查询人与组织关系
+        List<UcOrgUser> list = ucOrgUserService.getUserOrg(userId);
+        if (null == list || list.size() <= 0) {
+            return new ArrayList<>();
+        }
+        String orgIds = "";
+        for (int i = 0; i < list.size(); i++) {
+            if (i == 0) {
+                orgIds = list.get(i).getOrgId();
+            } else {
+                orgIds = orgIds + "," + list.get(i).getOrgId();
+            }
+        }
+        //根据组织id获取组织信息
+        QueryFilter orgQuery = QueryFilter.build();
+        orgQuery.addFilter("id",orgIds,QueryOP.IN,FieldRelation.AND);
+        orgQuery.addFilter("isDele","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
+        List<UcOrg> returnList = this.query(orgQuery).getRows();
+        //根据组织获取子级
+        List<UcOrg> set = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
+        for(UcOrg ucOrg :returnList){
+            QueryFilter childQuery = QueryFilter.build();
+            childQuery.addFilter("path",ucOrg.getPath(), QueryOP.RIGHT_LIKE,FieldRelation.AND);
+            childQuery.addFilter("grade",grade, QueryOP.EQUAL,FieldRelation.AND);
+            childQuery.addFilter("isDele","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
+            List<UcOrg> orgs = this.query(childQuery).getRows();
+            for(UcOrg org :orgs){
+                if (!ids.contains(org.getId())) {
+//                    org.setDisabled("1");
+                    set.add(org);
+                    ids.add(org.getId());
+                }
             }
         }
         return set;
+    }
+
+    @Override
+    public List<UcOrg> queryChildrenByOrgId(String orgId, String grade) {
+        QueryFilter childQuery = QueryFilter.build();
+        childQuery.addFilter("path",orgId, QueryOP.LEFT_LIKE,FieldRelation.AND);
+        childQuery.addFilter("id",orgId, QueryOP.NOT_EQUAL,FieldRelation.AND);
+        childQuery.addFilter("grade",grade, QueryOP.EQUAL,FieldRelation.AND);
+        childQuery.addFilter("isDele","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
+        List<UcOrg> orgs = this.query(childQuery).getRows();
+        return orgs;
     }
 }

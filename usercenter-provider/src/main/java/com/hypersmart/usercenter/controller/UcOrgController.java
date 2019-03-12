@@ -4,8 +4,7 @@ import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.query.*;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
-import com.hypersmart.usercenter.model.UcOrgUser;
-import com.hypersmart.usercenter.model.User;
+import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,9 +12,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.persistence.Id;
 
-import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.service.UcOrgService;
 import tk.mybatis.mapper.util.StringUtil;
 
@@ -213,12 +210,28 @@ public class UcOrgController extends BaseController {
     }
 
 
-    //分层显示
-    @PostMapping({"/userGradeList"})
-    public List<UcOrg> userGradeList(@RequestBody User user) {
-        String userId=user.getUserId();
-        String parentOrgId=user.getParentOrgId();
-        return ucOrgService.getUserOrgGradeList(userId,parentOrgId);
+    //根据用户Id和组织父级id查询组织信息
+    @PostMapping({"/queryChildrenByUserId"})
+    public List<UcOrg> queryChildrenByUserId(@RequestBody UserIdParentId userIdParentId) {
+        String userId=userIdParentId.getUserId();
+        String parentOrgId=userIdParentId.getParentOrgId();
+        return ucOrgService.queryChildrenByUserId(userId,parentOrgId);
+    }
+
+    //根据组织级别查询组织信息
+    @PostMapping({"/queryByGrade"})
+    public List<UcOrg> queryByGrade(@RequestBody UserIdGrade userIdGrade) {
+        String userId=userIdGrade.getUserId();
+        String grade=userIdGrade.getGrade();
+        return ucOrgService.queryByGrade(userId,grade);
+    }
+
+    //根据组织id查询所有子节点的组织信息
+    @PostMapping({"/queryChildrenByOrgId"})
+    public List<UcOrg> queryChildrenByOrgId(@RequestBody OrgIdGrade orgIdGrade) {
+        String orgId=orgIdGrade.getOrgId();
+        String grade=orgIdGrade.getGrade();
+        return ucOrgService.queryChildrenByOrgId(orgId,grade);
     }
 
     @PostMapping({"/getByList"})
