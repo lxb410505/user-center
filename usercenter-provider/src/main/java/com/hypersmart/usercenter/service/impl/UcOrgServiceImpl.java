@@ -145,19 +145,15 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         for(UcOrg ucOrg :returnList){
             QueryFilter childQuery = QueryFilter.build();
             childQuery.addFilter("path",ucOrg.getPath(), QueryOP.RIGHT_LIKE,FieldRelation.AND);
+            childQuery.addFilter("parentId",parentOrgId, QueryOP.RIGHT_LIKE,FieldRelation.AND);
             childQuery.addFilter("isDele","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
             List<UcOrg> orgs = this.query(childQuery).getRows();
             for(UcOrg org :orgs){
-                if(!ids.contains(org.getId())&&org.getParentId().equals(parentOrgId)){
-                    org.setDisabled("1");
+                if(!ids.contains(org.getId())){
+//                    org.setDisabled("1");
                     set.add(org);
                     ids.add(org.getId());
                 }
-            }
-            if(!ids.contains(ucOrg.getId())&&ucOrg.getParentId().equals(parentOrgId)){
-                ucOrg.setDisabled("1");
-                set.add(ucOrg);
-                ids.add(ucOrg.getId());
             }
         }
         return set;
@@ -190,21 +186,15 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         for(UcOrg ucOrg :returnList){
             QueryFilter childQuery = QueryFilter.build();
             childQuery.addFilter("path",ucOrg.getPath(), QueryOP.RIGHT_LIKE,FieldRelation.AND);
+            childQuery.addFilter("grade",grade, QueryOP.EQUAL,FieldRelation.AND);
             childQuery.addFilter("isDele","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
             List<UcOrg> orgs = this.query(childQuery).getRows();
             for(UcOrg org :orgs){
-                if(!StringUtils.isEmpty(org.getGrade())) {
-                    if (!ids.contains(org.getId())&& org.getGrade().equals(grade)) {
-                        org.setDisabled("1");
-                        set.add(org);
-                        ids.add(org.getId());
-                    }
+                if (!ids.contains(org.getId())) {
+//                    org.setDisabled("1");
+                    set.add(org);
+                    ids.add(org.getId());
                 }
-            }
-            if(!ids.contains(ucOrg.getId())&&ucOrg.getGrade().equals(grade)){
-                ucOrg.setDisabled("1");
-                set.add(ucOrg);
-                ids.add(ucOrg.getId());
             }
         }
         return set;
