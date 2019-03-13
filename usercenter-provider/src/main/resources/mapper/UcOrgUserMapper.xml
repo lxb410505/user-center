@@ -25,16 +25,16 @@
         and  IS_DELE_ = 0
     </select>
 
-    <select id="getUserIdOrgByOrgIds" resultMap="java.lang.String">
-        select
-        ID_
-        from
-        <include refid="BaseTable"/>
-        where IS_DELE_ = 0 AND ORG_ID_  in  #{userId}
-        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
-                #{item}
-        </foreach>
-    </select>
+    <!--<select id="getUserIdOrgByOrgIds" resultMap="java.lang.String">-->
+        <!--select-->
+        <!--ID_-->
+        <!--from-->
+        <!--<include refid="BaseTable"/>-->
+        <!--where IS_DELE_ = 0 AND ORG_ID_  in  #{userId}-->
+        <!--<foreach collection="list" index="index" item="item" open="(" separator="," close=")">-->
+                <!--#{item}-->
+        <!--</foreach>-->
+    <!--</select>-->
 
     <select id="getPostIdByjobCode" resultType="java.lang.String">
         select p.ID_
