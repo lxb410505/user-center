@@ -37,7 +37,7 @@ import java.util.Map;
 @Api(tags = {"ucUserController"})
 public class UcUserController extends BaseController {
     @Resource
-        UcUserService ucUserService;
+    UcUserService ucUserService;
 
     @Resource
     UcOrgService ucOrgService;
@@ -52,7 +52,7 @@ public class UcUserController extends BaseController {
     @ApiOperation(value = "用户管理数据列表}", httpMethod = "POST", notes = "获取用户管理列表")
     public List<UcUser> allList() {
         QueryFilter queryFilter = QueryFilter.build();
-        queryFilter.addFilter("IS_DELE_",1, QueryOP.EQUAL);
+        queryFilter.addFilter("IS_DELE_", 1, QueryOP.EQUAL);
         return this.ucUserService.query(queryFilter).getRows();
     }
 
@@ -66,22 +66,28 @@ public class UcUserController extends BaseController {
     @ApiOperation(value = "设置当前组织", httpMethod = "GET", notes = "设置当前组织")
     public CommonResult<String> setCurrentOrg(@PathVariable("orgId") String orgId) {
         CommonResult<String> commonResult = new CommonResult<>();
-        try{
+        try {
             UcOrg ucorg = ucOrgService.get(orgId);
-            if(null != ucorg){
+            if (null != ucorg) {
                 IUser iUser = ContextUtil.getCurrentUser();
                 Map<String, String> map = iUser.getAttributes();
-                map.put("currentOrg",orgId);
+                map.put("currentOrg", orgId);
                 iUser.setAttributes(map);
                 ContextUtil.setCurrentUser(iUser);
                 commonResult.setState(true);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             commonResult.setState(false);
         }
         return commonResult;
     }
 
+
+    @GetMapping({"/getDepUserByOrgCodeAndJobCode"})
+    @ApiOperation(value = "通过组织编码和职务编码，深度获取用户", httpMethod = "GET", notes = "深度获取用户")
+    public CommonResult<String> getDepUserByOrgCodeAndJobCode(@RequestParam("orgCode") String orgCode, @RequestParam("jobCode") String jobCode) {
+        return null;
+    }
 
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增用户管理信息", httpMethod = "POST", notes = "保存用户管理")
@@ -122,4 +128,6 @@ public class UcUserController extends BaseController {
 //        this.ucUserService.delete(aryIds);
 //        return new CommonResult(true, "批量删除成功");
 //    }
+
+
 }
