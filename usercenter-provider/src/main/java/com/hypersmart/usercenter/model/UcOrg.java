@@ -86,6 +86,10 @@ public class UcOrg implements Serializable {
     @ApiModelProperty("级别")
     private Integer level;
 
+    @Column(name = "REF_ID_")
+    @ApiModelProperty("级别")
+    private String refId;
+
     @Transient
     private String disabled;
 
@@ -191,6 +195,14 @@ public class UcOrg implements Serializable {
 
     public void setLevel(Integer level) {
         this.level = level;
+    }
+
+    public String getRefId() {
+        return refId;
+    }
+
+    public void setRefId(String refId) {
+        this.refId = refId;
     }
 
     public String getDisabled() {
