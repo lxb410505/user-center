@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * 组织架构
- * 
+ *
  * @author sun
  * @email @sina.cn
  * @date 2019-01-11 11:48:45
@@ -21,4 +21,6 @@ public interface UcOrgMapper extends GenericMapper<UcOrg> {
     List<UcOrg> getOrgList(@Param("orgUserList") List<UcOrgUser> list);
 
     List<UcOrg> getChildrenOrg(UcOrg ucOrg);
+
+    List<UcOrg> queryByDemId(String demId);
 }

@@ -36,4 +36,11 @@
         where PATH_ like concat(#{path},"%")
     </select>
 
+    <select id="queryByDemId" resultMap="UcOrg">
+        select ID_,NAME_,PARENT_ID_,PATH_,REF_ID_
+        from
+        <include refid="BaseTable"/>
+        where DEM_ID_ = #{demId}
+    </select>
+
 </mapper>

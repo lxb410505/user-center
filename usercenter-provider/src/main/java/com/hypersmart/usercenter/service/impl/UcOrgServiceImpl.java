@@ -5,11 +5,11 @@ import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.framework.utils.StringUtils;
-import com.hypersmart.uc.api.impl.util.ContextUtil;
-import com.hypersmart.uc.api.model.IUser;
-import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.mapper.UcOrgMapper;
+import com.hypersmart.usercenter.model.UcDemension;
+import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UcOrgUser;
+import com.hypersmart.usercenter.service.UcDemensionService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,9 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
 
     @Autowired
     UcOrgUserService ucOrgUserService;
+
+    @Autowired
+    UcDemensionService ucDemensionService;
 
     public UcOrgServiceImpl(UcOrgMapper mapper) {
         super(mapper);
@@ -195,6 +198,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
                     set.add(org);
                     ids.add(org.getId());
                 }
+
             }
         }
         return set;
@@ -203,11 +207,35 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     @Override
     public List<UcOrg> queryChildrenByOrgId(String orgId, String grade) {
         QueryFilter childQuery = QueryFilter.build();
-        childQuery.addFilter("path",orgId, QueryOP.LEFT_LIKE,FieldRelation.AND);
+        childQuery.addFilter("path",orgId, QueryOP.LIKE,FieldRelation.AND);
         childQuery.addFilter("id",orgId, QueryOP.NOT_EQUAL,FieldRelation.AND);
         childQuery.addFilter("grade",grade, QueryOP.EQUAL,FieldRelation.AND);
         childQuery.addFilter("isDele","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
         List<UcOrg> orgs = this.query(childQuery).getRows();
         return orgs;
+    }
+
+    @Override
+    public List<UcOrg> queryByDemensionCode(String userId, String demensionCode) {
+        List<UcDemension> queryByCodeList=ucDemensionService.queryByCode(demensionCode);
+        List<UcOrg> ucOrgList=new ArrayList<>();
+        for(UcDemension ucDemension:queryByCodeList){
+            List<UcOrg> ucOrgs=ucOrgMapper.queryByDemId(ucDemension.getId());
+            for(UcOrg ucOrg:ucOrgs){
+                ucOrgList.add(ucOrg);
+            }
+        }
+
+        List<UcDemension> queryByNotCodeList=ucDemensionService.queryByNotCode(demensionCode);
+        List<UcOrg> ucOrgNotCodeList=new ArrayList<>();
+        for(UcDemension ucDemension:queryByNotCodeList){
+            List<UcOrg> ucOrgs=ucOrgMapper.queryByDemId(ucDemension.getId());
+//            for(UcOrg ucOrg:ucOrgs){
+//                if(ucOrg.getRefId().equals()){
+//
+//                }
+//            }
+        }
+        return null;
     }
 }
