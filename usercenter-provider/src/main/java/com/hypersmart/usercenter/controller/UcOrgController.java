@@ -5,17 +5,15 @@ import com.hypersmart.base.query.*;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.model.*;
+import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
-
-import com.hypersmart.usercenter.service.UcOrgService;
 import tk.mybatis.mapper.util.StringUtil;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -232,6 +230,14 @@ public class UcOrgController extends BaseController {
         String orgId=orgIdGrade.getOrgId();
         String grade=orgIdGrade.getGrade();
         return ucOrgService.queryChildrenByOrgId(orgId,grade);
+    }
+
+    //查询用户有权查看条线的列表接口
+    @PostMapping({"/queryByDemensionCode"})
+    public List<UcOrg> queryByDemensionCode(@RequestBody UserIdDemensionCode userIdDemensionCode) {
+        String userId=userIdDemensionCode.getUserId();
+        String demensionCode=userIdDemensionCode.getDemensionCode();
+        return ucOrgService.queryByDemensionCode(userId,demensionCode);
     }
 
     @PostMapping({"/getByList"})
