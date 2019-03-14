@@ -5,6 +5,7 @@ import com.hypersmart.framework.service.IGenericService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,5 +21,7 @@ public interface UcUserService extends IGenericService<String, UcUser> {
     UcUser getUserByUnitId(String unitId,String unitType);
 
     Set<UcUser> getDepUserByOrgCodeAndJobCode(String orgCode, String jobCode);
+
+    List<UcUser> queryUserByGradeAndDemCode(String userId,String grade, String DemensionCode, String fullname, String mobile);
 }
 

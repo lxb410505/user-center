@@ -14,6 +14,7 @@ import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,5 +77,13 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
         //ucOrgService.getChildrenOrg() // 通过path查询,匹配方式： path%
 
         return null;
+    }
+
+    @Override
+    public List<UcUser> queryUserByGradeAndDemCode(String userId,String grade, String DemensionCode, String fullname, String mobile) {
+        List<UcOrg> ucOrgList=ucOrgService.queryByDemensionCode(userId,DemensionCode);
+        List<UcUser> ucUsers= this.ucUserMapper.queryUserByOrgIdList(ucOrgList,fullname,mobile);
+
+        return ucUsers;
     }
 }
