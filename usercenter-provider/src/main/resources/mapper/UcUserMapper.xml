@@ -194,9 +194,9 @@
     </select>
 
     <select id="queryUserByOrgIdList" resultMap="baseMap">
-        select u.* from
+        select distinct u.* from
         uc_user u
-        INNER JOIN  uc_org_user ou on u.ID_ = ou.USER_ID_
+        INNER JOIN uc_org_user ou on u.ID_ = ou.USER_ID_
         where ou.ORG_ID_ in
         <foreach collection="ucOrgList" index="index" item="item" open="(" separator="," close=")">
             #{item.id}
