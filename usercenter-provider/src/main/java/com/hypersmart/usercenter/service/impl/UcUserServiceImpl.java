@@ -83,7 +83,12 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
     public List<UcUser> queryUserByGradeAndDemCode(String userId,String grade, String DemensionCode, String fullname, String mobile) {
         List<UcOrg> ucOrgList=ucOrgService.queryByDemensionCode(userId,DemensionCode);
         List<UcUser> ucUsers= this.ucUserMapper.queryUserByOrgIdList(ucOrgList,fullname,mobile);
-
+//        List<String> ids = new ArrayList<>();
+//        for(UcUser ucUser:ucUsers){
+//                if(ids.contains(ucUser.getId())||ids.contains(ucUser.getId())){
+//                    ids.add(ucUser.getId());
+//                }
+//        }
         return ucUsers;
     }
 }
