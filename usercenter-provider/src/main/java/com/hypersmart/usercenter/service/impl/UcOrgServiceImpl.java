@@ -221,24 +221,66 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     @Override
     public List<UcOrg> queryByDemensionCode(String userId, String demensionCode) {
         List<UcDemension> queryByCodeList = ucDemensionService.queryByCode(demensionCode);
-        List<UcOrg> ucOrgList = new ArrayList<>();
+        List<String> ucOrgList = new ArrayList<>();//id集合
+        //维度为xx组织下的所有组织机构的id集合
         for (UcDemension ucDemension : queryByCodeList) {
             List<UcOrg> ucOrgs = ucOrgMapper.queryByDemId(ucDemension.getId());
             for (UcOrg ucOrg : ucOrgs) {
-                ucOrgList.add(ucOrg);
+                ucOrgList.add(ucOrg.getId());
+            }
+        }
+        //非xx维度组织下的所有组织机构的id集合(且组织机构的引用id（REF_ID_）在第一步查出的id集合中)
+        List<UcDemension> queryByNotCodeList = ucDemensionService.queryByNotCode(demensionCode);
+        List<String> ucOrgNotCodeList = new ArrayList<>();//id集合
+        for (UcDemension ucDemension : queryByNotCodeList) {
+            List<UcOrg> ucOrgs = ucOrgMapper.queryByDemId(ucDemension.getId());
+            for(UcOrg ucOrg:ucOrgs){
+                if(ucOrgList.contains(ucOrg.getRefId())){
+                    ucOrgNotCodeList.add(ucOrg.getId());
+                }
             }
         }
 
-        List<UcDemension> queryByNotCodeList = ucDemensionService.queryByNotCode(demensionCode);
-        List<UcOrg> ucOrgNotCodeList = new ArrayList<>();
-        for (UcDemension ucDemension : queryByNotCodeList) {
-            List<UcOrg> ucOrgs = ucOrgMapper.queryByDemId(ucDemension.getId());
-//            for(UcOrg ucOrg:ucOrgs){
-//                if(ucOrg.getRefId().equals()){
-//
-//                }
-//            }
+        QueryFilter queryFilter = QueryFilter.build();
+        //根据用户查询人与组织关系
+        List<UcOrgUser> list = ucOrgUserService.getUserOrg(userId);
+        if (null == list || list.size() <= 0) {
+            return new ArrayList<>();
         }
-        return null;
+        String orgIds = "";
+        for (int i = 0; i < list.size(); i++) {
+            if (i == 0) {
+                orgIds = list.get(i).getOrgId();
+            } else {
+                orgIds = orgIds + "," + list.get(i).getOrgId();
+            }
+        }
+        //根据组织id获取组织信息
+        QueryFilter orgQuery = QueryFilter.build();
+        orgQuery.addFilter("id", orgIds, QueryOP.IN, FieldRelation.AND);
+        orgQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+        List<UcOrg> returnList = this.query(orgQuery).getRows();
+        //根据组织获取子级
+        List<UcOrg> set = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
+        for (UcOrg ucOrg : returnList) {
+            QueryFilter childQuery = QueryFilter.build();
+            childQuery.addFilter("path", ucOrg.getPath(), QueryOP.RIGHT_LIKE, FieldRelation.AND);
+            childQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+            List<UcOrg> orgs = this.query(childQuery).getRows();
+            for (UcOrg org : orgs) {
+                if (!ids.contains(org.getId())) {
+                    set.add(org);
+                    ids.add(org.getId());
+                }
+            }
+        }
+        List<UcOrg> ucOrgs=new ArrayList<>();
+        for(UcOrg sets:set){
+            if(ucOrgList.contains(sets.getId())||ucOrgNotCodeList.contains(sets.getId())){
+                ucOrgs.add(sets);
+            }
+        }
+        return ucOrgs;
     }
 }

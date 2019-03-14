@@ -3,6 +3,9 @@ package com.hypersmart.usercenter.service;
 import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.framework.service.IGenericService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Set;
 
 /**
  * 用户管理
@@ -15,5 +18,7 @@ import org.springframework.stereotype.Service;
 public interface UcUserService extends IGenericService<String, UcUser> {
 
     UcUser getUserByUnitId(String unitId,String unitType);
+
+    Set<UcUser> getDepUserByOrgCodeAndJobCode(String orgCode, String jobCode);
 }
 
