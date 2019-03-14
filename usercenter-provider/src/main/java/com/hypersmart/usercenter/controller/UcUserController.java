@@ -8,6 +8,7 @@ import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
+import com.hypersmart.usercenter.model.GradeDemCode;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.service.UcOrgService;
 import io.swagger.annotations.Api;
@@ -83,10 +84,24 @@ public class UcUserController extends BaseController {
     }
 
 
+
     @GetMapping({"/getDepUserByOrgCodeAndJobCode"})
     @ApiOperation(value = "通过组织编码和职务编码，深度获取用户", httpMethod = "GET", notes = "深度获取用户")
     public CommonResult<String> getDepUserByOrgCodeAndJobCode(@RequestParam("orgCode") String orgCode, @RequestParam("jobCode") String jobCode) {
         return null;
+    }
+
+    //根据组织和用户有权看到的条线 查询人员列表接口
+    @PostMapping({"/queryUserByGradeAndDemCode"})
+    @ApiOperation(value = "根据组织和用户有权看到的条线，查询人员接口}", httpMethod = "POST", notes = "查询人员接口")
+    public List<UcUser> queryUserByGradeAndDemCode(@RequestBody GradeDemCode gradeDemCode) {
+        String userId=gradeDemCode.getUserId();
+        String grade=gradeDemCode.getGrade();
+        String DemensionCode=gradeDemCode.getDemensionCode();
+        String fullname=gradeDemCode.getFullname();
+        String mobile=gradeDemCode.getMobile();
+        List<UcUser> ucUsers = this.ucUserService.queryUserByGradeAndDemCode(userId,grade,DemensionCode,fullname,mobile);
+        return ucUsers;
     }
 
 //    @PostMapping({"add"})

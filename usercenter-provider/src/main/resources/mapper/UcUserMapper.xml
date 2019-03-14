@@ -4,7 +4,18 @@
 <mapper namespace="com.hypersmart.usercenter.mapper.UcUserMapper">
     <resultMap id="baseMap" type="com.hypersmart.usercenter.model.UcUser">
         <id property="id" jdbcType="VARCHAR" column="ID_"></id>
-        <result column="FULL_NAME_" jdbcType="VARCHAR" property="fullname"></result>
+        <result column="FULLNAME_" jdbcType="VARCHAR" property="fullname"></result>
+        <result column="ACCOUNT_" jdbcType="VARCHAR" property="account"></result>
+        <result column="PASSWORD_" jdbcType="VARCHAR" property="password"></result>
+        <result column="EMAIL_" jdbcType="VARCHAR" property="email"></result>
+        <result column="MOBILE_" jdbcType="VARCHAR" property="mobile"></result>
+        <result column="ADDRESS_" jdbcType="VARCHAR" property="address"></result>
+        <result column="SEX_" jdbcType="VARCHAR" property="sex"></result>
+        <result column="PHOTO_" jdbcType="VARCHAR" property="photo"></result>
+        <result column="STATUS_" jdbcType="INTEGER" property="status"></result>
+        <result column="ID_CARD_" jdbcType="VARCHAR" property="idCard"></result>
+        <result column="BIRTHDAY_" jdbcType="DATE" property="birthday"></result>
+        <result column="EDUCATION_" jdbcType="VARCHAR" property="education"></result>
     </resultMap>
 
     <select id="quertListFive" parameterType="java.util.Map" resultType="java.util.Map">
@@ -179,6 +190,22 @@
         </where>
         <if test="orderBySql!=null">
             ORDER BY ${orderBySql}
+        </if>
+    </select>
+
+    <select id="queryUserByOrgIdList" resultMap="baseMap">
+        select u.* from
+        uc_user u
+        INNER JOIN  uc_org_user ou on u.ID_ = ou.USER_ID_
+        where ou.ORG_ID_ in
+        <foreach collection="ucOrgList" index="index" item="item" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+        <if test="fullname != null and fullname !=''" >
+        and u.FULLNAME_ like CONCAT('%',#{fullname},'%')
+        </if>
+        <if test="mobile != null and mobile !=''" >
+        and u.MOBILE_ like CONCAT('%',#{mobile},'%')
         </if>
     </select>
 
