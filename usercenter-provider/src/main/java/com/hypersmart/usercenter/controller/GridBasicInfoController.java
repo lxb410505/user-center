@@ -5,6 +5,7 @@ import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.bo.GridBasicInfoBO;
 import com.hypersmart.usercenter.bo.HouseKeeperBO;
@@ -292,5 +293,15 @@ public class GridBasicInfoController extends BaseController {
 		}
 		gridBasicInfoService.updateBatch(gridBasicInfoList);
 		return gridBasicInfoList;
+	}
+
+	@GetMapping({"/getGridsBymassifId/{id}"})
+	@ApiOperation(value = "根据地块id，获取地块下的楼栋网格信息", httpMethod = "GET", notes = "根据地块id，获取地块下的楼栋网格信息")
+	public List<GridBasicInfo> getGridsBymassifId(@ApiParam(name = "id", value = "地块id", required = true) @PathVariable String id) {
+		if (StringUtils.isRealEmpty(id)) {
+			return new ArrayList<>();
+		}
+		List<GridBasicInfo> gridBasicInfos = gridBasicInfoService.getGridsBymassifId(id);
+		return gridBasicInfos;
 	}
 }

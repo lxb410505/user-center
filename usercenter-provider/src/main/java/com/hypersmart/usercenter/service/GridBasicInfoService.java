@@ -23,75 +23,93 @@ import java.util.Map;
 public interface GridBasicInfoService extends IGenericService<String, GridBasicInfo> {
 
 
-    /**
-     * 网格分页查询
-     * @param queryFilter
-     * @return
-     */
-    PageList<Map<String,Object>> quertList(QueryFilter queryFilter);
+	/**
+	 * 网格分页查询
+	 *
+	 * @param queryFilter
+	 * @return
+	 */
+	PageList<Map<String, Object>> quertList(QueryFilter queryFilter);
 
 
-    /**
-     * 获取指定id的网格信息
-     * @param id
-     * @return
-     */
-    Map<String,Object> getGridById(String id);
+	/**
+	 * 获取指定id的网格信息
+	 *
+	 * @param id
+	 * @return
+	 */
+	Map<String, Object> getGridById(String id);
 
-    /**
-     * 新增网格
-     * @param gridBasicInfoDTO
-     * @return
-     */
-    GridErrorCode create(GridBasicInfoDTO gridBasicInfoDTO);
+	/**
+	 * 新增网格
+	 *
+	 * @param gridBasicInfoDTO
+	 * @return
+	 */
+	GridErrorCode create(GridBasicInfoDTO gridBasicInfoDTO);
 
-    /**
-     * 修改网格
-     * @param gridBasicInfoDTO
-     * @return
-     */
-    GridErrorCode edit(GridBasicInfoDTO gridBasicInfoDTO);
+	/**
+	 * 修改网格
+	 *
+	 * @param gridBasicInfoDTO
+	 * @return
+	 */
+	GridErrorCode edit(GridBasicInfoDTO gridBasicInfoDTO);
 
-    /**
-     * 变更管家
-     * @param gridBasicInfoDTO
-     * @return
-     */
-    GridErrorCode changeHousekeeper(GridBasicInfoDTO gridBasicInfoDTO);
+	/**
+	 * 变更管家
+	 *
+	 * @param gridBasicInfoDTO
+	 * @return
+	 */
+	GridErrorCode changeHousekeeper(GridBasicInfoDTO gridBasicInfoDTO);
 
-    /**
-     * 变更映射楼栋
-     * @param gridBasicInfoDTO
-     * @return
-     */
-    GridErrorCode changeRange(GridBasicInfoDTO gridBasicInfoDTO);
+	/**
+	 * 变更映射楼栋
+	 *
+	 * @param gridBasicInfoDTO
+	 * @return
+	 */
+	GridErrorCode changeRange(GridBasicInfoDTO gridBasicInfoDTO);
 
-    /**
-     * 禁用网格
-     * @param gridBasicInfoBO
-     * @return
-     */
-    GridErrorCode disableGridList(GridBasicInfoBO gridBasicInfoBO);
+	/**
+	 * 禁用网格
+	 *
+	 * @param gridBasicInfoBO
+	 * @return
+	 */
+	GridErrorCode disableGridList(GridBasicInfoBO gridBasicInfoBO);
 
-    /**
-     * 删除网格
-     * @param gridBasicInfoBO
-     * @return
-     */
-    GridErrorCode deleteGridList(GridBasicInfoBO gridBasicInfoBO);
+	/**
+	 * 删除网格
+	 *
+	 * @param gridBasicInfoBO
+	 * @return
+	 */
+	GridErrorCode deleteGridList(GridBasicInfoBO gridBasicInfoBO);
 
-    /**
-     * 根据管家id和分期id获得 网格id和名称
-     * @param houseKeeperBO
-     * @return
-     */
-    List<GridBasicInfoSimpleDTO> getGridBasicInfoByHouseKeeperIds(List<HouseKeeperBO> houseKeeperBO);
+	/**
+	 * 根据管家id和分期id获得 网格id和名称
+	 *
+	 * @param houseKeeperBO
+	 * @return
+	 */
+	List<GridBasicInfoSimpleDTO> getGridBasicInfoByHouseKeeperIds(List<HouseKeeperBO> houseKeeperBO);
 
-    /**
-     * 根据分期id获得该分期下未关联的分期
-     * @param divideId
-     * @return
-     */
-    List<GridBasicInfo> getDisassociatedGridByDivideId(String divideId);
+	/**
+	 * 根据分期id获得该分期下未关联的分期
+	 *
+	 * @param divideId
+	 * @return
+	 */
+	List<GridBasicInfo> getDisassociatedGridByDivideId(String divideId);
+
+	/**
+	 * 根据地块id，获取地块下的楼栋网格
+	 *
+	 * @param massifId
+	 * @return
+	 */
+	List<GridBasicInfo> getGridsBymassifId(String massifId);
 }
 
