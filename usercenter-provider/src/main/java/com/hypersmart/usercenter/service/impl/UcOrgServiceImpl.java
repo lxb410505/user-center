@@ -179,7 +179,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         QueryFilter orgQuery2 = QueryFilter.build();
         orgQuery2.addFilter("id", idSet, QueryOP.IN, FieldRelation.AND);
         orgQuery2.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
-        orgQuery2.addFilter("parentId", parentOrgId, QueryOP.EQUAL_IGNORE_CASE, FieldRelation.AND);
+        orgQuery2.addFilter("parentId", parentOrgId, QueryOP.EQUAL, FieldRelation.AND);
 
         List<UcOrg> rtn = this.query(orgQuery2).getRows();
 
