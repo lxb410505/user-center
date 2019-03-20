@@ -17,8 +17,7 @@ import com.hypersmart.usercenter.service.UcOrgUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 组织架构
@@ -142,26 +141,49 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         orgQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
         List<UcOrg> returnList = this.query(orgQuery).getRows();
         //根据组织获取子级
-        List<UcOrg> set = new ArrayList<>();
-        List<String> ids = new ArrayList<>();
+//        List<UcOrg> set = new ArrayList<>();
+//        List<String> ids = new ArrayList<>();
         if (StringUtils.isEmpty(parentOrgId)) {
             parentOrgId = "0";
         }
+
+        //Set<String> idSet = new HashSet<>();
+        StringBuffer stringBuffer = new StringBuffer();
+        //Set<String> set = new HashSet<>(list);
         for (UcOrg ucOrg : returnList) {
-            QueryFilter childQuery = QueryFilter.build();
-            childQuery.addFilter("path", ucOrg.getPath(), QueryOP.RIGHT_LIKE, FieldRelation.AND);
-            childQuery.addFilter("parentId", parentOrgId, QueryOP.RIGHT_LIKE, FieldRelation.AND);
-            childQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
-            List<UcOrg> orgs = this.query(childQuery).getRows();
-            for (UcOrg org : orgs) {
-                if (!ids.contains(org.getId())) {
-//                    org.setDisabled("1");
-                    set.add(org);
-                    ids.add(org.getId());
-                }
-            }
+            stringBuffer.append(ucOrg.getPath());
+
+//            String[] _ids = ucOrg.getPath().split(".");
+//            List<String> _list = Arrays.asList(_ids);
+//            idSet = new HashSet<String>(_list);
+
+//            QueryFilter childQuery = QueryFilter.build();
+//            childQuery.addFilter("path", ucOrg.getPath(), QueryOP.RIGHT_LIKE, FieldRelation.AND);
+//            childQuery.addFilter("parentId", parentOrgId, QueryOP.EQUAL_IGNORE_CASE, FieldRelation.AND);
+//            childQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+//            List<UcOrg> orgs = this.query(childQuery).getRows();
+//            for (UcOrg org : orgs) {
+//                if (!ids.contains(org.getId())) {
+////                    org.setDisabled("1");
+//                    set.add(org);
+//                    ids.add(org.getId());
+//                }
+//            }
         }
-        return set;
+
+
+        String[] _ids = stringBuffer.toString().split(".");
+        List<String> _list = Arrays.asList(_ids);
+        Set<String> idSet = new HashSet<String>(_list);
+
+        QueryFilter orgQuery2 = QueryFilter.build();
+        orgQuery2.addFilter("id", idSet, QueryOP.IN, FieldRelation.AND);
+        orgQuery2.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+        orgQuery2.addFilter("parentId", parentOrgId, QueryOP.EQUAL_IGNORE_CASE, FieldRelation.AND);
+
+        List<UcOrg> rtn = this.query(orgQuery2).getRows();
+
+        return rtn;
     }
 
     //根据组织级别查询组织信息
@@ -236,8 +258,8 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         List<String> ucOrgNotCodeList = new ArrayList<>();//id集合
         for (UcDemension ucDemension : queryByNotCodeList) {
             List<UcOrg> ucOrgs = ucOrgMapper.queryByDemId(ucDemension.getId());
-            for(UcOrg ucOrg:ucOrgs){
-                if(ucOrgList.contains(ucOrg.getRefId())){
+            for (UcOrg ucOrg : ucOrgs) {
+                if (ucOrgList.contains(ucOrg.getRefId())) {
                     ucOrgNotCodeList.add(ucOrg.getId());
                 }
             }
@@ -277,9 +299,9 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
                 }
             }
         }
-        List<UcOrg> ucOrgs=new ArrayList<>();
-        for(UcOrg sets:set){
-            if(ucOrgList.contains(sets.getId())||ucOrgNotCodeList.contains(sets.getId())){
+        List<UcOrg> ucOrgs = new ArrayList<>();
+        for (UcOrg sets : set) {
+            if (ucOrgList.contains(sets.getId()) || ucOrgNotCodeList.contains(sets.getId())) {
                 ucOrgs.add(sets);
             }
         }
@@ -288,10 +310,11 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
 
     /**
      * 根据组织id获取所有维度的关联组织及当前组织
+     *
      * @param query
      * @return
      */
-    public List<UcOrgExtend> getAllDimOrgListByOrg(UcOrgBO query){
+    public List<UcOrgExtend> getAllDimOrgListByOrg(UcOrgBO query) {
         return ucOrgMapper.getAllDimOrgListByOrg(query);
     }
 }
