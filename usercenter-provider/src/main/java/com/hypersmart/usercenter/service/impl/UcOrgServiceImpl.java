@@ -5,6 +5,8 @@ import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.framework.utils.StringUtils;
+import com.hypersmart.usercenter.bo.UcOrgBO;
+import com.hypersmart.usercenter.dto.UcOrgExtend;
 import com.hypersmart.usercenter.mapper.UcOrgMapper;
 import com.hypersmart.usercenter.model.UcDemension;
 import com.hypersmart.usercenter.model.UcOrg;
@@ -282,5 +284,14 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
             }
         }
         return ucOrgs;
+    }
+
+    /**
+     * 根据组织id获取所有维度的关联组织及当前组织
+     * @param query
+     * @return
+     */
+    public List<UcOrgExtend> getAllDimOrgListByOrg(UcOrgBO query){
+        return ucOrgMapper.getAllDimOrgListByOrg(query);
     }
 }
