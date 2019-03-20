@@ -1,5 +1,7 @@
 package com.hypersmart.usercenter.mapper;
 
+import com.hypersmart.usercenter.bo.UcOrgBO;
+import com.hypersmart.usercenter.dto.UcOrgExtend;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.framework.mapper.GenericMapper;
 import com.hypersmart.usercenter.model.UcOrgUser;
@@ -23,4 +25,11 @@ public interface UcOrgMapper extends GenericMapper<UcOrg> {
     List<UcOrg> getChildrenOrg(UcOrg ucOrg);
 
     List<UcOrg> queryByDemId(String demId);
+
+    /**
+     * 根据组织id获取所有维度的关联组织及当前组织
+     * @param query
+     * @return
+     */
+    List<UcOrgExtend> getAllDimOrgListByOrg(UcOrgBO query);
 }

@@ -9,6 +9,28 @@
         <result column="PARENT_ID_" jdbcType="VARCHAR" property="parentId"></result>
         <result column="PATH_" jdbcType="VARCHAR" property="path"></result>
     </resultMap>
+    <resultMap id="OrgFullMap" type="com.hypersmart.usercenter.model.UcOrg">
+        <id property="id" column="ID_" jdbcType="VARCHAR"/>
+        <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+        <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="ORDER_NO_" jdbcType="NUMERIC"/>
+        <result property="code" column="CODE_" jdbcType="VARCHAR"/>
+        <result property="grade" column="GRADE_" jdbcType="VARCHAR"/>
+        <result property="demId" column="DEM_ID_" jdbcType="VARCHAR"/>
+        <result property="path" column="PATH_" jdbcType="VARCHAR"/>
+        <result property="pathName" column="PATH_NAME_" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="UPDATE_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="isDele" column="IS_DELE_" jdbcType="VARCHAR"/>
+        <result property="version" column="VERSION_" jdbcType="NUMERIC"/>
+        <result property="level" column="LEVEL_" jdbcType="TINYINT"/>
+        <result property="refId" column="REF_ID_" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="OrgExtMap" extends="OrgFullMap" type="com.hypersmart.usercenter.dto.UcOrgExtend">
+        <result property="dimCode" column="DEM_CODE_" jdbcType="VARCHAR"/>
+        <result property="dimName" column="DEM_NAME_" jdbcType="VARCHAR"/>
+
+    </resultMap>
 
     <sql id="BaseAttribute">
         ID_,NAME_,PARENT_ID_,PATH_
@@ -43,4 +65,34 @@
         where DEM_ID_ = #{demId}
     </select>
 
+    <select id="getAllDimOrgListByOrg" parameterType="com.hypersmart.usercenter.bo.UcOrgBO" resultMap="OrgExtMap">
+        select o.* ,d.CODE_ as DEM_CODE_ ,d.DEM_NAME_ as DEM_NAME_
+        from
+        <include refid="BaseTable"/> o
+        LEFT JOIN  uc_demension d on o.DEM_ID_ = d.ID_
+        where o.IS_DELE_!=1  AND
+        <choose>
+            <when test="orgIdList!=null and orgIdList.size > 0">
+                (
+                o.ID_ in
+                <foreach collection="orgIdList" item="iOrgId" open="(" separator="," close=")">
+                    #{iOrgId}
+                </foreach>
+                or o.REF_ID_ in
+                <foreach collection="orgIdList" item="iOrgId" open="(" separator="," close=")">
+                    #{iOrgId}
+                </foreach>
+                )
+            </when>
+            <otherwise>
+                ( o.ID_ =#{orgId} OR o.REF_ID_=#{orgId} )
+            </otherwise>
+        </choose>
+        <if test="dimCode!=null">
+            and d.CODE_ = #{dimCode}
+        </if>
+        <if test="dimId!=null">
+            and d.id_ = #{dimId}
+        </if>
+    </select>
 </mapper>
