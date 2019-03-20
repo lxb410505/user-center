@@ -104,6 +104,19 @@ public class UcUserController extends BaseController {
         return ucUsers;
     }
 
+    /**
+     * 根据组织和职务查询对应组织中的用户
+     * @param queryFilter
+     * @return
+     */
+    @RequestMapping(value = {"searchUserByCondition"}, method = {
+            RequestMethod.POST}, produces = {
+            "application/json; charset=utf-8"})
+    @ApiOperation(value = "根据组织和职务查询对应组织中的用户", httpMethod = "POST", notes = "根据组织和职务查询对应组织中的用户")
+    public PageList<UcUser> searchUserByCondition(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody
+                                                          QueryFilter queryFilter){
+        return ucUserService.searchUserByCondition(queryFilter);
+    }
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增用户管理信息", httpMethod = "POST", notes = "保存用户管理")
 //    public CommonResult<String> post(@ApiParam(name = "ucUser", value = "用户管理业务对象", required = true) @RequestBody UcUser model) {

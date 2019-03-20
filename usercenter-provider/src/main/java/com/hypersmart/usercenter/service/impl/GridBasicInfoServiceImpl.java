@@ -6,6 +6,9 @@ import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.ContextUtils;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
+import com.hypersmart.mdm.feign.UcOrgFeignService;
+import com.hypersmart.mdm.feign.UcOrgUserFeign;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.bo.GridBasicInfoBO;
 import com.hypersmart.usercenter.bo.GridRangeBO;
 import com.hypersmart.usercenter.bo.HouseKeeperBO;
@@ -16,19 +19,12 @@ import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
 import com.hypersmart.usercenter.mapper.GridBasicInfoMapper;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
 import com.hypersmart.usercenter.model.GridBasicInfo;
-import com.hypersmart.usercenter.model.UcOrg;
-import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.GridBasicInfoHistoryService;
 import com.hypersmart.usercenter.service.GridBasicInfoService;
-import com.hypersmart.mdm.feign.UcOrgFeignService;
-import com.hypersmart.mdm.feign.UcOrgUserFeign;
-import com.hypersmart.uc.api.impl.util.ContextUtil;
-import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.service.GridRangeService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.Example;
 
@@ -463,4 +459,20 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         example.createCriteria().andEqualTo("stagingId", divideId).andIsNull("housekeeperId");
         return gridBasicInfoMapper.selectByExample(example);
     }
+
+	/**
+	 * 根据地块id，获取地块下的楼栋网格
+	 *
+	 * @param massifId
+	 * @return
+	 */
+	@Override
+	public List<GridBasicInfo> getGridsBymassifId(String massifId) {
+		Example example = new Example(GridBasicInfo.class);
+		example.createCriteria().andEqualTo("stagingId", massifId)
+				.andEqualTo("gridType", "building_grid")
+				.andEqualTo("isDeleted", 0)
+				.andEqualTo("enabledFlag", 1);
+		return gridBasicInfoMapper.selectByExample(example);
+	}
 }

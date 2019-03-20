@@ -31,4 +31,11 @@ public interface UcUserMapper extends GenericMapper<UcUser> {
 
 
     UcUser getUserByUnitId(@Param("unitId") String unitId,@Param("unitType")String unitType);
+
+    /**
+     * 根据组织和职务查询对应组织中的用户
+     * @param params
+     * @return
+     */
+    List<UcUser> searchUserByCondition(Map<String, Object> params);
 }

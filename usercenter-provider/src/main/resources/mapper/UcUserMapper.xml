@@ -226,4 +226,43 @@
             AND gr.resource_id = #{unitId}
             )
     </select>
+
+    <select id="searchUserByCondition" resultMap="baseMap" parameterType="java.util.Map">
+        select distinct u.ID_,u.FULLNAME_,u.ACCOUNT_,u.EMAIL_,u.MOBILE_,u.PHOTO_,u.STATUS_ from uc_user u
+        inner join uc_org_user uorg on u.ID_ = uorg.USER_ID_
+        <if test="(jobIdList!=null and jobIdList.size > 0) || (posIdList!=null and posIdList.size > 0)">
+            inner join uc_org_post uorgp on uorg.ORG_ID_ = uorgp.ORG_ID_ and uorg.POS_ID_ = uorgp.id_
+        </if>
+        <if test="(roleIdList!=null and roleIdList.size > 0)">
+            inner join uc_user_role ur on u.ID_ = ur.USER_ID_
+        </if>
+        where u.IS_DELE_ = 0 and uorg.ORG_ID_ in
+        <foreach collection="orgIdList" item="iOrgId" open="(" separator="," close=")">
+            #{iOrgId}
+        </foreach>
+        <if test="whereSql!=null">
+            and ${whereSql}
+        </if>
+        <if test="(jobIdList!=null and jobIdList.size) > 0">
+            and uorgp.JOB_ID_ in
+            <foreach collection="jobIdList" item="iJobId" open="(" separator="," close=")">
+                #{iJobId}
+            </foreach>
+        </if>
+        <if test="(posIdList!=null and posIdList.size > 0)">
+            and uorgp.id_ in
+            <foreach collection="posIdList" item="iPosId" open="(" separator="," close=")">
+                #{iPosId}
+            </foreach>
+        </if>
+        <if test="(roleIdList!=null and roleIdList.size > 0)">
+            and ur.ROLE_ID_ in
+            <foreach collection="roleIdList" item="iRoleId" open="(" separator="," close=")">
+                #{iRoleId}
+            </foreach>
+        </if>
+        order by u.id_ asc
+
+
+    </select>
 </mapper>
