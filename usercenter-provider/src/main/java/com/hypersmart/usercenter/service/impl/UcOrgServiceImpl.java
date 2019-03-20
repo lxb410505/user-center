@@ -176,8 +176,16 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         List<String> _list = Arrays.asList(_ids);
         Set<String> idSet = new HashSet<String>(_list);
 
+        List<String> _list2 = new ArrayList<>();
+        Iterator<String> iterator = idSet.iterator();
+        while (iterator.hasNext()) {
+            String i = iterator.next();
+            if (StringUtils.isNotEmpty(i)) {
+                _list2.add(i);
+            }
+        }
         QueryFilter orgQuery2 = QueryFilter.build();
-        orgQuery2.addFilter("id", org.apache.commons.lang.StringUtils.join(idSet,","), QueryOP.IN, FieldRelation.AND);
+        orgQuery2.addFilter("id", org.apache.commons.lang.StringUtils.join(_list2, ","), QueryOP.IN, FieldRelation.AND);
         orgQuery2.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
         orgQuery2.addFilter("parentId", parentOrgId, QueryOP.EQUAL, FieldRelation.AND);
 
