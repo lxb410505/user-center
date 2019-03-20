@@ -172,7 +172,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         }
 
 
-        String[] _ids = stringBuffer.toString().split(".");
+        String[] _ids = stringBuffer.toString().split("\\.");
         List<String> _list = Arrays.asList(_ids);
         Set<String> idSet = new HashSet<String>(_list);
 
