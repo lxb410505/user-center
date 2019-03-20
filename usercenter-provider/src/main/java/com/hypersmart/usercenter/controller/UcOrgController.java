@@ -4,6 +4,8 @@ import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.query.*;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
+import com.hypersmart.usercenter.bo.UcOrgBO;
+import com.hypersmart.usercenter.dto.UcOrgExtend;
 import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcOrgUserService;
@@ -264,6 +266,15 @@ public class UcOrgController extends BaseController {
     @ApiOperation(value = "组织架构数据列表", httpMethod = "GET", notes = "获取单个组织架构记录")
     public UcOrg get(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {
         return this.ucOrgService.get(id);
+    }
+
+    @RequestMapping(value = {"getAllDimOrgListByOrg"}, method = {
+            RequestMethod.POST}, produces = {
+            "application/json; charset=utf-8"})
+    @ApiOperation(value = "根据组织id获取所有维度的关联组织及当前组织", httpMethod = "GET", notes = "根据组织id获取所有维度的关联组织及当前组织")
+    public List<UcOrgExtend> getAllDimOrgListByOrg(@ApiParam(name = "query", value = "查询对象", required = true)
+                                                       @RequestBody UcOrgBO query) {
+        return this.ucOrgService.getAllDimOrgListByOrg(query);
     }
 
 
