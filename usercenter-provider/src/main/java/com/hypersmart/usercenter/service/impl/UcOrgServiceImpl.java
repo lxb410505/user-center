@@ -177,7 +177,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         Set<String> idSet = new HashSet<String>(_list);
 
         QueryFilter orgQuery2 = QueryFilter.build();
-        orgQuery2.addFilter("id", idSet, QueryOP.IN, FieldRelation.AND);
+        orgQuery2.addFilter("id", org.apache.commons.lang.StringUtils.join(idSet,","), QueryOP.IN, FieldRelation.AND);
         orgQuery2.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
         orgQuery2.addFilter("parentId", parentOrgId, QueryOP.EQUAL, FieldRelation.AND);
 
