@@ -2,6 +2,7 @@ package com.hypersmart.usercenter.service;
 
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.bo.UcOrgBO;
+import com.hypersmart.usercenter.dto.UcOrgDTO;
 import com.hypersmart.usercenter.dto.UcOrgExtend;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.framework.service.IGenericService;
@@ -28,7 +29,7 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
 
     List<UcOrg> getUserOrgList2(String userId);
 
-    List<UcOrg> queryChildrenByUserId(String userId,String parentOrgId);
+    List<UcOrgDTO> queryChildrenByUserId(String userId, String parentOrgId);
 
     List<UcOrg> queryByGrade(String userId,String grade);
 
