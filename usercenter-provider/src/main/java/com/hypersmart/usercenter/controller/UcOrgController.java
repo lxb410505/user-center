@@ -206,7 +206,7 @@ public class UcOrgController extends BaseController {
     @GetMapping({"/userList/{id}"})
     @ApiOperation(value = "组织架构数据列表}", httpMethod = "GET", notes = "获取组织架构列表")
     public List<UcOrg> userList(@PathVariable("id") String userId) {
-       return ucOrgService.getUserOrgList2(userId);
+       return ucOrgService.getUserOrgList(userId);
     }
 
 
