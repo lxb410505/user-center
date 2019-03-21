@@ -15,6 +15,7 @@ import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.UcDemensionService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcOrgUserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -197,37 +198,59 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
 
     //根据userId和组织父级id查询组织信息
     public List<UcOrgDTO> queryChildrenByUserId(String userId, String parentOrgId) {
-        QueryFilter queryFilter = QueryFilter.build();
-        //根据用户查询人与组织关系
-        List<UcOrgUser> list = ucOrgUserService.getUserOrg(userId);
-        if (null == list || list.size() <= 0) {
+        List<UcOrg> orgList = this.getUserOrgList(userId);
+        if (orgList != null && orgList.size() > 0){
+            if (StringUtils.isRealEmpty(parentOrgId)){
+                parentOrgId = "0";
+            }
+            List<UcOrgDTO> ucOrgDTOList = new ArrayList<>();
+            String parentCode = "";
+            for (UcOrg ucOrg : orgList){
+                if (parentOrgId.equals(ucOrg.getParentId())){
+                    UcOrgDTO ucOrgDTO = new UcOrgDTO();
+                    BeanUtils.copyProperties(ucOrg, ucOrgDTO);
+                    if (StringUtils.isRealEmpty(parentCode)){
+                        parentCode = ucOrgMapper.getCodeById(parentOrgId);
+                    }
+                    ucOrgDTO.setParentCode(parentCode);
+                    ucOrgDTOList.add(ucOrgDTO);
+                }
+            }
+            return ucOrgDTOList;
+        } else {
             return new ArrayList<>();
         }
-        String orgIds = "";
-        for (int i = 0; i < list.size(); i++) {
-            if (i == 0) {
-                orgIds = list.get(i).getOrgId();
-            } else {
-                orgIds = orgIds + "," + list.get(i).getOrgId();
-            }
-        }
-        //根据组织id获取组织信息
-        QueryFilter orgQuery = QueryFilter.build();
-        orgQuery.addFilter("id", orgIds, QueryOP.IN, FieldRelation.AND);
-        orgQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
-        List<UcOrg> returnList = this.query(orgQuery).getRows();
-        //根据组织获取子级
-//        List<UcOrg> set = new ArrayList<>();
-//        List<String> ids = new ArrayList<>();
-        if (StringUtils.isEmpty(parentOrgId)) {
-            parentOrgId = "0";
-        }
-
-        //Set<String> idSet = new HashSet<>();
-        StringBuffer stringBuffer = new StringBuffer();
-        //Set<String> set = new HashSet<>(list);
-        for (UcOrg ucOrg : returnList) {
-            stringBuffer.append(ucOrg.getPath());
+//        QueryFilter queryFilter = QueryFilter.build();
+//        //根据用户查询人与组织关系
+//        List<UcOrgUser> list = ucOrgUserService.getUserOrg(userId);
+//        if (null == list || list.size() <= 0) {
+//            return new ArrayList<>();
+//        }
+//        String orgIds = "";
+//        for (int i = 0; i < list.size(); i++) {
+//            if (i == 0) {
+//                orgIds = list.get(i).getOrgId();
+//            } else {
+//                orgIds = orgIds + "," + list.get(i).getOrgId();
+//            }
+//        }
+//        //根据组织id获取组织信息
+//        QueryFilter orgQuery = QueryFilter.build();
+//        orgQuery.addFilter("id", orgIds, QueryOP.IN, FieldRelation.AND);
+//        orgQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+//        List<UcOrg> returnList = this.query(orgQuery).getRows();
+//        //根据组织获取子级
+////        List<UcOrg> set = new ArrayList<>();
+////        List<String> ids = new ArrayList<>();
+//        if (StringUtils.isEmpty(parentOrgId)) {
+//            parentOrgId = "0";
+//        }
+//
+//        //Set<String> idSet = new HashSet<>();
+//        StringBuffer stringBuffer = new StringBuffer();
+//        //Set<String> set = new HashSet<>(list);
+//        for (UcOrg ucOrg : returnList) {
+//            stringBuffer.append(ucOrg.getPath());
 
 //            String[] _ids = ucOrg.getPath().split(".");
 //            List<String> _list = Arrays.asList(_ids);
@@ -245,29 +268,29 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
 //                    ids.add(org.getId());
 //                }
 //            }
-        }
-
-
-        String[] _ids = stringBuffer.toString().split("\\.");
-        List<String> _list = Arrays.asList(_ids);
-        Set<String> idSet = new HashSet<String>(_list);
-
-        List<String> _list2 = new ArrayList<>();
-        Iterator<String> iterator = idSet.iterator();
-        while (iterator.hasNext()) {
-            String i = iterator.next();
-            if (StringUtils.isNotEmpty(i)) {
-                _list2.add(i);
-            }
-        }
-        /*QueryFilter orgQuery2 = QueryFilter.build();
-        orgQuery2.addFilter("id", org.apache.commons.lang.StringUtils.join(_list2, ","), QueryOP.IN, FieldRelation.AND);
-        orgQuery2.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
-        orgQuery2.addFilter("parentId", parentOrgId, QueryOP.EQUAL, FieldRelation.AND);*/
-
-        List<UcOrgDTO> rtn = ucOrgMapper.getByIdsAndParentId(_list2, parentOrgId);
-
-        return rtn;
+//        }
+//
+//
+//        String[] _ids = stringBuffer.toString().split("\\.");
+//        List<String> _list = Arrays.asList(_ids);
+//        Set<String> idSet = new HashSet<String>(_list);
+//
+//        List<String> _list2 = new ArrayList<>();
+//        Iterator<String> iterator = idSet.iterator();
+//        while (iterator.hasNext()) {
+//            String i = iterator.next();
+//            if (StringUtils.isNotEmpty(i)) {
+//                _list2.add(i);
+//            }
+//        }
+//        /*QueryFilter orgQuery2 = QueryFilter.build();
+//        orgQuery2.addFilter("id", org.apache.commons.lang.StringUtils.join(_list2, ","), QueryOP.IN, FieldRelation.AND);
+//        orgQuery2.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+//        orgQuery2.addFilter("parentId", parentOrgId, QueryOP.EQUAL, FieldRelation.AND);*/
+//
+//        List<UcOrgDTO> rtn = ucOrgMapper.getByIdsAndParentId(_list2, parentOrgId);
+//
+//        return rtn;
     }
 
     //根据组织级别查询组织信息
