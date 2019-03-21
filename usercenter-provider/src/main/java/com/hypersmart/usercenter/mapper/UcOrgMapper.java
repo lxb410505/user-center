@@ -36,4 +36,6 @@ public interface UcOrgMapper extends GenericMapper<UcOrg> {
     List<UcOrgExtend> getAllDimOrgListByOrg(UcOrgBO query);
 
     List<UcOrgDTO> getByIdsAndParentId(@Param("ids") List<String> list2,@Param("parentId") String parentOrgId);
+
+    String getCodeById(@Param("orgId") String parentOrgId);
 }
