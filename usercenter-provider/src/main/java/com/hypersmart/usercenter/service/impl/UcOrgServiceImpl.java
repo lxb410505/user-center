@@ -6,6 +6,7 @@ import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.usercenter.bo.UcOrgBO;
+import com.hypersmart.usercenter.dto.UcOrgDTO;
 import com.hypersmart.usercenter.dto.UcOrgExtend;
 import com.hypersmart.usercenter.mapper.UcOrgMapper;
 import com.hypersmart.usercenter.model.UcDemension;
@@ -195,7 +196,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     }
 
     //根据userId和组织父级id查询组织信息
-    public List<UcOrg> queryChildrenByUserId(String userId, String parentOrgId) {
+    public List<UcOrgDTO> queryChildrenByUserId(String userId, String parentOrgId) {
         QueryFilter queryFilter = QueryFilter.build();
         //根据用户查询人与组织关系
         List<UcOrgUser> list = ucOrgUserService.getUserOrg(userId);
@@ -259,12 +260,12 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
                 _list2.add(i);
             }
         }
-        QueryFilter orgQuery2 = QueryFilter.build();
+        /*QueryFilter orgQuery2 = QueryFilter.build();
         orgQuery2.addFilter("id", org.apache.commons.lang.StringUtils.join(_list2, ","), QueryOP.IN, FieldRelation.AND);
         orgQuery2.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
-        orgQuery2.addFilter("parentId", parentOrgId, QueryOP.EQUAL, FieldRelation.AND);
+        orgQuery2.addFilter("parentId", parentOrgId, QueryOP.EQUAL, FieldRelation.AND);*/
 
-        List<UcOrg> rtn = this.query(orgQuery2).getRows();
+        List<UcOrgDTO> rtn = ucOrgMapper.getByIdsAndParentId(_list2, parentOrgId);
 
         return rtn;
     }
