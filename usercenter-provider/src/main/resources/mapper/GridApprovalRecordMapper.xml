@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.GridApprovalRecordMapper">
+
+    <resultMap id="gridApprovalRecord" type="com.hypersmart.usercenter.model.GridApprovalRecord">
+        <id jdbcType="VARCHAR" property="id" column="id"></id>
+        <result column="grid_id" jdbcType="VARCHAR" property="gridId"></result>
+        <result column="approval_type" jdbcType="VARCHAR" property="approvalType"></result>
+        <result column="approval_content" jdbcType="VARCHAR" property="approvalContent"></result>
+        <result column="approval_status" jdbcType="INTEGER" property="approvalStatus"></result>
+        <result column="approval_opinion" jdbcType="VARCHAR" property="approvalOpinion"></result>
+        <result column="approver" jdbcType="VARCHAR" property="approver"></result>
+        <result column="approval_date" jdbcType="DATE" property="approvalDate"></result>
+        <result column="create_date" jdbcType="DATE" property="createDate"></result>
+        <result column="proc_inst_id" jdbcType="VARCHAR" property="procInstId"></result>
+        <result column="call_flow_content" jdbcType="VARCHAR" property="callFlowContent"></result>
+        <result column="call_status" jdbcType="INTEGER" property="callStatus"></result>
+        <result column="call_error_message" jdbcType="VARCHAR" property="callErrorMessage"></result>
+        <result column="submitter_id" jdbcType="VARCHAR" property="submitterId"></result>
+        <result column="submitter_name" jdbcType="VARCHAR" property="submitterName"></result>
+    </resultMap>
+
+    <sql id="BaseAttribute">
+        id,
+        grid_id,
+        approval_type,
+        approval_content,
+        create_date,
+        approval_status,
+        approval_opinion,
+        approver,
+        approval_date,
+        proc_inst_id,
+        call_flow_content,
+        call_status,
+        call_error_message,
+        submitter_id,
+        submitter_name
+    </sql>
+    <sql id="BaseTable">
+        grid_approval_record
+    </sql>
+
+    <select id="getBeforeGridInfo" resultType="com.hypersmart.usercenter.model.GridBasicInfo">
+        SELECT
+            id,
+            grid_code AS gridCode,
+            grid_name AS gridName,
+            grid_range AS gridRange,
+            grid_remark AS gridRemark,
+            format_attribute AS formatAttribute,
+            housekeeper_id AS housekeeperId,
+            grid_type as gridType
+        FROM
+            grid_basic_info
+        WHERE id = #{gridId}
+    </select>
+
+    <select id="getUserNameById" resultType="java.lang.String">
+        SELECT
+            FULLNAME_
+        FROM
+            uc_user
+        WHERE
+            ID_ = #{userId}
+    </select>
+
+    <select id="getGridInfoByIds" resultType="com.hypersmart.usercenter.model.GridBasicInfo">
+        SELECT
+        id,
+        grid_code AS gridCode,
+        grid_name AS gridName,
+        grid_type AS gridType,
+        grid_range AS gridRange,
+        grid_remark AS gridRemark,
+        format_attribute AS formatAttribute,
+        housekeeper_id AS housekeeperId,
+        creation_date AS creationDate
+        FROM
+        grid_basic_info
+        WHERE id IN
+        <foreach collection="ids" index="index" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getHousekeeperInfoById" resultType="java.util.Map">
+        SELECT
+            u.FULLNAME_,
+            u.MOBILE_,
+            sd.NAME_
+        FROM
+            uc_user u
+            INNER JOIN uc_org_user ou ON ou.USER_ID_ = u.ID_
+            INNER JOIN uc_org_post op ON ou.POS_ID_ = op.ID_
+            INNER JOIN ${dbName}.portal_sys_dic sd ON sd.KEY_ = op.POST_KEY_
+            AND u.ID_ = #{housekeeperId}
+            AND op.ORG_ID_ = #{orgId}
+    </select>
+
+    <select id="getSysDicsByTypeKey" resultType="java.util.Map">
+        SELECT
+            d.KEY_,
+            d.NAME_
+        FROM
+            ${dbName}.portal_sys_dic d
+            INNER JOIN ${dbName}.portal_sys_type t ON t.ID_ = d.PARENT_ID_
+            AND TYPE_KEY_ = #{typeKey}
+    </select>
+
+    <select id="getGridApprovalRecordByProcInstId" resultMap="gridApprovalRecord">
+        select
+        <include refid="BaseAttribute"/>
+        from grid_approval_record
+        where proc_inst_Id = #{procInstId}
+        ORDER BY
+        create_date DESC
+        LIMIT 1
+    </select>
+
+</mapper>
