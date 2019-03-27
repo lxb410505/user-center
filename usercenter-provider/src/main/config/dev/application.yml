@@ -104,3 +104,11 @@ system:
 
 grid:
   code: guanjia
+
+flow:
+  url: http://172.16.0.108:6666/k2/callK2
+  db:
+    portal: portal
+  const:
+    grid-type: grid_type
+    format-attribute: format_attribute
