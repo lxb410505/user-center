@@ -216,7 +216,7 @@
             uc_user
         WHERE
             ID_ = (
-            SELECT
+            SELECT DISTINCT
                 housekeeper_id
             FROM
                 grid_basic_info info
