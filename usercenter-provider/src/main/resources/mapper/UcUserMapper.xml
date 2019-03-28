@@ -229,12 +229,12 @@
 
     <select id="searchUserByCondition" resultMap="baseMap" parameterType="java.util.Map">
         select distinct u.ID_,u.FULLNAME_,u.ACCOUNT_,u.EMAIL_,u.MOBILE_,u.PHOTO_,u.STATUS_ from uc_user u
-        inner join uc_org_user uorg on u.ID_ = uorg.USER_ID_
+        inner join uc_org_user uorg on u.ID_ = uorg.USER_ID_ and uorg.IS_DELE_ = 0
         <if test="(jobIdList!=null and jobIdList.size > 0) || (posIdList!=null and posIdList.size > 0)">
-            inner join uc_org_post uorgp on uorg.ORG_ID_ = uorgp.ORG_ID_ and uorg.POS_ID_ = uorgp.id_
+            inner join uc_org_post uorgp on uorg.ORG_ID_ = uorgp.ORG_ID_ and uorg.POS_ID_ = uorgp.id_ and uorgp.IS_DELE_ = 0
         </if>
         <if test="(roleIdList!=null and roleIdList.size > 0)">
-            inner join uc_user_role ur on u.ID_ = ur.USER_ID_
+            inner join uc_user_role ur on u.ID_ = ur.USER_ID_ and ur.IS_DELE_ = 0
         </if>
         where u.IS_DELE_ = 0 and uorg.ORG_ID_ in
         <foreach collection="orgIdList" item="iOrgId" open="(" separator="," close=")">
