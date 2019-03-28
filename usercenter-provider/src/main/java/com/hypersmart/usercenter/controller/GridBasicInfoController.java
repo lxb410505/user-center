@@ -3,8 +3,10 @@ package com.hypersmart.usercenter.controller;
 
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
+import com.hypersmart.base.query.PageBean;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.usercenter.bo.GridBasicInfoBO;
 import com.hypersmart.usercenter.bo.HouseKeeperBO;
@@ -211,6 +213,7 @@ public class GridBasicInfoController extends BaseController {
 	@PostMapping({"/getHouseKeeper"})
 	@ApiOperation(value = "管家列表", httpMethod = "POST", notes = "管家列表")
 	public PageList<Map<String, Object>> listHouseKeeper(@ApiParam(name = "queryFilter", value = "查询条件") @RequestBody QueryFilter queryFilter) {
+		PageBean pageBean = queryFilter.getPageBean();
 		PageList<Map<String, Object>> pageList = ucOrgUserService.quertListFive(queryFilter);
 		if (pageList != null && pageList.getRows() != null && pageList.getRows().size() > 0) {
 			List<HouseKeeperBO> houseKeeperBOList = new ArrayList<>();
@@ -237,8 +240,13 @@ public class GridBasicInfoController extends BaseController {
 			pageList.setRows(new ArrayList<>());
 		}
 		if (pageList.getPageSize() == 0) {
-			pageList.setPageSize(1);
-			pageList.setPage(1);
+			if(BeanUtils.isEmpty(pageBean)){
+				pageList.setPageSize(20);
+				pageList.setPage(1);
+			}else{
+				pageList.setPageSize(pageBean.getPageSize());
+				pageList.setPage(pageBean.getPage());
+			}
 		}
 		return pageList;
 	}
