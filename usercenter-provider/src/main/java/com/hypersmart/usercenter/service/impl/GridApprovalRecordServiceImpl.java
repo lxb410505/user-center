@@ -128,8 +128,8 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			}
 			record.setCallFlowContent(flowContent);
 
-			// 调用K2流程
-			HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
+			// TODO 调用K2流程
+			/*HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
 			String resultContent = httpClientUtils.httpPost(flowUrl, flowContent, null);
 			JsonNode resultNode = JsonUtil.toJsonNode(resultContent);
 			if (null != resultNode) {
@@ -144,13 +144,24 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			} else {
 				record.setCallStatus(2);
 				record.setCallErrorMessage("调用K2审批流程失败：未能收到K2任何反馈信息");
-			}
+			}*/
 		} catch (IOException e) {
 			e.printStackTrace();
 			record.setCallStatus(2);
 			record.setCallErrorMessage(e.getMessage());
 		} finally {
+//			gridApprovalRecordMapper.insert(record);
+			// TODO 待调整（删除此段代码，使用上面代码）
+			record.setCallStatus(1);
+			String procInstId = UUID.randomUUID().toString();
+			record.setProcInstId(procInstId);
 			gridApprovalRecordMapper.insert(record);
+
+			K2Result k2Result = new K2Result();
+			k2Result.setMessage("审批通过");
+			k2Result.setProcInstId(procInstId);
+			k2Result.setResultCode("1");
+			processFlowResult(k2Result);
 		}
 	}
 
@@ -355,8 +366,8 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		 */
 		GridBasicInfoDTO gridBasicInfoDTO = (GridBasicInfoDTO) approvalContent;
 		Map<String, Object> flowMap = new ConcurrentHashMap(),
-				body = new ConcurrentHashMap(),
-				detail = new ConcurrentHashMap();
+				body = new HashMap(),
+				detail = new HashMap();
 		List<Map<String, Object>> details = new ArrayList<>();
 		GridBasicInfo gridInfo = gridApprovalRecordMapper.getBeforeGridInfo(gridBasicInfoDTO.getId());
 		detail.put("TYPE", GridOperateEnum.CHANGE_HOUSEKEEPER.getDescription());
@@ -413,9 +424,9 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		 * 4.事项信息
 		 * 5.网格覆盖范围
 		 */
-		Map<String, Object> flowMap = new ConcurrentHashMap(),
-				body = new ConcurrentHashMap(),
-				detail = new ConcurrentHashMap();
+		Map<String, Object> flowMap = new HashMap(),
+				body = new HashMap(),
+				detail = new HashMap();
 		List<Map<String, Object>> removeGridDetails = new ArrayList<>();
 
 		String houseKeeperId = "", orgId = "";
@@ -423,7 +434,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			houseKeeperId = gridInfo.getHousekeeperId();
 			orgId = gridInfo.getStagingId();
 
-			Map<String, Object> gridMap = new ConcurrentHashMap();
+			Map<String, Object> gridMap = new HashMap();
 			gridMap.put("GRIDCODE", gridInfo.getGridCode());
 			gridMap.put("GRIDNAME", gridInfo.getGridName());
 			gridMap.put("GRIDTYPE", getDicByType(gridInfo.getGridType(), gridTypes));
@@ -478,7 +489,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 				for (GridRangeInfo unit : unitList) {
 					List<GridRangeInfo> houseList = gridRangeInfos.stream().filter(m -> m.getLevel() == 3 && m.getParentId().equals(unit.getId())).collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(GridRangeInfo::getId))), ArrayList::new));
 					for (GridRangeInfo house : houseList) {
-						Map<String, Object> coverageAreaDetail = new ConcurrentHashMap();
+						Map<String, Object> coverageAreaDetail = new HashMap();
 						coverageAreaDetail.put("STORIEDBUILDING", building.getName());
 						coverageAreaDetail.put("UNIT", unit.getName());
 						coverageAreaDetail.put("HOUSEPROPERTY", house.getName());
@@ -497,7 +508,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	 */
 	private Map<String, Object> getProposer(GridBasicInfoDTO proposer) {
 		// TODO 需要传入更多信息（区域id、城区id、项目id、地块id、申请人页面选择信息）
-		Map<String, Object> map = new ConcurrentHashMap();
+		Map<String, Object> map = new HashMap();
 		map.put("NAME", ContextUtil.getCurrentUser().getFullname());
 		map.put("DATE", new Date());
 		map.put("PLANS", proposer.getPostId());
