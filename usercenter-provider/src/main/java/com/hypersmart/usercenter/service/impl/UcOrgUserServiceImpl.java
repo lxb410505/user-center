@@ -160,22 +160,24 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
 //            return pageList;
 //        }
         //===============================================================================================
-        PageBean pageBean = queryFilter.getPageBean();
-        if (BeanUtils.isEmpty(pageBean)) {
-            PageHelper.startPage(1, Integer.MAX_VALUE, false);
-        } else {
-            PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
-                    pageBean.showTotal());
-        }
-
-        if (BeanUtils.isEmpty(pageBean)) {
-            PageHelper.startPage(1, Integer.MAX_VALUE, false);
-        } else {
-            PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
-                    pageBean.showTotal());
-        }
         UcOrg ucOrg = ucOrgService.get(orgId.toString());
         if(null!= ucOrg){
+
+            PageBean pageBean = queryFilter.getPageBean();
+            if (BeanUtils.isEmpty(pageBean)) {
+                PageHelper.startPage(1, Integer.MAX_VALUE, false);
+            } else {
+                PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
+                        pageBean.showTotal());
+            }
+
+            if (BeanUtils.isEmpty(pageBean)) {
+                PageHelper.startPage(1, Integer.MAX_VALUE, false);
+            } else {
+                PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
+                        pageBean.showTotal());
+            }
+
             String path = ucOrg.getPath();
             String pathpli = path.replace(".","");
             int num = path.length()-pathpli.length();
