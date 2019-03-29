@@ -1,5 +1,7 @@
 package com.hypersmart.usercenter.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.hypersmart.base.query.PageBean;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
@@ -16,9 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 用户管理
@@ -90,5 +90,35 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
 //                }
 //        }
         return ucUsers;
+    }
+
+    /**
+     * 根据组织和职务查询对应组织中的用户
+     * @param queryFilter
+     * @return
+     */
+    public PageList<UcUser> searchUserByCondition(QueryFilter queryFilter) {
+        queryFilter.setClazz(UcUser.class);
+        PageBean pageBean = queryFilter.getPageBean();
+        if (!BeanUtils.isEmpty(pageBean)) {
+            PageHelper.startPage(pageBean.getPage(), pageBean.getPageSize(), pageBean.showTotal());
+        } else {
+            PageHelper.startPage(1, Integer.MAX_VALUE, false);
+        }
+        Map<String, Object> paramMap = queryFilter.getParams();
+        if (BeanUtils.isEmpty(paramMap) || BeanUtils.isEmpty(paramMap.get("orgIdList"))) {
+            PageList pageList = new PageList();
+            if (!BeanUtils.isEmpty(pageBean)) {
+                pageList.setPage(pageBean.getPage());
+                pageList.setPageSize(pageBean.getPageSize());
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0L);
+            }
+
+            return pageList;
+        }
+
+        List<UcUser> userList = ucUserMapper.searchUserByCondition(queryFilter.getParams());
+        return new PageList(userList);
     }
 }

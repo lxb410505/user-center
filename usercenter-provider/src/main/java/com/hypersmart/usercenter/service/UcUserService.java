@@ -1,11 +1,14 @@
 package com.hypersmart.usercenter.service;
 
+import com.hypersmart.base.query.PageList;
+import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.framework.service.IGenericService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -23,5 +26,12 @@ public interface UcUserService extends IGenericService<String, UcUser> {
     Set<UcUser> getDepUserByOrgCodeAndJobCode(String orgCode, String jobCode);
 
     List<UcUser> queryUserByGradeAndDemCode(String userId,String grade, String DemensionCode, String fullname, String mobile);
+
+    /**
+     * 根据组织和职务查询对应组织中的用户
+     * @param queryFilter
+     * @return
+     */
+    PageList<UcUser> searchUserByCondition(QueryFilter queryFilter);
 }
 
