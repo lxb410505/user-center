@@ -1,7 +1,6 @@
 package com.hypersmart.usercenter.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.hypersmart.base.util.JsonUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.framework.utils.StringUtils;
@@ -19,7 +18,6 @@ import com.hypersmart.usercenter.service.GridBasicInfoHistoryService;
 import com.hypersmart.usercenter.service.GridBasicInfoService;
 import com.hypersmart.usercenter.service.GridRangeService;
 import com.hypersmart.usercenter.util.GridOperateEnum;
-import com.hypersmart.usercenter.util.HttpClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,7 +26,6 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service("gridApprovalRecordServiceImpl")
@@ -264,9 +261,9 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		 * 5.网格覆盖范围
 		 */
 		GridBasicInfoDTO gridBasicInfo = (GridBasicInfoDTO) approvalContent;
-		Map<String, Object> flowMap = new ConcurrentHashMap(),
-				body = new ConcurrentHashMap(),
-				detail = new ConcurrentHashMap();
+		Map<String, Object> flowMap = new HashMap(),
+				body = new HashMap(),
+				detail = new HashMap();
 		List<Map<String, Object>> coverageAreaDetails = new ArrayList<>();
 
 		detail.put("TYPE", gridDescription);
@@ -312,9 +309,9 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		 * 5.网格覆盖范围
 		 */
 		GridBasicInfoDTO gridBasicInfo = (GridBasicInfoDTO) approvalContent;
-		Map<String, Object> flowMap = new ConcurrentHashMap(),
-				body = new ConcurrentHashMap(),
-				detail = new ConcurrentHashMap();
+		Map<String, Object> flowMap = new HashMap(),
+				body = new HashMap(),
+				detail = new HashMap();
 		List<Map<String, Object>> beforeDetails = new ArrayList<>(), afterDetails = new ArrayList<>();
 		detail.put("TYPE", GridOperateEnum.CHANGE_SCOPE.getDescription());
 		detail.put("GRIDCODE", gridBasicInfo.getGridCode());
@@ -365,7 +362,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		 * 5.网格覆盖范围
 		 */
 		GridBasicInfoDTO gridBasicInfoDTO = (GridBasicInfoDTO) approvalContent;
-		Map<String, Object> flowMap = new ConcurrentHashMap(),
+		Map<String, Object> flowMap = new HashMap(),
 				body = new HashMap(),
 				detail = new HashMap();
 		List<Map<String, Object>> details = new ArrayList<>();
@@ -479,6 +476,9 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	 * @param gridRange
 	 */
 	private void constructingGridRanges(List<Map<String, Object>> areaDetails, String gridRange) {
+		if (StringUtils.isRealEmpty(gridRange)) {
+			return;
+		}
 		JSONArray jsonArray = JSONArray.parseArray(gridRange);
 		List<GridRangeInfo> gridRangeInfos = jsonArray.toJavaList(GridRangeInfo.class);
 		if (!CollectionUtils.isEmpty(gridRangeInfos)) {
