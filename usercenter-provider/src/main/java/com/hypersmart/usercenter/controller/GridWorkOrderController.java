@@ -111,10 +111,10 @@ public class GridWorkOrderController {
                 userQuery.addFilter("id",userIds, QueryOP.IN,FieldRelation.AND);
                 userQuery.addFilter("isDele",0, QueryOP.EQUAL,FieldRelation.AND);
                 PageList<UcUser> userPage = ucUserService.query(userQuery);
-                Map<String,String> userDetilMap = new HashMap<>();
+                Map<String,UcUser> userDetilMap = new HashMap<>();
                 if(null != userPage && null != userPage.getRows() && userPage.getRows().size()>0){
                     for(UcUser ucUser : userPage.getRows()){
-                        userDetilMap.put(ucUser.getId(),ucUser.getFullname());
+                        userDetilMap.put(ucUser.getId(),ucUser);
                     }
                 }
                 //设置返回值格式
@@ -128,7 +128,8 @@ public class GridWorkOrderController {
                             if(null != userDetilMap.get(userId)){
                                 map.put("houseId",houseId);
                                 map.put("userId",userId);
-                                map.put("userName",userDetilMap.get(userId));
+                                map.put("userName",userDetilMap.get(userId).getFullname());
+                                map.put("mobile",userDetilMap.get(userId).getMobile());
                             }else{//没有对应的管家信息
                                 //查询服务中心管家
                                 UcUser ucUser = getUserByDivideId(resourceId,"service_center_grid");
@@ -136,6 +137,7 @@ public class GridWorkOrderController {
                                     map.put("houseId",houseId);
                                     map.put("userId",ucUser.getId());
                                     map.put("userName",ucUser.getFullname());
+                                    map.put("mobile",ucUser.getMobile());
                                 }
                             }
                         }else{//没有关联管家
@@ -145,6 +147,7 @@ public class GridWorkOrderController {
                                 map.put("houseId",houseId);
                                 map.put("userId",ucUser.getId());
                                 map.put("userName",ucUser.getFullname());
+                                map.put("mobile",ucUser.getMobile());
                             }
                         }
                     }else{//表示该房产没有关联表格
@@ -154,6 +157,7 @@ public class GridWorkOrderController {
                             map.put("houseId",houseId);
                             map.put("userId",ucUser.getId());
                             map.put("userName",ucUser.getFullname());
+                            map.put("mobile",ucUser.getMobile());
                         }
                     }
                     mapList.add(map);
@@ -170,6 +174,7 @@ public class GridWorkOrderController {
                     map.put("houseId",houseId);
                     map.put("userId",ucUser.getId());
                     map.put("userName",ucUser.getFullname());
+                    map.put("mobile",ucUser.getMobile());
                     mapList.add(map);
                 }
             }
