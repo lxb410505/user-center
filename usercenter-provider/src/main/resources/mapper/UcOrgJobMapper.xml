@@ -2,5 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.hypersmart.usercenter.mapper.UcOrgJobMapper">
+    <resultMap id="OrgJobMap" type="com.hypersmart.usercenter.model.UcOrgJob">
+        <id property="id" column="ID_" jdbcType="VARCHAR"/>
+        <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+        <result property="code" column="CODE_" jdbcType="VARCHAR"/>
+        <result property="jobLevel" column="JOB_LEVEL_" jdbcType="VARCHAR"/>
+        <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="UPDATE_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="isDele" column="IS_DELE_" jdbcType="VARCHAR"/>
+        <result property="version" column="VERSION_" jdbcType="NUMERIC"/>
+    </resultMap>
 
+    <sql id="BaseTable">
+        uc_org_job
+    </sql>
+
+    <select id="filterJobByOrgId" parameterType="java.util.Map" resultMap="OrgJobMap">
+        select distinct job.* from
+        uc_org_job job
+        left join uc_org_post post on job.id_ = post.JOB_ID_
+        where job.IS_DELE_ = 0 and post.IS_DELE_ = 0
+        and post.ORG_ID_ in
+        <foreach collection="orgIdList" item="iOrgId" open="(" separator="," close=")">
+            #{iOrgId}
+        </foreach>
+
+    </select>
 </mapper>
