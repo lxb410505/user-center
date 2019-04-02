@@ -16,6 +16,9 @@ import javax.annotation.Resource;
 import com.hypersmart.usercenter.model.UcOrgJob;
 import com.hypersmart.usercenter.service.UcOrgJobService;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * 职务定义
  *
@@ -81,5 +84,19 @@ public class UcOrgJobController extends BaseController {
         String[] aryIds = ids.split(",");
         this.ucOrgJobService.delete(aryIds);
         return new CommonResult(true, "批量删除成功");
+    }
+
+
+
+    /**
+     * 根据组织id过滤组织关联的岗位，再通过岗位过滤职务列表
+     * @param queryFilter
+     * @return
+     */
+    @PostMapping({"filterJobByOrgId"})
+    @ApiOperation(value = "根据组织id过滤职务列表", httpMethod = "POST", notes = "根据组织id过滤职务列表")
+    public PageList<UcOrgJob> filterJobByOrgId(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter){
+
+        return this.ucOrgJobService.filterJobByOrgId(queryFilter);
     }
 }
