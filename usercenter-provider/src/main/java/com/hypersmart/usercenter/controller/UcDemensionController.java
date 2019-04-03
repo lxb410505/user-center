@@ -43,43 +43,43 @@ public class UcDemensionController extends BaseController {
     }
 
 
-    @PostMapping({"add"})
-    @ApiOperation(value = "新增维度管理信息", httpMethod = "POST", notes = "保存维度管理")
-    public CommonResult<String> post(@ApiParam(name = "ucDemension", value = "维度管理业务对象", required = true) @RequestBody UcDemension model) {
-        String msg = "添加维度管理成功";
-        this.ucDemensionService.insert(model);
-        return new CommonResult(msg);
-    }
-
-    @PutMapping({"update"})
-    @ApiOperation(value = "更新指定id的 维度管理 信息（更新全部信息）", httpMethod = "PUT", notes = "更新指定id的 维度管理 信息（更新全部信息）")
-    public CommonResult<String> put(@ApiParam(name = "ucDemension", value = "维度管理业务对象", required = true) @RequestBody UcDemension model) {
-        String msg = "更新维度管理成功";
-        this.ucDemensionService.update(model);
-        return new CommonResult(msg);
-    }
-
-    @PatchMapping({"update"})
-    @ApiOperation(value = "更新指定id的 维度管理 信息（更新部分信息）", httpMethod = "PATCH", notes = "更新指定id的 维度管理 信息（更新部分信息）")
-    public CommonResult<String> patch(@ApiParam(name = "ucDemension", value = "维度管理业务对象", required = true) @RequestBody UcDemension model) {
-        String msg = "更新维度管理成功";
-        this.ucDemensionService.updateSelective(model);
-        return new CommonResult(msg);
-    }
-
-    @DeleteMapping({"remove/{id}"})
-    @ApiOperation(value = "删除维度管理记录", httpMethod = "DELETE", notes = "删除维度管理记录")
-    public CommonResult<String> remove(@ApiParam(name = "id", value = "业务主键", required = true) @PathVariable String id) {
-        this.ucDemensionService.delete(id);
-        return new CommonResult(true, "删除成功");
-    }
-
-    @DeleteMapping({"/remove"})
-    @ApiOperation(value = "批量删除维度管理记录", httpMethod = "DELETE", notes = "批量删除维度管理记录")
-    public CommonResult<String> removes(
-            @ApiParam(name = "ids", value = "业务主键数组,多个业务主键之间用逗号分隔", required = true) @RequestParam String ids) {
-        String[] aryIds = ids.split(",");
-        this.ucDemensionService.delete(aryIds);
-        return new CommonResult(true, "批量删除成功");
-    }
+//    @PostMapping({"add"})
+//    @ApiOperation(value = "新增维度管理信息", httpMethod = "POST", notes = "保存维度管理")
+//    public CommonResult<String> post(@ApiParam(name = "ucDemension", value = "维度管理业务对象", required = true) @RequestBody UcDemension model) {
+//        String msg = "添加维度管理成功";
+//        this.ucDemensionService.insert(model);
+//        return new CommonResult(msg);
+//    }
+//
+//    @PutMapping({"update"})
+//    @ApiOperation(value = "更新指定id的 维度管理 信息（更新全部信息）", httpMethod = "PUT", notes = "更新指定id的 维度管理 信息（更新全部信息）")
+//    public CommonResult<String> put(@ApiParam(name = "ucDemension", value = "维度管理业务对象", required = true) @RequestBody UcDemension model) {
+//        String msg = "更新维度管理成功";
+//        this.ucDemensionService.update(model);
+//        return new CommonResult(msg);
+//    }
+//
+//    @PatchMapping({"update"})
+//    @ApiOperation(value = "更新指定id的 维度管理 信息（更新部分信息）", httpMethod = "PATCH", notes = "更新指定id的 维度管理 信息（更新部分信息）")
+//    public CommonResult<String> patch(@ApiParam(name = "ucDemension", value = "维度管理业务对象", required = true) @RequestBody UcDemension model) {
+//        String msg = "更新维度管理成功";
+//        this.ucDemensionService.updateSelective(model);
+//        return new CommonResult(msg);
+//    }
+//
+//    @DeleteMapping({"remove/{id}"})
+//    @ApiOperation(value = "删除维度管理记录", httpMethod = "DELETE", notes = "删除维度管理记录")
+//    public CommonResult<String> remove(@ApiParam(name = "id", value = "业务主键", required = true) @PathVariable String id) {
+//        this.ucDemensionService.delete(id);
+//        return new CommonResult(true, "删除成功");
+//    }
+//
+//    @DeleteMapping({"/remove"})
+//    @ApiOperation(value = "批量删除维度管理记录", httpMethod = "DELETE", notes = "批量删除维度管理记录")
+//    public CommonResult<String> removes(
+//            @ApiParam(name = "ids", value = "业务主键数组,多个业务主键之间用逗号分隔", required = true) @RequestParam String ids) {
+//        String[] aryIds = ids.split(",");
+//        this.ucDemensionService.delete(aryIds);
+//        return new CommonResult(true, "批量删除成功");
+//    }
 }

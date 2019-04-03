@@ -108,8 +108,11 @@ public class UcOrgController extends BaseController {
         return set;
     }
 
-
-
+    /**
+     * 根据组织id获取父级组织
+     * @param id
+     * @return
+     */
     @GetMapping({"/queryParent"})
     @ApiOperation(value = "组织架构数据列表}", httpMethod = "GET", notes = "获取组织架构列表")
     public UcOrg queryParent(@ApiParam(name = "queryFilter", value = "查询对象") @RequestParam String id) {
@@ -121,13 +124,23 @@ public class UcOrgController extends BaseController {
         return null;
     }
 
+
+    /**
+     * 通用查询方法
+     * @param queryFilter
+     * @return
+     */
     @PostMapping({"/queryList"})
     @ApiOperation(value = "组织架构数据列表}", httpMethod = "POST", notes = "获取组织架构列表")
     public PageList<UcOrg> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
         return this.ucOrgService.query(queryFilter);
     }
 
-
+    /**
+     * 查询用户的关联的组织列表--》弃用，主要维护userList方法
+     * @param map
+     * @return
+     */
     @PostMapping({"/list"})
     @ApiOperation(value = "组织架构数据列表}", httpMethod = "POST", notes = "获取组织架构列表")
     public List<UcOrg> list( @RequestBody  Map<String,String> map) {
@@ -203,7 +216,11 @@ public class UcOrgController extends BaseController {
         return new ArrayList<>();
     }
 
-
+    /**
+     * 查询用户关联组织的列表
+     * @param userId
+     * @return
+     */
     @GetMapping({"/userList/{id}"})
     @ApiOperation(value = "组织架构数据列表}", httpMethod = "GET", notes = "获取组织架构列表")
     public List<UcOrg> userList(@PathVariable("id") String userId) {
@@ -211,7 +228,9 @@ public class UcOrgController extends BaseController {
     }
 
 
-    //根据用户Id和组织父级id查询组织信息
+    /**
+     *  根据用户Id和组织父级id查询组织信息
+     */
     @PostMapping({"/queryChildrenByUserId"})
     public List<UcOrgDTO> queryChildrenByUserId(@RequestBody UserIdParentId userIdParentId) {
         String userId=userIdParentId.getUserId();
@@ -243,6 +262,11 @@ public class UcOrgController extends BaseController {
         return ucOrgService.queryByDemensionCode(userId,demensionCode);
     }
 
+    /**
+     * 根据组织id集合获取组织信息
+     * @param map
+     * @return
+     */
     @PostMapping({"/getByList"})
     @ApiOperation(value = "根据组织id集合获取组织信息}", httpMethod = "POST", notes = "根据组织id集合获取组织信息")
     public List<UcOrg> getByList( @RequestBody  Map<String,List<String>> map) {
@@ -263,12 +287,21 @@ public class UcOrgController extends BaseController {
         return new ArrayList<>();
     }
 
+    /**
+     * 根据组织id查询详情
+     * @return
+     */
     @GetMapping({"/get/{id}"})
     @ApiOperation(value = "组织架构数据列表", httpMethod = "GET", notes = "获取单个组织架构记录")
     public UcOrg get(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {
         return this.ucOrgService.get(id);
     }
 
+    /**
+     * 根据组织id获取所有维度的关联组织及当前组织
+     * @param query
+     * @return
+     */
     @RequestMapping(value = {"getAllDimOrgListByOrg"}, method = {
             RequestMethod.POST}, produces = {
             "application/json; charset=utf-8"})

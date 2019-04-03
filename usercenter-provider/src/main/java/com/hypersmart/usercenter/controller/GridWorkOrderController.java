@@ -36,6 +36,7 @@ public class GridWorkOrderController {
     /*
     *   unitType : 参数类型 1：楼栋 2:单元
     *   unitId :参数id  对应grid_range 的resourceId字段
+    *   【作用】根据单元，楼栋查询对应网格的管家
     * */
     @PostMapping("/getUserByUnitId")
     public UcUser getUserByUnitId(@RequestParam("unitId") String unitId,@RequestParam("unitType")String unitType){
@@ -48,6 +49,11 @@ public class GridWorkOrderController {
         return new UcUser();
     }
 
+    /**
+     *  【新增】 根据房产id获取管家接口
+     *  【新增目的】小程序首页管家列表接口
+     *  【作用】根据地块查询对应网格的管家--》主要查询服务中心网格管家
+     */
     @PostMapping("/getUserByDivideId")
     public UcUser getUserByDivideId(@RequestParam("divideId") String divideId,@RequestParam("gridType")String gridType){
         if(StringUtil.isNotEmpty(divideId) && StringUtil.isNotEmpty(divideId)){

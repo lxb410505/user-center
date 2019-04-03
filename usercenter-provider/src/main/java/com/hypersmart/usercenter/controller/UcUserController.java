@@ -49,6 +49,10 @@ public class UcUserController extends BaseController {
         return this.ucUserService.query(queryFilter);
     }
 
+    /**
+     *查询所有未删除的用户列表
+     * @return
+     */
     @PostMapping({"/allList"})
     @ApiOperation(value = "用户管理数据列表}", httpMethod = "POST", notes = "获取用户管理列表")
     public List<UcUser> allList() {
@@ -63,6 +67,11 @@ public class UcUserController extends BaseController {
         return this.ucUserService.get(id);
     }
 
+    /**
+     * 设置当前组织
+     * @param orgId
+     * @return
+     */
     @GetMapping({"/setCurrentOrg/{orgId}"})
     @ApiOperation(value = "设置当前组织", httpMethod = "GET", notes = "设置当前组织")
     public CommonResult<String> setCurrentOrg(@PathVariable("orgId") String orgId) {
@@ -84,7 +93,13 @@ public class UcUserController extends BaseController {
     }
 
 
-
+    /**
+     * 通过组织编码和职务编码，深度获取用户
+     * @param orgCode
+     * @param jobCode
+     * @return
+     * 编辑人--》李良亚
+     */
     @GetMapping({"/getDepUserByOrgCodeAndJobCode"})
     @ApiOperation(value = "通过组织编码和职务编码，深度获取用户", httpMethod = "GET", notes = "深度获取用户")
     public CommonResult<String> getDepUserByOrgCodeAndJobCode(@RequestParam("orgCode") String orgCode, @RequestParam("jobCode") String jobCode) {
