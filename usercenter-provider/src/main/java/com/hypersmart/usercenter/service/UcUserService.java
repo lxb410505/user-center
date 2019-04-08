@@ -2,6 +2,8 @@ package com.hypersmart.usercenter.service;
 
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.usercenter.dto.UserDetailRb;
+import com.hypersmart.usercenter.dto.UserDetailValue;
 import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.framework.service.IGenericService;
 import org.springframework.stereotype.Service;
@@ -33,5 +35,7 @@ public interface UcUserService extends IGenericService<String, UcUser> {
      * @return
      */
     PageList<UcUser> searchUserByCondition(QueryFilter queryFilter);
+
+    UserDetailValue searchUserDetailByCondition(UserDetailRb userDetailRb);
 }
 

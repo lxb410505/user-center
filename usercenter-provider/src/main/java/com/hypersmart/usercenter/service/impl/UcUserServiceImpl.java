@@ -7,6 +7,8 @@ import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.framework.service.GenericService;
+import com.hypersmart.usercenter.dto.UserDetailRb;
+import com.hypersmart.usercenter.dto.UserDetailValue;
 import com.hypersmart.usercenter.model.UcDemension;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UcUser;
@@ -121,4 +123,23 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
         List<UcUser> userList = ucUserMapper.searchUserByCondition(queryFilter.getParams());
         return new PageList(userList);
     }
+
+    @Override
+    public UserDetailValue searchUserDetailByCondition(UserDetailRb userDetailRb) {
+        UserDetailValue userDetailValue = new UserDetailValue();
+        UcOrg devideInfo = ucOrgService.get(userDetailRb.getDevideId());
+        if (BeanUtils.isNotEmpty(devideInfo)) {
+            userDetailValue.setDevideName(devideInfo.getName());
+            UcOrg projectInfo = ucOrgService.get(devideInfo.getParentId());
+            if (BeanUtils.isNotEmpty(projectInfo)) {
+                userDetailValue.setProjectName(projectInfo.getName());
+            }
+
+        }
+        List<String> jobs = ucUserMapper.serchUserJobsByUserId(userDetailRb.getUserId(), userDetailRb.getDevideId());
+        userDetailValue.setJobs(BeanUtils.isEmpty(jobs) ? new ArrayList<>() : jobs);
+        return userDetailValue;
+    }
+
+
 }

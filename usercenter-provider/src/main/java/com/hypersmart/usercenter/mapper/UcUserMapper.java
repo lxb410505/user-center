@@ -38,4 +38,14 @@ public interface UcUserMapper extends GenericMapper<UcUser> {
      * @return
      */
     List<UcUser> searchUserByCondition(Map<String, Object> params);
+
+    /**
+     * 查询user的岗位集合
+     * @param uId
+     * @param oId
+     * @return
+     */
+    List<String> serchUserJobsByUserId(@Param(" u.ID_") String uId,@Param(" o.ID_") String oId);
+
+
 }
