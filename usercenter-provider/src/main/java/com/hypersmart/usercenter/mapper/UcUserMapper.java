@@ -45,7 +45,7 @@ public interface UcUserMapper extends GenericMapper<UcUser> {
      * @param oId
      * @return
      */
-    List<String> serchUserJobsByUserId(@Param(" u.ID_") String uId,@Param(" o.ID_") String oId);
+    List<String> serchUserJobsByUserId(@Param("uId") String uId,@Param("oId") String oId);
 
 
 }

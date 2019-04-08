@@ -263,17 +263,17 @@
         </if>
         order by u.id_ asc
     </select>
-    <select id="serchUserJobsByUserId" resultType="java.util.List" parameterType="java.lang.String">
+    <select id="serchUserJobsByUserId" resultType="java.lang.String">
         select distinct   post.POS_NAME_ from uc_user u
         JOIN uc_org_user ou on u.ID_ = ou.USER_ID_
         JOIN uc_org o on ou.ORG_ID_ = o.ID_
         JOIN uc_org_post post on post.ORG_ID_ = o.ID_
         where u.IS_DELE_ &lt;&gt; 1 and ou.IS_DELE_  &lt;&gt; 1 and post.IS_DELE_ &lt;&gt; 1
-        <if test="u.ID_!=null and u.ID_!=''">
-            AND u.ID_ = #{u.ID_}
+        <if test="uId!=null and uId!=''">
+            AND u.ID_ = #{uId}
         </if>
-        <if test="o.ID_!=null and o.ID_!=''">
-            and o.ID_ = #{o.ID}
+        <if test="oId!=null and oId!=''">
+            and o.ID_ = #{oId}
         </if>
     </select>
 
