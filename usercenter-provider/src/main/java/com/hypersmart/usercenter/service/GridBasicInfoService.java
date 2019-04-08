@@ -27,9 +27,10 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 * 网格分页查询
 	 *
 	 * @param queryFilter
+	 * @param type  0 网格管理页面    1 管家关联网格页面  2 管家解除关联页面
 	 * @return
 	 */
-	PageList<Map<String, Object>> quertList(QueryFilter queryFilter);
+	PageList<Map<String, Object>> quertList(QueryFilter queryFilter, int type);
 
 
 	/**
@@ -75,10 +76,10 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	/**
 	 * 禁用网格
 	 *
-	 * @param gridBasicInfoBO
+	 * @param gridBasicInfoDTO
 	 * @return
 	 */
-	GridErrorCode disableGridList(GridBasicInfoBO gridBasicInfoBO);
+	GridErrorCode disableGridList(GridBasicInfoDTO gridBasicInfoDTO);
 
 	/**
 	 * 删除网格
@@ -111,5 +112,21 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 * @return
 	 */
 	List<GridBasicInfo> getGridsBymassifId(String massifId);
+
+	/**
+	 * 管家关联网格
+	 *
+	 * @param gridBasicInfoDTO
+	 * @return
+	 */
+	GridErrorCode associatedGrid(GridBasicInfoDTO gridBasicInfoDTO);
+
+	/**
+	 * 管家解除关联网格
+	 *
+	 * @param gridBasicInfoDTO
+	 * @return
+	 */
+	GridErrorCode disassociatedGrid(GridBasicInfoDTO gridBasicInfoDTO);
 }
 

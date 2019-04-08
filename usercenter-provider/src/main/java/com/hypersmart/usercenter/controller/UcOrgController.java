@@ -5,6 +5,7 @@ import com.hypersmart.base.query.*;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.bo.UcOrgBO;
+import com.hypersmart.usercenter.dto.UcOrgDTO;
 import com.hypersmart.usercenter.dto.UcOrgExtend;
 import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.UcOrgService;
@@ -212,7 +213,7 @@ public class UcOrgController extends BaseController {
 
     //根据用户Id和组织父级id查询组织信息
     @PostMapping({"/queryChildrenByUserId"})
-    public List<UcOrg> queryChildrenByUserId(@RequestBody UserIdParentId userIdParentId) {
+    public List<UcOrgDTO> queryChildrenByUserId(@RequestBody UserIdParentId userIdParentId) {
         String userId=userIdParentId.getUserId();
         String parentOrgId=userIdParentId.getParentOrgId();
         return ucOrgService.queryChildrenByUserId(userId,parentOrgId);

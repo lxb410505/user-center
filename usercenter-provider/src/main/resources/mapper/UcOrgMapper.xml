@@ -95,4 +95,40 @@
             and d.id_ = #{dimId}
         </if>
     </select>
+
+    <select id="getByIdsAndParentId" resultType="com.hypersmart.usercenter.dto.UcOrgDTO">
+        select
+        ID_ as id,
+        NAME_ as name,
+        PARENT_ID_ as parentId,
+        ORDER_NO_ as orderNo,
+        CODE_ as code,
+        GRADE_ as grade,
+        DEM_ID_ as dem_id,
+        PATH_ as path,
+        PATH_NAME_ as pathName,
+        UPDATE_TIME_ as updateTime,
+        IS_DELE_ as isDele,
+        VERSION_ as version,
+        LEVEL_ as level,
+        REF_ID_ as refId,
+        REF_CODE_ as refCode,
+        (select CODE_ from uc_org where ID_ = parentId) as parentCode
+        from
+        <include refid="BaseTable"/>
+        where ID_ in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and IS_DELE_ != 1
+        and PARENT_ID_ = #{parentId}
+    </select>
+
+    <select id="getCodeById" resultType="java.lang.String">
+        select
+        CODE_
+        from
+        <include refid="BaseTable"/>
+        where ID_ = #{orgId}
+    </select>
 </mapper>

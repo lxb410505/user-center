@@ -51,7 +51,77 @@
     </select>
 
     <select id="quertList" parameterType="java.util.Map" resultType="java.util.Map">
-        select * from (
+        select t.*, r.procInstId, r.approvalStatus from (
+            select g.id as id,
+            g.grid_range as gridRange,
+            g.grid_name as gridName,
+            g.grid_type as gridType,
+            g.grid_code as gridCode,
+            g.grid_remark as gridRemark,
+            g.area_id as areaId,
+            g.project_id as projectId,
+            g.city_id as cityId,
+            g.staging_id as stagingId,
+            g.staging_id as divideId,
+            g.housekeeper_id as housekeeperId,
+            g.format_attribute as formatAttribute,
+            g.second_format_attribute as secondFormatAttribute,
+            g.third_format_attribute as thirdFormatAttribute,
+            concat('',g.enabled_flag,'') as enabledFlag,
+            g.is_deleted as isDeleted,
+            g.creation_date as creationDate,
+            (select org.NAME_ from uc_org org where ID_ = g.area_id) as areaName,
+            (select org.NAME_ from uc_org org where ID_ = g.project_id) as projectName,
+            (select org.NAME_ from uc_org org where ID_ = g.city_id) as cityName,
+            (select org.NAME_ from uc_org org where ID_ = g.staging_id) as stagingName,
+            k.fullName as housekeeperName
+            from grid_basic_info g LEFT JOIN (
+            SELECT
+                u.ID_ AS houseKeeperId,
+                uou.ID_ AS id,
+                u.FULLNAME_ AS fullName,
+                u.MOBILE_ AS mobile,
+                u.ACCOUNT_ AS account,
+                post.ID_ AS `postId`,
+                post.POS_NAME_ AS posName,
+                org.NAME_ AS divideName,
+                org.ID_ AS divideId
+                FROM
+                uc_user u
+                JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
+                JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+                JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
+                JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
+                JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
+                WHERE
+                uoj.CODE_ = 'guanjia'
+                AND dem.CODE_ = 'smsf'
+                AND org.GRADE_ = 'ORG_DiKuai'
+                and u.IS_DELE_ = 0 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
+            ) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId where g.staging_id = #{massifId} and g.is_deleted = 0
+        ) as t
+        LEFT JOIN (
+            SELECT
+            gr.grid_id,
+            gr.approval_status AS approvalStatus,
+            gr.proc_inst_Id AS procInstId
+            FROM
+            grid_approval_record gr
+            WHERE
+            gr.create_date = ( SELECT max( create_date ) FROM grid_approval_record WHERE grid_id = gr.grid_id )
+        ) r ON r.grid_id = t.id
+        <where>
+            <if test="whereSql!=null">
+                ${whereSql}
+            </if>
+        </where>
+        <if test="orderBySql!=null">
+            ORDER BY ${orderBySql}
+        </if>
+    </select>
+
+    <select id="queryAssociateList" parameterType="java.util.Map" resultType="java.util.Map">
+        select t.*, r.procInstId, r.approvalStatus from (
         select g.id as id,
         g.grid_range as gridRange,
         g.grid_name as gridName,
@@ -75,7 +145,8 @@
         (select org.NAME_ from uc_org org where ID_ = g.city_id) as cityName,
         (select org.NAME_ from uc_org org where ID_ = g.staging_id) as stagingName,
         k.fullName as housekeeperName
-        from grid_basic_info g LEFT JOIN (SELECT
+        from grid_basic_info g LEFT JOIN (
+        SELECT
         u.ID_ AS houseKeeperId,
         uou.ID_ AS id,
         u.FULLNAME_ AS fullName,
@@ -97,11 +168,23 @@
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
-        ) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId where g.staging_id = #{massifId} and g.is_deleted = 0) as t
+        ) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId where g.staging_id = #{massifId} and g.is_deleted = 0
+        ) as t
+        LEFT JOIN (
+        SELECT
+        gr.grid_id,
+        gr.approval_status AS approvalStatus,
+        gr.proc_inst_Id AS procInstId
+        FROM
+        grid_approval_record gr
+        WHERE
+        gr.create_date = ( SELECT max( create_date ) FROM grid_approval_record WHERE grid_id = gr.grid_id )
+        ) r ON r.grid_id = t.id
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
             </if>
+            and (approvalStatus is null or approvalStatus !=1)
         </where>
         <if test="orderBySql!=null">
             ORDER BY ${orderBySql}
@@ -158,7 +241,7 @@
 
     <update id="disableGridInfo" parameterType="com.hypersmart.usercenter.bo.GridBasicInfoBO">
         update grid_basic_info
-        set enabled_flag = 0, grid_range = null, update_times = update_times + 1, updated_by = #{updatedBy}
+        set enabled_flag = 0, grid_range = null, update_times = update_times + 1, updated_by = #{updatedBy}, updation_date = now()
         where id in
         <foreach collection="ids" index="index" item="id" open="(" close=")" separator=",">
             #{id}
