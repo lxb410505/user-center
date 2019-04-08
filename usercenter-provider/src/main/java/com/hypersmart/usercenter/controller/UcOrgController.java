@@ -311,6 +311,19 @@ public class UcOrgController extends BaseController {
         return this.ucOrgService.getAllDimOrgListByOrg(query);
     }
 
+    @GetMapping({"getAllParentByOrgId"})
+    @ApiOperation(value = "获取当前组织及其所有上级组织列表", httpMethod = "GET", notes = "获取当前组织及其所有上级组织列表")
+    public List<UcOrg> getAllParentByOrgId(@ApiParam(name = "id", value = "业务对象主键", required = true)
+                                           @RequestParam("id") String id) {
+        UcOrg currentOrg = this.ucOrgService.get(id);
+        if (null == currentOrg) {
+            return null;
+        }
+        String fullPath = currentOrg.getPath();
+        String[] orgIds = fullPath.split("\\.");
+        List<UcOrg> orgList = this.ucOrgService.getByIds(orgIds);
+        return orgList;
+    }
 
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增组织架构信息", httpMethod = "POST", notes = "保存组织架构")
