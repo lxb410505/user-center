@@ -6,6 +6,7 @@ import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.base.util.BeanUtils;
+import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.usercenter.dto.UserDetailRb;
 import com.hypersmart.usercenter.dto.UserDetailValue;
@@ -57,23 +58,22 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
         PageList<UcOrg> ucOrgPageList = this.ucOrgService.query(queryFilter);
 
 
-        List<String> userIds= new ArrayList<>();
+        List<String> userIds = new ArrayList<>();
 
         if (BeanUtils.isNotEmpty(ucOrgPageList) && BeanUtils.isNotEmpty(ucOrgPageList.getRows())) {
             UcOrg ucOrg = ucOrgPageList.getRows().get(0);
             List<UcOrg> ucOrgList = ucOrgService.getChildrenOrg(ucOrg); // 通过path查询,匹配方式： path%
 
-           UcDemension ucDemension = ucDemensionService.get(ucOrg.getDemId());
-           if(BeanUtils.isNotEmpty(ucDemension)){
+            UcDemension ucDemension = ucDemensionService.get(ucOrg.getDemId());
+            if (BeanUtils.isNotEmpty(ucDemension)) {
 
-               if(ucDemension.getIsDefault().equals(1)){ //默认维度
+                if (ucDemension.getIsDefault().equals(1)) { //默认维度
 
-               }
-               else {
-                   //ucOrgList
-               }
+                } else {
+                    //ucOrgList
+                }
 
-           }
+            }
 
         }
         //ucOrgService.getChildrenOrg() // 通过path查询,匹配方式： path%
@@ -82,9 +82,9 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
     }
 
     @Override
-    public List<UcUser> queryUserByGradeAndDemCode(String userId,String grade, String DemensionCode, String fullname, String mobile) {
-        List<UcOrg> ucOrgList=ucOrgService.queryByDemensionCode(userId,DemensionCode);
-        List<UcUser> ucUsers= this.ucUserMapper.queryUserByOrgIdList(ucOrgList,fullname,mobile);
+    public List<UcUser> queryUserByGradeAndDemCode(String userId, String grade, String DemensionCode, String fullname, String mobile) {
+        List<UcOrg> ucOrgList = ucOrgService.queryByDemensionCode(userId, DemensionCode);
+        List<UcUser> ucUsers = this.ucUserMapper.queryUserByOrgIdList(ucOrgList, fullname, mobile);
 //        List<String> ids = new ArrayList<>();
 //        for(UcUser ucUser:ucUsers){
 //                if(ids.contains(ucUser.getId())||ids.contains(ucUser.getId())){
@@ -96,6 +96,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
 
     /**
      * 根据组织和职务查询对应组织中的用户
+     *
      * @param queryFilter
      * @return
      */
@@ -127,11 +128,12 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
 
     /**
      * 根据职务编码查询对应的用户
+     *
      * @param queryFilter
      * @return
      */
     @Override
-    public PageList<UcUser> pagedQueryByJobCodes(QueryFilter queryFilter) {
+    public PageList<UcUser> pagedQueryByJobCodes(String jobCodes, QueryFilter queryFilter) {
         queryFilter.setClazz(UcUser.class);
         PageBean pageBean = queryFilter.getPageBean();
         if (!BeanUtils.isEmpty(pageBean)) {
@@ -140,7 +142,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
             PageHelper.startPage(1, Integer.MAX_VALUE, false);
         }
         Map<String, Object> paramMap = queryFilter.getParams();
-        if (BeanUtils.isEmpty(paramMap) || BeanUtils.isEmpty(paramMap.get("jobCodes"))) {
+        if (BeanUtils.isEmpty(paramMap) || StringUtil.isEmpty(jobCodes)) {
             PageList pageList = new PageList();
             if (!BeanUtils.isEmpty(pageBean)) {
                 pageList.setPage(pageBean.getPage());
@@ -150,8 +152,8 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
             }
             return pageList;
         }
-
-        List<UcUser> userList = ucUserMapper.getByJobCodes(queryFilter.getParams());
+        paramMap.put("jobCodes", jobCodes.split(","));
+        List<UcUser> userList = ucUserMapper.getByJobCodes(paramMap);
         return new PageList(userList);
     }
 

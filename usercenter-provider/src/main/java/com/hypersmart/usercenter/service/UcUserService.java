@@ -23,14 +23,15 @@ import java.util.Set;
 @Service
 public interface UcUserService extends IGenericService<String, UcUser> {
 
-    UcUser getUserByUnitId(String unitId,String unitType);
+    UcUser getUserByUnitId(String unitId, String unitType);
 
     Set<UcUser> getDepUserByOrgCodeAndJobCode(String orgCode, String jobCode);
 
-    List<UcUser> queryUserByGradeAndDemCode(String userId,String grade, String DemensionCode, String fullname, String mobile);
+    List<UcUser> queryUserByGradeAndDemCode(String userId, String grade, String DemensionCode, String fullname, String mobile);
 
     /**
      * 根据组织和职务查询对应组织中的用户
+     *
      * @param queryFilter
      * @return
      */
@@ -38,10 +39,11 @@ public interface UcUserService extends IGenericService<String, UcUser> {
 
     /**
      * 根据职务编码查询对应的用户
+     *
      * @param queryFilter
      * @return
      */
-    PageList<UcUser> pagedQueryByJobCodes(QueryFilter queryFilter);
+    PageList<UcUser> pagedQueryByJobCodes(String jobCodes, QueryFilter queryFilter);
 
     UserDetailValue searchUserDetailByCondition(UserDetailRb userDetailRb);
 }

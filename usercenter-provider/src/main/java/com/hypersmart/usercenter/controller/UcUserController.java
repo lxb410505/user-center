@@ -144,8 +144,8 @@ public class UcUserController extends BaseController {
             RequestMethod.POST}, produces = {
             "application/json; charset=utf-8"})
     @ApiOperation(value = "根据职务编码查询对应的用户", httpMethod = "POST", notes = "根据职务编码查询对应的用户")
-    public PageList<UcUser> pagedQueryByJobCodes(QueryFilter queryFilter){
-        return ucUserService.pagedQueryByJobCodes(queryFilter);
+    public PageList<UcUser> pagedQueryByJobCodes(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter, @ApiParam(name = "jobCodes", value = "职务编码（多个以英文逗号(,)隔开）") @RequestParam("jobCodes") String jobCodes) {
+        return ucUserService.pagedQueryByJobCodes(jobCodes, queryFilter);
     }
 
     @RequestMapping(value = {"userDetails"}, method = {
@@ -153,12 +153,12 @@ public class UcUserController extends BaseController {
             "application/json; charset=utf-8"})
     @ApiOperation(value = "通过用户id和地块id，获取信息", httpMethod = "POST", notes = "获取特定字段")
     public CommonResult<UserDetailValue> searchUserDetailByCondition(@RequestBody UserDetailRb userDetailRb) {
-        if(StringUtil.isEmpty(userDetailRb.getUserId())){
-            return new CommonResult<>(false,"用户信息为空");
-        }else if(StringUtil.isEmpty(userDetailRb.getDevideId())){
-            return new CommonResult<>(false,"地块信息为空");
+        if (StringUtil.isEmpty(userDetailRb.getUserId())) {
+            return new CommonResult<>(false, "用户信息为空");
+        } else if (StringUtil.isEmpty(userDetailRb.getDevideId())) {
+            return new CommonResult<>(false, "地块信息为空");
         }
-        return new CommonResult<UserDetailValue>(true, "处理成功",ucUserService.searchUserDetailByCondition(userDetailRb), 200);
+        return new CommonResult<UserDetailValue>(true, "处理成功", ucUserService.searchUserDetailByCondition(userDetailRb), 200);
     }
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增用户管理信息", httpMethod = "POST", notes = "保存用户管理")
