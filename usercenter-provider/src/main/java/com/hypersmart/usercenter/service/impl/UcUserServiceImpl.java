@@ -142,7 +142,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
             PageHelper.startPage(1, Integer.MAX_VALUE, false);
         }
         Map<String, Object> paramMap = queryFilter.getParams();
-        if (BeanUtils.isEmpty(paramMap) || StringUtil.isEmpty(jobCodes)) {
+        if (StringUtil.isEmpty(jobCodes)) {
             PageList pageList = new PageList();
             if (!BeanUtils.isEmpty(pageBean)) {
                 pageList.setPage(pageBean.getPage());
