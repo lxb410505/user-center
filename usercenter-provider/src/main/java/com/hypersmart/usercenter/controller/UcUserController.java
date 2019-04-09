@@ -140,6 +140,14 @@ public class UcUserController extends BaseController {
         return ucUserService.searchUserByCondition(queryFilter);
     }
 
+    @RequestMapping(value = {"pagedQueryByJobCodes"}, method = {
+            RequestMethod.POST}, produces = {
+            "application/json; charset=utf-8"})
+    @ApiOperation(value = "根据职务编码查询对应的用户", httpMethod = "POST", notes = "根据职务编码查询对应的用户")
+    public PageList<UcUser> pagedQueryByJobCodes(QueryFilter queryFilter){
+        return ucUserService.pagedQueryByJobCodes(queryFilter);
+    }
+
     @RequestMapping(value = {"userDetails"}, method = {
             RequestMethod.POST}, produces = {
             "application/json; charset=utf-8"})

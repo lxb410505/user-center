@@ -36,6 +36,13 @@ public interface UcUserService extends IGenericService<String, UcUser> {
      */
     PageList<UcUser> searchUserByCondition(QueryFilter queryFilter);
 
+    /**
+     * 根据职务编码查询对应的用户
+     * @param queryFilter
+     * @return
+     */
+    PageList<UcUser> pagedQueryByJobCodes(QueryFilter queryFilter);
+
     UserDetailValue searchUserDetailByCondition(UserDetailRb userDetailRb);
 }
 

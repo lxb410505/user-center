@@ -47,5 +47,10 @@ public interface UcUserMapper extends GenericMapper<UcUser> {
      */
     List<String> serchUserJobsByUserId(@Param("uId") String uId,@Param("oId") String oId);
 
-
+    /**
+     * 根据职务编码查询对应的用户
+     * @param params
+     * @return
+     */
+    List<UcUser> getByJobCodes(Map<String, Object> params);
 }

@@ -99,6 +99,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
      * @param queryFilter
      * @return
      */
+    @Override
     public PageList<UcUser> searchUserByCondition(QueryFilter queryFilter) {
         queryFilter.setClazz(UcUser.class);
         PageBean pageBean = queryFilter.getPageBean();
@@ -121,6 +122,36 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
         }
 
         List<UcUser> userList = ucUserMapper.searchUserByCondition(queryFilter.getParams());
+        return new PageList(userList);
+    }
+
+    /**
+     * 根据职务编码查询对应的用户
+     * @param queryFilter
+     * @return
+     */
+    @Override
+    public PageList<UcUser> pagedQueryByJobCodes(QueryFilter queryFilter) {
+        queryFilter.setClazz(UcUser.class);
+        PageBean pageBean = queryFilter.getPageBean();
+        if (!BeanUtils.isEmpty(pageBean)) {
+            PageHelper.startPage(pageBean.getPage(), pageBean.getPageSize(), pageBean.showTotal());
+        } else {
+            PageHelper.startPage(1, Integer.MAX_VALUE, false);
+        }
+        Map<String, Object> paramMap = queryFilter.getParams();
+        if (BeanUtils.isEmpty(paramMap) || BeanUtils.isEmpty(paramMap.get("jobCodes"))) {
+            PageList pageList = new PageList();
+            if (!BeanUtils.isEmpty(pageBean)) {
+                pageList.setPage(pageBean.getPage());
+                pageList.setPageSize(pageBean.getPageSize());
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0L);
+            }
+            return pageList;
+        }
+
+        List<UcUser> userList = ucUserMapper.getByJobCodes(queryFilter.getParams());
         return new PageList(userList);
     }
 
