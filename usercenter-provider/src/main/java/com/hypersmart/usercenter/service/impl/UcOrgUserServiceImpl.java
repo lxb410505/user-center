@@ -313,4 +313,14 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         }
         return null;
     }
+
+    @Override
+    public List<UcOrgUser> getUserDefaultOrg(String userId) {
+        return ucOrgUserMapper.getUserDefaultOrg(userId);
+    }
+
+    @Override
+    public List<UcOrgUser> getUserDefaultOrgByRef(String userId) {
+        return ucOrgUserMapper.getUserDefaultOrgByRef(userId);
+    }
 }

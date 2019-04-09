@@ -60,7 +60,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     public List<UcOrg> getUserOrgList(String userId) {
         QueryFilter queryFilter = QueryFilter.build();
         //根据用户查询人与组织关系
-        List<UcOrgUser> list = ucOrgUserService.getUserOrg(userId);
+        List<UcOrgUser> list =ucOrgUserService.getUserOrg(userId);
         if (null == list || list.size() <= 0) {
             return new ArrayList<>();
         }
@@ -282,5 +282,86 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
             }
         }
         return ucOrgs;
+    }
+
+
+    //获取用户默认维度组织，以及条线对应的默认组织的合集
+    public List<UcOrg> getUserOrgListMerge(String userId) {
+        QueryFilter queryFilter = QueryFilter.build();
+        //查询用户所在默认维度组织
+        List<UcOrgUser> list=new ArrayList<>();
+        List<UcOrgUser> list1 =ucOrgUserService.getUserDefaultOrg(userId);
+
+        //查询用户所在非默认维度组织的引用默认组织（查询用户所在条线对应的默认组织，只查询地块级别）
+        List<UcOrgUser> list2 =ucOrgUserService.getUserDefaultOrgByRef(userId);
+        if(list1!=null&& list1.size()>0){
+            list.addAll(list1);
+        }
+        if(list2!=null&& list2.size()>0){
+            list.addAll(list2);
+        }
+
+        if (null == list || list.size() <= 0) {
+            return new ArrayList<>();
+        }
+        String orgIds = "";
+        //去重
+        List<String> fullOrgIds = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            String tempId=list.get(i).getOrgId();
+            if (!fullOrgIds.contains(tempId)) {
+                if (i == 0) {
+                    orgIds =tempId;
+                } else {
+                    orgIds = orgIds + "," +tempId;
+                }
+                fullOrgIds.add(tempId);
+            }
+        }
+
+        //根据组织id获取组织信息
+        QueryFilter orgQuery = QueryFilter.build();
+        orgQuery.addFilter("id", orgIds, QueryOP.IN, FieldRelation.AND);
+        orgQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+        List<UcOrg> returnList = this.query(orgQuery).getRows();
+        //根据组织获取子级
+        List<UcOrg> set = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
+        for (UcOrg ucOrg : returnList) {
+            QueryFilter childQuery = QueryFilter.build();
+            childQuery.addFilter("path", ucOrg.getPath(), QueryOP.RIGHT_LIKE, FieldRelation.AND);
+            childQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+            List<UcOrg> orgs = this.query(childQuery).getRows();
+            for (UcOrg org : orgs) {
+                if (!ids.contains(org.getId())) {
+                    org.setDisabled("1");
+                    set.add(org);
+                    ids.add(org.getId());
+                }
+            }
+            if (!ids.contains(ucOrg.getId())) {
+                ucOrg.setDisabled("1");
+                set.add(ucOrg);
+                ids.add(ucOrg.getId());
+            }
+        }
+        //根据组织查询父级组织
+        for (UcOrg ucOrg : returnList) {
+            String[] paths = ucOrg.getPath().split("\\.");
+            for (int i = 0; i < paths.length; i++) {
+                QueryFilter query = QueryFilter.build();
+                query.addFilter("id", paths[i], QueryOP.EQUAL, FieldRelation.AND);
+                query.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+                List<UcOrg> voList = this.query(query).getRows();
+                for (UcOrg vo : voList) {
+                    if (!ids.contains(vo.getId())) {
+                        vo.setDisabled("2");
+                        set.add(vo);
+                        ids.add(vo.getId());
+                    }
+                }
+            }
+        }
+        return set;
     }
 }

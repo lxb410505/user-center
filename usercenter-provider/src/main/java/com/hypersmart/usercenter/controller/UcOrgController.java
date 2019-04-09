@@ -207,6 +207,12 @@ public class UcOrgController extends BaseController {
        return ucOrgService.getUserOrgList(userId);
     }
 
+    @GetMapping({"/userListMerge/{id}"})
+    @ApiOperation(value = "组织架构数据列表包含条线的引用}", httpMethod = "GET", notes = "组织架构数据列表包含条线的引用")
+    public List<UcOrg> userListMerge(@PathVariable("id") String userId) {
+        return ucOrgService.getUserOrgListMerge(userId);
+    }
+
 
     //根据用户Id和组织父级id查询组织信息
     @PostMapping({"/queryChildrenByUserId"})
