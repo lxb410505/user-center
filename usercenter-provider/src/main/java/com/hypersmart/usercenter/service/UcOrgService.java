@@ -45,5 +45,8 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
      */
     List<UcOrgExtend> getAllDimOrgListByOrg(UcOrgBO query);
 
+    //获取用户默认维度组织，以及条线对应的默认组织的合集
+    List<UcOrg> getUserOrgListMerge(String userId);
+
 }
 

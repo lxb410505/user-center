@@ -5,24 +5,27 @@ import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
+import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.StringUtil;
+import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
+import com.hypersmart.usercenter.dto.UserDetailRb;
+import com.hypersmart.usercenter.dto.UserDetailValue;
 import com.hypersmart.usercenter.model.GradeDemCode;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.service.UcOrgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import com.hypersmart.framework.model.ResponseData;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.naming.Context;
 
 import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.usercenter.service.UcUserService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +53,8 @@ public class UcUserController extends BaseController {
     }
 
     /**
-     *查询所有未删除的用户列表
+     * 查询所有未删除的用户列表
+     *
      * @return
      */
     @PostMapping({"/allList"})
@@ -67,8 +71,10 @@ public class UcUserController extends BaseController {
         return this.ucUserService.get(id);
     }
 
+
     /**
      * 设置当前组织
+     *
      * @param orgId
      * @return
      */
@@ -95,10 +101,10 @@ public class UcUserController extends BaseController {
 
     /**
      * 通过组织编码和职务编码，深度获取用户
+     *
      * @param orgCode
      * @param jobCode
-     * @return
-     * 编辑人--》李良亚
+     * @return 编辑人--》李良亚
      */
     @GetMapping({"/getDepUserByOrgCodeAndJobCode"})
     @ApiOperation(value = "通过组织编码和职务编码，深度获取用户", httpMethod = "GET", notes = "深度获取用户")
@@ -110,17 +116,18 @@ public class UcUserController extends BaseController {
     @PostMapping({"/queryUserByGradeAndDemCode"})
     @ApiOperation(value = "根据组织和用户有权看到的条线，查询人员接口}", httpMethod = "POST", notes = "查询人员接口")
     public List<UcUser> queryUserByGradeAndDemCode(@RequestBody GradeDemCode gradeDemCode) {
-        String userId=gradeDemCode.getUserId();
-        String grade=gradeDemCode.getGrade();
-        String DemensionCode=gradeDemCode.getDemensionCode();
-        String fullname=gradeDemCode.getFullname();
-        String mobile=gradeDemCode.getMobile();
-        List<UcUser> ucUsers = this.ucUserService.queryUserByGradeAndDemCode(userId,grade,DemensionCode,fullname,mobile);
+        String userId = gradeDemCode.getUserId();
+        String grade = gradeDemCode.getGrade();
+        String DemensionCode = gradeDemCode.getDemensionCode();
+        String fullname = gradeDemCode.getFullname();
+        String mobile = gradeDemCode.getMobile();
+        List<UcUser> ucUsers = this.ucUserService.queryUserByGradeAndDemCode(userId, grade, DemensionCode, fullname, mobile);
         return ucUsers;
     }
 
     /**
      * 根据组织和职务查询对应组织中的用户
+     *
      * @param queryFilter
      * @return
      */
@@ -129,8 +136,21 @@ public class UcUserController extends BaseController {
             "application/json; charset=utf-8"})
     @ApiOperation(value = "根据组织和职务查询对应组织中的用户", httpMethod = "POST", notes = "根据组织和职务查询对应组织中的用户")
     public PageList<UcUser> searchUserByCondition(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody
-                                                          QueryFilter queryFilter){
+                                                          QueryFilter queryFilter) {
         return ucUserService.searchUserByCondition(queryFilter);
+    }
+
+    @RequestMapping(value = {"userDetails"}, method = {
+            RequestMethod.POST}, produces = {
+            "application/json; charset=utf-8"})
+    @ApiOperation(value = "通过用户id和地块id，获取信息", httpMethod = "POST", notes = "获取特定字段")
+    public CommonResult<UserDetailValue> searchUserDetailByCondition(@RequestBody UserDetailRb userDetailRb) {
+        if(StringUtil.isEmpty(userDetailRb.getUserId())){
+            return new CommonResult<>(false,"用户信息为空");
+        }else if(StringUtil.isEmpty(userDetailRb.getDevideId())){
+            return new CommonResult<>(false,"地块信息为空");
+        }
+        return new CommonResult<UserDetailValue>(true, "处理成功",ucUserService.searchUserDetailByCondition(userDetailRb), 200);
     }
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增用户管理信息", httpMethod = "POST", notes = "保存用户管理")

@@ -28,5 +28,9 @@ public interface UcOrgUserService extends IGenericService<String, UcOrgUser> {
     PageList<Map<String,Object>> quertList(QueryFilter queryFilter);
 
     UcOrgUser getByUserIdAndOrgId(String housekeeperId, String stagingId);
+
+    List<UcOrgUser> getUserDefaultOrg(String userId);
+
+    List<UcOrgUser> getUserDefaultOrgByRef(String userId);
 }
 
