@@ -216,7 +216,7 @@
             uc_user
         WHERE
             ID_ = (
-            SELECT
+            SELECT DISTINCT
                 housekeeper_id
             FROM
                 grid_basic_info info
@@ -229,12 +229,12 @@
 
     <select id="searchUserByCondition" resultMap="baseMap" parameterType="java.util.Map">
         select distinct u.ID_,u.FULLNAME_,u.ACCOUNT_,u.EMAIL_,u.MOBILE_,u.PHOTO_,u.STATUS_ from uc_user u
-        inner join uc_org_user uorg on u.ID_ = uorg.USER_ID_
+        inner join uc_org_user uorg on u.ID_ = uorg.USER_ID_ and uorg.IS_DELE_ = 0
         <if test="(jobIdList!=null and jobIdList.size > 0) || (posIdList!=null and posIdList.size > 0)">
-            inner join uc_org_post uorgp on uorg.ORG_ID_ = uorgp.ORG_ID_ and uorg.POS_ID_ = uorgp.id_
+            inner join uc_org_post uorgp on uorg.ORG_ID_ = uorgp.ORG_ID_ and uorg.POS_ID_ = uorgp.id_ and uorgp.IS_DELE_ = 0
         </if>
         <if test="(roleIdList!=null and roleIdList.size > 0)">
-            inner join uc_user_role ur on u.ID_ = ur.USER_ID_
+            inner join uc_user_role ur on u.ID_ = ur.USER_ID_ and ur.IS_DELE_ = 0
         </if>
         where u.IS_DELE_ = 0 and uorg.ORG_ID_ in
         <foreach collection="orgIdList" item="iOrgId" open="(" separator="," close=")">
@@ -262,7 +262,20 @@
             </foreach>
         </if>
         order by u.id_ asc
-
-
     </select>
+    <select id="serchUserJobsByUserId" resultType="java.lang.String">
+        select distinct   post.POS_NAME_ from uc_user u
+        JOIN uc_org_user ou on u.ID_ = ou.USER_ID_
+        JOIN uc_org o on ou.ORG_ID_ = o.ID_
+        JOIN uc_org_post post on post.ORG_ID_ = o.ID_
+        where u.IS_DELE_ &lt;&gt; 1 and ou.IS_DELE_  &lt;&gt; 1 and post.IS_DELE_ &lt;&gt; 1
+        <if test="uId!=null and uId!=''">
+            AND u.ID_ = #{uId}
+        </if>
+        <if test="oId!=null and oId!=''">
+            and o.ID_ = #{oId}
+        </if>
+    </select>
+
+
 </mapper>

@@ -35,6 +35,11 @@ public class UserCurrentOrgHistoryController extends BaseController {
     @Resource
         UserCurrentOrgHistoryService userCurrentOrgHistoryService;
 
+    /**
+     * 设置当前当前组织
+     * @param user
+     * @return
+     */
     @PostMapping("setCurrentOrg")
     public CommonResult<String> setCurrentOrg(@RequestBody UserCurrentOrgHistory user){
         CommonResult<String> commonResult = new CommonResult<>();
@@ -63,6 +68,11 @@ public class UserCurrentOrgHistoryController extends BaseController {
         return commonResult;
     }
 
+    /**
+     * 获取人员的当前组织接口
+     * @param userId
+     * @return
+     */
     @GetMapping("getCurrentOrg/{userId}")
     public CommonResult<String> getCurrentOrg(@PathVariable String userId){
         CommonResult<String> commonResult = new CommonResult<>();
