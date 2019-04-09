@@ -6,6 +6,8 @@ import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.base.util.BeanUtils;
+import com.hypersmart.base.util.StringUtil;
+import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.dto.UserDetailRb;
@@ -143,6 +145,11 @@ public class UcUserController extends BaseController {
             "application/json; charset=utf-8"})
     @ApiOperation(value = "通过用户id和地块id，获取信息", httpMethod = "POST", notes = "获取特定字段")
     public CommonResult<UserDetailValue> searchUserDetailByCondition(@RequestBody UserDetailRb userDetailRb) {
+        if(StringUtil.isEmpty(userDetailRb.getUserId())){
+            return new CommonResult<>(false,"用户信息为空");
+        }else if(StringUtil.isEmpty(userDetailRb.getDevideId())){
+            return new CommonResult<>(false,"地块信息为空");
+        }
         return new CommonResult<UserDetailValue>(true, "处理成功",ucUserService.searchUserDetailByCondition(userDetailRb), 200);
     }
 //    @PostMapping({"add"})
