@@ -198,7 +198,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
 
     //根据userId和组织父级id查询组织信息
     public List<UcOrgDTO> queryChildrenByUserId(String userId, String parentOrgId) {
-        List<UcOrg> orgList = this.getUserOrgList(userId);
+        List<UcOrg> orgList = this.getUserOrgListMerge(userId);//getUserOrgList--edit by lily
         if (orgList != null && orgList.size() > 0){
             if (StringUtils.isRealEmpty(parentOrgId)){
                 parentOrgId = "0";
