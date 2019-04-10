@@ -42,10 +42,9 @@ public class UcOrgPostController extends BaseController {
     public UcOrgPost get(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {
         return this.ucOrgPostService.get(id);
     }
-    @RequestMapping(value = { "/jobPage" }, method = {
-            RequestMethod.POST })
-    @ApiOperation(value = "获取职位列表}", httpMethod = "POST", notes = "获取获取职位列表")
-    PageList<ObjectNode> jobPage(@RequestBody QueryFilter filter){
+    @PostMapping("/jobPage")
+    @ApiOperation(value = "职位数据列表}", httpMethod = "POST", notes = "获取职位数据列表")
+    public PageList<ObjectNode> jobPage(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter filter){
         return ucOrgPostService.getJobPage(filter);
     }
 
