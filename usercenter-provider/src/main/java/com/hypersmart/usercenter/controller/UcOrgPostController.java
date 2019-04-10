@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.controller;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
@@ -41,7 +42,12 @@ public class UcOrgPostController extends BaseController {
     public UcOrgPost get(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {
         return this.ucOrgPostService.get(id);
     }
-
+    @RequestMapping(value = { "/jobPage" }, method = {
+            RequestMethod.POST })
+    @ApiOperation(value = "获取职位列表}", httpMethod = "POST", notes = "获取获取职位列表")
+    PageList<ObjectNode> jobPage(@RequestBody QueryFilter filter){
+        return ucOrgPostService.getJobPage(filter);
+    }
 
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增部门岗位信息", httpMethod = "POST", notes = "保存部门岗位")
