@@ -3,8 +3,8 @@
 
 <mapper namespace="com.hypersmart.usercenter.mapper.UcOrgPostMapper">
     <select id="getJobPage" resultType="java.util.Map">
-        select * from uc_org_job t1
-join uc_org_post t2  on  t1.ID_=t2.JOB_ID_
+        select t1.ID_ id ,t1.name_ name,t1.CODE_ code,t1.VERSION_ version,t1.UPDATE_TIME_ updateTime from uc_org_job t1
+        join uc_org_post t2  on  t1.ID_=t2.JOB_ID_
         <where>
             t1.IS_DELE_='0' and t2.IS_DELE_='0'
             <if test="whereSql">
