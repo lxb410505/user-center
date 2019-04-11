@@ -6,8 +6,9 @@
         select * from uc_org_job t1
 join uc_org_post t2  on  t1.ID_=t2.JOB_ID_
         <where>
+            t1.IS_DELE_='0' and t2.IS_DELE_='0'
             <if test="whereSql">
-                ${whereSql}
+               and ${whereSql}
             </if>
             <if test="orderSql">
                 order by ${orderSql}
