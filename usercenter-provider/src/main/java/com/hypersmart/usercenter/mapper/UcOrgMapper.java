@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.security.core.parameters.P;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 组织架构
@@ -38,4 +39,6 @@ public interface UcOrgMapper extends GenericMapper<UcOrg> {
     List<UcOrgDTO> getByIdsAndParentId(@Param("ids") List<String> list2,@Param("parentId") String parentOrgId);
 
     String getCodeById(@Param("orgId") String parentOrgId);
+
+    List<UcOrg> getChildrenOrgByCondition(@Param("path")String path, @Param("ids")Set<String> ids, @Param("grade")String grade);
 }

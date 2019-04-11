@@ -244,6 +244,20 @@ public class UcOrgController extends BaseController {
         return ucOrgService.queryChildrenByUserId(userId,parentOrgId);
     }
 
+    /**
+     *  根据用户id和组织id获取下级组织信息
+     */
+    @GetMapping({"/queryChildrenByCondition"})
+    public List<UcOrg> queryChildrenByCondition(@RequestParam String userId,
+                                                   @RequestParam String orgId,
+                                                   @RequestParam(required = false) String grade
+    ) {
+        if(com.hypersmart.base.util.StringUtil.isEmpty(grade)){
+            grade =null;
+        }
+        return ucOrgService.queryChildrenByCondition(userId,orgId,grade);
+    }
+
     //根据组织级别查询组织信息
     @PostMapping({"/queryByGrade"})
     public List<UcOrg> queryByGrade(@RequestBody UserIdGrade userIdGrade) {

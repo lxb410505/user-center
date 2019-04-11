@@ -505,4 +505,39 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         }
         return set;
     }
+
+
+    public List<UcOrg> queryChildrenByCondition(String userId,String orgId,String grade) {
+
+
+        UcOrg org= this.ucOrgMapper.get(orgId);
+        if(org==null){
+            return new ArrayList<>();
+        }
+
+        Set<String> list=new HashSet<String>();
+        List<UcOrgUser> list1 =ucOrgUserService.getUserDefaultOrg(userId);
+        //查询用户所在非默认维度组织的引用默认组织（查询用户所在条线对应的默认组织，只查询地块级别）
+        List<UcOrgUser> list2 =ucOrgUserService.getUserDefaultOrgByRef(userId);
+
+
+        if(list1!=null && list1.size()>0){
+           for(UcOrgUser o1 : list1){
+               list.add(o1.getOrgId());
+           }
+        }
+        if(list2!=null && list2.size()>0){
+            for(UcOrgUser o2 : list2){
+                list.add(o2.getOrgId());
+            }
+        }
+
+        if (null == list || list.size() <= 0) {
+            return new ArrayList<>();
+        }
+
+        return  ucOrgMapper.getChildrenOrgByCondition(org.getPath(),list,grade);
+
+
+    }
 }
