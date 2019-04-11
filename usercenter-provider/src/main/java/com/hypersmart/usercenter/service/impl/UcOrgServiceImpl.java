@@ -505,4 +505,33 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         }
         return set;
     }
+
+
+    public List<UcOrg> queryChildrenByCondition(String userId,String orgId,String grade) {
+
+
+        UcOrg org= this.ucOrgMapper.get(orgId);
+        if(org==null){
+            return new ArrayList<>();
+        }
+
+        Set<String> list=new HashSet<String>();
+        List<UcOrg> list1 =getUserOrgListMerge(userId);
+
+        if(list1!=null && list1.size()>0){
+           for(UcOrg o : list1){
+               if("1".equals(o.getDisabled())){
+                   list.add(o.getId());
+               }
+           }
+        }
+
+        if (null == list || list.size() <= 0) {
+            return new ArrayList<>();
+        }
+
+        return  ucOrgMapper.getChildrenOrgByCondition(org.getPath(),list,grade);
+
+
+    }
 }

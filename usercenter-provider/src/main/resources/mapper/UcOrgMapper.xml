@@ -131,4 +131,20 @@
         <include refid="BaseTable"/>
         where ID_ = #{orgId}
     </select>
+
+    <select id="getChildrenOrgByCondition" resultMap="UcOrg">
+        select
+        <include refid="BaseAttribute"/>
+        from
+        <include refid="BaseTable"/>
+        where PATH_ like concat(#{path},"%")
+        and ID_ in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        <if test="grade!=null">
+            and GRADE_ = #{grade}
+        </if>
+    </select>
+
 </mapper>
