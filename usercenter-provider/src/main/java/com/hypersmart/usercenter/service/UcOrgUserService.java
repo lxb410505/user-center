@@ -32,5 +32,13 @@ public interface UcOrgUserService extends IGenericService<String, UcOrgUser> {
     List<UcOrgUser> getUserDefaultOrg(String userId);
 
     List<UcOrgUser> getUserDefaultOrgByRef(String userId);
+
+
+    /**
+     * 根据用户和区域查询其下所有地块
+     * @param queryFilter
+     * @return
+     */
+    List<Map<String, Object>> getOrgByCondition(QueryFilter queryFilter);
 }
 

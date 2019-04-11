@@ -3,13 +3,17 @@ package com.hypersmart.usercenter.service.impl;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.query.QueryOP;
+import com.hypersmart.base.util.ContextUtils;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.usercenter.model.UcOrgPost;
 import com.hypersmart.usercenter.mapper.UcOrgPostMapper;
 import com.hypersmart.usercenter.service.UcOrgPostService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +35,31 @@ public class UcOrgPostServiceImpl extends GenericService<String, UcOrgPost> impl
 
     @Override
     public PageList<ObjectNode> getJobPage(QueryFilter filter) {
+        Object orgId = ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
+        PageList<ObjectNode> pageList=new PageList<>();
+        filter.addFilter("ORG_ID_",orgId, QueryOP.EQUAL);
         Map<String, Object> params = filter.getParams();
+
+        if (null == filter.getPageBean() || null == filter.getPageBean().getPageSize()
+                || null == filter.getPageBean().getPage()) {
+            pageList.setPage(1);
+            pageList.setPageSize(20);
+        } else {
+            pageList.setPage(filter.getPageBean().getPage());
+            pageList.setPageSize(filter.getPageBean().getPageSize());
+        }
+
         List<Map<String,Object>> list =ucOrgPostMapper.getJobPage(params);
+
+
+        if(CollectionUtils.isEmpty(list)){
+            pageList.setTotal(0);
+            pageList.setRows(new ArrayList<>());
+            pageList.setPage(1);
+            pageList.setPageSize(20);
+            return pageList;
+
+        }
         return new PageList(list);
     }
 }

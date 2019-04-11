@@ -26,4 +26,11 @@ public interface UcOrgUserMapper extends GenericMapper<UcOrgUser> {
 
     List<UcOrgUser> getUserDefaultOrgByRef(@Param("userId") String userId);
 
+
+    /**
+     * 根据用户和区域查询其下所有地块
+     * @param params
+     * @return
+     */
+    List<Map<String, Object>> getOrgByCondition(Map<String, Object> params);
 }
