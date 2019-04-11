@@ -66,4 +66,17 @@
 
     </select>
 
+    <select id="getOrgByCondition" resultType="java.util.Map">
+        select  t2.*  from uc_org_user t1
+        join uc_org t2 on t1.ORG_ID_=t2.ID_
+        <where>
+            t1.IS_DELE_='0' and t2.IS_DELE_='0'
+            <if test="whereSql">
+                and ${whereSql}
+            </if>
+            <if test="orderSql">
+                order by ${orderSql}
+            </if>
+        </where>
+    </select>
 </mapper>

@@ -319,4 +319,10 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
     public List<UcOrgUser> getUserDefaultOrgByRef(String userId) {
         return ucOrgUserMapper.getUserDefaultOrgByRef(userId);
     }
+    @Override
+    public List<Map<String, Object>> getOrgByCondition(QueryFilter queryFilter) {
+        Map<String, Object> params = queryFilter.getParams();
+        return  ucOrgUserMapper.getOrgByCondition(params);
+    }
+
 }

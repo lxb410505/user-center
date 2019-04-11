@@ -72,7 +72,11 @@ public class UcOrgUserController extends BaseController {
         return this.ucOrgUserService.get(id);
     }
 
-
+    @PostMapping({"/orgList"})
+    @ApiOperation(value = "获取用户地块数据列表}", httpMethod = "POST", notes = "获取用户地块数据列表")
+    public List<Map<String, Object>> getOrgByCondition(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+        return this.ucOrgUserService.getOrgByCondition(queryFilter);
+    }
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增用户组织关系信息", httpMethod = "POST", notes = "保存用户组织关系")
 //    public CommonResult<String> post(@ApiParam(name = "ucOrgUser", value = "用户组织关系业务对象", required = true) @RequestBody UcOrgUser model) {
