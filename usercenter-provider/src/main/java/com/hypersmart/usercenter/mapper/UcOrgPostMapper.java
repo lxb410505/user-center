@@ -4,6 +4,9 @@ import com.hypersmart.usercenter.model.UcOrgPost;
 import com.hypersmart.framework.mapper.GenericMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * 部门岗位
  * 
@@ -14,4 +17,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UcOrgPostMapper extends GenericMapper<UcOrgPost> {
 
+    List<Map<String, Object>> getJobPage(Map<String, Object> params);
 }

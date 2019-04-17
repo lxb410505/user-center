@@ -7,7 +7,7 @@ spring:
       maxRequestSize: 1024MB
   datasource:
     name: ${spring.profiles.active}
-    url: jdbc:mysql://db.ldnext.com:3306/x7_uc_uat?serverTimezone=UTC&useSSL=false&&characterEncoding=UTF-8
+    url: jdbc:mysql://db.ldnext.com:3306/uc?serverTimezone=UTC&useSSL=false&&characterEncoding=UTF-8
     username: root
     password: 5tgbNHY^
     # 使用druid数据源
@@ -104,3 +104,11 @@ system:
 
 grid:
   code: guanjia
+
+flow:
+  url: http://172.16.0.108:6666/k2/callK2
+  db:
+    portal: portal
+  const:
+    grid-type: grid_type
+    format-attribute: format_attribute

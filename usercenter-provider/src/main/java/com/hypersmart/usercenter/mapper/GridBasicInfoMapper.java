@@ -29,6 +29,14 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
 
 
     /**
+     * 网格分页查询（管家关联网格）
+     * @param map
+     * @return
+     */
+    List<Map<String, Object>> queryAssociateList(Map<String, Object> map);
+
+
+    /**
      * 根据管家id和分期id获得 网格id和名称
      * @param houseKeeperBO
      * @return

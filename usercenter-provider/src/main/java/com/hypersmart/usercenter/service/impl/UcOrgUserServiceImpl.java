@@ -160,22 +160,17 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
 //            return pageList;
 //        }
         //===============================================================================================
-        PageBean pageBean = queryFilter.getPageBean();
-        if (BeanUtils.isEmpty(pageBean)) {
-            PageHelper.startPage(1, Integer.MAX_VALUE, false);
-        } else {
-            PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
-                    pageBean.showTotal());
-        }
-
-        if (BeanUtils.isEmpty(pageBean)) {
-            PageHelper.startPage(1, Integer.MAX_VALUE, false);
-        } else {
-            PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
-                    pageBean.showTotal());
-        }
         UcOrg ucOrg = ucOrgService.get(orgId.toString());
         if(null!= ucOrg){
+
+            PageBean pageBean = queryFilter.getPageBean();
+            if (BeanUtils.isEmpty(pageBean)) {
+                PageHelper.startPage(1, Integer.MAX_VALUE, false);
+            } else {
+                PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
+                        pageBean.showTotal());
+            }
+
             String path = ucOrg.getPath();
             String pathpli = path.replace(".","");
             int num = path.length()-pathpli.length();
@@ -200,6 +195,7 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         }
     }
 
+    @Override
     public PageList<Map<String, Object>> quertList(QueryFilter queryFilter) {
 
         /**
@@ -313,4 +309,30 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         }
         return null;
     }
+
+    @Override
+    public List<UcOrgUser> getUserDefaultOrg(String userId) {
+        return ucOrgUserMapper.getUserDefaultOrg(userId);
+    }
+
+    @Override
+    public List<UcOrgUser> getUserDefaultOrgByRef(String userId) {
+        return ucOrgUserMapper.getUserDefaultOrgByRef(userId);
+    }
+    @Override
+    public List<Map<String, Object>> getOrgByCondition(QueryFilter queryFilter) {
+        String userId = ContextUtil.getCurrentUserId();
+        List<UcOrgUser> list = getUserOrg(userId);
+        Map<String, Object> params;
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        for (UcOrgUser orgUser : list) {
+
+            params = queryFilter.getParams();
+            params.put("sy",orgUser.getOrgId());
+           resultList.addAll(ucOrgUserMapper.getOrgByCondition(params));
+        }
+
+        return  resultList;
+    }
+
 }
