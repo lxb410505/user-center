@@ -321,8 +321,18 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
     }
     @Override
     public List<Map<String, Object>> getOrgByCondition(QueryFilter queryFilter) {
-        Map<String, Object> params = queryFilter.getParams();
-        return  ucOrgUserMapper.getOrgByCondition(params);
+        String userId = ContextUtil.getCurrentUserId();
+        List<UcOrgUser> list = getUserOrg(userId);
+        Map<String, Object> params;
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        for (UcOrgUser orgUser : list) {
+
+            params = queryFilter.getParams();
+            params.put("sy",orgUser.getOrgId());
+           resultList.addAll(ucOrgUserMapper.getOrgByCondition(params));
+        }
+
+        return  resultList;
     }
 
 }

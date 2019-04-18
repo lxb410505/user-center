@@ -67,10 +67,9 @@
     </select>
 
     <select id="getOrgByCondition" resultType="java.util.Map">
-        select  t2.*  from uc_org_user t1
-        join uc_org t2 on t1.ORG_ID_=t2.ID_
+        select * from uc_org
         <where>
-            t1.IS_DELE_='0' and t2.IS_DELE_='0'
+            IS_DELE_='0' and PATH_ LIKE CONCAT('%', #{sy}, '%')
             <if test="whereSql">
                 and ${whereSql}
             </if>
