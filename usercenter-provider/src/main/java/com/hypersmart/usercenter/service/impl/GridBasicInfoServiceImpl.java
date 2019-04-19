@@ -430,10 +430,5 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		return GridErrorCode.SUCCESS;
 	}
 
-	@Override
-	public List<GridBasicInfo> getBasicInfo(QueryFilter queryFilter) {
-		Map<String, Object> params = queryFilter.getParams();
-		return gridBasicInfoMapper.getBasicInfo(params);
-
-	}
+	
 }

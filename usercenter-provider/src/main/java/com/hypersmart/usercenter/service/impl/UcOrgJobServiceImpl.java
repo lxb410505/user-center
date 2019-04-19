@@ -51,4 +51,10 @@ public class UcOrgJobServiceImpl extends GenericService<String, UcOrgJob> implem
         List<UcOrgJob> query = this.orgJobMapper.filterJobByOrgId(queryFilter.getParams());
         return new PageList<>(query);
     }
+
+    @Override
+    public List<Map<String, Object>> checkPermission(QueryFilter queryFilter) {
+        Map<String, Object> params = queryFilter.getParams();
+        return orgJobMapper.checkPermission(params);
+    }
 }

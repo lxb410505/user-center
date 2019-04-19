@@ -65,9 +65,9 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
     Integer deleteGridInfo(GridBasicInfoBO gridBasicInfoBO);
 
     /**
-     * 按条件查询网格
+     * 检查用户是否用户指定权限
      * @param params
      * @return
      */
-    List<GridBasicInfo> getBasicInfo(Map<String, Object> params);
+    List<Map<String,Object>> checkPermission(Map<String, Object> params);
 }

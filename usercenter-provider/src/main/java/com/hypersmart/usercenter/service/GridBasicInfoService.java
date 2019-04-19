@@ -131,11 +131,5 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	GridErrorCode disassociatedGrid(GridBasicInfoDTO gridBasicInfoDTO);
 
 
-	/**
-	 * 按条件查询网格
-	 * @param queryFilter
-	 * @return
-	 */
-	List<GridBasicInfo> getBasicInfo(QueryFilter queryFilter);
 }
 

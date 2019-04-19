@@ -22,5 +22,12 @@ public interface UcOrgJobService extends IGenericService<String, UcOrgJob> {
      * @return
      */
     PageList<UcOrgJob> filterJobByOrgId(QueryFilter queryFilter);
+
+    /**
+     * 检查指定用户是否有用指定权限
+     * @param queryFilter
+     * @return
+     */
+    List<Map<String,Object>> checkPermission(QueryFilter queryFilter);
 }
 
