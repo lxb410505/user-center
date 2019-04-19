@@ -207,6 +207,9 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
             String parentCode = "";
             for (UcOrg ucOrg : orgList){
                 if (parentOrgId.equals(ucOrg.getParentId())){
+                    if("ORG_XingZheng".equals(ucOrg.getGrade())){
+                        continue;//（排除行政组织）--edit by lily 0417
+                    }
                     UcOrgDTO ucOrgDTO = new UcOrgDTO();
                     BeanUtils.copyProperties(ucOrg, ucOrgDTO);
                     if (StringUtils.isRealEmpty(parentCode)){
