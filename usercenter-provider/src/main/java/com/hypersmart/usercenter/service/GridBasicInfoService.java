@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.service;
 
+import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.framework.service.IGenericService;
@@ -128,5 +129,13 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 * @return
 	 */
 	GridErrorCode disassociatedGrid(GridBasicInfoDTO gridBasicInfoDTO);
+
+
+	/**
+	 * 按条件查询网格
+	 * @param queryFilter
+	 * @return
+	 */
+	List<GridBasicInfo> getBasicInfo(QueryFilter queryFilter);
 }
 

@@ -257,4 +257,18 @@
         </foreach>
     </update>
 
+    <select id="getBasicInfo" resultMap="DtoResultMap" >
+        select * from grid_basic_info
+
+        <where>
+            is_deleted=0
+            <if test="whereSql!=null">
+              and  ${whereSql}
+            </if>
+        </where>
+        <if test="orderBySql!=null">
+            ORDER BY ${orderBySql}
+        </if>
+    </select>
+
 </mapper>

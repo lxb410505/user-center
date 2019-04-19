@@ -19,6 +19,7 @@ import com.hypersmart.usercenter.service.UcOrgUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,6 +71,18 @@ public class GridBasicInfoController extends BaseController {
 		return this.gridBasicInfoService.quertList(queryFilter, 1);
 	}
 
+
+	/**
+	 *
+	 *
+	 * @param queryFilter
+	 * @return
+	 */
+	@PostMapping({"/getBasicInfo"})
+	@ApiOperation(value = "用户组织关系数据列表(关联网格)", httpMethod = "POST", notes = "获取用户组织关系列表")
+	public  List<GridBasicInfo> getBasicInfo(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+		return  this.gridBasicInfoService.getBasicInfo(queryFilter);
+	}
 	/**
 	 * 新增网格
 	 *

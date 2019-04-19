@@ -63,4 +63,11 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
      * @return
      */
     Integer deleteGridInfo(GridBasicInfoBO gridBasicInfoBO);
+
+    /**
+     * 按条件查询网格
+     * @param params
+     * @return
+     */
+    List<GridBasicInfo> getBasicInfo(Map<String, Object> params);
 }

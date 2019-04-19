@@ -429,4 +429,11 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		gridApprovalRecordService.callApproval(GridOperateEnum.HOUSEKEEPER_DISASSOCIATED.getOperateType(), "", gridBasicInfoDTO);
 		return GridErrorCode.SUCCESS;
 	}
+
+	@Override
+	public List<GridBasicInfo> getBasicInfo(QueryFilter queryFilter) {
+		Map<String, Object> params = queryFilter.getParams();
+		return gridBasicInfoMapper.getBasicInfo(params);
+
+	}
 }
