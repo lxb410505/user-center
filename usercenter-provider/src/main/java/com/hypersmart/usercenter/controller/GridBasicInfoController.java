@@ -19,6 +19,7 @@ import com.hypersmart.usercenter.service.UcOrgUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,6 +70,7 @@ public class GridBasicInfoController extends BaseController {
 	public PageList<Map<String, Object>> queryAssociateList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
 		return this.gridBasicInfoService.quertList(queryFilter, 1);
 	}
+
 
 	/**
 	 * 新增网格

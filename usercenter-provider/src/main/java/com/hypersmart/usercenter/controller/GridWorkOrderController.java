@@ -58,7 +58,7 @@ public class GridWorkOrderController {
     public UcUser getUserByDivideId(@RequestParam("divideId") String divideId,@RequestParam("gridType")String gridType){
         if(StringUtil.isNotEmpty(divideId) && StringUtil.isNotEmpty(divideId)){
             QueryFilter query = QueryFilter.build();
-            query.addFilter("gridType",gridType, QueryOP.EQUAL,FieldRelation.AND);
+                query.addFilter("gridType",gridType, QueryOP.EQUAL,FieldRelation.AND);
             query.addFilter("stagingId",divideId,QueryOP.EQUAL,FieldRelation.AND);
             query.addFilter("housekeeperId","",QueryOP.NOTNULL,FieldRelation.AND);
             PageList<GridBasicInfo> page = gridBasicInfoService.query(query);

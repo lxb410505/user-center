@@ -28,4 +28,13 @@
         </foreach>
 
     </select>
+
+    <select id="checkPermission" resultType="java.util.Map" >
+      select * from uc_org_user t1
+join uc_org_post t3 on t3.ID_=t1.POS_ID_
+join uc_org_job t4 on t4.ID_=t3.JOB_ID_
+where t1.USER_ID_=#{userId} and t4.CODE_=#{code}   and t1.IS_DELE_=0 and t4.IS_DELE_=0
+
+
+    </select>
 </mapper>

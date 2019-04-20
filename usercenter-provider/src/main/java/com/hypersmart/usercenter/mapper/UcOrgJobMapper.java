@@ -24,4 +24,11 @@ public interface UcOrgJobMapper extends GenericMapper<UcOrgJob> {
      */
     List<UcOrgJob> filterJobByOrgId(Map<String, Object> paramMap);
 
+    /**
+     * 检查指定用户是否有用指定权限
+     * @param map
+     * @return
+     */
+    List<Map<String,Object>> checkPermission(Map<String,Object> map);
+
 }
