@@ -136,6 +136,12 @@ public class UcOrgController extends BaseController {
         return this.ucOrgService.query(queryFilter);
     }
 
+    @GetMapping({"/getDefaultOrgList"})
+    @ApiOperation(value = "组织架构数据列表}", httpMethod = "GET", notes = "获取组织架构列表")
+    public List<UcOrg> getDefaultOrgList() {
+        return this.ucOrgService.getDefaultOrgList();
+    }
+
     /**
      * 查询用户的关联的组织列表--》弃用，主要维护userList方法
      * @param map
