@@ -429,4 +429,6 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		gridApprovalRecordService.callApproval(GridOperateEnum.HOUSEKEEPER_DISASSOCIATED.getOperateType(), "", gridBasicInfoDTO);
 		return GridErrorCode.SUCCESS;
 	}
+
+	
 }

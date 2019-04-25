@@ -5,6 +5,7 @@ import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.util.StringUtil;
+import com.hypersmart.usercenter.model.GridBasicInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import com.hypersmart.framework.model.ResponseData;
@@ -55,6 +56,17 @@ public class UcOrgJobController extends BaseController {
         return this.ucOrgJobService.get(id);
     }
 
+    /**
+     *
+     *
+     * @param queryFilter
+     * @return
+     */
+    @PostMapping({"/checkPermission"})
+    @ApiOperation(value = "检查指定用户是否拥有指定的权限", httpMethod = "POST", notes = "获取用户组织关系列表")
+    public  List<Map<String,Object>> checkPermission(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+        return  this.ucOrgJobService.checkPermission(queryFilter);
+    }
 
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增职务定义信息", httpMethod = "POST", notes = "保存职务定义")
