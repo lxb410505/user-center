@@ -1,0 +1,82 @@
+package com.hypersmart.usercenter.controller;
+
+
+import com.hypersmart.base.controller.BaseController;
+import com.hypersmart.base.model.CommonResult;
+import com.hypersmart.base.query.PageBean;
+import com.hypersmart.base.query.PageList;
+import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.util.BeanUtils;
+import com.hypersmart.framework.utils.StringUtils;
+import com.hypersmart.usercenter.bo.GridBasicInfoBO;
+import com.hypersmart.usercenter.bo.HouseKeeperBO;
+import com.hypersmart.usercenter.constant.GridErrorCode;
+import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
+import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
+import com.hypersmart.usercenter.model.GridBasicInfo;
+import com.hypersmart.usercenter.model.UcUserWorkHistory;
+import com.hypersmart.usercenter.service.GridBasicInfoService;
+import com.hypersmart.usercenter.service.UcOrgUserService;
+import com.hypersmart.usercenter.service.UcUserWorkHistoryService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+
+/**
+ * 用户上下班记录
+ * @author liyong
+ */
+@RestController
+@RequestMapping(value = {"/api/usercenter/v1/ucWorkHistory"}, produces = {"application/json;charset=UTF-8"})
+@Api(tags = {"gridBasicInfoController"})
+public class UcWorkHistoryController extends BaseController {
+
+
+	@Autowired
+	private UcUserWorkHistoryService ucUserWorkHistoryService;
+
+	/**
+	 * 分页查询
+	 *
+	 * @param queryFilter
+	 * @return
+	 */
+	@PostMapping({"/list"})
+	@ApiOperation(value = "用户上下班历史列表}", httpMethod = "POST", notes = "用户上下班历史列表")
+	public PageList<UcUserWorkHistory> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+		return this.ucUserWorkHistoryService.query(queryFilter);
+
+	}
+
+
+	/**
+	 * 新增上下班记录
+	 *
+	 * @param
+	 * @return
+	 */
+	@PostMapping({"/save"})
+	@ApiOperation(value = "新增上下班记录", httpMethod = "POST", notes = "新增上下班记录")
+	public CommonResult<String> create(@ApiParam(name = "ucUserWorkHistory", value = "新增上下班记录", required = true) @RequestBody UcUserWorkHistory ucUserWorkHistory) {
+		CommonResult commonResult = new CommonResult();
+		int i = ucUserWorkHistoryService.insert(ucUserWorkHistory);
+		if (i>0) {
+			commonResult.setState(true);
+			commonResult.setMessage("新增成功！");
+		} else {
+			commonResult.setState(false);
+			commonResult.setMessage("新增失败");
+		}
+		return commonResult;
+	}
+
+}

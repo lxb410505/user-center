@@ -3,7 +3,7 @@ spring:
     platform: mysql
     base: com.hypersmart.usercenter.controller
   application:
-    name: user-center-eureka
+    name: user-center-eureka-liyong
 
 system:
   id:
