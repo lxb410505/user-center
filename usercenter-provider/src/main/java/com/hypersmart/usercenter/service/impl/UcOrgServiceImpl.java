@@ -1,6 +1,7 @@
 package com.hypersmart.usercenter.service.impl;
 
 import com.hypersmart.base.query.FieldRelation;
+import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.framework.service.GenericService;
@@ -122,7 +123,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     }
 
 
-    public List<UcOrg> getUserOrgList2(String userId){
+    public List<UcOrg> getUserOrgList2(String userId) {
         QueryFilter queryFilter = QueryFilter.build();
         //根据用户查询人与组织关系
         List<UcOrgUser> list = ucOrgUserService.getUserOrg(userId);
@@ -199,20 +200,20 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     //根据userId和组织父级id查询组织信息
     public List<UcOrgDTO> queryChildrenByUserId(String userId, String parentOrgId) {
         List<UcOrg> orgList = this.getUserOrgListMerge(userId);//getUserOrgList--edit by lily
-        if (orgList != null && orgList.size() > 0){
-            if (StringUtils.isRealEmpty(parentOrgId)){
+        if (orgList != null && orgList.size() > 0) {
+            if (StringUtils.isRealEmpty(parentOrgId)) {
                 parentOrgId = "0";
             }
             List<UcOrgDTO> ucOrgDTOList = new ArrayList<>();
             String parentCode = "";
-            for (UcOrg ucOrg : orgList){
-                if (parentOrgId.equals(ucOrg.getParentId())){
-                    if("ORG_XingZheng".equals(ucOrg.getGrade())){
+            for (UcOrg ucOrg : orgList) {
+                if (parentOrgId.equals(ucOrg.getParentId())) {
+                    if ("ORG_XingZheng".equals(ucOrg.getGrade())) {
                         continue;//（排除行政组织）--edit by lily 0417
                     }
                     UcOrgDTO ucOrgDTO = new UcOrgDTO();
                     BeanUtils.copyProperties(ucOrg, ucOrgDTO);
-                    if (StringUtils.isRealEmpty(parentCode)){
+                    if (StringUtils.isRealEmpty(parentCode)) {
                         parentCode = ucOrgMapper.getCodeById(parentOrgId);
                     }
                     ucOrgDTO.setParentCode(parentCode);
@@ -433,15 +434,15 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     public List<UcOrg> getUserOrgListMerge(String userId) {
         QueryFilter queryFilter = QueryFilter.build();
         //查询用户所在默认维度组织
-        List<UcOrgUser> list=new ArrayList<>();
-        List<UcOrgUser> list1 =ucOrgUserService.getUserDefaultOrg(userId);
+        List<UcOrgUser> list = new ArrayList<>();
+        List<UcOrgUser> list1 = ucOrgUserService.getUserDefaultOrg(userId);
 
         //查询用户所在非默认维度组织的引用默认组织（查询用户所在条线对应的默认组织，只查询地块级别）
-        List<UcOrgUser> list2 =ucOrgUserService.getUserDefaultOrgByRef(userId);
-        if(list1!=null&& list1.size()>0){
+        List<UcOrgUser> list2 = ucOrgUserService.getUserDefaultOrgByRef(userId);
+        if (list1 != null && list1.size() > 0) {
             list.addAll(list1);
         }
-        if(list2!=null&& list2.size()>0){
+        if (list2 != null && list2.size() > 0) {
             list.addAll(list2);
         }
 
@@ -452,12 +453,12 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         //去重
         List<String> fullOrgIds = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
-            String tempId=list.get(i).getOrgId();
+            String tempId = list.get(i).getOrgId();
             if (!fullOrgIds.contains(tempId)) {
                 if (i == 0) {
-                    orgIds =tempId;
+                    orgIds = tempId;
                 } else {
-                    orgIds = orgIds + "," +tempId;
+                    orgIds = orgIds + "," + tempId;
                 }
                 fullOrgIds.add(tempId);
             }
@@ -510,30 +511,53 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     }
 
 
-    public List<UcOrg> queryChildrenByCondition(String userId,String orgId,String grade) {
+    public List<UcOrg> queryChildrenByCondition(String userId, String orgId, String grade) {
 
 
-        UcOrg org= this.ucOrgMapper.get(orgId);
-        if(org==null){
+        UcOrg org = this.ucOrgMapper.get(orgId);
+        if (org == null) {
             return new ArrayList<>();
         }
 
-        Set<String> list=new HashSet<String>();
-        List<UcOrg> list1 =getUserOrgListMerge(userId);
+        Set<String> list = new HashSet<String>();
+        List<UcOrg> list1 = getUserOrgListMerge(userId);
 
-        if(list1!=null && list1.size()>0){
-           for(UcOrg o : list1){
-               if("1".equals(o.getDisabled())){
-                   list.add(o.getId());
-               }
-           }
+        if (list1 != null && list1.size() > 0) {
+            for (UcOrg o : list1) {
+                if ("1".equals(o.getDisabled())) {
+                    list.add(o.getId());
+                }
+            }
         }
 
         if (null == list || list.size() <= 0) {
             return new ArrayList<>();
         }
 
-        return  ucOrgMapper.getChildrenOrgByCondition(org.getPath(),list,grade);
+        return ucOrgMapper.getChildrenOrgByCondition(org.getPath(), list, grade);
+
+
+    }
+
+    public List<UcOrg> getDefaultOrgList() {
+
+        QueryFilter queryFilter = QueryFilter.build();
+        queryFilter.setPageBean(null);
+        queryFilter.addFilter("IS_DELE_", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("IS_DEFAULT_", 1, QueryOP.EQUAL, FieldRelation.AND);
+        PageList<UcDemension> demensionPageList = ucDemensionService.query(queryFilter);
+        if (demensionPageList.getRows().size() > 0) {
+            UcDemension demension = demensionPageList.getRows().get(0);
+
+            QueryFilter queryFilter2 = QueryFilter.build();
+            queryFilter2.setPageBean(null);
+            queryFilter2.addFilter("IS_DELE_", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+            queryFilter2.addFilter("DEM_ID_", demension.getId(), QueryOP.EQUAL, FieldRelation.AND);
+            PageList<UcOrg> pageList = this.query(queryFilter2);
+            return pageList.getRows();
+        } else {
+            return null;
+        }
 
 
     }

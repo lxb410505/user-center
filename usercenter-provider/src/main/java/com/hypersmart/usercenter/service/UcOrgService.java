@@ -50,6 +50,7 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
 
     List<UcOrg> queryChildrenByCondition(String userId,String orgId,String grade);
 
+    List<UcOrg> getDefaultOrgList();
 
 }
 
