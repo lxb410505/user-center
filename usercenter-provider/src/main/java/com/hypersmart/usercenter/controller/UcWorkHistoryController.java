@@ -13,13 +13,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 
 /**
@@ -27,7 +25,7 @@ import java.util.Date;
  * @author liyong
  */
 @RestController
-@RequestMapping(value = {"/api/usercenter/v1/ucWorkHistory"}, produces = {"application/json;charset=UTF-8"})
+@RequestMapping(value = {"/api/usercenter/v1/ucWorkHistory"})
 @Api(tags = {"ucWorkHistoryController"})
 public class UcWorkHistoryController extends BaseController {
 
@@ -43,27 +41,30 @@ public class UcWorkHistoryController extends BaseController {
 	 */
 	@PostMapping({"/list"})
 	@ApiOperation(value = "用户上下班历史列表}", httpMethod = "POST", notes = "用户上下班历史列表")
-	public PageList<UcUserWorkHistory> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+	public PageList<Map<String,Object>> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
 		queryFilter.setSorter(new ArrayList<FieldSort>(){{
 			add(new FieldSort("create_time", Direction.DESC));
 		}});
-		return this.ucUserWorkHistoryService.query(queryFilter);
+		return this.ucUserWorkHistoryService.queryPage(queryFilter);
 
 	}
 
 
 	/**
-	 * 新增上下班记录
-	 *
-	 * @param
-	 * @return
-	 */
-	@PostMapping({"/save"})
-	@ApiOperation(value = "新增上下班记录", httpMethod = "POST", notes = "新增上下班记录")
-	public CommonResult<String> create(@ApiParam(name = "ucUserWorkHistory", value = "新增上下班记录", required = true) @RequestBody UcUserWorkHistory ucUserWorkHistory) {
+     * 新增上下班记录
+     *
+     * @param
+     * @return
+     */
+    @GetMapping("save")
+    @ApiOperation(value = "新增上下班记录", httpMethod = "POST", notes = "新增上下班记录")
+    public CommonResult<String> create(@ApiParam(name = "ucUserWorkHistory", value = "新增上下班记录", required = true)  @RequestParam String status, @RequestParam String account) {
 		CommonResult commonResult = new CommonResult();
+		UcUserWorkHistory ucUserWorkHistory = new UcUserWorkHistory();
 		ucUserWorkHistory.setCreateBy(current());
 		ucUserWorkHistory.setCreateTime(new Date());
+		ucUserWorkHistory.setStatus(status);
+		ucUserWorkHistory.setAccount(account);
 		int i = ucUserWorkHistoryService.insert(ucUserWorkHistory);
 		if (i>0) {
 			commonResult.setState(true);

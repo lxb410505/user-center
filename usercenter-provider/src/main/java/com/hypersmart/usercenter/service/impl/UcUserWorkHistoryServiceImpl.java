@@ -1,19 +1,22 @@
 package com.hypersmart.usercenter.service.impl;
 
-import com.hypersmart.base.exception.SystemException;
+import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.query.PageBean;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.framework.mapper.GenericMapper;
-import com.hypersmart.framework.model.Pagination;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.usercenter.mapper.UcUserWorkHistoryMapper;
-import com.hypersmart.usercenter.model.UcOrgUser;
-import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.usercenter.model.UcUserWorkHistory;
 import com.hypersmart.usercenter.service.UcUserWorkHistoryService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -30,5 +33,26 @@ public class UcUserWorkHistoryServiceImpl extends GenericService<String, UcUserW
 
     public UcUserWorkHistoryServiceImpl(GenericMapper<UcUserWorkHistory> genericMapper) {
         super(genericMapper);
+    }
+
+    @Override
+    public PageList<Map<String, Object>> queryPage(QueryFilter queryFilter) {
+        Map<String, Object> map = queryFilter.getParams();
+        PageList pageList = new PageList();
+        PageBean pageBean = queryFilter.getPageBean();
+        if (BeanUtils.isEmpty(pageBean)) {
+            PageHelper.startPage(1, Integer.MAX_VALUE, false);
+        } else {
+            PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
+                    pageBean.showTotal());
+        }
+        List<Map<String, Object>> maps = ucUserWorkHistoryMapper.queryPage(map);
+        if (CollectionUtils.isEmpty(maps)) {
+
+            pageList.setRows(new ArrayList<>());
+            pageList.setTotal(0);
+        }
+
+        return new PageList<>(maps);
     }
 }

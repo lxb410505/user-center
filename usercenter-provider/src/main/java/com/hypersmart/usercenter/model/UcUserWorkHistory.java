@@ -36,7 +36,7 @@ public class UcUserWorkHistory implements Serializable {
     private Date createTime;
 
     @ApiModelProperty("'用户'")
-    private String userName;
+    private String account;
 
     public String getId() {
         return id;
@@ -70,11 +70,11 @@ public class UcUserWorkHistory implements Serializable {
         this.createTime = createTime;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getAccount() {
+        return account;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setAccount(String account) {
+        this.account = account;
     }
 }

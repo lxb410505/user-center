@@ -1,8 +1,12 @@
 package com.hypersmart.usercenter.service;
 
+import com.hypersmart.base.query.PageList;
+import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.framework.service.IGenericService;
 import com.hypersmart.usercenter.model.UcUserWorkHistory;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 /**
  * @Description: 用户上下班记录
@@ -12,4 +16,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public interface UcUserWorkHistoryService extends IGenericService<String, UcUserWorkHistory> {
+
+    PageList<Map<String, Object>> queryPage(QueryFilter queryFilter);
 }

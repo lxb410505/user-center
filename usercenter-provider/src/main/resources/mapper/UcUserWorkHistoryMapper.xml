@@ -17,7 +17,7 @@
         uc_org_user
     </sql>
 
-    <select id="getUserWork" resultMap="UcUserWorkHis">
+    <select id="queryPage" resultType="java.util.Map">
         select * from uc_user_work_his
         <where>
             <if test="whereSql!=null">
