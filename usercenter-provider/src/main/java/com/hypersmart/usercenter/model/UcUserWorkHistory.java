@@ -33,7 +33,10 @@ public class UcUserWorkHistory implements Serializable {
     private String createBy;
     @Column(name = "'CREATE_TIME'")
     @ApiModelProperty("'创建时间'")
-    private LocalDateTime createTime;
+    private Date createTime;
+
+    @ApiModelProperty("'用户'")
+    private String userName;
 
     public String getId() {
         return id;
@@ -59,22 +62,19 @@ public class UcUserWorkHistory implements Serializable {
         this.createBy = createBy;
     }
 
-    public LocalDateTime getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(LocalDateTime createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("UcUserWorkHistory{");
-        sb.append("id='").append(id).append('\'');
-        sb.append(", status='").append(status).append('\'');
-        sb.append(", createBy='").append(createBy).append('\'');
-        sb.append(", createTime=").append(createTime);
-        sb.append('}');
-        return sb.toString();
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

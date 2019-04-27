@@ -3,32 +3,23 @@ package com.hypersmart.usercenter.controller;
 
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
-import com.hypersmart.base.query.PageBean;
+import com.hypersmart.base.query.Direction;
+import com.hypersmart.base.query.FieldSort;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
-import com.hypersmart.base.util.BeanUtils;
-import com.hypersmart.framework.utils.StringUtils;
-import com.hypersmart.usercenter.bo.GridBasicInfoBO;
-import com.hypersmart.usercenter.bo.HouseKeeperBO;
-import com.hypersmart.usercenter.constant.GridErrorCode;
-import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
-import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
-import com.hypersmart.usercenter.model.GridBasicInfo;
 import com.hypersmart.usercenter.model.UcUserWorkHistory;
-import com.hypersmart.usercenter.service.GridBasicInfoService;
-import com.hypersmart.usercenter.service.UcOrgUserService;
 import com.hypersmart.usercenter.service.UcUserWorkHistoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Date;
 
 
 /**
@@ -37,7 +28,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping(value = {"/api/usercenter/v1/ucWorkHistory"}, produces = {"application/json;charset=UTF-8"})
-@Api(tags = {"gridBasicInfoController"})
+@Api(tags = {"ucWorkHistoryController"})
 public class UcWorkHistoryController extends BaseController {
 
 
@@ -53,6 +44,9 @@ public class UcWorkHistoryController extends BaseController {
 	@PostMapping({"/list"})
 	@ApiOperation(value = "用户上下班历史列表}", httpMethod = "POST", notes = "用户上下班历史列表")
 	public PageList<UcUserWorkHistory> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+		queryFilter.setSorter(new ArrayList<FieldSort>(){{
+			add(new FieldSort("create_time", Direction.DESC));
+		}});
 		return this.ucUserWorkHistoryService.query(queryFilter);
 
 	}
@@ -68,6 +62,8 @@ public class UcWorkHistoryController extends BaseController {
 	@ApiOperation(value = "新增上下班记录", httpMethod = "POST", notes = "新增上下班记录")
 	public CommonResult<String> create(@ApiParam(name = "ucUserWorkHistory", value = "新增上下班记录", required = true) @RequestBody UcUserWorkHistory ucUserWorkHistory) {
 		CommonResult commonResult = new CommonResult();
+		ucUserWorkHistory.setCreateBy(current());
+		ucUserWorkHistory.setCreateTime(new Date());
 		int i = ucUserWorkHistoryService.insert(ucUserWorkHistory);
 		if (i>0) {
 			commonResult.setState(true);
@@ -80,3 +76,9 @@ public class UcWorkHistoryController extends BaseController {
 	}
 
 }
+
+
+
+
+
+
