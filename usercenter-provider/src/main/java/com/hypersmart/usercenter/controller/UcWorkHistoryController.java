@@ -61,7 +61,7 @@ public class UcWorkHistoryController extends BaseController {
      */
     @GetMapping("save")
     @ApiOperation(value = "新增上下班记录", httpMethod = "POST", notes = "新增上下班记录")
-    public CommonResult<String> create(@ApiParam(name = "ucUserWorkHistory", value = "新增上下班记录", required = true)  @RequestParam("status") String status, @RequestParam("account") String account) {
+    public CommonResult<String> create(@ApiParam(name = "ucUserWorkHistory", value = "新增上下班记录", required = true)  @RequestParam(value = "status",required = false) String status, @RequestParam(value = "account",required = false) String account) {
 		CommonResult commonResult = new CommonResult();
 		UcUserWorkHistory ucUserWorkHistory = new UcUserWorkHistory();
 		ucUserWorkHistory.setCreateBy(current());
