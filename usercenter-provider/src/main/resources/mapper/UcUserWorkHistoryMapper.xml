@@ -28,5 +28,13 @@
             </if>
         </where>
     </select>
-
+<insert id="save" parameterType="com.hypersmart.usercenter.model.UserCurrentOrgHistory">
+    insert into uc_user_work_his(
+     `ID_`,
+  `status` ,
+  `create_by` ,
+  `create_time` ,
+  `username`
+    ) values(#{id},#{status},#{createBy},#{createTime},#{account})
+</insert>
 </mapper>

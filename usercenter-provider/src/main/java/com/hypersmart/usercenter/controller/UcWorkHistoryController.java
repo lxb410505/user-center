@@ -15,9 +15,12 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 
 /**
@@ -39,7 +42,7 @@ public class UcWorkHistoryController extends BaseController {
 	 * @param queryFilter
 	 * @return
 	 */
-	@PostMapping({"/list"})
+	@PostMapping("list")
 	@ApiOperation(value = "用户上下班历史列表}", httpMethod = "POST", notes = "用户上下班历史列表")
 	public PageList<Map<String,Object>> queryList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
 		queryFilter.setSorter(new ArrayList<FieldSort>(){{
@@ -65,7 +68,8 @@ public class UcWorkHistoryController extends BaseController {
 		ucUserWorkHistory.setCreateTime(new Date());
 		ucUserWorkHistory.setStatus(status);
 		ucUserWorkHistory.setAccount(account);
-		int i = ucUserWorkHistoryService.insert(ucUserWorkHistory);
+		ucUserWorkHistory.setId(UUID.randomUUID().toString().replaceAll("-",""));
+		int i = ucUserWorkHistoryService.save(ucUserWorkHistory);
 		if (i>0) {
 			commonResult.setState(true);
 			commonResult.setMessage("新增成功！");

@@ -8,6 +8,7 @@ import com.hypersmart.usercenter.bo.UcOrgBO;
 import com.hypersmart.usercenter.dto.UcOrgDTO;
 import com.hypersmart.usercenter.dto.UcOrgExtend;
 import com.hypersmart.usercenter.model.*;
+import com.hypersmart.usercenter.service.UcOrgParamsService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 import io.swagger.annotations.Api;
@@ -34,10 +35,13 @@ import java.util.Map;
 @Api(tags = {"ucOrgController"})
 public class UcOrgController extends BaseController {
     @Resource
-        UcOrgService ucOrgService;
+    UcOrgService ucOrgService;
 
     @Resource
     UcOrgUserService ucOrgUserService;
+
+    @Resource
+    UcOrgParamsService ucOrgParamsService;
 
     /*
     *   根据地块id与当前用户信息，获取它及它以上的组织信息
@@ -350,6 +354,20 @@ public class UcOrgController extends BaseController {
         List<UcOrg> orgList = this.ucOrgService.getByIds(orgIds);
         return orgList;
     }
+
+    /**
+     * 根据组织id查询组织参数
+     * @param orgId
+     * @return
+     */
+    @GetMapping({"/organizationParams/{orgId}"})
+    @ApiOperation(value = "组织架构数据列表}", httpMethod = "GET", notes = "获取组织架构列表")
+    public List<UcOrgParams> organizationParams(@PathVariable("orgId") String orgId) {
+        List<UcOrgParams> ucOrgParams = ucOrgParamsService.selectByOrgId(orgId);
+        return ucOrgParams;
+    }
+
+
 
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增组织架构信息", httpMethod = "POST", notes = "保存组织架构")
