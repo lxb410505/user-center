@@ -37,4 +37,14 @@ where t1.USER_ID_=#{userId} and t4.CODE_=#{code}   and t1.IS_DELE_=0 and t4.IS_D
 
 
     </select>
+
+    <select id="getByJobName" resultMap="OrgJobMap" parameterType="java.lang.String">
+        select distinct job.* from
+        uc_org_job job
+        <where>
+            <if test="jobName!=null and jobName!=''">
+                job.NAME_=#{jobName}
+            </if>
+        </where>
+    </select>
 </mapper>

@@ -1,8 +1,10 @@
 package com.hypersmart.usercenter.mapper;
 
+import com.hypersmart.usercenter.model.UcOrgJob;
 import com.hypersmart.usercenter.model.UcOrgPost;
 import com.hypersmart.framework.mapper.GenericMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -18,4 +20,6 @@ import java.util.Map;
 public interface UcOrgPostMapper extends GenericMapper<UcOrgPost> {
 
     List<Map<String, Object>> getJobPage(Map<String, Object> params);
+
+    UcOrgPost getByOrgIdAndJobId(@Param("orgId") String orgId,@Param("jobId") String jobId);
 }

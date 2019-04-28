@@ -78,4 +78,19 @@
             </if>
         </where>
     </select>
+
+    <select id="getListByOrgIdUserId" resultType="com.hypersmart.usercenter.model.UcOrgUser">
+        select 	ID_ as id, ORG_ID_ as orgId, USER_ID_ as userId, IS_MASTER_ as isMaster, POS_ID_ as posId,
+        IS_CHARGE_ as isCharge, START_DATE_ as startDate, END_DATE_ as endDate,
+        IS_REL_ACTIVE_ as isRelActive, UPDATE_TIME_ as updateTime, IS_DELE_, VERSION_ as version
+        from uc_org_user
+        <where>
+            <if test="orgId!=null and orgId!=''">
+                ORG_ID_=#{orgId}
+            </if>
+            <if test="userId!=null and userId!=''">
+                and USER_ID_=#{userId}
+            </if>
+        </where>
+    </select>
 </mapper>
