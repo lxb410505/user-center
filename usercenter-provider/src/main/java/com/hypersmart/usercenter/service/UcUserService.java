@@ -6,8 +6,10 @@ import com.hypersmart.usercenter.dto.UserDetailRb;
 import com.hypersmart.usercenter.dto.UserDetailValue;
 import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.framework.service.IGenericService;
+import com.hypersmart.usercenter.util.ResourceErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -46,5 +48,14 @@ public interface UcUserService extends IGenericService<String, UcUser> {
     PageList<UcUser> pagedQueryByJobCodes(String jobCodes, QueryFilter queryFilter);
 
     UserDetailValue searchUserDetailByCondition(UserDetailRb userDetailRb);
+
+    /**
+     * 工单系统总部角色导入
+     * @param file
+     * @return
+     * @throws Exception
+     */
+    ResourceErrorCode importOrgUser(MultipartFile file) throws Exception;
+
 }
 

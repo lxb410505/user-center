@@ -33,4 +33,6 @@ public interface UcOrgUserMapper extends GenericMapper<UcOrgUser> {
      * @return
      */
     List<Map<String, Object>> getOrgByCondition(Map<String, Object> params);
+
+    List<UcOrgUser> getListByOrgIdUserId(@Param("orgId") String orgId,@Param("userId") String userId);
 }
