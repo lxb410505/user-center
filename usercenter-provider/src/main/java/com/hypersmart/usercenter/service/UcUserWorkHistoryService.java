@@ -18,4 +18,6 @@ import java.util.Map;
 public interface UcUserWorkHistoryService extends IGenericService<String, UcUserWorkHistory> {
 
     PageList<Map<String, Object>> queryPage(QueryFilter queryFilter);
+
+    int save(UcUserWorkHistory ucUserWorkHistory);
 }

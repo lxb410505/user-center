@@ -14,4 +14,6 @@ import java.util.Map;
 @Mapper
 public interface UcUserWorkHistoryMapper extends GenericMapper<UcUserWorkHistory> {
     List<Map<String,Object>> queryPage(Map<String,Object> map);
+
+    int save(UcUserWorkHistory ucUserWorkHistory);
 }

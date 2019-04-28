@@ -55,4 +55,9 @@ public class UcUserWorkHistoryServiceImpl extends GenericService<String, UcUserW
 
         return new PageList<>(maps);
     }
+
+    @Override
+    public int save(UcUserWorkHistory ucUserWorkHistory) {
+        return ucUserWorkHistoryMapper.save(ucUserWorkHistory);
+    }
 }
