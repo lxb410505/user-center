@@ -23,10 +23,10 @@
             <if test="whereSql!=null">
                 and ${whereSql}
             </if>
-            <if test="orderBySql!=null">
-                order by ${orderBySql}
-            </if>
         </where>
+        <if test="orderBySql!=null">
+            order by ${orderBySql}
+        </if>
     </select>
 <insert id="save" parameterType="com.hypersmart.usercenter.model.UserCurrentOrgHistory">
     insert into uc_user_work_his(
