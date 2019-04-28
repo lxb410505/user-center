@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.UcUserWorkHistoryMapper">
+
+    <resultMap id="UcUserWorkHis" type="com.hypersmart.usercenter.model.UcUserWorkHistory">
+        <id jdbcType="VARCHAR" property="id" column="ID_"></id>
+        <result column="status" jdbcType="VARCHAR" property="status"></result>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"></result>
+        <result column="create_time" jdbcType="VARCHAR" property="createTime"></result>
+    </resultMap>
+
+    <sql id="BaseAttribute">
+        ID_,ORG_ID_,USER_ID_
+    </sql>
+    <sql id="BaseTable">
+        uc_org_user
+    </sql>
+
+    <select id="queryPage" resultType="java.util.Map">
+        select * from uc_user_work_his
+        <where>
+            <if test="whereSql!=null">
+                and ${whereSql}
+            </if>
+            <if test="orderBySql!=null">
+                order by ${orderBySql}
+            </if>
+        </where>
+    </select>
+
+</mapper>
