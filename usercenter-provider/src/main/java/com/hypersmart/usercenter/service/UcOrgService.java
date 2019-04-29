@@ -1,11 +1,11 @@
 package com.hypersmart.usercenter.service;
 
-import com.hypersmart.uc.api.model.IUser;
+import com.hypersmart.framework.service.IGenericService;
 import com.hypersmart.usercenter.bo.UcOrgBO;
 import com.hypersmart.usercenter.dto.UcOrgDTO;
 import com.hypersmart.usercenter.dto.UcOrgExtend;
 import com.hypersmart.usercenter.model.UcOrg;
-import com.hypersmart.framework.service.IGenericService;
+import com.hypersmart.usercenter.model.UcOrgParams;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +49,8 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
     List<UcOrg> getUserOrgListMerge(String userId);
 
     List<UcOrg> queryChildrenByCondition(String userId,String orgId,String grade);
+
+    List<UcOrgParams> getOrgParams(String code, String value);
 
 
 }
