@@ -235,6 +235,8 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
         List<ImportUserData> importUserDataList = new ArrayList<>();
         Integer errorCount = 0;//错误数量
         if (stat != true) {
+            //总部，或者根据地区code获取区域,改！！
+            UcOrg orgZb = ucOrgMapper.getByOrgName("总部").get(0);
             for (int i = 1; i < listob.size(); i++) {
                 long beforeLength = message.length();
                 List<Object> lo = listob.get(i);
@@ -248,12 +250,14 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                         lo.add(1,String.valueOf(listob.get(i-1).get(1)));
                     }
                     String orgName=String.valueOf(lo.get(1));
-                    List<UcOrg> orgList = ucOrgMapper.getByOrgName(orgName);
-                    UcOrg org = new UcOrg();
-                    if (BeanUtils.isEmpty(orgList)){
+                    //写一个方法去：根据parentId和name获取唯一的UcOrg
+                    //List<UcOrg> orgList = ucOrgMapper.getByOrgName(orgName);
+                    UcOrg org = ucOrgMapper.getByOrgNameParentId(orgName,orgZb.getId());
+                    //UcOrg org = new UcOrg();
+                    if (BeanUtils.isEmpty(org)){
                         message.append("第").append(i + 1).append("行，查无此中心；");
                     }else {
-                        org=orgList.get(0);
+                        //org=orgList.get(0);
                         importUserData.setCenter(org);
                     }
                 }
@@ -265,11 +269,15 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                         lo.add(2,String.valueOf(listob.get(i-1).get(2)));
                     }
                     String orgName = String.valueOf(lo.get(2));
-                    List<UcOrg> orgs= ucOrgMapper.getByOrgName(orgName);
-                    if (BeanUtils.isEmpty(orgs)){
-                        message.append("第").append(i + 1).append("行，部门查询失败，查无此部门；");
-                    }else {
-                        importUserData.setDepartment(orgs.get(0));
+                    //写一个方法去：根据parentId和name获取唯一的UcOrg
+                    if (BeanUtils.isNotEmpty(importUserData.getCenter())){
+                        //List<UcOrg> orgs= ucOrgMapper.getByOrgName(orgName);
+                        UcOrg org = ucOrgMapper.getByOrgNameParentId(orgName,importUserData.getCenter().getId());
+                        if (BeanUtils.isEmpty(org)){
+                            message.append("第").append(i + 1).append("行，部门查询失败，查无此部门；");
+                        }else {
+                            importUserData.setDepartment(org);
+                        }
                     }
                 }
                 if (lo.get(9).equals("暂时无人")){
