@@ -4,16 +4,20 @@ import com.hypersmart.base.query.FieldRelation;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
+import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.usercenter.bo.UcOrgBO;
 import com.hypersmart.usercenter.dto.UcOrgDTO;
 import com.hypersmart.usercenter.dto.UcOrgExtend;
 import com.hypersmart.usercenter.mapper.UcOrgMapper;
+import com.hypersmart.usercenter.mapper.UcOrgParamsMapper;
 import com.hypersmart.usercenter.model.UcDemension;
 import com.hypersmart.usercenter.model.UcOrg;
+import com.hypersmart.usercenter.model.UcOrgParams;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.UcDemensionService;
+import com.hypersmart.usercenter.service.UcOrgParamsService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 import org.springframework.beans.BeanUtils;
@@ -40,6 +44,9 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
 
     @Autowired
     UcDemensionService ucDemensionService;
+
+    @Autowired
+    UcOrgParamsMapper ucOrgParamsMapper;
 
     public UcOrgServiceImpl(UcOrgMapper mapper) {
         super(mapper);
@@ -560,5 +567,39 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         }
 
 
+    }
+
+
+    public List<UcOrgParams> getOrgParams(String code, String value) {
+
+        if(StringUtil.isEmpty(code) || StringUtil.isEmpty(value)){
+            return null;
+        }
+        return  ucOrgParamsMapper.getOrgParams(code,value);
+
+//        QueryFilter queryFilter=QueryFilter.build();
+//        queryFilter.setClazz(UcOrgParams.class);
+//        queryFilter.addFilter("CODE_",code, QueryOP.EQUAL,FieldRelation.AND);
+//        queryFilter.addFilter("VALUE_",value, QueryOP.EQUAL,FieldRelation.AND);
+//        queryFilter.addFilter("IS_DELE_","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
+//        queryFilter.setPageBean(null);
+//        PageList<UcOrgParams> paramsPageList = ucOrgParamsService.query(queryFilter);
+//        List<UcOrgParams> paramsList=paramsPageList.getRows();
+//        if(paramsList !=null && paramsList.size()>0){
+//            Set<String> list=new HashSet<String>();
+//                for(UcOrgParams param : paramsList){
+//                    list.add(param.getOrgId());
+//                }
+//            QueryFilter queryFilter2=QueryFilter.build();
+//            String ids =  org.apache.commons.lang3.StringUtils.join(list.toArray(),",");
+//            queryFilter2.addFilter("ORG_ID_",ids, QueryOP.IN,FieldRelation.AND);
+//            queryFilter2.addFilter("IS_DELE_",ids, QueryOP.NOT_EQUAL,FieldRelation.AND);
+//            queryFilter2.setPageBean(null);
+//            PageList<UcOrgParams> paramsPage2List = ucOrgParamsService.query(queryFilter2);
+//            return  paramsPage2List.getRows();
+//        }
+//        else {
+//            return  null;
+//        }
     }
 }
