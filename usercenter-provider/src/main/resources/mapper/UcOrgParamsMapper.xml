@@ -2,11 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.hypersmart.usercenter.mapper.UcOrgParamsMapper">
-<select id="selectByOrgId" resultType="com.hypersmart.usercenter.model.UcOrgParams">
-    select ID_ as id,
-    CODE_ as code,
-    VALUE_ as `value`
-    FROM uc_org_params
-    where ORG_ID_ = #{orgId} AND IS_DELE_ = 0;
-</select>
+
+    <resultMap id="BaseResultMap" type="com.hypersmart.usercenter.model.UcOrgParams">
+        <id property="id" column="ID_" jdbcType="VARCHAR"/>
+        <result property="orgId" column="ORG_ID_" jdbcType="VARCHAR"/>
+        <result property="code" column="CODE_" jdbcType="VARCHAR"/>
+        <result property="value" column="VALUE_" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="UPDATE_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="isDele" column="IS_DELE_" jdbcType="VARCHAR"/>
+        <result property="version" column="VERSION_" jdbcType="NUMERIC"/>
+    </resultMap>
+
+    <select id="getOrgParams" resultMap="BaseResultMap">
+        SELECT DISTINCT CODE_,VALUE_ from uc_org_params where ORG_ID_ in (
+        SELECT ORG_ID_ from uc_org_params
+        where CODE_ =  #{code} AND VALUE_= #{value} AND IS_DELE_!=1
+        ) AND CODE_!=#{code} AND IS_DELE_!=1
+    </select>
+
+    <select id="selectByOrgId" resultType="com.hypersmart.usercenter.model.UcOrgParams">
+        select ID_ as id,
+        CODE_ as code,
+        VALUE_ as `value`
+        FROM uc_org_params
+        where ORG_ID_ = #{orgId} AND IS_DELE_ = 0;
+    </select>
 </mapper>

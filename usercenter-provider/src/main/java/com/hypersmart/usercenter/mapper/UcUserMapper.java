@@ -53,4 +53,6 @@ public interface UcUserMapper extends GenericMapper<UcUser> {
      * @return
      */
     List<UcUser> getByJobCodes(Map<String, Object> params);
+
+    UcUser getByAccount(@Param("account")String account);
 }

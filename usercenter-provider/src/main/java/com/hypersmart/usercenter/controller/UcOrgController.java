@@ -369,6 +369,16 @@ public class UcOrgController extends BaseController {
 
 
 
+    @GetMapping({"getOrgParams"})
+    @ApiOperation(value = "获取组织参数信息", httpMethod = "GET", notes = "获取组织参数信息")
+    public List<UcOrgParams> getOrgParams(@ApiParam(name = "code", value = "参数Code", required = true)
+                                           @RequestParam("code") String code,
+    @ApiParam(name = "value", value = "参数值", required = true)
+    @RequestParam("value") String value
+    ) {
+       return  this.ucOrgService.getOrgParams(code,value);
+    }
+
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增组织架构信息", httpMethod = "POST", notes = "保存组织架构")
 //    public CommonResult<String> post(@ApiParam(name = "ucOrg", value = "组织架构业务对象", required = true) @RequestBody UcOrg model) {

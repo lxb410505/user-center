@@ -15,6 +15,7 @@ import com.hypersmart.usercenter.dto.UserDetailValue;
 import com.hypersmart.usercenter.model.GradeDemCode;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.service.UcOrgService;
+import com.hypersmart.usercenter.util.ResourceErrorCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,6 +25,7 @@ import javax.annotation.Resource;
 
 import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.usercenter.service.UcUserService;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -159,6 +161,26 @@ public class UcUserController extends BaseController {
             return new CommonResult<>(false, "地块信息为空");
         }
         return new CommonResult<UserDetailValue>(true, "处理成功", ucUserService.searchUserDetailByCondition(userDetailRb), 200);
+    }
+
+    /** sunwenjie
+     * 工单系统总部角色导入
+     * @param file
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/importOrgUserData", method = RequestMethod.POST)
+    public CommonResult<String> importOrgUserData(@RequestParam("file") MultipartFile file) throws Exception {
+        CommonResult commonResult = new CommonResult();
+        ResourceErrorCode resourceErrorCode = ucUserService.importOrgUser(file);
+        if (ResourceErrorCode.SUCCESS.getCode() == resourceErrorCode.getCode()) {
+            commonResult.setState(true);
+            commonResult.setMessage(resourceErrorCode.getMessage());
+        } else {
+            commonResult.setState(false);
+            commonResult.setMessage(resourceErrorCode.getMessage());
+        }
+        return commonResult;
     }
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增用户管理信息", httpMethod = "POST", notes = "保存用户管理")
