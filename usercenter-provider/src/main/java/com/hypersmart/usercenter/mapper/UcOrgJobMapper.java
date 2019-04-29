@@ -3,6 +3,7 @@ package com.hypersmart.usercenter.mapper;
 import com.hypersmart.usercenter.model.UcOrgJob;
 import com.hypersmart.framework.mapper.GenericMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -30,5 +31,7 @@ public interface UcOrgJobMapper extends GenericMapper<UcOrgJob> {
      * @return
      */
     List<Map<String,Object>> checkPermission(Map<String,Object> map);
+
+    List<UcOrgJob> getByJobName(@Param("jobName") String jobName);
 
 }

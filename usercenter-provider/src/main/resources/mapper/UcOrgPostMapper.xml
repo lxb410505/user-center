@@ -15,4 +15,19 @@
             </if>
         </where>
     </select>
+
+    <select id="getByOrgIdAndJobId" resultType="com.hypersmart.usercenter.model.UcOrgPost">
+        select p.ID_ AS id, p.ORG_ID_ AS orgId,
+        p.JOB_ID_ AS jobId, p.POS_NAME_ AS posName, p.CODE_ AS code, p.IS_CHARGE_ AS isCharge,
+        p.UPDATE_TIME_ AS updateTime, p.IS_DELE_ AS isDele, p.VERSION_ AS version, p.POST_KEY_ AS postKey
+        from uc_org_post p
+        <where>
+            <if test="orgId!=null and orgId!=''">
+                p.ORG_ID_=#{orgId}
+            </if>
+            <if test="jobId!=null and jobId!=''">
+                AND p.JOB_ID_=#{jobId}
+            </if>
+        </where>
+    </select>
 </mapper>

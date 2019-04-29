@@ -303,4 +303,14 @@
         </if>
     </select>
 
+    <select id="getByAccount" resultMap="baseMap" parameterType="java.lang.String">
+        select distinct u.* from
+        uc_user u
+        <where>
+            <if test="account!=null and account!=''">
+                u.ACCOUNT_=#{account}
+            </if>
+        </where>
+    </select>
+
 </mapper>
