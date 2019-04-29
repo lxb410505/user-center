@@ -28,7 +28,7 @@ import java.util.UUID;
  * @author liyong
  */
 @RestController
-@RequestMapping(value = {"/api/usercenter/v1/ucWorkHistory"})
+@RequestMapping(value = {"/api/usercenter/v1/ucWorkHistory"},produces = {"application/json;charset=UTF-8"})
 @Api(tags = {"ucWorkHistoryController"})
 public class UcWorkHistoryController extends BaseController {
 
