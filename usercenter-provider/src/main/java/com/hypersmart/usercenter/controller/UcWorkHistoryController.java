@@ -64,12 +64,13 @@ public class UcWorkHistoryController extends BaseController {
     public CommonResult<String> create(@ApiParam(name = "ucUserWorkHistory", value = "新增上下班记录", required = true)  @RequestParam(value = "status",required = false) String status, @RequestParam(value = "account",required = false) String account,@RequestParam(value = "userId",required = false) String userId) {
 		CommonResult commonResult = new CommonResult();
 		String msg = null;
+		String state=null;
 		// 0上班  1下班
 		if("0".equals(status)){
-			status="1";
+			state="1";
 			msg="上班成功！";
 		}else if("1".equals(status)){
-			status="0";
+			state="0";
 			msg="下班成功";
 		}
 		UcUserWorkHistory ucUserWorkHistory = new UcUserWorkHistory();
@@ -83,7 +84,7 @@ public class UcWorkHistoryController extends BaseController {
 		if (i>0) {
 			commonResult.setState(true);
 			commonResult.setMessage(msg);
-			commonResult.setValue(status);
+			commonResult.setValue(state);
 		} else {
 			commonResult.setState(false);
 			commonResult.setMessage("新增失败");
