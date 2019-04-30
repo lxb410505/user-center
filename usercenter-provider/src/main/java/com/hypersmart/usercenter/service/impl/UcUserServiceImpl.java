@@ -450,7 +450,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                     groupIdentitySet.add(groupIdentity1);
                 }
             }catch (Exception e){
-                logger.error("groupIdentity转实体类异常");
+                e.printStackTrace();
             }
         });
         return groupIdentitySet;
