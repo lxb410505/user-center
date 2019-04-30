@@ -61,13 +61,14 @@ public class UcWorkHistoryController extends BaseController {
      */
     @GetMapping("save")
     @ApiOperation(value = "新增上下班记录", httpMethod = "POST", notes = "新增上下班记录")
-    public CommonResult<String> create(@ApiParam(name = "ucUserWorkHistory", value = "新增上下班记录", required = true)  @RequestParam(value = "status",required = false) String status, @RequestParam(value = "account",required = false) String account) {
+    public CommonResult<String> create(@ApiParam(name = "ucUserWorkHistory", value = "新增上下班记录", required = true)  @RequestParam(value = "status",required = false) String status, @RequestParam(value = "account",required = false) String account,@RequestParam(value = "userId",required = false) String userId) {
 		CommonResult commonResult = new CommonResult();
 		UcUserWorkHistory ucUserWorkHistory = new UcUserWorkHistory();
 		ucUserWorkHistory.setCreateBy(current());
 		ucUserWorkHistory.setCreateTime(new Date());
 		ucUserWorkHistory.setStatus(status);
 		ucUserWorkHistory.setAccount(account);
+		ucUserWorkHistory.setUserId(userId);
 		ucUserWorkHistory.setId(UUID.randomUUID().toString().replaceAll("-",""));
 		int i = ucUserWorkHistoryService.save(ucUserWorkHistory);
 		if (i>0) {
@@ -80,6 +81,15 @@ public class UcWorkHistoryController extends BaseController {
 		return commonResult;
 	}
 
+	@GetMapping("getUserHisStatus")
+	public CommonResult<String> getUserHisStatus(@RequestParam("userId") String userId){
+		String s = ucUserWorkHistoryService.queryLatest(userId);
+		if(null==s){
+			return new CommonResult<>(false,"该用户无上下班记录",null);
+		}
+		return new CommonResult<>(true,"",s,null);
+
+	}
 }
 
 
