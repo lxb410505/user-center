@@ -4,6 +4,7 @@ import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.usercenter.dto.UserDetailRb;
 import com.hypersmart.usercenter.dto.UserDetailValue;
+import com.hypersmart.usercenter.model.GroupIdentity;
 import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.framework.service.IGenericService;
 import com.hypersmart.usercenter.util.ResourceErrorCode;
@@ -56,6 +57,8 @@ public interface UcUserService extends IGenericService<String, UcUser> {
      * @throws Exception
      */
     ResourceErrorCode importOrgUser(MultipartFile file) throws Exception;
+
+    Set<GroupIdentity> getByJobCodeAndOrgIdAndDimCodeDeeply(String jobCode, String orgId, String dimCode, String fullName) throws Exception;
 
 }
 

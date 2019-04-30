@@ -20,4 +20,6 @@ public interface UcUserWorkHistoryService extends IGenericService<String, UcUser
     PageList<Map<String, Object>> queryPage(QueryFilter queryFilter);
 
     int save(UcUserWorkHistory ucUserWorkHistory);
+
+    String queryLatest(String username);
 }

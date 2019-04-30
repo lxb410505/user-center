@@ -4,6 +4,7 @@ import com.hypersmart.framework.mapper.GenericMapper;
 import com.hypersmart.usercenter.model.HousekeeperHistory;
 import com.hypersmart.usercenter.model.UcUserWorkHistory;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -16,4 +17,6 @@ public interface UcUserWorkHistoryMapper extends GenericMapper<UcUserWorkHistory
     List<Map<String,Object>> queryPage(Map<String,Object> map);
 
     int save(UcUserWorkHistory ucUserWorkHistory);
+
+    String queryLatest(@Param("userId") String username);
 }

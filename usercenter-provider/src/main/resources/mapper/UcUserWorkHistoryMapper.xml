@@ -28,13 +28,26 @@
             order by ${orderBySql}
         </if>
     </select>
-<insert id="save" parameterType="com.hypersmart.usercenter.model.UserCurrentOrgHistory">
+<insert id="save" parameterType="com.hypersmart.usercenter.model.UcUserWorkHistory">
     insert into uc_user_work_his(
      `ID_`,
   `status` ,
   `create_by` ,
   `create_time` ,
-  `username`
-    ) values(#{id},#{status},#{createBy},#{createTime},#{account})
+  `username`,
+   `user_id`
+    ) values(#{id},#{status},#{createBy},#{createTime},#{account},#{userId})
 </insert>
+
+    <select id="queryLatest" resultType="java.lang.String">
+        SELECT
+            status
+        FROM
+            uc_user_work_his
+        WHERE
+            user_id = #{userId}
+        ORDER BY
+            create_time DESC
+        LIMIT 1
+    </select>
 </mapper>

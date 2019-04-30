@@ -61,25 +61,47 @@ public class UcWorkHistoryController extends BaseController {
      */
     @GetMapping("save")
     @ApiOperation(value = "新增上下班记录", httpMethod = "POST", notes = "新增上下班记录")
-    public CommonResult<String> create(@ApiParam(name = "ucUserWorkHistory", value = "新增上下班记录", required = true)  @RequestParam(value = "status",required = false) String status, @RequestParam(value = "account",required = false) String account) {
+    public CommonResult<String> create(@ApiParam(name = "ucUserWorkHistory", value = "新增上下班记录", required = true)  @RequestParam(value = "status",required = false) String status, @RequestParam(value = "account",required = false) String account,@RequestParam(value = "userId",required = false) String userId) {
 		CommonResult commonResult = new CommonResult();
+		String msg = null;
+		String state=null;
+		// 0上班  1下班
+		if("0".equals(status)){
+			state="1";
+			msg="上班成功！";
+		}else if("1".equals(status)){
+			state="0";
+			msg="下班成功";
+		}
 		UcUserWorkHistory ucUserWorkHistory = new UcUserWorkHistory();
 		ucUserWorkHistory.setCreateBy(current());
 		ucUserWorkHistory.setCreateTime(new Date());
 		ucUserWorkHistory.setStatus(status);
 		ucUserWorkHistory.setAccount(account);
+		ucUserWorkHistory.setUserId(userId);
 		ucUserWorkHistory.setId(UUID.randomUUID().toString().replaceAll("-",""));
 		int i = ucUserWorkHistoryService.save(ucUserWorkHistory);
 		if (i>0) {
 			commonResult.setState(true);
-			commonResult.setMessage("新增成功！");
+			commonResult.setMessage(msg);
+			commonResult.setValue(state);
 		} else {
 			commonResult.setState(false);
 			commonResult.setMessage("新增失败");
+//			commonResult.setValue(status);
 		}
 		return commonResult;
 	}
 
+	@GetMapping("getUserHisStatus")
+	public CommonResult<String> getUserHisStatus(@RequestParam("userId") String userId){
+		String s = ucUserWorkHistoryService.queryLatest(userId);
+		if(null==s){
+			return new CommonResult<>(false,"该用户无上下班记录",null);
+		}
+		return new CommonResult<>(true,"",s,null);
+
+	}
 }
 
 
