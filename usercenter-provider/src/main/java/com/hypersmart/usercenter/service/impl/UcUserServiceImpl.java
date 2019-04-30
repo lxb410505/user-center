@@ -1,14 +1,16 @@
 package com.hypersmart.usercenter.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.pagehelper.PageHelper;
-import com.hypersmart.base.query.PageBean;
-import com.hypersmart.base.query.PageList;
-import com.hypersmart.base.query.QueryFilter;
-import com.hypersmart.base.query.QueryOP;
+import com.hypersmart.base.exception.RequiredException;
+import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
+import com.hypersmart.base.util.JsonUtil;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.base.util.UniqueIdUtil;
 import com.hypersmart.framework.service.GenericService;
+import com.hypersmart.uc.api.impl.model.Org;
 import com.hypersmart.usercenter.dto.ImportUserData;
 import com.hypersmart.usercenter.dto.UserDetailRb;
 import com.hypersmart.usercenter.dto.UserDetailValue;
@@ -17,14 +19,18 @@ import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.UcDemensionService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcUserService;
+import com.hypersmart.usercenter.service.UcUserWorkHistoryService;
 import com.hypersmart.usercenter.util.ImportExcelUtil;
 import com.hypersmart.usercenter.util.ResourceErrorCode;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import com.hypersmart.base.feign.UCFeignService;
 
+import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.*;
 
@@ -52,6 +58,10 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
     private UcOrgJobMapper ucOrgJobMapper;
     @Autowired
     private UcOrgUserMapper ucOrgUserMapper;
+    @Resource
+    private UCFeignService ucFeignService;
+    @Resource
+    private UcUserWorkHistoryService ucUserWorkHistoryService;
 
     public UcUserServiceImpl(UcUserMapper mapper) {
         super(mapper);
@@ -413,5 +423,24 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
             }
         }
         return convert;
+    }
+
+    @Override
+    public Set<GroupIdentity> getByJobCodeAndOrgIdAndDimCodeDeeply(String jobCode, String orgId, String dimCode, String fullName) throws Exception {
+        List<ObjectNode> groupIdentities = ucFeignService.getByJobCodeAndOrgIdAndDimCodeDeeply(jobCode,orgId,dimCode,fullName);
+        Set<GroupIdentity> groupIdentitySet = new HashSet<>();
+        groupIdentities.forEach(groupIdentity->{
+            try{
+                GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(),GroupIdentity.class);
+                //根据上下班状态获取上班人员
+                String status = ucUserWorkHistoryService.queryLatest(groupIdentity1.getCode());
+                if(com.hypersmart.framework.utils.StringUtils.isNotRealEmpty(status) && "0".equals(status)){
+                    groupIdentitySet.add(groupIdentity1);
+                }
+            }catch (Exception e){
+                logger.error("groupIdentity转实体类异常");
+            }
+        });
+        return groupIdentitySet;
     }
 }
