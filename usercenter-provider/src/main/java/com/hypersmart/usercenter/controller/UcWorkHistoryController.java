@@ -78,7 +78,7 @@ public class UcWorkHistoryController extends BaseController {
 		} else {
 			commonResult.setState(false);
 			commonResult.setMessage("新增失败");
-			commonResult.setValue(status);
+//			commonResult.setValue(status);
 		}
 		return commonResult;
 	}
