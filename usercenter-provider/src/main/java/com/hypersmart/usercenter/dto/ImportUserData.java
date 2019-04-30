@@ -5,10 +5,14 @@ import com.hypersmart.usercenter.model.UcOrgJob;
 import com.hypersmart.usercenter.model.UcUser;
 
 public class ImportUserData {
-    //中心
-    private UcOrg center;
-    //部门
-    private UcOrg department;
+    //一级单位
+    private UcOrg firstUnit;
+    //二级单位
+    private UcOrg secondUnit;
+    //三级单位
+    private UcOrg thirdUnit;
+    //四级单位
+    private UcOrg fourthUnit;
     //工单角色
     private UcOrgJob orgJob;
     //PSA编号
@@ -24,6 +28,37 @@ public class ImportUserData {
     //表格行
     private Integer excleRow;
 
+    public UcOrg getFirstUnit() {
+        return firstUnit;
+    }
+
+    public void setFirstUnit(UcOrg firstUnit) {
+        this.firstUnit = firstUnit;
+    }
+
+    public UcOrg getSecondUnit() {
+        return secondUnit;
+    }
+
+    public void setSecondUnit(UcOrg secondUnit) {
+        this.secondUnit = secondUnit;
+    }
+
+    public UcOrg getThirdUnit() {
+        return thirdUnit;
+    }
+
+    public void setThirdUnit(UcOrg thirdUnit) {
+        this.thirdUnit = thirdUnit;
+    }
+
+    public UcOrg getFourthUnit() {
+        return fourthUnit;
+    }
+
+    public void setFourthUnit(UcOrg fourthUnit) {
+        this.fourthUnit = fourthUnit;
+    }
 
     public Integer getExcleRow() {
         return excleRow;
@@ -31,22 +66,6 @@ public class ImportUserData {
 
     public void setExcleRow(Integer excleRow) {
         this.excleRow = excleRow;
-    }
-
-    public UcOrg getCenter() {
-        return center;
-    }
-
-    public void setCenter(UcOrg center) {
-        this.center = center;
-    }
-
-    public UcOrg getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(UcOrg department) {
-        this.department = department;
     }
 
     public UcOrgJob getOrgJob() {
