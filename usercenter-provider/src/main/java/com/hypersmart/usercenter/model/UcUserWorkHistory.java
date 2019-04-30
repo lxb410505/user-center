@@ -37,6 +37,8 @@ public class UcUserWorkHistory implements Serializable {
 
     @ApiModelProperty("'用户'")
     private String account;
+    @ApiModelProperty("'用户ID'")
+    private String userId;
 
     public String getId() {
         return id;
@@ -76,5 +78,13 @@ public class UcUserWorkHistory implements Serializable {
 
     public void setAccount(String account) {
         this.account = account;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }
