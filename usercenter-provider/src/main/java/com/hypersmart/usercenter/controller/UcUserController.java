@@ -188,7 +188,7 @@ public class UcUserController extends BaseController {
         return commonResult;
     }
 
-    @RequestMapping(value = {"users/getByJobCodeAndOrgIdAndDimCodeDeeply"}, method = {
+    @RequestMapping(value = {"/users/getByJobCodeAndOrgIdAndDimCodeDeeply"}, method = {
             org.springframework.web.bind.annotation.RequestMethod.GET}, produces = {
             "application/json; charset=utf-8"})
     @ApiOperation(value = "根据组织Id、条线编码和职务编码获取对应条线上的对应人员", httpMethod = "GET", notes = "根据组织Id、条线编码和职务编码获取对应条线上的对应人员")
