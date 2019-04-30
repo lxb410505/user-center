@@ -170,5 +170,32 @@
         </where>
     </select>
 
+    <select id="getByOrgNameParentId" resultType="com.hypersmart.usercenter.model.UcOrg">
+        select
+        ID_ as id,
+        NAME_ as name,
+        PARENT_ID_ as parentId,
+        ORDER_NO_ as orderNo,
+        CODE_ as code,
+        GRADE_ as grade,
+        DEM_ID_ as demId,
+        PATH_ as path,
+        PATH_NAME_ as pathName,
+        UPDATE_TIME_ as updateTime,
+        IS_DELE_ as isDele,
+        VERSION_ as version,
+        LEVEL_ as level,
+        REF_ID_ as refId
+        from uc_org
+        <where>
+            <if test="orgName!=null and orgName!=''">
+                NAME_=#{orgName}
+            </if>
+            <if test="parentId!=null and parentId!=''">
+                AND PARENT_ID_=#{parentId}
+            </if>
+        </where>
+    </select>
+
 
 </mapper>
