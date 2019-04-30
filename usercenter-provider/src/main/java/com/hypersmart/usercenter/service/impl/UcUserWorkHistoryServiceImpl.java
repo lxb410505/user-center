@@ -27,7 +27,7 @@ import java.util.Map;
  */
 @Service("ucUserWorkHistoryServiceImpl")
 public class UcUserWorkHistoryServiceImpl extends GenericService<String, UcUserWorkHistory> implements UcUserWorkHistoryService {
-@Autowired
+    @Autowired
     UcUserWorkHistoryMapper ucUserWorkHistoryMapper;
 
 
@@ -59,5 +59,10 @@ public class UcUserWorkHistoryServiceImpl extends GenericService<String, UcUserW
     @Override
     public int save(UcUserWorkHistory ucUserWorkHistory) {
         return ucUserWorkHistoryMapper.save(ucUserWorkHistory);
+    }
+
+    @Override
+    public String queryLatest(String username) {
+        return ucUserWorkHistoryMapper.queryLatest(username);
     }
 }

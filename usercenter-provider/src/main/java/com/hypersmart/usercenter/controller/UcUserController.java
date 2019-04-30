@@ -1,6 +1,7 @@
 package com.hypersmart.usercenter.controller;
 
 import com.hypersmart.base.controller.BaseController;
+import com.hypersmart.base.exception.RequiredException;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
@@ -13,6 +14,7 @@ import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.dto.UserDetailRb;
 import com.hypersmart.usercenter.dto.UserDetailValue;
 import com.hypersmart.usercenter.model.GradeDemCode;
+import com.hypersmart.usercenter.model.GroupIdentity;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.util.ResourceErrorCode;
@@ -30,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 用户管理
@@ -163,8 +166,10 @@ public class UcUserController extends BaseController {
         return new CommonResult<UserDetailValue>(true, "处理成功", ucUserService.searchUserDetailByCondition(userDetailRb), 200);
     }
 
-    /** sunwenjie
+    /**
+     * sunwenjie
      * 工单系统总部角色导入
+     *
      * @param file
      * @return
      * @throws Exception
@@ -181,6 +186,23 @@ public class UcUserController extends BaseController {
             commonResult.setMessage(resourceErrorCode.getMessage());
         }
         return commonResult;
+    }
+
+    @RequestMapping(value = {"users/getByJobCodeAndOrgIdAndDimCodeDeeply"}, method = {
+            org.springframework.web.bind.annotation.RequestMethod.GET}, produces = {
+            "application/json; charset=utf-8"})
+    @ApiOperation(value = "根据组织Id、条线编码和职务编码获取对应条线上的对应人员", httpMethod = "GET", notes = "根据组织Id、条线编码和职务编码获取对应条线上的对应人员")
+    public Set<GroupIdentity> getByJobCodeAndOrgIdAndDimCodeDeeply(
+            @ApiParam(name = "jobCode", value = "职务编码") @RequestParam(required = false) String jobCode,
+            @ApiParam(name = "orgId", value = "组织Id", required = true) @RequestParam String orgId,
+            @ApiParam(name = "dimCode", value = "维度编码") @RequestParam(required = false) String dimCode,
+            @ApiParam(name = "fullName", value = "姓名") @RequestParam(required = false) String fullName
+    )
+            throws Exception {
+        if (StringUtil.isEmpty(orgId)) {
+            throw new RequiredException("职务编码、组织Id为空！");
+        }
+        return ucUserService.getByJobCodeAndOrgIdAndDimCodeDeeply(jobCode, orgId, dimCode, fullName);
     }
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增用户管理信息", httpMethod = "POST", notes = "保存用户管理")

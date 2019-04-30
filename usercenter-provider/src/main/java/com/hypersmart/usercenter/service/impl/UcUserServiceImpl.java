@@ -1,14 +1,16 @@
 package com.hypersmart.usercenter.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.pagehelper.PageHelper;
-import com.hypersmart.base.query.PageBean;
-import com.hypersmart.base.query.PageList;
-import com.hypersmart.base.query.QueryFilter;
-import com.hypersmart.base.query.QueryOP;
+import com.hypersmart.base.exception.RequiredException;
+import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
+import com.hypersmart.base.util.JsonUtil;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.base.util.UniqueIdUtil;
 import com.hypersmart.framework.service.GenericService;
+import com.hypersmart.uc.api.impl.model.Org;
 import com.hypersmart.usercenter.dto.ImportUserData;
 import com.hypersmart.usercenter.dto.UserDetailRb;
 import com.hypersmart.usercenter.dto.UserDetailValue;
@@ -17,14 +19,18 @@ import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.UcDemensionService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcUserService;
+import com.hypersmart.usercenter.service.UcUserWorkHistoryService;
 import com.hypersmart.usercenter.util.ImportExcelUtil;
 import com.hypersmart.usercenter.util.ResourceErrorCode;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import com.hypersmart.base.feign.UCFeignService;
 
+import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.*;
 
@@ -52,6 +58,10 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
     private UcOrgJobMapper ucOrgJobMapper;
     @Autowired
     private UcOrgUserMapper ucOrgUserMapper;
+    @Resource
+    private UCFeignService ucFeignService;
+    @Resource
+    private UcUserWorkHistoryService ucUserWorkHistoryService;
 
     public UcUserServiceImpl(UcUserMapper mapper) {
         super(mapper);
@@ -234,6 +244,12 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
         //获取表格数据信息
         List<ImportUserData> importUserDataList = new ArrayList<>();
         Integer errorCount = 0;//错误数量
+        //总部，或者根据地区code获取区域,改！！
+        UcOrg orgZb = ucOrgMapper.getByOrgName("总部").get(0);
+        if(BeanUtils.isEmpty(orgZb)){
+            message.append("上级组织/总部不存在");
+            stat=true;
+        }
         if (stat != true) {
             for (int i = 1; i < listob.size(); i++) {
                 long beforeLength = message.length();
@@ -248,12 +264,14 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                         lo.add(1,String.valueOf(listob.get(i-1).get(1)));
                     }
                     String orgName=String.valueOf(lo.get(1));
-                    List<UcOrg> orgList = ucOrgMapper.getByOrgName(orgName);
-                    UcOrg org = new UcOrg();
-                    if (BeanUtils.isEmpty(orgList)){
+                    //写一个方法去：根据parentId和name获取唯一的UcOrg
+                    //List<UcOrg> orgList = ucOrgMapper.getByOrgName(orgName);
+                    UcOrg org = ucOrgMapper.getByOrgNameParentId(orgName,orgZb.getId());
+                    //UcOrg org = new UcOrg();
+                    if (BeanUtils.isEmpty(org)){
                         message.append("第").append(i + 1).append("行，查无此中心；");
                     }else {
-                        org=orgList.get(0);
+                        //org=orgList.get(0);
                         importUserData.setCenter(org);
                     }
                 }
@@ -265,11 +283,15 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                         lo.add(2,String.valueOf(listob.get(i-1).get(2)));
                     }
                     String orgName = String.valueOf(lo.get(2));
-                    List<UcOrg> orgs= ucOrgMapper.getByOrgName(orgName);
-                    if (BeanUtils.isEmpty(orgs)){
-                        message.append("第").append(i + 1).append("行，部门查询失败，查无此部门；");
-                    }else {
-                        importUserData.setDepartment(orgs.get(0));
+                    //写一个方法去：根据parentId和name获取唯一的UcOrg
+                    if (BeanUtils.isNotEmpty(importUserData.getCenter())){
+                        //List<UcOrg> orgs= ucOrgMapper.getByOrgName(orgName);
+                        UcOrg org = ucOrgMapper.getByOrgNameParentId(orgName,importUserData.getCenter().getId());
+                        if (BeanUtils.isEmpty(org)){
+                            message.append("第").append(i + 1).append("行，部门查询失败，查无此部门；");
+                        }else {
+                            importUserData.setDepartment(org);
+                        }
                     }
                 }
                 if (lo.get(9).equals("暂时无人")){
@@ -413,5 +435,24 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
             }
         }
         return convert;
+    }
+
+    @Override
+    public Set<GroupIdentity> getByJobCodeAndOrgIdAndDimCodeDeeply(String jobCode, String orgId, String dimCode, String fullName) throws Exception {
+        List<ObjectNode> groupIdentities = ucFeignService.getByJobCodeAndOrgIdAndDimCodeDeeply(jobCode,orgId,dimCode,fullName);
+        Set<GroupIdentity> groupIdentitySet = new HashSet<>();
+        groupIdentities.forEach(groupIdentity->{
+            try{
+                GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(),GroupIdentity.class);
+                //根据上下班状态获取上班人员
+                String status = ucUserWorkHistoryService.queryLatest(groupIdentity1.getCode());
+                if(com.hypersmart.framework.utils.StringUtils.isNotRealEmpty(status) && "0".equals(status)){
+                    groupIdentitySet.add(groupIdentity1);
+                }
+            }catch (Exception e){
+                logger.error("groupIdentity转实体类异常");
+            }
+        });
+        return groupIdentitySet;
     }
 }
