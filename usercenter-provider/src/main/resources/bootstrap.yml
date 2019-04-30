@@ -4,7 +4,15 @@ spring:
     base: com.hypersmart.usercenter.controller
   application:
     name: user-center-eureka
-
+  cloud:
+    config:
+      failFast: true
+      retry:
+        initialInterval: 3000
+        multiplier: 1.3
+        maxInterval: 5000
+        maxAttempts: 20
+      uri: ${vcap.services.${PREFIX:}configserver.credentials.uri:http://config.ldnext.com:28888}
 system:
   id:
     machineName: user-center
