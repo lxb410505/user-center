@@ -234,9 +234,13 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
         //获取表格数据信息
         List<ImportUserData> importUserDataList = new ArrayList<>();
         Integer errorCount = 0;//错误数量
+        //总部，或者根据地区code获取区域,改！！
+        UcOrg orgZb = ucOrgMapper.getByOrgName("总部").get(0);
+        if(BeanUtils.isEmpty(orgZb)){
+            message.append("上级组织/总部不存在");
+            stat=true;
+        }
         if (stat != true) {
-            //总部，或者根据地区code获取区域,改！！
-            UcOrg orgZb = ucOrgMapper.getByOrgName("总部").get(0);
             for (int i = 1; i < listob.size(); i++) {
                 long beforeLength = message.length();
                 List<Object> lo = listob.get(i);
