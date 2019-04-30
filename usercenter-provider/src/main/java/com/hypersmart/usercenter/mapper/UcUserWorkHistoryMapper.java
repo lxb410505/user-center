@@ -18,5 +18,5 @@ public interface UcUserWorkHistoryMapper extends GenericMapper<UcUserWorkHistory
 
     int save(UcUserWorkHistory ucUserWorkHistory);
 
-    String queryLatest(@Param("username") String username);
+    String queryLatest(@Param("userId") String username);
 }
