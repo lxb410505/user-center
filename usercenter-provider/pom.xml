@@ -99,6 +99,7 @@
             <artifactId>spring-cloud-config-client</artifactId>
             <version>${spring.config.version}</version>
         </dependency>
+
     </dependencies>
     <build>
         <plugins>
