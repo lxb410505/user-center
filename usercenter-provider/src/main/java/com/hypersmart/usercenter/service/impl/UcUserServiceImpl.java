@@ -487,7 +487,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
             try{
                 GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(),GroupIdentity.class);
                 //根据上下班状态获取上班人员
-                String status = ucUserWorkHistoryService.queryLatest(groupIdentity1.getCode());
+                String status = ucUserWorkHistoryService.queryLatest(groupIdentity1.getId());
                 if(com.hypersmart.framework.utils.StringUtils.isNotRealEmpty(status) && "0".equals(status)){
                     groupIdentitySet.add(groupIdentity1);
                 }
