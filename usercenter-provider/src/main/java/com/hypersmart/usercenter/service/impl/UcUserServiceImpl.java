@@ -225,9 +225,10 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                     headerList.add(value);
                 }
             }
-            if (headerList.size() >= 9 && "序号".equals(headerList.get(0)) && "中心".equals(headerList.get(1)) && "部门".equals(headerList.get(2))
-                    && "工单角色".equals(headerList.get(3)) && "SAP编号".equals(headerList.get(4)) && "姓名".equals(headerList.get(5))
-                    && "岗位".equals(headerList.get(6)) && "职级".equals(headerList.get(7)) && "K2".equals(headerList.get(8))) {
+            if (headerList.size() >= 11 && "一级单位".equals(headerList.get(0)) && "二级单位".equals(headerList.get(1))
+                    && "三级单位".equals(headerList.get(2)) && "四级单位".equals(headerList.get(3)) && "工单审批角色".equals(headerList.get(4))
+                    && "人员工号\n（SAP人员工号）".equals(headerList.get(5)) && "人员姓名".equals(headerList.get(6)) && "岗位名称".equals(headerList.get(7))
+                    && "职级".equals(headerList.get(8)) && "K2账号".equals(headerList.get(9)) && "备注".equals(headerList.get(10))) {
                 if (listob.size() == 1) {
                     resourceErrorCode = ResourceErrorCode.EMPTY_FILE;
                     message.append("导入失败，数据为空；");
@@ -252,105 +253,136 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
         }
         if (stat != true) {
             for (int i = 1; i < listob.size(); i++) {
-                long beforeLength = message.length();
-                List<Object> lo = listob.get(i);
+                long beforeLength = message.length();//用于判断本条信息是否有误
+                List<Object> lo = listob.get(i);//获取行内内容
                 ImportUserData importUserData = new ImportUserData();
                 boolean tag = true;//判断user的姓名和账号都存在
-                if ((lo.get(1) == null || "".equals(lo.get(1))) && i==1) {
-                    message.append("第").append(i + 1).append("行，中心不能为空；");
+                //处理一级单位
+                if (lo.get(0)==null || "".equals(lo.get(0)) && i==1){
+                    message.append("第").append(i + 1).append("行，一级单位不能为空；");
                 }else {
+                    if ((lo.get(0) == null || "".equals(lo.get(0)))) {
+                        lo.remove(0);
+                        lo.add(0, String.valueOf(listob.get(i - 1).get(0)));
+                    }
+                    String firstOrgName = String.valueOf(lo.get(0));
+                    UcOrg firstOrg = ucOrgMapper.getByOrgName(firstOrgName).get(0);
+                    if (BeanUtils.isEmpty(firstOrg)){
+                        message.append("第").append(i + 1).append("行，一级单位查询失败；");
+                    }else {
+                        importUserData.setFirstUnit(firstOrg);
+                    }
+                }
+
+                //处理二级单位
+                if ((lo.get(1) == null || "".equals(lo.get(1))) && i==1) {
+                    message.append("第").append(i + 1).append("行，二级单位不能为空，必须填写完整名称或者“/”；");
+                }else if(!String.valueOf(lo.get(1)).equals("/")){
                     if ((lo.get(1) == null || "".equals(lo.get(1)))){
                         lo.remove(1);
                         lo.add(1,String.valueOf(listob.get(i-1).get(1)));
                     }
                     String orgName=String.valueOf(lo.get(1));
-                    //写一个方法去：根据parentId和name获取唯一的UcOrg
-                    //List<UcOrg> orgList = ucOrgMapper.getByOrgName(orgName);
-                    UcOrg org = ucOrgMapper.getByOrgNameParentId(orgName,orgZb.getId());
-                    //UcOrg org = new UcOrg();
-                    if (BeanUtils.isEmpty(org)){
-                        message.append("第").append(i + 1).append("行，查无此中心；");
-                    }else {
-                        //org=orgList.get(0);
-                        importUserData.setCenter(org);
+                    if (BeanUtils.isNotEmpty(importUserData.getFirstUnit())){
+                        UcOrg secondOrg = ucOrgMapper.getByOrgNameParentId(orgName,importUserData.getFirstUnit().getId());
+                        if (BeanUtils.isEmpty(secondOrg)){
+                            message.append("第").append(i + 1).append("行，二级单位查询失败；");
+                        }else {
+                            importUserData.setSecondUnit(secondOrg);
+                        }
                     }
                 }
+
+                //处理三级单位
                 if ((lo.get(2) == null || "".equals(lo.get(2))) && i==1) {
-                    message.append("第").append(i + 1).append("行，部门不能为空，必须填写完整名称或者“/”；");
+                    message.append("第").append(i + 1).append("行，三级单位不能为空，必须填写完整名称或者“/”；");
                 }else if (!String.valueOf(lo.get(2)).equals("/")){
                     if ((lo.get(2) == null || "".equals(lo.get(2)))){
                         lo.remove(2);
                         lo.add(2,String.valueOf(listob.get(i-1).get(2)));
                     }
-                    String orgName = String.valueOf(lo.get(2));
-                    //写一个方法去：根据parentId和name获取唯一的UcOrg
-                    if (BeanUtils.isNotEmpty(importUserData.getCenter())){
-                        //List<UcOrg> orgs= ucOrgMapper.getByOrgName(orgName);
-                        UcOrg org = ucOrgMapper.getByOrgNameParentId(orgName,importUserData.getCenter().getId());
-                        if (BeanUtils.isEmpty(org)){
-                            message.append("第").append(i + 1).append("行，部门查询失败，查无此部门；");
+                    String thirdOrgName = String.valueOf(lo.get(2));
+                    if (BeanUtils.isNotEmpty(importUserData.getSecondUnit())){
+                        UcOrg thirdOrg = ucOrgMapper.getByOrgNameParentId(thirdOrgName,importUserData.getSecondUnit().getId());
+                        if (BeanUtils.isEmpty(thirdOrg)){
+                            message.append("第").append(i + 1).append("行，三级单位查询失败；");
                         }else {
-                            importUserData.setDepartment(org);
+                            importUserData.setThirdUnit(thirdOrg);
                         }
                     }
                 }
-                if (lo.get(9).equals("暂时无人")){
-                    importUserData.setExistUser(false);
-                    if (lo.get(3) == null || "".equals(lo.get(3))) {
-                        message.append("第").append(i + 1).append("行，工单角色不能为空；");
-                    }else {
-                        List<UcOrgJob> jobs = ucOrgJobMapper.getByJobName(String.valueOf(lo.get(3)));
-                        if(BeanUtils.isEmpty(jobs)){
-                            message.append("第").append(i + 1).append("行，工单角色查询失败，查无此工单角色；");
+
+                //处理四级单位
+                if ((lo.get(3) == null || "".equals(lo.get(3))) && i==1) {
+                    message.append("第").append(i + 1).append("行，四级单位不能为空，必须填写完整名称或者“/”；");
+                }else if (!String.valueOf(lo.get(3)).equals("/")){
+                    if ((lo.get(3) == null || "".equals(lo.get(3)))){
+                        lo.remove(3);
+                        lo.add(3,String.valueOf(listob.get(i-1).get(3)));
+                    }
+                    String fourthOrgName = String.valueOf(lo.get(3));
+                    if (BeanUtils.isNotEmpty(importUserData.getSecondUnit())){
+                        UcOrg fourthOrg = ucOrgMapper.getByOrgNameParentId(fourthOrgName,importUserData.getThirdUnit().getId());
+                        if (BeanUtils.isEmpty(fourthOrg)){
+                            message.append("第").append(i + 1).append("行，四级单位查询失败；");
                         }else {
-                            importUserData.setOrgJob(jobs.get(0));
+                            importUserData.setFourthUnit(fourthOrg);
                         }
                     }
+                }
+
+                //处理工单审批角色
+                if (lo.get(4) == null || "".equals(lo.get(4))) {
+                    message.append("第").append(i + 1).append("行，工单审批角色不能为空；");
+                }else {
+                    List<UcOrgJob> jobs = ucOrgJobMapper.getByJobName(String.valueOf(lo.get(4)));
+                    if(BeanUtils.isEmpty(jobs)){
+                        message.append("第").append(i + 1).append("行，工单审批角色查询失败，查无此工单审批角色；");
+                    }else {
+                        importUserData.setOrgJob(jobs.get(0));
+                    }
+                }
+                //备注是否含有人员
+                if (lo.get(10).equals("暂时无人")){
+                    importUserData.setExistUser(false);
+
                 }else {
                     importUserData.setExistUser(true);
-                    if (lo.get(3) == null || "".equals(lo.get(3))) {
-                        message.append("第").append(i + 1).append("行，工单角色不能为空；");
-                    }else {
-                        List<UcOrgJob> jobs = ucOrgJobMapper.getByJobName(String.valueOf(lo.get(3)));
-                        if(BeanUtils.isEmpty(jobs)){
-                            message.append("第").append(i + 1).append("行，工单角色查询失败，查无此工单角色；");
-                        }else {
-                            importUserData.setOrgJob(jobs.get(0));
-                        }
-                    }
-                    if (lo.get(4) == null || "".equals(lo.get(4))) {
+                    if (lo.get(5) == null || "".equals(lo.get(5))) {
                         message.append("第").append(i + 1).append("行，SAP编号不能为空；");
                     }else {
-                        importUserData.setSapCode(String.valueOf(lo.get(3)));
+                        importUserData.setSapCode(String.valueOf(lo.get(5)));
                     }
-                    if (lo.get(8) == null || "".equals(lo.get(8))) {
-                        message.append("第").append(i + 1).append("行，K2不能为空；");
+                    if (lo.get(9) == null || "".equals(lo.get(9))) {
+                        message.append("第").append(i + 1).append("行，K2账号不能为空；");
                         tag = false;
                     }
-                    if (lo.get(5) == null || "".equals(lo.get(5))) {
-                        message.append("第").append(i + 1).append("行，姓名不能为空；");
+                    if (lo.get(6) == null || "".equals(lo.get(6))) {
+                        message.append("第").append(i + 1).append("行，人员姓名不能为空；");
                         tag = false;
                     }
                     if (tag){
-                        UcUser user = ucUserMapper.getByAccount(String.valueOf(lo.get(8)));
+                        UcUser user = ucUserMapper.getByAccount(String.valueOf(lo.get(9)));
                         if (BeanUtils.isEmpty(user)){
                             message.append("第").append(i + 1).append("行，K2账号信息错误；");
-                        }else if (!user.getFullname().equals(lo.get(5))){
-                            message.append("第").append(i + 1).append("行，K2账号与姓名不匹配；");
+                        }else if (!user.getFullname().equals(lo.get(6))){
+                            message.append("第").append(i + 1).append("行，K2账号与人员姓名不匹配；");
                         }else {
                             importUserData.setUser(user);
                         }
                     }
-                    if (lo.get(6) == null || "".equals(lo.get(6))) {
-                        message.append("第").append(i + 1).append("行，岗位不能为空；");
-                    }
                     if (lo.get(7) == null || "".equals(lo.get(7))) {
+                        message.append("第").append(i + 1).append("行，岗位名称不能为空；");
+                    }else {
+                        importUserData.setPosName(String.valueOf(lo.get(7)));
+                    }
+                    if (lo.get(8) == null || "".equals(lo.get(8))) {
                         message.append("第").append(i + 1).append("行，职级不能为空；");
+                    }else {
+                        importUserData.setPostKey(String.valueOf(lo.get(8)));
                     }
                 }
-                importUserData.setPosName(String.valueOf(lo.get(6)));
-                importUserData.setPostKey(String.valueOf(lo.get(7)));
-                importUserData.setExcleRow(i);
+                importUserData.setExcleRow(i+1);
                 importUserDataList.add(importUserData);
                 long afterLength = message.length();
                 if (afterLength > beforeLength) {
@@ -358,9 +390,19 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                 }
             }
             if (message.length() < 1 && !CollectionUtils.isEmpty(importUserDataList)) {
-                //如果格式全部正确，开始批量处理数据。待写！！！！！！！！！！！！！！！！
+                //如果格式全部正确，开始批量处理数据。
                 for (ImportUserData userData : importUserDataList) {
-                    UcOrg org = BeanUtils.isEmpty(userData.getDepartment()) ? userData.getCenter():userData.getDepartment();
+                    //获取人员上级部门org
+                    UcOrg org = new UcOrg();
+                    if (BeanUtils.isNotEmpty(userData.getFourthUnit())){
+                        org=userData.getFourthUnit();
+                    }else {
+                        if (BeanUtils.isNotEmpty(userData.getThirdUnit())){
+                            org=userData.getThirdUnit();
+                        }else {
+                            org=BeanUtils.isNotEmpty(userData.getSecondUnit())?userData.getSecondUnit():userData.getFirstUnit();
+                        }
+                    }
                     //建立job和org的关系
                     //根据组织id和jobId去查询post信息
                     UcOrgPost orgPost = ucOrgPostMapper.getByOrgIdAndJobId(org.getId(),userData.getOrgJob().getId());
@@ -445,7 +487,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
             try{
                 GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(),GroupIdentity.class);
                 //根据上下班状态获取上班人员
-                String status = ucUserWorkHistoryService.queryLatest(groupIdentity1.getCode());
+                String status = ucUserWorkHistoryService.queryLatest(groupIdentity1.getId());
                 if(com.hypersmart.framework.utils.StringUtils.isNotRealEmpty(status) && "0".equals(status)){
                     groupIdentitySet.add(groupIdentity1);
                 }
