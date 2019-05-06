@@ -1,11 +1,16 @@
 package com.hypersmart.usercenter.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.ContextUtils;
+import com.hypersmart.base.util.JsonUtil;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
+import com.hypersmart.framework.utils.JsonUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.bo.GridBasicInfoBO;
 import com.hypersmart.usercenter.bo.GridRangeBO;
@@ -430,5 +435,26 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		return GridErrorCode.SUCCESS;
 	}
 
-	
+	@Override
+	public List<Map<String,Object>> getGridsHouseBymassifId(String massifId) {
+		List<Map<String,Object>> returnList = new ArrayList<>();
+		List<GridBasicInfo> gridBasicInfos = this.getGridsBymassifId(massifId);
+		gridBasicInfos.forEach(grid -> {
+			List<Map<String,Object>> listObjectFir = (List<Map<String,Object>>) JSONArray.parse(grid.getGridRange());
+			returnList.addAll(listObjectFir);
+			/*returnList.addAll(JsonUtil.to)*/
+		});
+		return returnList;
+	}
+
+	/*public static void main(String[] args){
+		String a = "[{\"id\":\"d3d6affe-841a-11e8-940f-7cd30adaaf52\",\"name\":\"27栋\",\"code\":\"027\",\"parentId\":0,\"checked\":0,\"level\":1},{\"id\":\"ce314fa8-841f-11e8-940f-7cd30adaaf52\",\"name\":\"1单元\",\"code\":\"01\",\"parentId\":\"d3d6affe-841a-11e8-940f-7cd30adaaf52\",\"checked\":0,\"level\":2},{\"id\":\"1cf45506-88a8-11e8-940f-7cd30adaaf52\",\"name\":\"027-01-0201\",\"code\":\"0201\",\"parentId\":\"ce314fa8-841f-11e8-940f-7cd30adaaf52\",\"checked\":1,\"level\":3},{\"id\":\"1cf45563-88a8-11e8-940f-7cd30adaaf52\",\"name\":\"027-01-0202\",\"code\":\"0202\",\"parentId\":\"ce314fa8-841f-11e8-940f-7cd30adaaf52\",\"checked\":1,\"level\":3}]";
+		List<Map<String,Object>> listObjectFir = (List<Map<String,Object>>) JSONArray.parse(a);
+		System.out.println("利用JSONArray中的parse方法来解析json数组字符串");
+		for(Map<String,Object> mapList : listObjectFir){
+			for (Map.Entry entry : mapList.entrySet()){
+				System.out.println( entry.getKey()  + "  " +entry.getValue());
+			}
+		}
+	}*/
 }

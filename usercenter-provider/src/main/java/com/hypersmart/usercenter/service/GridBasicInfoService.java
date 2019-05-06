@@ -130,6 +130,13 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 */
 	GridErrorCode disassociatedGrid(GridBasicInfoDTO gridBasicInfoDTO);
 
+	/**
+	 * 根据地块id，获取地块下的楼栋网格覆盖的房产
+	 *
+	 * @param massifId
+	 * @return
+	 */
+	List<Map<String,Object>> getGridsHouseBymassifId(String massifId);
 
 }
 
