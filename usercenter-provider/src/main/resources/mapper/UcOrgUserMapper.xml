@@ -85,8 +85,9 @@
         IS_REL_ACTIVE_ as isRelActive, UPDATE_TIME_ as updateTime, IS_DELE_, VERSION_ as version
         from uc_org_user
         <where>
+            IS_DELE_='0'
             <if test="orgId!=null and orgId!=''">
-                ORG_ID_=#{orgId}
+                AND ORG_ID_=#{orgId}
             </if>
             <if test="userId!=null and userId!=''">
                 and USER_ID_=#{userId}
