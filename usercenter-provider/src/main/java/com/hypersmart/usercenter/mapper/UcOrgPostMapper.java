@@ -21,5 +21,7 @@ public interface UcOrgPostMapper extends GenericMapper<UcOrgPost> {
 
     List<Map<String, Object>> getJobPage(Map<String, Object> params);
 
-    UcOrgPost getByOrgIdAndJobId(@Param("orgId") String orgId,@Param("jobId") String jobId);
+    List<UcOrgPost> getByOrgIdAndJobId(@Param("orgId") String orgId,@Param("jobId") String jobId);
+
+    Integer getPostCodeLookLikeCount(@Param("postCode") String postCode);
 }
