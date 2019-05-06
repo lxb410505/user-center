@@ -175,11 +175,11 @@
         org_lv2.ID_ AS corpId,
         org.ID_ AS divideId
         from uc_user u
-        join uc_org_user uou on u.ID_ = uou.USER_ID_
-        join uc_org org on uou.ORG_ID_ = org.ID_
-        join uc_org org_lv2 on org.PARENT_ID_ = org_lv2.ID_
-        join uc_org_post post on uou.POS_ID_ =  post.ID_
-        join uc_org_job uoj on post.JOB_ID_ = uoj.ID_
+        join uc_org_user uou on u.ID_ = uou.USER_ID_ and uou.IS_DELE_ = 0
+        join uc_org org on uou.ORG_ID_ = org.ID_ and org.IS_DELE_ = 0
+        join uc_org org_lv2 on org.PARENT_ID_ = org_lv2.ID_ and org_lv2.IS_DELE_ = 0
+        join uc_org_post post on uou.POS_ID_ =  post.ID_ and post.IS_DELE_ = 0
+        join uc_org_job uoj on post.JOB_ID_ = uoj.ID_ and uoj.IS_DELE_ = 0
         join uc_demension dem on
         org.DEM_ID_ = dem.ID_ and  org_lv2.DEM_ID_ = dem.ID_
         where uoj.CODE_ = 'guanjia' and dem.CODE_ = 'smsf' and org.GRADE_ = 'ORG_DiKuai') a

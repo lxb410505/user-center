@@ -14,7 +14,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-
+import java.util.List;
 
 
 /**
@@ -82,5 +82,11 @@ public class UcOrgParamsController extends BaseController {
         String[] aryIds = ids.split(",");
         this.ucOrgParamsService.delete(aryIds);
         return new CommonResult(true, "批量删除成功");
+    }
+
+    @GetMapping({"/selectByOrgId/{id}"})
+    @ApiOperation(value = "组织参数数据列表", httpMethod = "GET", notes = "获取单个组织参数记录")
+    public List<UcOrgParams> selectByOrgId(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {
+        return this.ucOrgParamsService.selectByOrgId(id);
     }
 }

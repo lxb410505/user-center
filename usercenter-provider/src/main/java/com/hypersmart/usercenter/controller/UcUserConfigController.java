@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -40,7 +42,7 @@ public class UcUserConfigController extends BaseController {
     @GetMapping({"/get/{id}"})
     @ApiOperation(value = "数据列表", httpMethod = "GET", notes = "获取单个记录")
     public UcUserConfig get(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {
-        return this.ucUserConfigService.get(id);
+        return this.ucUserConfigService.getUnique("userId",id);
     }
 
 
