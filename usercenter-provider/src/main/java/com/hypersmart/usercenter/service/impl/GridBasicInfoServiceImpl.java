@@ -447,6 +447,12 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		return returnList;
 	}
 
+	@Override
+	public List<GridBasicInfo> getByGridRange(String gridRange) {
+		List<GridBasicInfo> list = gridBasicInfoMapper.getByGridRange(gridRange);
+		return list;
+	}
+
 	/*public static void main(String[] args){
 		String a = "[{\"id\":\"d3d6affe-841a-11e8-940f-7cd30adaaf52\",\"name\":\"27栋\",\"code\":\"027\",\"parentId\":0,\"checked\":0,\"level\":1},{\"id\":\"ce314fa8-841f-11e8-940f-7cd30adaaf52\",\"name\":\"1单元\",\"code\":\"01\",\"parentId\":\"d3d6affe-841a-11e8-940f-7cd30adaaf52\",\"checked\":0,\"level\":2},{\"id\":\"1cf45506-88a8-11e8-940f-7cd30adaaf52\",\"name\":\"027-01-0201\",\"code\":\"0201\",\"parentId\":\"ce314fa8-841f-11e8-940f-7cd30adaaf52\",\"checked\":1,\"level\":3},{\"id\":\"1cf45563-88a8-11e8-940f-7cd30adaaf52\",\"name\":\"027-01-0202\",\"code\":\"0202\",\"parentId\":\"ce314fa8-841f-11e8-940f-7cd30adaaf52\",\"checked\":1,\"level\":3}]";
 		List<Map<String,Object>> listObjectFir = (List<Map<String,Object>>) JSONArray.parse(a);
