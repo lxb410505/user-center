@@ -257,5 +257,40 @@
         </foreach>
     </update>
 
+    <select id="getByGridRange" parameterType="java.lang.String" resultType="com.hypersmart.usercenter.model.GridBasicInfo">
+        select 	id,
+        grid_code as gridCode,
+        grid_name AS gridName,
+        grid_type as gridType,
+        grid_range as gridRange,
+        grid_remark as gridRemark,
+        area_id as areaId,
+        project_id as projectId,
+        massif_id as massifId,
+        staging_id as stagingId,
+        city_id as cityId,
+        housekeeper_id as housekeeperId,
+        update_times as updateTimes,
+        format_attribute as formatAttribute,
+        second_format_attribute as secondFormatAttribute,
+        third_format_attribute as thirdFormatAttribute,
+        creation_date as creationDate,
+        created_by as createdBy,
+        updation_date as updationDate,
+        updated_by as updatedBy,
+        row_time as rowTime,
+        row_version as rowVersion,
+        tenant_id as tenantId,
+        enabled_flag as enabledFlag,
+        is_deleted as isDeleted
+        from
+        grid_basic_info
+        <where>
+            is_deleted = '0'
+            <if test="gridRange!=null and gridRange!=''">
+                AND grid_range LIKE CONCAT('%',#{gridRange},'%')
+            </if>
+        </where>
+    </select>
 
 </mapper>

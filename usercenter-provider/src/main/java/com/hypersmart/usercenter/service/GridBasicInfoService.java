@@ -138,5 +138,12 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 */
 	List<Map<String,Object>> getGridsHouseBymassifId(String massifId);
 
+	/**
+	 * 根据房产id获取网格
+	 * @param gridRange
+	 * @return
+	 */
+	List<GridBasicInfo> getByGridRange(String gridRange);
+
 }
 
