@@ -23,10 +23,7 @@ import com.hypersmart.usercenter.mapper.GridApprovalRecordMapper;
 import com.hypersmart.usercenter.mapper.GridBasicInfoMapper;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
 import com.hypersmart.usercenter.model.GridBasicInfo;
-import com.hypersmart.usercenter.service.GridApprovalRecordService;
-import com.hypersmart.usercenter.service.GridBasicInfoService;
-import com.hypersmart.usercenter.service.GridRangeService;
-import com.hypersmart.usercenter.service.UcOrgService;
+import com.hypersmart.usercenter.service.*;
 import com.hypersmart.usercenter.util.GridOperateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,6 +62,9 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
 	@Resource
 	private GridApprovalRecordMapper gridApprovalRecordMapper;
+
+	@Resource
+	private DashBoardFeignService dashBoardFeignService;
 
 	public GridBasicInfoServiceImpl(GridBasicInfoMapper mapper) {
 		super(mapper);
@@ -200,6 +200,15 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			gridBasicInfoDTO.setId(gridBasicInfo.getId());
 			gridBasicInfoDTO.setCreationDate(gridBasicInfo.getCreationDate());
 			gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfo.getId(), gridBasicInfoDTO);
+			if(num>0){
+				//线程执行 增加gridRange 字段的缓存
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						dashBoardFeignService.handChangeRange(gridBasicInfo.getId(),gridBasicInfo.getGridRange(),1);//1 新增
+					}
+				}).start();
+			}
 		}
 		if (num < 1) {
 			gridErrorCode = GridErrorCode.INSERT_EXCEPTION;
@@ -247,6 +256,15 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			gridBasicInfo.setUpdationDate(new Date());
 			gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
 			num = this.updateSelective(gridBasicInfo);
+			if(num>1 && !StringUtils.isEmpty(gridBasicInfo.getGridRange())){
+				//线程执行 增加gridRange 字段的缓存
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						dashBoardFeignService.handChangeRange(gridBasicInfo.getId(),gridBasicInfo.getGridRange(),2);//2 修改
+					}
+				}).start();
+			}
 		}
 		if (num < 1) {
 			gridErrorCode = GridErrorCode.UPDATE_EXCEPTION;
@@ -348,6 +366,15 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		gridRangeService.deleteRangeByGridIds(gridBasicInfoBO.getIds());
 		if (num < 1) {
 			gridErrorCode = GridErrorCode.DELETE_EXCEPTION;
+		}else
+		if(num>1 ){
+			//线程执行 增加gridRange 字段的缓存
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					dashBoardFeignService.handChangeRange(gridBasicInfoBO.getId(),null,3);//3 删除
+				}
+			}).start();
 		}
 		return gridErrorCode;
 	}
@@ -445,6 +472,12 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			/*returnList.addAll(JsonUtil.to)*/
 		});
 		return returnList;
+	}
+
+	@Override
+	public List<GridBasicInfo> getByGridRange(String gridRange) {
+		List<GridBasicInfo> list = gridBasicInfoMapper.getByGridRange(gridRange);
+		return list;
 	}
 
 	/*public static void main(String[] args){

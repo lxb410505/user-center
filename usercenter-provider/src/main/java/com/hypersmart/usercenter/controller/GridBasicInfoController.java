@@ -286,4 +286,11 @@ public class GridBasicInfoController extends BaseController {
 		List<Map<String,Object>> gridHouses = gridBasicInfoService.getGridsHouseBymassifId(id);
 		return gridHouses;
 	}
+
+	@GetMapping({"/getGridByHouseId"})
+	@ApiOperation(value = "根据房产id，获取相应网格", httpMethod = "GET", notes = "根据房产id，获取相应网格")
+	public List<GridBasicInfo> getGridByHouseId(@ApiParam(name = "id", value = "查询对象") @RequestParam String id) {
+		List<GridBasicInfo> gridBasicInfos = gridBasicInfoService.getByGridRange(id);
+		return gridBasicInfos;
+	}
 }

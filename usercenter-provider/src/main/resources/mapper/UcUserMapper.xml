@@ -307,8 +307,9 @@
         select distinct u.* from
         uc_user u
         <where>
+            u.IS_DELE_!=1
             <if test="account!=null and account!=''">
-                u.ACCOUNT_=#{account}
+                AND u.ACCOUNT_=#{account}
             </if>
         </where>
     </select>

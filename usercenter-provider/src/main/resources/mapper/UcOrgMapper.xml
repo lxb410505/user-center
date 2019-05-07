@@ -164,8 +164,9 @@
         REF_ID_ as refId
         from uc_org
         <where>
+            IS_DELE_ = '0'
             <if test="orgName!=null and orgName!=''">
-                NAME_=#{orgName}
+                AND NAME_=#{orgName}
             </if>
         </where>
     </select>
@@ -188,8 +189,9 @@
         REF_ID_ as refId
         from uc_org
         <where>
+            IS_DELE_ = '0'
             <if test="orgName!=null and orgName!=''">
-                NAME_=#{orgName}
+                AND NAME_=#{orgName}
             </if>
             <if test="parentId!=null and parentId!=''">
                 AND PARENT_ID_=#{parentId}

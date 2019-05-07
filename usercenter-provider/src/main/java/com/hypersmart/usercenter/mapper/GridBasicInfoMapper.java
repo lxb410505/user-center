@@ -70,4 +70,6 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
      * @return
      */
     List<Map<String,Object>> checkPermission(Map<String, Object> params);
+
+    List<GridBasicInfo> getByGridRange(@Param("gridRange") String gridRange);
 }
