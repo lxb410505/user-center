@@ -21,8 +21,10 @@ import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
 import com.hypersmart.usercenter.mapper.GridApprovalRecordMapper;
 import com.hypersmart.usercenter.mapper.GridBasicInfoMapper;
+import com.hypersmart.usercenter.mapper.UcOrgParamsMapper;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
 import com.hypersmart.usercenter.model.GridBasicInfo;
+import com.hypersmart.usercenter.model.UcOrgParams;
 import com.hypersmart.usercenter.service.*;
 import com.hypersmart.usercenter.util.GridOperateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,9 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
 	@Resource
 	private GridBasicInfoMapper gridBasicInfoMapper;
+
+	@Resource
+	private UcOrgParamsMapper ucOrgParamsMapper;
 
 	@Autowired
 	UcOrgUserMapper ucOrgUserMapper;
@@ -405,6 +410,15 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	 */
 	@Override
 	public List<GridBasicInfo> getGridsBymassifId(String massifId) {
+		Example exampleP = new Example(UcOrgParams.class);
+		exampleP.createCriteria().andEqualTo("value", massifId)
+				.andEqualTo("isDele", 0);
+		List<UcOrgParams> list = ucOrgParamsMapper.selectByExample(exampleP);
+		if (CollectionUtils.isEmpty(list)) {
+			return new ArrayList<>();
+		}
+		massifId = list.get(0).getOrgId();
+
 		Example example = new Example(GridBasicInfo.class);
 		example.createCriteria().andEqualTo("stagingId", massifId)
 				.andEqualTo("gridType", "building_grid")
