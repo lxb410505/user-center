@@ -418,7 +418,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                     UcOrgPost orgPost = null;
                     if (!BeanUtils.isEmpty(orgPosts)){
                         for (UcOrgPost post : orgPosts){
-                            if (post.getPosName().equals(userData.getPosName())){
+                            if (post.getPosName().equals(userData.getPosName()) && post.getPostKey().equals(userData.getPostKey())){
                                 orgPost=post;
                             }
                         }
