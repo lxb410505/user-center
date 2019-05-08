@@ -2,6 +2,7 @@ package com.hypersmart.usercenter.dto;
 
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UcOrgJob;
+import com.hypersmart.usercenter.model.UcRole;
 import com.hypersmart.usercenter.model.UcUser;
 
 public class ImportUserData {
@@ -15,6 +16,8 @@ public class ImportUserData {
     private UcOrg fourthUnit;
     //工单角色
     private UcOrgJob orgJob;
+    //role
+    private UcRole ucRole;
     //PSA编号
     private String sapCode;
     //用户
@@ -28,6 +31,13 @@ public class ImportUserData {
     //表格行
     private Integer excleRow;
 
+    public UcRole getUcRole() {
+        return ucRole;
+    }
+
+    public void setUcRole(UcRole ucRole) {
+        this.ucRole = ucRole;
+    }
     public UcOrg getFirstUnit() {
         return firstUnit;
     }
