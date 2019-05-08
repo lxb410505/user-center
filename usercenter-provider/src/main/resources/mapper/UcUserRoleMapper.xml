@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.UcUserRoleMapper">
+    <select id="getByRoleIdAndUserId" parameterType="java.lang.String" resultType="com.hypersmart.usercenter.model.UcUserRole">
+        select 	ID_ as id,
+        ROLE_ID_ as roleId,
+        USER_ID_ as userId,
+        UPDATE_TIME_ as updateTime,
+        IS_DELE_ as isDele,
+        VERSION_ as version
+        from uc_user_role
+        <where>
+            IS_DELE_ = '0'
+            <if test="RoleId!=null and RoleId!=''">
+                and ROLE_ID_ = #{RoleId}
+            </if>
+            <if test="UserId!=null and UserId!=''">
+                and USER_ID_ = #{UserId}
+            </if>
+        </where>
+    </select>
+</mapper>
