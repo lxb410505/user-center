@@ -1,11 +1,16 @@
 package com.hypersmart.usercenter.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.ContextUtils;
+import com.hypersmart.base.util.JsonUtil;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
+import com.hypersmart.framework.utils.JsonUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.bo.GridBasicInfoBO;
 import com.hypersmart.usercenter.bo.GridRangeBO;
@@ -16,12 +21,11 @@ import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
 import com.hypersmart.usercenter.mapper.GridApprovalRecordMapper;
 import com.hypersmart.usercenter.mapper.GridBasicInfoMapper;
+import com.hypersmart.usercenter.mapper.UcOrgParamsMapper;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
 import com.hypersmart.usercenter.model.GridBasicInfo;
-import com.hypersmart.usercenter.service.GridApprovalRecordService;
-import com.hypersmart.usercenter.service.GridBasicInfoService;
-import com.hypersmart.usercenter.service.GridRangeService;
-import com.hypersmart.usercenter.service.UcOrgService;
+import com.hypersmart.usercenter.model.UcOrgParams;
+import com.hypersmart.usercenter.service.*;
 import com.hypersmart.usercenter.util.GridOperateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +50,9 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	@Resource
 	private GridBasicInfoMapper gridBasicInfoMapper;
 
+	@Resource
+	private UcOrgParamsMapper ucOrgParamsMapper;
+
 	@Autowired
 	UcOrgUserMapper ucOrgUserMapper;
 
@@ -60,6 +67,9 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
 	@Resource
 	private GridApprovalRecordMapper gridApprovalRecordMapper;
+
+	@Resource
+	private DashBoardFeignService dashBoardFeignService;
 
 	public GridBasicInfoServiceImpl(GridBasicInfoMapper mapper) {
 		super(mapper);
@@ -195,6 +205,15 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			gridBasicInfoDTO.setId(gridBasicInfo.getId());
 			gridBasicInfoDTO.setCreationDate(gridBasicInfo.getCreationDate());
 			gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfo.getId(), gridBasicInfoDTO);
+			if(num>0){
+				//线程执行 增加gridRange 字段的缓存
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						dashBoardFeignService.handChangeRange(gridBasicInfo.getId(),gridBasicInfo.getGridRange(),1);//1 新增
+					}
+				}).start();
+			}
 		}
 		if (num < 1) {
 			gridErrorCode = GridErrorCode.INSERT_EXCEPTION;
@@ -242,6 +261,15 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			gridBasicInfo.setUpdationDate(new Date());
 			gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
 			num = this.updateSelective(gridBasicInfo);
+			if(num>1 && !StringUtils.isEmpty(gridBasicInfo.getGridRange())){
+				//线程执行 增加gridRange 字段的缓存
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						dashBoardFeignService.handChangeRange(gridBasicInfo.getId(),gridBasicInfo.getGridRange(),2);//2 修改
+					}
+				}).start();
+			}
 		}
 		if (num < 1) {
 			gridErrorCode = GridErrorCode.UPDATE_EXCEPTION;
@@ -343,6 +371,15 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		gridRangeService.deleteRangeByGridIds(gridBasicInfoBO.getIds());
 		if (num < 1) {
 			gridErrorCode = GridErrorCode.DELETE_EXCEPTION;
+		}else
+		if(num>1 ){
+			//线程执行 增加gridRange 字段的缓存
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					dashBoardFeignService.handChangeRange(gridBasicInfoBO.getId(),null,3);//3 删除
+				}
+			}).start();
 		}
 		return gridErrorCode;
 	}
@@ -373,6 +410,15 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	 */
 	@Override
 	public List<GridBasicInfo> getGridsBymassifId(String massifId) {
+		Example exampleP = new Example(UcOrgParams.class);
+		exampleP.createCriteria().andEqualTo("value", massifId)
+				.andEqualTo("isDele", 0);
+		List<UcOrgParams> list = ucOrgParamsMapper.selectByExample(exampleP);
+		if (CollectionUtils.isEmpty(list)) {
+			return new ArrayList<>();
+		}
+		massifId = list.get(0).getOrgId();
+
 		Example example = new Example(GridBasicInfo.class);
 		example.createCriteria().andEqualTo("stagingId", massifId)
 				.andEqualTo("gridType", "building_grid")
@@ -430,5 +476,32 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		return GridErrorCode.SUCCESS;
 	}
 
-	
+	@Override
+	public List<Map<String,Object>> getGridsHouseBymassifId(String massifId) {
+		List<Map<String,Object>> returnList = new ArrayList<>();
+		List<GridBasicInfo> gridBasicInfos = this.getGridsBymassifId(massifId);
+		gridBasicInfos.forEach(grid -> {
+			List<Map<String,Object>> listObjectFir = (List<Map<String,Object>>) JSONArray.parse(grid.getGridRange());
+			returnList.addAll(listObjectFir);
+			/*returnList.addAll(JsonUtil.to)*/
+		});
+		return returnList;
+	}
+
+	@Override
+	public List<GridBasicInfo> getByGridRange(String gridRange) {
+		List<GridBasicInfo> list = gridBasicInfoMapper.getByGridRange(gridRange);
+		return list;
+	}
+
+	/*public static void main(String[] args){
+		String a = "[{\"id\":\"d3d6affe-841a-11e8-940f-7cd30adaaf52\",\"name\":\"27栋\",\"code\":\"027\",\"parentId\":0,\"checked\":0,\"level\":1},{\"id\":\"ce314fa8-841f-11e8-940f-7cd30adaaf52\",\"name\":\"1单元\",\"code\":\"01\",\"parentId\":\"d3d6affe-841a-11e8-940f-7cd30adaaf52\",\"checked\":0,\"level\":2},{\"id\":\"1cf45506-88a8-11e8-940f-7cd30adaaf52\",\"name\":\"027-01-0201\",\"code\":\"0201\",\"parentId\":\"ce314fa8-841f-11e8-940f-7cd30adaaf52\",\"checked\":1,\"level\":3},{\"id\":\"1cf45563-88a8-11e8-940f-7cd30adaaf52\",\"name\":\"027-01-0202\",\"code\":\"0202\",\"parentId\":\"ce314fa8-841f-11e8-940f-7cd30adaaf52\",\"checked\":1,\"level\":3}]";
+		List<Map<String,Object>> listObjectFir = (List<Map<String,Object>>) JSONArray.parse(a);
+		System.out.println("利用JSONArray中的parse方法来解析json数组字符串");
+		for(Map<String,Object> mapList : listObjectFir){
+			for (Map.Entry entry : mapList.entrySet()){
+				System.out.println( entry.getKey()  + "  " +entry.getValue());
+			}
+		}
+	}*/
 }

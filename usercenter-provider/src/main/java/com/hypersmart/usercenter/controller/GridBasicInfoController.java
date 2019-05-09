@@ -279,4 +279,18 @@ public class GridBasicInfoController extends BaseController {
 		List<GridBasicInfo> gridBasicInfos = gridBasicInfoService.getGridsBymassifId(id);
 		return gridBasicInfos;
 	}
+
+	@GetMapping({"/getGridsHouse/{id}"})
+	@ApiOperation(value = "根据地块id，获取地块下的网格覆盖的房产信息", httpMethod = "GET", notes = "根据地块id，获取地块下的楼栋网格信息")
+	public List<Map<String,Object>> getGridsHouse(@ApiParam(name = "id", value = "地块id", required = true) @PathVariable String id) {
+		List<Map<String,Object>> gridHouses = gridBasicInfoService.getGridsHouseBymassifId(id);
+		return gridHouses;
+	}
+
+	@GetMapping({"/getGridByHouseId"})
+	@ApiOperation(value = "根据房产id，获取相应网格", httpMethod = "GET", notes = "根据房产id，获取相应网格")
+	public List<GridBasicInfo> getGridByHouseId(@ApiParam(name = "id", value = "查询对象") @RequestParam String id) {
+		List<GridBasicInfo> gridBasicInfos = gridBasicInfoService.getByGridRange(id);
+		return gridBasicInfos;
+	}
 }
