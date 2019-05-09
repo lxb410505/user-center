@@ -97,7 +97,7 @@
 
 
     <select id="findDivide" resultType="com.hypersmart.usercenter.model.Divide">
-        select * from resource-center.divide
+        select * from <![CDATA[resource-center.divide]]>
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
