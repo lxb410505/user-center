@@ -11,6 +11,7 @@ import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
 import com.hypersmart.usercenter.mapper.UcUserMapper;
 import com.hypersmart.usercenter.model.Divide;
+import com.hypersmart.usercenter.model.House;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.UcOrgService;
@@ -351,5 +352,20 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         List<Divide> divide = ucOrgUserMapper.findDivide(params);
         return new PageList(divide);
 
+    }
+
+    @Override
+    public PageList<House> findHous(QueryFilter queryFilter){
+    PageBean pageBean = queryFilter.getPageBean();
+        if (com.hypersmart.base.util.BeanUtils.isEmpty(pageBean)) {
+        PageHelper.startPage(1, Integer.MAX_VALUE, false);
+    } else {
+        PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
+                pageBean.showTotal());
+    }
+    Map<String, Object> params = queryFilter.getParams();
+
+    List<House> divide = ucOrgUserMapper.findHous(params);
+        return new PageList(divide);
     }
 }

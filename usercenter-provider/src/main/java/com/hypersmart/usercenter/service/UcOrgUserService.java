@@ -3,6 +3,7 @@ package com.hypersmart.usercenter.service;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.usercenter.model.Divide;
+import com.hypersmart.usercenter.model.House;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.framework.service.IGenericService;
 import org.springframework.stereotype.Service;
@@ -43,5 +44,8 @@ public interface UcOrgUserService extends IGenericService<String, UcOrgUser> {
     List<Map<String, Object>> getOrgByCondition(QueryFilter queryFilter);
 
     PageList<Divide> findDivide(QueryFilter queryFilter);
+
+    PageList<House> findHous(QueryFilter queryFilter);
+
 }
 

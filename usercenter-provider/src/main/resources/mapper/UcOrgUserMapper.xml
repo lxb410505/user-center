@@ -78,6 +78,57 @@
         <result column="address" jdbcType="VARCHAR" property="address"></result>
     </resultMap>
 
+    <resultMap id="hours" type="com.hypersmart.usercenter.model.House">
+        <id jdbcType="VARCHAR" property="id" column="id"></id>
+        <result column="sf_guid" jdbcType="VARCHAR" property="sfGuid"></result>
+        <result column="sap_id" jdbcType="VARCHAR" property="sapId"></result>
+        <result column="wbs_code" jdbcType="VARCHAR" property="wbsCode"></result>
+        <result column="house_code" jdbcType="VARCHAR" property="houseCode"></result>
+        <result column="house_inner_name" jdbcType="VARCHAR" property="houseInnerName"></result>
+        <result column="is_invented" jdbcType="VARCHAR" property="isInvented"></result>
+        <result column="floor" jdbcType="VARCHAR" property="floor"></result>
+        <result column="house_state" jdbcType="VARCHAR" property="houseState"></result>
+        <result column="property_type" jdbcType="VARCHAR" property="propertyType"></result>
+        <result column="actual_address" jdbcType="VARCHAR" property="actualAddress"></result>
+        <result column="measured_area" jdbcType="VARCHAR" property="measuredArea"></result>
+        <result column="predicted_area" jdbcType="VARCHAR" property="predictedArea"></result>
+        <result column="building_area" jdbcType="VARCHAR" property="buildingArea"></result>
+        <result column="fee_area" jdbcType="VARCHAR" property="feeArea"></result>
+        <result column="used_area" jdbcType="VARCHAR" property="usedArea"></result>
+        <result column="total_arrearage" jdbcType="VARCHAR" property="totalArrearage"></result>
+        <result column="start_date" jdbcType="VARCHAR" property="startDate"></result>
+        <result column="restore_original_date" jdbcType="VARCHAR" property="restoreOriginalDate"></result>
+        <result column="remark" jdbcType="VARCHAR" property="remark"></result>
+        <result column="reason" jdbcType="VARCHAR" property="reason"></result>
+        <result column="unit_id" jdbcType="VARCHAR" property="unitId"></result>
+        <result column="unit_code" jdbcType="VARCHAR" property="unitCode"></result>
+        <result column="building_id" jdbcType="VARCHAR" property="buildingId"></result>
+        <result column="divide_id" jdbcType="VARCHAR" property="divideId"></result>
+        <result column="project_id" jdbcType="VARCHAR" property="projectId"></result>
+        <result column="building_name" jdbcType="VARCHAR" property="buildingName"></result>
+        <result column="divide_name" jdbcType="VARCHAR" property="divideName"></result>
+        <result column="project_name" jdbcType="VARCHAR" property="projectName"></result>
+        <result column="contract_id" jdbcType="VARCHAR" property="contractId"></result>
+        <result column="contract_flag" jdbcType="VARCHAR" property="contractFlag"></result>
+        <result column="corp_id" jdbcType="VARCHAR" property="corpId"></result>
+        <result column="creation_date" jdbcType="VARCHAR" property="creationDate"></result>
+        <result column="created_by" jdbcType="VARCHAR" property="createdBy"></result>
+        <result column="updation_date" jdbcType="VARCHAR" property="updationDate"></result>
+        <result column="updated_by" jdbcType="VARCHAR" property="updatedBy"></result>
+        <result column="row_version" jdbcType="VARCHAR" property="rowVersion"></result>
+        <result column="updation_date" jdbcType="VARCHAR" property="updationDate"></result>
+        <result column="is_deleted" jdbcType="VARCHAR" property="isDeleted"></result>
+        <result column="enabled_flag" jdbcType="VARCHAR" property="enabledFlag"></result>
+        <result column="divide_code" jdbcType="VARCHAR" property="divideCode"></result>
+        <result column="plat_divide_id" jdbcType="VARCHAR" property="platDivideId"></result>
+        <result column="plat_divide_name" jdbcType="VARCHAR" property="platDivideName"></result>
+        <result column="project_code" jdbcType="VARCHAR" property="projectCode"></result>
+        <result column="plat_project_id" jdbcType="VARCHAR" property="platProjectId"></result>
+        <result column="plat_project_name" jdbcType="VARCHAR" property="platProjectName"></result>
+
+    </resultMap>
+
+
     <sql id="BaseAttribute">
         ID_,ORG_ID_,USER_ID_
     </sql>
@@ -173,4 +224,14 @@
             </if>
         </where>
     </select>
+
+    <select id="findHous" resultMap="hours">
+         select * from  <![CDATA[ `resource-center`.house_bak ]]>
+        <where>
+            <if test="whereSql!=null">
+                ${whereSql}
+            </if>
+        </where>
+    </select>
+
 </mapper>
