@@ -16,6 +16,7 @@ import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
@@ -30,7 +31,6 @@ import java.util.*;
  */
 @Service("ucOrgUserServiceImpl")
 public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> implements UcOrgUserService {
-
     @Autowired
     UcOrgUserMapper ucOrgUserMapper;
 
@@ -346,7 +346,9 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
             PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
                     pageBean.showTotal());
         }
-        List<Divide> divide = ucOrgUserMapper.findDivide(queryFilter.getParams());
+        Map<String, Object> params = queryFilter.getParams();
+
+        List<Divide> divide = ucOrgUserMapper.findDivide(params);
         return new PageList(divide);
 
     }
