@@ -31,8 +31,6 @@ import java.util.*;
  */
 @Service("ucOrgUserServiceImpl")
 public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> implements UcOrgUserService {
-    @Value("${info.app.java.resourceCenter}")
-    String  resourceCenter ;
     @Autowired
     UcOrgUserMapper ucOrgUserMapper;
 
