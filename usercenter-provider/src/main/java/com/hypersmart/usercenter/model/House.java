@@ -20,7 +20,7 @@ import java.sql.Date;
  * @date 2019-01-08 10:49:00
  */
 
-@Table(name = "house")
+@Table(name = "house_bak")
 @ApiModel(value = "House", description = "【基础信息】房产")
 public class House implements Serializable{
 private static final long serialVersionUID=1L;
