@@ -83,7 +83,7 @@ public class UcOrgUserController extends BaseController {
 
     @PostMapping({"/getHouse"})
     @ApiOperation(value = "获取用户地块数据列表}", httpMethod = "POST", notes = "获取用户地块数据列表")
-    public PageList<House> getHouse(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+    public List<String> getHouse(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
         return   ucOrgUserService.findHous(queryFilter);
     }
 //    @PostMapping({"add"})

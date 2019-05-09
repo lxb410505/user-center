@@ -45,7 +45,7 @@ public interface UcOrgUserService extends IGenericService<String, UcOrgUser> {
 
     PageList<Divide> findDivide(QueryFilter queryFilter);
 
-    PageList<House> findHous(QueryFilter queryFilter);
+    List<String> findHous(QueryFilter queryFilter);
 
 }
 
