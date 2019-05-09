@@ -459,6 +459,22 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	}
 
 	/**
+	 * 根据地块id，获取地块下的楼栋网格
+	 *
+	 * @param massifId
+	 * @return
+	 */
+	@Override
+	public List<GridBasicInfo> getGridsBySmcloudmassifId(String massifId) {
+		Example example = new Example(GridBasicInfo.class);
+		example.createCriteria().andEqualTo("stagingId", massifId)
+				.andEqualTo("gridType", "building_grid")
+				.andEqualTo("isDeleted", 0)
+				.andEqualTo("enabledFlag", 1);
+		return gridBasicInfoMapper.selectByExample(example);
+	}
+
+	/**
 	 * 管家解除关联网格
 	 *
 	 * @param gridBasicInfoDTO
@@ -479,7 +495,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	@Override
 	public List<Map<String,Object>> getGridsHouseBymassifId(String massifId) {
 		List<Map<String,Object>> returnList = new ArrayList<>();
-		List<GridBasicInfo> gridBasicInfos = this.getGridsBymassifId(massifId);
+		List<GridBasicInfo> gridBasicInfos = this.getGridsBySmcloudmassifId(massifId);
 		gridBasicInfos.forEach(grid -> {
 			List<Map<String,Object>> listObjectFir = (List<Map<String,Object>>) JSONArray.parse(grid.getGridRange());
 			returnList.addAll(listObjectFir);
