@@ -93,4 +93,14 @@
             </if>
         </where>
     </select>
+
+
+    <select id="findDivide" resultType="com.hypersmart.usercenter.model.Divide">
+        select * from resource-center.divide
+        <where>
+            <if test="whereSql!=null">
+                ${whereSql}
+            </if>
+        </where>
+    </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.mapper;
 
+import com.hypersmart.usercenter.model.Divide;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.framework.mapper.GenericMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -35,4 +36,6 @@ public interface UcOrgUserMapper extends GenericMapper<UcOrgUser> {
     List<Map<String, Object>> getOrgByCondition(Map<String, Object> params);
 
     List<UcOrgUser> getListByOrgIdUserId(@Param("orgId") String orgId,@Param("userId") String userId);
+
+    List<Divide> findDivide(Map<String,Object> param);
 }

@@ -10,6 +10,7 @@ import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
 import com.hypersmart.usercenter.mapper.UcUserMapper;
+import com.hypersmart.usercenter.model.Divide;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.UcOrgService;
@@ -43,7 +44,6 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
     public UcOrgUserServiceImpl(UcOrgUserMapper mapper) {
         super(mapper);
     }
-
     @Override
     public List<UcOrgUser> getUserOrg(String userId) {
         return ucOrgUserMapper.getUserOrg(userId);
@@ -160,6 +160,7 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
 //            return pageList;
 //        }
         //===============================================================================================
+
         UcOrg ucOrg = ucOrgService.get(orgId.toString());
         if(null!= ucOrg){
 
@@ -335,4 +336,18 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         return  resultList;
     }
 
+    @Override
+    public PageList<Divide> findDivide(QueryFilter queryFilter) {
+
+        PageBean pageBean = queryFilter.getPageBean();
+        if (com.hypersmart.base.util.BeanUtils.isEmpty(pageBean)) {
+            PageHelper.startPage(1, Integer.MAX_VALUE, false);
+        } else {
+            PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
+                    pageBean.showTotal());
+        }
+        List<Divide> divide = ucOrgUserMapper.findDivide(queryFilter.getParams());
+        return new PageList(divide);
+
+    }
 }
