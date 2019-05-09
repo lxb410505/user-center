@@ -5,23 +5,22 @@ import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.ContextUtils;
 import com.hypersmart.framework.service.GenericService;
-import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
 import com.hypersmart.usercenter.mapper.UcUserMapper;
 import com.hypersmart.usercenter.model.Divide;
-import com.hypersmart.usercenter.model.House;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UcOrgUser;
+import com.hypersmart.usercenter.service.GridBasicInfoService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 用户组织关系
@@ -41,10 +40,13 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
     @Autowired
     UcOrgService ucOrgService;
 
+    @Autowired
+    GridBasicInfoService gridBasicInfoService;
 
     public UcOrgUserServiceImpl(UcOrgUserMapper mapper) {
         super(mapper);
     }
+
     @Override
     public List<UcOrgUser> getUserOrg(String userId) {
         return ucOrgUserMapper.getUserOrg(userId);
@@ -163,7 +165,7 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         //===============================================================================================
 
         UcOrg ucOrg = ucOrgService.get(orgId.toString());
-        if(null!= ucOrg){
+        if (null != ucOrg) {
 
             PageBean pageBean = queryFilter.getPageBean();
             if (BeanUtils.isEmpty(pageBean)) {
@@ -174,25 +176,25 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
             }
 
             String path = ucOrg.getPath();
-            String pathpli = path.replace(".","");
-            int num = path.length()-pathpli.length();
+            String pathpli = path.replace(".", "");
+            int num = path.length() - pathpli.length();
             List<Map<String, Object>> query = new ArrayList<>();
-            switch (num){
+            switch (num) {
                 case 3:
-                    query= this.ucUserMapper.quertListTwo(queryFilter.getParams());
+                    query = this.ucUserMapper.quertListTwo(queryFilter.getParams());
                     break;
                 case 4:
-                    query= this.ucUserMapper.quertListThree(queryFilter.getParams());
+                    query = this.ucUserMapper.quertListThree(queryFilter.getParams());
                     break;
                 case 5:
-                    query= this.ucUserMapper.quertListFour(queryFilter.getParams());
+                    query = this.ucUserMapper.quertListFour(queryFilter.getParams());
                     break;
                 case 6:
-                    query= this.ucUserMapper.quertListFive(queryFilter.getParams());
+                    query = this.ucUserMapper.quertListFive(queryFilter.getParams());
                     break;
             }
             return new PageList<>(query);
-        }else{
+        } else {
             return new PageList<>(new ArrayList<>());
         }
     }
@@ -321,20 +323,21 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
     public List<UcOrgUser> getUserDefaultOrgByRef(String userId) {
         return ucOrgUserMapper.getUserDefaultOrgByRef(userId);
     }
+
     @Override
     public List<Map<String, Object>> getOrgByCondition(QueryFilter queryFilter) {
         String userId = ContextUtil.getCurrentUserId();
         List<UcOrgUser> list = getUserOrg(userId);
         Map<String, Object> params;
-        List<Map<String,Object>> resultList = new ArrayList<>();
+        List<Map<String, Object>> resultList = new ArrayList<>();
         for (UcOrgUser orgUser : list) {
 
             params = queryFilter.getParams();
-            params.put("sy",orgUser.getOrgId());
-           resultList.addAll(ucOrgUserMapper.getOrgByCondition(params));
+            params.put("sy", orgUser.getOrgId());
+            resultList.addAll(ucOrgUserMapper.getOrgByCondition(params));
         }
 
-        return  resultList;
+        return resultList;
     }
 
     @Override
@@ -355,17 +358,18 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
     }
 
     @Override
-    public PageList<House> findHous(QueryFilter queryFilter){
-    PageBean pageBean = queryFilter.getPageBean();
+    public List<String> findHous(QueryFilter queryFilter) {
+        PageBean pageBean = queryFilter.getPageBean();
         if (com.hypersmart.base.util.BeanUtils.isEmpty(pageBean)) {
-        PageHelper.startPage(1, Integer.MAX_VALUE, false);
-    } else {
-        PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
-                pageBean.showTotal());
-    }
-    Map<String, Object> params = queryFilter.getParams();
+            PageHelper.startPage(1, Integer.MAX_VALUE, false);
+        } else {
+            PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
+                    pageBean.showTotal());
+        }
+        List<QueryField> querys = queryFilter.getQuerys();
 
-    List<House> divide = ucOrgUserMapper.findHous(params);
-        return new PageList(divide);
+
+        List<Map<String, Object>> maps = gridBasicInfoService.getGridsHouseBymassifId((String) querys.get(0).getValue());
+        return maps.stream().map(e -> (String) e.get("id")).collect(Collectors.toList());
     }
 }
