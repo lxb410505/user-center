@@ -9,73 +9,23 @@
         <result column="USER_ID_" jdbcType="VARCHAR" property="userId"></result>
     </resultMap>
 
-    <resultMap id="DivideId" type="com.hypersmart.usercenter.model.Divide">
-        <id jdbcType="VARCHAR" property="id" column="id"></id>
-        <result column="sf_guid" jdbcType="VARCHAR" property="sfGuid"></result>
-        <result column="divide_name" jdbcType="VARCHAR" property="divideName"></result>
-        <result column="divide_code" jdbcType="VARCHAR" property="divideCode"></result>
+    <resultMap id="DivideId" type="com.hypersmart.usercenter.model.UcOrg">
 
-        <result column="wbs_code" jdbcType="VARCHAR" property="wbsCode"></result>
-        <result column="detail_address" jdbcType="VARCHAR" property="detailAddress"></result>
-        <result column="building_area" jdbcType="VARCHAR" property="buildingArea"></result>
-        <result column="invoice_amount" jdbcType="VARCHAR" property="invoiceAmount"></result>
-        <result column="fee_area" jdbcType="VARCHAR" property="feeArea"></result>
-        <result column="manage_area" jdbcType="VARCHAR" property="manageArea"></result>
-        <result column="house_count" jdbcType="VARCHAR" property="houseCount"></result>
-        <result column="parking_fixed_count" jdbcType="VARCHAR" property="parkingFixedCount"></result>
-        <result column="parking_temporary_count" jdbcType="VARCHAR" property="parkingTemporaryCount"></result>
-        <result column="green_rate" jdbcType="VARCHAR" property="greenRate"></result>
-        <result column="volume_ratio" jdbcType="VARCHAR" property="volumeRatio"></result>
-        <result column="completion_date" jdbcType="VARCHAR" property="completionDate"></result>
-        <result column="zip_code" jdbcType="VARCHAR" property="zipCode"></result>
-        <result column="supervisor_unit" jdbcType="VARCHAR" property="supervisorUnit"></result>
-        <result column="developer_unit" jdbcType="VARCHAR" property="developersId"></result>
+        <id jdbcType="VARCHAR" property="id" column="ID_"></id>
+        <result column="NAME_" jdbcType="VARCHAR" property="name"></result>
+        <result column="PARENT_ID_" jdbcType="VARCHAR" property="parentId"></result>
+        <result column="ORDER_NO_" jdbcType="VARCHAR" property="orderNo"></result>
+        <result column="CODE_" jdbcType="VARCHAR" property="code"></result>
+        <result column="GRADE_" jdbcType="VARCHAR" property="grade"></result>
+        <result column="PATH_" jdbcType="VARCHAR" property="path"></result>
+        <result column="PATH_NAME_" jdbcType="VARCHAR" property="pathName"></result>
+        <result column="DEM_ID_" jdbcType="VARCHAR" property="demId"></result>
+        <result column="pathName" jdbcType="VARCHAR" property="pathName"></result>
+        <result column="UPDATE_TIME_" jdbcType="VARCHAR" property="updateTime"></result>
+        <result column="IS_DELE_" jdbcType="VARCHAR" property="isDele"></result>
+        <result column="VERSION_" jdbcType="VARCHAR" property="version"></result>
+        <result column="LEVEL_" jdbcType="VARCHAR" property="level"></result>
 
-        <result column="owners_committee_state" jdbcType="VARCHAR" property="ownersCommitteeState"></result>
-
-        <result column="design_unit" jdbcType="VARCHAR" property="designUnit"></result>
-        <result column="lift_count" jdbcType="VARCHAR" property="liftCount"></result>
-        <result column="aircondition_count" jdbcType="VARCHAR" property="airconditionCount"></result>
-        <result column="leave_time" jdbcType="VARCHAR" property="leaveTime"></result>
-        <result column="project_id" jdbcType="VARCHAR" property="projectId"></result>
-        <result column="project_name" jdbcType="VARCHAR" property="projectName"></result>
-        <result column="company_code" jdbcType="VARCHAR" property="companyCode"></result>
-        <result column="branch_company_id" jdbcType="VARCHAR" property="branchCompanyId"></result>
-        <result column="org_id" jdbcType="VARCHAR" property="orgId"></result>
-        <result column="cell_category" jdbcType="VARCHAR" property="cellCategory"></result>
-        <result column="income_mode" jdbcType="VARCHAR" property="incomeMode"></result>
-        <result column="total_count" jdbcType="VARCHAR" property="totalCount"></result>
-        <result column="total_building" jdbcType="VARCHAR" property="totalBuilding"></result>
-        <result column="afforested_area" jdbcType="VARCHAR" property="afforestedArea"></result>
-        <result column="wuguan_house" jdbcType="VARCHAR" property="wuguanHouse"></result>
-        <result column="instead_rate" jdbcType="VARCHAR" property="insteadRate"></result>
-        <result column="collection_rate" jdbcType="VARCHAR" property="collectionRate"></result>
-        <result column="receiving_date" jdbcType="VARCHAR" property="receivingDate"></result>
-        <result column="first_hand_date" jdbcType="VARCHAR" property="firstHandDate"></result>
-        <result column="committee_filing_date" jdbcType="VARCHAR" property="committeeFilingDate"></result>
-        <result column="street_address" jdbcType="VARCHAR" property="streetAddress"></result>
-        <result column="detailed_address" jdbcType="VARCHAR" property="detailedAddress"></result>
-        <result column="taxpayer_identify_number" jdbcType="VARCHAR" property="taxpayerIdentifyNumber"></result>
-        <result column="company_name" jdbcType="VARCHAR" property="companyName"></result>
-        <result column="telphone" jdbcType="VARCHAR" property="telphone"></result>
-        <result column="bank_account_name" jdbcType="VARCHAR" property="bankAccountName"></result>
-        <result column="bank_account" jdbcType="VARCHAR" property="bankAccount"></result>
-        <result column="bank" jdbcType="VARCHAR" property="bank"></result>
-        <result column="service_center" jdbcType="VARCHAR" property="serviceCenter"></result>
-        <result column="service_bank" jdbcType="VARCHAR" property="serviceBank"></result>
-        <result column="service_bank_account" jdbcType="VARCHAR" property="serviceBankAccount"></result>
-        <result column="service_telphone" jdbcType="VARCHAR" property="serviceTelphone"></result>
-        <result column="faxes" jdbcType="VARCHAR" property="faxes"></result>
-        <result column="remark" jdbcType="VARCHAR" property="remark"></result>
-        <result column="enabled_computer" jdbcType="VARCHAR" property="enabledComputer"></result>
-        <result column="creation_date" jdbcType="VARCHAR" property="creationDate"></result>
-        <result column="created_by" jdbcType="VARCHAR" property="createdBy"></result>
-        <result column="updation_date" jdbcType="VARCHAR" property="updationDate"></result>
-        <result column="updated_by" jdbcType="VARCHAR" property="updatedBy"></result>
-        <result column="row_version" jdbcType="VARCHAR" property="rowVersion"></result>
-        <result column="is_deleted" jdbcType="VARCHAR" property="isDeleted"></result>
-        <result column="enabled_flag" jdbcType="VARCHAR" property="enabledFlag"></result>
-        <result column="address" jdbcType="VARCHAR" property="address"></result>
     </resultMap>
 
     <resultMap id="hours" type="com.hypersmart.usercenter.model.House">
@@ -218,15 +168,16 @@
 
     <select id="findDivide" resultMap="DivideId">
 
-        select * from uc_org  where PARENT_ID_ in (
-        select id_ from  uc_org
+        select a.* from uc_org a where PARENT_ID_ in (
+        select id_ from  uc_org b
         <where>
+            and b.IS_DELE_=0
             <if test="whereSql!=null">
                 ${whereSql}
             </if>
         </where>
         )
-
+        and a.IS_DELE_=0
     </select>
 
     <select id="findHous" resultMap="hours">
