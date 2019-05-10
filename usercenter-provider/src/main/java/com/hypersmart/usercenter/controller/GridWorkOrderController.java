@@ -35,7 +35,7 @@ public class GridWorkOrderController {
     *   unitId :参数id  对应grid_range 的resourceId字段
     *   【作用】根据单元，楼栋查询对应网格的管家
     * */
-    @GetMapping("/getUserByUnitId")
+    @PostMapping("/getUserByUnitId")
     public UcUser getUserByUnitId(@RequestParam("unitId") String unitId,@RequestParam("unitType")String unitType){
         if(StringUtil.isNotEmpty(unitId) && StringUtil.isNotEmpty(unitType)){
             UcUser user = ucUserService.getUserByUnitId(unitId,unitType);
