@@ -167,9 +167,11 @@
 
 
     <select id="findDivide" resultMap="DivideId">
-
-        select  * from uc_org  where PARENT_ID_ in (
-        select id_ from  uc_org
+        select  a.* from uc_org a  where a.PARENT_ID_ in (
+        SELECT
+        b.id_
+        FROM
+        uc_org b
         <where>
 
             <if test="whereSql!=null">
