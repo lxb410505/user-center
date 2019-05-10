@@ -168,16 +168,16 @@
 
     <select id="findDivide" resultMap="DivideId">
 
-        select a.* from uc_org a where PARENT_ID_ in (
-        select id_ from  uc_org b
+        select  * from uc_org  where PARENT_ID_ in (
+        select id_ from  uc_org
         <where>
-            and b.IS_DELE_=0
+
             <if test="whereSql!=null">
                 ${whereSql}
             </if>
         </where>
         )
-        and a.IS_DELE_=0
+
     </select>
 
     <select id="findHous" resultMap="hours">
