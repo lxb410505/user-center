@@ -62,6 +62,10 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
     private UCFeignService ucFeignService;
     @Resource
     private UcUserWorkHistoryService ucUserWorkHistoryService;
+    @Resource
+    private UcRoleMapper ucRoleMapper;
+    @Resource
+    private UcUserRoleMapper ucUserRoleMapper;
 
     public UcUserServiceImpl(UcUserMapper mapper) {
         super(mapper);
@@ -337,10 +341,12 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                     message.append("第").append(i + 1).append("行，工单审批角色不能为空；");
                 } else {
                     List<UcOrgJob> jobs = ucOrgJobMapper.getByJobName(String.valueOf(lo.get(4)));
-                    if (BeanUtils.isEmpty(jobs)) {
-                        message.append("第").append(i + 1).append("行，" + lo.get(4) + "，工单审批角色查询失败，查无此工单审批角色；");
-                    } else {
+                    List<UcRole> roles = ucRoleMapper.getUcRoleByName(String.valueOf(lo.get(4)));
+                    if (BeanUtils.isNotEmpty(jobs) && BeanUtils.isNotEmpty(roles)) {
                         importUserData.setOrgJob(jobs.get(0));
+                        importUserData.setUcRole(roles.get(0));
+                    } else {
+                        message.append("第").append(i + 1).append("行，" + lo.get(4) + "，工单审批角色查询失败，查无此工单审批角色；");
                     }
                 }
                 //备注是否含有人员
@@ -412,7 +418,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                     UcOrgPost orgPost = null;
                     if (!BeanUtils.isEmpty(orgPosts)){
                         for (UcOrgPost post : orgPosts){
-                            if (post.getPosName().equals(userData.getPosName())){
+                            if (post.getPosName().equals(userData.getPosName()) && post.getPostKey().equals(userData.getPostKey())){
                                 orgPost=post;
                             }
                         }
@@ -434,9 +440,12 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                         orgPost.setVersion(1);
                         this.ucOrgPostMapper.insert(orgPost);
                     }
+
                     //建立user和org的关系，1、暂时无人,不做任何动作  2、有人员岗位信息，进行关联
+                    //建立user和role的关系
                     if (userData.getExistUser()) {
                         UcUser u = userData.getUser();
+                        UcRole r = userData.getUcRole();
                         //查询用户和组织的关系，如果为空则建立关系
                         List<UcOrgUser> l = ucOrgUserMapper.getListByOrgIdUserId(org.getId(), u.getId());
                         Boolean falg = false;
@@ -460,6 +469,17 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                             ou.setIsDele("0");
                             ou.setPosId(orgPost.getId());//岗位Id,建立OrgUser和orgPost的关系!!!!
                             this.ucOrgUserMapper.insert(ou);
+                        }
+                        //查询用户和role的关系，如果为空则建立
+                        List<UcUserRole> userRoles = ucUserRoleMapper.getByRoleIdAndUserId(r.getId(),u.getId());
+                        if (BeanUtils.isEmpty(userRoles)){
+                            UcUserRole ucUserRole = new UcUserRole();
+                            ucUserRole.setId(UniqueIdUtil.getSuid());
+                            ucUserRole.setUserId(u.getId());
+                            ucUserRole.setRoleId(r.getId());
+                            ucUserRole.setIsDele("0");
+                            ucUserRole.setVersion(1);
+                            this.ucUserRoleMapper.insert(ucUserRole);
                         }
                     }
                     importCount++;

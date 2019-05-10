@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.UcRoleMapper">
+    <select id="getUcRoleByName" resultType="com.hypersmart.usercenter.model.UcRole" parameterType="java.lang.String">
+        select 	ID_ as id,
+         NAME_ as name,
+         CODE_ as code,
+         ENABLED_ as enabled,
+         DESCRIPTION_ as description,
+         UPDATE_TIME_ as updateTime,
+         IS_DELE_ as isDele,
+         VERSION_ as version,
+        CREATE_BY_ as createBy,
+        UPDATE_BY_ as updateBy,
+        CREATE_ORG_ID_ as createOrgId
+        from uc_role
+        <where>
+            IS_DELE_ = '0'
+            <if test="roleName!=null and roleName!=''">
+                and NAME_ = #{roleName}
+            </if>
+        </where>
+    </select>
+</mapper>
