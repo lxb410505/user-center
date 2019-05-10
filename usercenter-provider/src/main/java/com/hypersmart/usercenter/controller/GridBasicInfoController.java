@@ -306,7 +306,7 @@ public class GridBasicInfoController extends BaseController {
 			for (String s : map.keySet()) {
 				if(!checkMap.containsValue(map.get("name"))){
 					checkMap.put(s,map.get("name"));
-					maps.add(checkMap);
+					maps.add(map);
 				}
 			}
 
