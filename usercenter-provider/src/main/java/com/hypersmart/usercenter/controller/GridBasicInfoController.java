@@ -308,6 +308,7 @@ public class GridBasicInfoController extends BaseController {
 					checkMap.put(s,map.get("name"));
 					maps.add(map);
 				}
+
 			}
 
 		}
