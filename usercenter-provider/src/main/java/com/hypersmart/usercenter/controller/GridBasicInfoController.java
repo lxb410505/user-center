@@ -303,7 +303,7 @@ public class GridBasicInfoController extends BaseController {
 		Map<String,Object> checkMap = new HashMap<>(16);
 		List<Map<String, Object>> maps = new ArrayList<>();
 		for (Map<String, Object> map : houseByCondition) {
-			for (String s : checkMap.keySet()) {
+			for (String s : map.keySet()) {
 				if(!checkMap.containsValue(map.get("name"))){
 					checkMap.put(s,map.get("name"));
 					maps.add(checkMap);
