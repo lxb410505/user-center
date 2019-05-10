@@ -152,5 +152,12 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 */
 	List<GridBasicInfo> getByGridRange(String gridRange);
 
+	/**
+	 *  更新网格覆盖房产信息
+	 * @param gridId
+	 * @param gridRange
+	 * @param action
+	 */
+	void handChangeRange(String gridId,String gridRange,Integer action);
 }
 
