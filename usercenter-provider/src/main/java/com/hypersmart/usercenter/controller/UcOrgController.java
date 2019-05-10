@@ -427,7 +427,7 @@ public class UcOrgController extends BaseController {
      */
     @PostMapping({"/getOrgList"})
     @ApiOperation(value = "职务定义数据列表}", httpMethod = "POST", notes = "获取职务定义列表")
-    public PageList<UcOrg> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+    public PageList<UcOrg> getOrgList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
         return this.ucOrgService.query(queryFilter);
     }
 }
