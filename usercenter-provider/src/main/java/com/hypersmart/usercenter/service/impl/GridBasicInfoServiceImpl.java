@@ -206,13 +206,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			gridBasicInfoDTO.setCreationDate(gridBasicInfo.getCreationDate());
 			gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfo.getId(), gridBasicInfoDTO);
 			if(num>0){
-				//线程执行 增加gridRange 字段的缓存
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						dashBoardFeignService.handChangeRange(gridBasicInfo.getId(),gridBasicInfo.getGridRange(),1);//1 新增
-					}
-				}).start();
+				//增加gridRange 字段的缓存
+				handChangeRange(gridBasicInfo.getId(),gridBasicInfo.getGridRange(),1);//1 新增
 			}
 		}
 		if (num < 1) {
@@ -261,15 +256,6 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			gridBasicInfo.setUpdationDate(new Date());
 			gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
 			num = this.updateSelective(gridBasicInfo);
-			if(num>1 && !StringUtils.isEmpty(gridBasicInfo.getGridRange())){
-				//线程执行 增加gridRange 字段的缓存
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						dashBoardFeignService.handChangeRange(gridBasicInfo.getId(),gridBasicInfo.getGridRange(),2);//2 修改
-					}
-				}).start();
-			}
 		}
 		if (num < 1) {
 			gridErrorCode = GridErrorCode.UPDATE_EXCEPTION;
@@ -371,15 +357,9 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		gridRangeService.deleteRangeByGridIds(gridBasicInfoBO.getIds());
 		if (num < 1) {
 			gridErrorCode = GridErrorCode.DELETE_EXCEPTION;
-		}else
-		if(num>1 ){
-			//线程执行 增加gridRange 字段的缓存
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					dashBoardFeignService.handChangeRange(gridBasicInfoBO.getId(),null,3);//3 删除
-				}
-			}).start();
+		}else{
+			//增加gridRange 字段的缓存
+			handChangeRange(gridBasicInfoBO.getId(),null,3);//3 删除
 		}
 		return gridErrorCode;
 	}
@@ -459,6 +439,22 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	}
 
 	/**
+	 * 根据地块id，获取地块下的楼栋网格
+	 *
+	 * @param massifId
+	 * @return
+	 */
+	@Override
+	public List<GridBasicInfo> getGridsBySmcloudmassifId(String massifId) {
+		Example example = new Example(GridBasicInfo.class);
+		example.createCriteria().andEqualTo("stagingId", massifId)
+				.andEqualTo("gridType", "building_grid")
+				.andEqualTo("isDeleted", 0)
+				.andEqualTo("enabledFlag", 1);
+		return gridBasicInfoMapper.selectByExample(example);
+	}
+
+	/**
 	 * 管家解除关联网格
 	 *
 	 * @param gridBasicInfoDTO
@@ -479,7 +475,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	@Override
 	public List<Map<String,Object>> getGridsHouseBymassifId(String massifId) {
 		List<Map<String,Object>> returnList = new ArrayList<>();
-		List<GridBasicInfo> gridBasicInfos = this.getGridsBymassifId(massifId);
+		List<GridBasicInfo> gridBasicInfos = this.getGridsBySmcloudmassifId(massifId);
 		gridBasicInfos.forEach(grid -> {
 			List<Map<String,Object>> listObjectFir = (List<Map<String,Object>>) JSONArray.parse(grid.getGridRange());
 			returnList.addAll(listObjectFir);
@@ -504,4 +500,13 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			}
 		}
 	}*/
+	@Override
+	public  void handChangeRange(String gridId,String gridRange,Integer action){
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				dashBoardFeignService.handChangeRange(gridId,gridRange,action);
+			}
+		});
+	}
 }

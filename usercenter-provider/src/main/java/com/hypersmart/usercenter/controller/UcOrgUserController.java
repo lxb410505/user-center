@@ -6,9 +6,7 @@ import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
-import com.hypersmart.usercenter.model.UcOrg;
-import com.hypersmart.usercenter.model.UcOrgPost;
-import com.hypersmart.usercenter.model.UcUser;
+import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.UcOrgPostService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcUserService;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
-import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.UcOrgUserService;
 
 import java.util.ArrayList;
@@ -76,6 +73,18 @@ public class UcOrgUserController extends BaseController {
     @ApiOperation(value = "获取用户地块数据列表}", httpMethod = "POST", notes = "获取用户地块数据列表")
     public List<Map<String, Object>> getOrgByCondition(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
         return this.ucOrgUserService.getOrgByCondition(queryFilter);
+    }
+
+    @PostMapping({"/getDivide"})
+    @ApiOperation(value = "获取用户地块数据列表}", httpMethod = "POST", notes = "获取用户地块数据列表")
+    public PageList<UcOrg> getDivide(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+      return   ucOrgUserService.findDivide(queryFilter);
+    }
+
+    @PostMapping({"/getHouse"})
+    @ApiOperation(value = "获取用户地块数据列表}", httpMethod = "POST", notes = "获取用户地块数据列表")
+    public List<String> getHouse(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+        return   ucOrgUserService.findHous(queryFilter);
     }
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增用户组织关系信息", httpMethod = "POST", notes = "保存用户组织关系")

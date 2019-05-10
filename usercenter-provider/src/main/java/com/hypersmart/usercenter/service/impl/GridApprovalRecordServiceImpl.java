@@ -187,7 +187,10 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 					grid.setUpdateTimes(grid.getUpdateTimes() + 1);
 					grid.setUpdationDate(new Date());
 					grid.setUpdatedBy(record.getSubmitterId());
-					gridBasicInfoService.updateSelective(grid);
+					int i = gridBasicInfoService.updateSelective(grid);
+					if(i>0){
+						gridBasicInfoService.handChangeRange(gridId,dto.getGridRange(),2);//2 修改
+					}
 					String[] ids = {gridId};
 					gridRangeService.deleteRangeByGridIds(ids);
 					gridRangeService.recordRange(dto.getGridRange(), gridId);
@@ -535,4 +538,5 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			return "";
 		}
 	}
+
 }

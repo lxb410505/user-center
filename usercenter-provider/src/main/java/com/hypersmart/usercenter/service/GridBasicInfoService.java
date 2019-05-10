@@ -115,6 +115,13 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	List<GridBasicInfo> getGridsBymassifId(String massifId);
 
 	/**
+	 * 根据系统id,获取地块下的楼栋网格
+	 * @param massifId
+	 * @return
+	 */
+	List<GridBasicInfo> getGridsBySmcloudmassifId(String massifId);
+
+	/**
 	 * 管家关联网格
 	 *
 	 * @param gridBasicInfoDTO
@@ -145,5 +152,12 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 */
 	List<GridBasicInfo> getByGridRange(String gridRange);
 
+	/**
+	 *  更新网格覆盖房产信息
+	 * @param gridId
+	 * @param gridRange
+	 * @param action
+	 */
+	void handChangeRange(String gridId,String gridRange,Integer action);
 }
 
