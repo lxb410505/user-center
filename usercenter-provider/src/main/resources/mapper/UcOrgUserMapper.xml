@@ -217,12 +217,16 @@
 
 
     <select id="findDivide" resultMap="DivideId">
-        select * from uc_org
+
+        select * from uc_org  where PARENT_ID_ in (
+        select id_ from  uc_org
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
             </if>
         </where>
+        )
+
     </select>
 
     <select id="findHous" resultMap="hours">
