@@ -418,4 +418,16 @@ public class UcOrgController extends BaseController {
 //        this.ucOrgService.delete(aryIds);
 //        return new CommonResult(true, "批量删除成功");
 //    }
+
+
+    /**
+     * 查询地块列表
+     * @param queryFilter
+     * @return
+     */
+    @PostMapping({"/getOrgList"})
+    @ApiOperation(value = "职务定义数据列表}", httpMethod = "POST", notes = "获取职务定义列表")
+    public PageList<UcOrg> getOrgList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+        return this.ucOrgService.query(queryFilter);
+    }
 }
