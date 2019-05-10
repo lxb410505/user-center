@@ -213,17 +213,17 @@
         SELECT
         ID_,FULLNAME_
         FROM uc_user
-				join
-				 (
-			         	SELECT DISTINCT
-                housekeeper_id
-                FROM
-                grid_basic_info info
-                JOIN grid_range gr ON info.id = gr.grid_id
-                WHERE
-                 gr.range_type = #{unitType}
-               AND gr.resource_id = #{unitId}
-              ) as  B  ON uc_user.ID_ =B.housekeeper_id
+        join
+         (SELECT DISTINCT
+        housekeeper_id
+        FROM
+        grid_basic_info info
+        JOIN grid_range gr ON info.id = gr.grid_id
+        WHERE
+         gr.range_type = #{unitType}
+       AND gr.resource_id = #{unitId}
+      ) as  B  ON uc_user.ID_ =B.housekeeper_id
+      	limit 1
     </select>
 
     <select id="searchUserByCondition" resultMap="baseMap" parameterType="java.util.Map">
