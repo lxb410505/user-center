@@ -215,7 +215,7 @@
         FROM
             uc_user
         WHERE
-            ID_ = (
+            ID_ IN (
             SELECT DISTINCT
                 housekeeper_id
             FROM
