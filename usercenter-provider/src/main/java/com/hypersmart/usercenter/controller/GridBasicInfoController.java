@@ -19,7 +19,6 @@ import com.hypersmart.usercenter.service.UcOrgUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -292,5 +291,13 @@ public class GridBasicInfoController extends BaseController {
 	public List<GridBasicInfo> getGridByHouseId(@ApiParam(name = "id", value = "查询对象") @RequestParam String id) {
 		List<GridBasicInfo> gridBasicInfos = gridBasicInfoService.getByGridRange(id);
 		return gridBasicInfos;
+	}
+
+
+	@GetMapping({"/getHouseByCondition"})
+	@ApiOperation(value = "根据地块id，获取地块下的网格覆盖的房产信息", httpMethod = "GET", notes = "根据地块id，获取地块下的楼栋网格信息")
+	public List<Map<String,Object>> getHouseByCondition(@ApiParam(name = "id", value = "地块id", required = true) @RequestParam("divide") String divide,@RequestParam(value = "id",required = false,defaultValue = "0") String id) {
+
+		return gridBasicInfoService.getHouseByCondition(divide,id);
 	}
 }
