@@ -77,7 +77,7 @@ public class UcOrgUserController extends BaseController {
 
     @PostMapping({"/getDivide"})
     @ApiOperation(value = "获取用户地块数据列表}", httpMethod = "POST", notes = "获取用户地块数据列表")
-    public PageList<Divide> getDivide(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+    public PageList<UcOrg> getDivide(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
       return   ucOrgUserService.findDivide(queryFilter);
     }
 

@@ -341,7 +341,7 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
     }
 
     @Override
-    public PageList<Divide> findDivide(QueryFilter queryFilter) {
+    public PageList<UcOrg> findDivide(QueryFilter queryFilter) {
 
         PageBean pageBean = queryFilter.getPageBean();
         if (com.hypersmart.base.util.BeanUtils.isEmpty(pageBean)) {
@@ -352,7 +352,7 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         }
         Map<String, Object> params = queryFilter.getParams();
 
-        List<Divide> divide = ucOrgUserMapper.findDivide(params);
+        List<UcOrg> divide = ucOrgUserMapper.findDivide(params);
         return new PageList(divide);
 
     }
@@ -373,3 +373,5 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         return maps.stream().map(e -> (String) e.get("id")).collect(Collectors.toList());
     }
 }
+
+
