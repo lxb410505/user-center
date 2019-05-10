@@ -217,10 +217,8 @@
 
 
     <select id="findDivide" resultMap="DivideId">
-        select o.* from uc_org_params p
-        INNER JOIN uc_org o on p.ORG_ID_=o.ID_
+        select * from uc_org
         <where>
-             o.IS_DELE_!=1  and p.CODE_='cwsfxtzh'
             <if test="whereSql!=null">
                 ${whereSql}
             </if>
