@@ -1,16 +1,12 @@
 package com.hypersmart.usercenter.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.ContextUtils;
-import com.hypersmart.base.util.JsonUtil;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
-import com.hypersmart.framework.utils.JsonUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.bo.GridBasicInfoBO;
 import com.hypersmart.usercenter.bo.GridRangeBO;
@@ -484,6 +480,9 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		return returnList;
 	}
 
+
+
+
 	@Override
 	public List<GridBasicInfo> getByGridRange(String gridRange) {
 		List<GridBasicInfo> list = gridBasicInfoMapper.getByGridRange(gridRange);
@@ -509,4 +508,13 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			}
 		});
 	}
+
+	@Override
+	public List<Map<String, Object>> getHouseByCondition(String divideId,String id) {
+		List<Map<String, Object>> gridsHouseBymassifId = getGridsHouseBymassifId(divideId);
+		List<GridBasicInfo> infos = new ArrayList<>();
+		List<Map<String, Object>> parentId = gridsHouseBymassifId.stream().filter(e -> String.valueOf(e.get("parentId")).equals(id)).collect(Collectors.toList());
+		return parentId;
+	}
+
 }

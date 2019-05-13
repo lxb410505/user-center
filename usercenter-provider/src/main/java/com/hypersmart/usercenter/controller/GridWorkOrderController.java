@@ -10,10 +10,7 @@ import com.hypersmart.usercenter.service.GridBasicInfoService;
 import com.hypersmart.usercenter.service.GridRangeService;
 import com.hypersmart.usercenter.service.UcUserService;
 import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.*;
