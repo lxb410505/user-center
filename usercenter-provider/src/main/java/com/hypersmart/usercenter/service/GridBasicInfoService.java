@@ -1,6 +1,5 @@
 package com.hypersmart.usercenter.service;
 
-import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.framework.service.IGenericService;
@@ -159,5 +158,7 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 * @param action
 	 */
 	void handChangeRange(String gridId,String gridRange,Integer action);
+
+	List<Map<String,Object>> getHouseByCondition(String divideId,String id);
 }
 
