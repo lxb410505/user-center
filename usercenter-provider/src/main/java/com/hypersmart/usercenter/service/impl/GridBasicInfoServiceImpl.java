@@ -19,8 +19,10 @@ import com.hypersmart.usercenter.mapper.GridApprovalRecordMapper;
 import com.hypersmart.usercenter.mapper.GridBasicInfoMapper;
 import com.hypersmart.usercenter.mapper.UcOrgParamsMapper;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
+import com.hypersmart.usercenter.mapper.UcUserMapper;
 import com.hypersmart.usercenter.model.GridBasicInfo;
 import com.hypersmart.usercenter.model.UcOrgParams;
+import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.usercenter.service.*;
 import com.hypersmart.usercenter.util.GridOperateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +53,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
 	@Autowired
 	UcOrgUserMapper ucOrgUserMapper;
-
+		
 	@Autowired
 	UcOrgService ucOrgService;
 
@@ -66,7 +68,10 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
 	@Resource
 	private DashBoardFeignService dashBoardFeignService;
-
+	
+	@Autowired
+    private UcUserMapper ucUserMapper;
+	
 	public GridBasicInfoServiceImpl(GridBasicInfoMapper mapper) {
 		super(mapper);
 	}
@@ -388,19 +393,19 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	public List<GridBasicInfo> getGridsBymassifId(String massifId) {
 		Example exampleP = new Example(UcOrgParams.class);
 		exampleP.createCriteria().andEqualTo("value", massifId)
-				.andEqualTo("isDele", 0);
+		                         .andEqualTo("code", "SAPgsdm")
+				                 .andEqualTo("isDele", 0);
 		List<UcOrgParams> list = ucOrgParamsMapper.selectByExample(exampleP);
 		if (CollectionUtils.isEmpty(list)) {
 			return new ArrayList<>();
 		}
-		massifId = list.get(0).getOrgId();
-
-		Example example = new Example(GridBasicInfo.class);
-		example.createCriteria().andEqualTo("stagingId", massifId)
-				.andEqualTo("gridType", "building_grid")
-				.andEqualTo("isDeleted", 0)
-				.andEqualTo("enabledFlag", 1);
-		return gridBasicInfoMapper.selectByExample(example);
+		List<String> stagingId = list.stream().map(UcOrgParams::getOrgId).collect(Collectors.toList());   
+				// list.getOrgId();
+		if (CollectionUtils.isEmpty(stagingId)) {
+			return new ArrayList<>();
+		}
+		
+		return gridBasicInfoMapper.getGridBasicInfoByHouseKeeperID(stagingId);
 	}
 
 	/**
