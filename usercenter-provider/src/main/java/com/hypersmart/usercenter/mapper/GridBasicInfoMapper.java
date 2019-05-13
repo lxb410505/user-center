@@ -72,4 +72,11 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
     List<Map<String,Object>> checkPermission(Map<String, Object> params);
 
     List<GridBasicInfo> getByGridRange(@Param("gridRange") String gridRange);
+    
+    /**
+     * 根据管家id查询网格信息和用户fullname
+     * @param houseKeeperID
+     * @return
+     */
+    List<GridBasicInfo> getGridBasicInfoByHouseKeeperID(List<String> list);
 }

@@ -6,6 +6,7 @@ import com.hypersmart.base.id.genId.Suid;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.data.annotation.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 import tk.mybatis.mapper.annotation.KeySql;
 
@@ -14,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 网格基础信息表
@@ -137,8 +139,21 @@ private static final long serialVersionUID=1L;
     @Column(name = "is_deleted")
     @ApiModelProperty("是否删除（0：正常 1：删除）")
     private Integer isDeleted;
+    
+    //用户表
+    @Transient
+    private List<UcUser> ucUsers;
+     
 
-    public String getId() {
+	public List<UcUser> getUcUsers() {
+		return ucUsers;
+	}
+
+	public void setUcUsers(List<UcUser> ucUsers) {
+		this.ucUsers = ucUsers;
+	}
+
+	public String getId() {
         return id;
     }
 

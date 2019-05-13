@@ -292,5 +292,44 @@
             </if>
         </where>
     </select>
-
+    
+     <resultMap id="gridBasicInfoByHouseKeeperIDMap" type="com.hypersmart.usercenter.model.GridBasicInfo">
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="grid_code" jdbcType="VARCHAR" property="gridCode" />
+        <result column="grid_name" jdbcType="VARCHAR" property="gridName" />
+        <result column="grid_type" jdbcType="VARCHAR" property="gridType" />
+        <result column="grid_range" jdbcType="VARCHAR" property="gridRange" />
+        <result column="grid_remark" jdbcType="VARCHAR" property="gridRemark" />
+        <result column="area_id" jdbcType="VARCHAR" property="areaId" />
+        <result column="city_id" jdbcType="VARCHAR" property="cityId" />
+        <result column="project_id" jdbcType="VARCHAR" property="projectId" />
+        <result column="massif_id" jdbcType="VARCHAR" property="massifId" />
+        <result column="staging_id" jdbcType="VARCHAR" property="stagingId" />
+        <result column="housekeeper_id" jdbcType="VARCHAR" property="housekeeperId" />
+        <result column="update_times" jdbcType="VARCHAR" property="updateTimes" />
+        <result column="format_attribute" jdbcType="VARCHAR" property="formatAttribute" />
+        <result column="creation_date" jdbcType="TIMESTAMP" property="creationDate" />
+        <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+        <result column="enabled_flag" jdbcType="TINYINT" property="enabledFlag" />
+         <collection property="ucUsers" ofType="com.hypersmart.usercenter.model.UcUser">
+            <id column="ID_" property="id" javaType="java.lang.String"></id>
+            <result column="FULLNAME_" property="fullname" javaType="java.lang.String"></result>
+         </collection>
+    </resultMap>
+    <select id="getGridBasicInfoByHouseKeeperID" resultMap="gridBasicInfoByHouseKeeperIDMap" parameterType="java.util.List">
+            select g.id, g.grid_code, g.grid_name, 
+                   g.grid_type, g.grid_range, g.grid_remark,
+                   g.area_id , g.city_id, g.project_id,
+                   g.massif_id, g.staging_id, g.staging_id, 
+                   g.housekeeper_id, g.update_times, g.format_attribute,
+                   g.creation_date, g.created_by, g.enabled_flag,
+                   u.FULLNAME_
+            from uc.grid_basic_info as g left join uc.uc_user as u on g.housekeeper_id = u.ID_
+            where 
+            g.grid_type = 'building_grid' and g.is_deleted = 0 and g.enabled_flag = 1
+            and g.staging_id in  
+            <foreach collection="list" item="stagingId" open="(" separator="," close=")">
+                #{stagingId}
+            </foreach>
+    </select> 
 </mapper>
