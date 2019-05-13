@@ -295,7 +295,7 @@ public class GridBasicInfoController extends BaseController {
 	}
 
 
-	@GetMapping({"/getHouseByCondition1"})
+	@GetMapping({"/getHouseByCondition"})
 	@ApiOperation(value = "根据地块id，获取地块下的网格覆盖的房产信息", httpMethod = "GET", notes = "根据地块id，获取地块下的楼栋网格信息")
 	public List<Map<String,Object>> getHouseByCondition(@ApiParam(name = "divide", value = "地块id", required = true) @RequestParam("divide") String divide,@RequestParam(value = "id",required = false,defaultValue = "0") String id) {
 		List<Map<String, Object>> houseByCondition = gridBasicInfoService.getHouseByCondition(divide, id);
