@@ -292,11 +292,9 @@
                 </foreach>
             </if>
         ) AND IS_DELE_!=1) AND IS_DELE_!=1
-        <where>
             <if test="whereSql!=null">
-                ${whereSql}
+                and ${whereSql}
             </if>
-        </where>
         <if test="orderBySql!=null">
             ORDER BY ${orderBySql}
         </if>

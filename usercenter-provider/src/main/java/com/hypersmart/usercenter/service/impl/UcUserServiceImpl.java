@@ -66,6 +66,12 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
     private UcRoleMapper ucRoleMapper;
     @Resource
     private UcUserRoleMapper ucUserRoleMapper;
+    /*@Resource
+    private UcOrgPostSwjMapper ucOrgPostSwjMapper;
+    @Resource
+    private UcUserRoleSwjMapper ucUserRoleSwjMapper;
+    @Resource
+    private UcOrgUserSwjMapper ucOrgUserSwjMapper;*/
 
     public UcUserServiceImpl(UcUserMapper mapper) {
         super(mapper);
@@ -439,8 +445,19 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                         orgPost.setIsDele(String.valueOf(0));
                         orgPost.setVersion(1);
                         this.ucOrgPostMapper.insert(orgPost);
+                        //存另外一张表*********************************************************
+                        /*UcOrgPostSwj orgPostSwj = new UcOrgPostSwj();
+                        orgPostSwj.setId(orgPost.getId());
+                        orgPostSwj.setJobId(orgPost.getJobId());
+                        orgPostSwj.setOrgId(orgPost.getOrgId());
+                        orgPostSwj.setPosName(orgPost.getPosName());
+                        orgPostSwj.setPostKey(orgPost.getPostKey());
+                        orgPostSwj.setCode(orgPost.getCode());
+                        orgPostSwj.setIsCharge(Integer.valueOf(0));
+                        orgPostSwj.setIsDele(String.valueOf(0));
+                        orgPostSwj.setVersion(1);
+                        this.ucOrgPostSwjMapper.insert(orgPostSwj);*/
                     }
-
                     //建立user和org的关系，1、暂时无人,不做任何动作  2、有人员岗位信息，进行关联
                     //建立user和role的关系
                     if (userData.getExistUser()) {
@@ -469,6 +486,18 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                             ou.setIsDele("0");
                             ou.setPosId(orgPost.getId());//岗位Id,建立OrgUser和orgPost的关系!!!!
                             this.ucOrgUserMapper.insert(ou);
+                            //存另一张表*********************************************
+                            /*UcOrgUserSwj ouSwf = new UcOrgUserSwj();
+                            ouSwf.setId(ou.getId());
+                            ouSwf.setIsCharge(ou.getIsCharge());
+                            ouSwf.setIsMaster(ou.getIsMaster());
+                            ouSwf.setOrgId(ou.getOrgId());
+                            ouSwf.setUserId(ou.getUserId());
+                            ouSwf.setVersion(ou.getVersion());
+                            ouSwf.setIsRelActive(1);
+                            ouSwf.setIsDele("0");
+                            ouSwf.setPosId(ou.getPosId());//岗位Id,建立OrgUser和orgPost的关系!!!!
+                            this.ucOrgUserSwjMapper.insert(ouSwf);*/
                         }
                         //查询用户和role的关系，如果为空则建立
                         List<UcUserRole> userRoles = ucUserRoleMapper.getByRoleIdAndUserId(r.getId(),u.getId());
@@ -480,6 +509,14 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                             ucUserRole.setIsDele("0");
                             ucUserRole.setVersion(1);
                             this.ucUserRoleMapper.insert(ucUserRole);
+                            //存另一张表**********************************
+                            /*UcUserRoleSwj ucUserRoleSwj = new UcUserRoleSwj();
+                            ucUserRoleSwj.setId(ucUserRole.getId());
+                            ucUserRoleSwj.setUserId(ucUserRole.getUserId());
+                            ucUserRoleSwj.setRoleId(ucUserRole.getRoleId());
+                            ucUserRoleSwj.setIsDele("0");
+                            ucUserRoleSwj.setVersion(1);
+                            this.ucUserRoleSwjMapper.insert(ucUserRoleSwj);*/
                         }
                     }
                     importCount++;
