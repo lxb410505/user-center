@@ -393,14 +393,14 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	public List<GridBasicInfo> getGridsBymassifId(String massifId) {
 		Example exampleP = new Example(UcOrgParams.class);
 		exampleP.createCriteria().andEqualTo("value", massifId)
-		                         .andEqualTo("code", "SAPgsdm")
+		                         //.andEqualTo("code", "SAPgsdm")
 				                 .andEqualTo("isDele", 0);
 		List<UcOrgParams> list = ucOrgParamsMapper.selectByExample(exampleP);
 		if (CollectionUtils.isEmpty(list)) {
 			return new ArrayList<>();
 		}
 		List<String> stagingId = list.stream().map(UcOrgParams::getOrgId).collect(Collectors.toList());   
-				// list.getOrgId();
+				
 		if (CollectionUtils.isEmpty(stagingId)) {
 			return new ArrayList<>();
 		}
