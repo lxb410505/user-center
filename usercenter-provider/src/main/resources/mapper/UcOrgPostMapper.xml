@@ -36,9 +36,8 @@
         select count(p.ID_)
         from uc_org_post p
         <where>
-            p.IS_DELE_='0'
             <if test="postCode!=null and postCode!=''">
-                AND p.CODE_ LIKE CONCAT('%',#{postCode},'%')
+                p.CODE_ LIKE CONCAT('%',#{postCode},'%')
             </if>
         </where>
     </select>
