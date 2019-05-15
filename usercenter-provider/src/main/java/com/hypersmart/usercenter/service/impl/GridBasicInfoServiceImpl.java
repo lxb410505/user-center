@@ -1,7 +1,9 @@
 package com.hypersmart.usercenter.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.ContextUtils;
@@ -452,8 +454,36 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 				.andEqualTo("gridType", "building_grid")
 				.andEqualTo("isDeleted", 0)
 				.andEqualTo("enabledFlag", 1);
+
 		return gridBasicInfoMapper.selectByExample(example);
 	}
+
+	@Override
+	public PageInfo<GridBasicInfo> getGridsBySmcloudmassifIdPage(String massifId, Integer page, Integer pageSize) {
+		Example example = new Example(GridBasicInfo.class);
+		if(org.apache.commons.lang3.StringUtils.isEmpty(massifId)) {
+			List<GridBasicInfo> infos = new ArrayList<>();
+			example.createCriteria()
+					.andEqualTo("gridType", "building_grid")
+					.andEqualTo("isDeleted", 0)
+					.andEqualTo("enabledFlag", 1);
+
+			return doPage(page,pageSize, example);
+
+		}
+		example.createCriteria().andEqualTo("stagingId", massifId)
+				.andEqualTo("gridType", "building_grid")
+				.andEqualTo("isDeleted", 0)
+				.andEqualTo("enabledFlag", 1);
+
+		return new PageInfo<>(gridBasicInfoMapper.selectByExample(example));
+	}
+
+public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example){
+    PageHelper.startPage(pageNum, pageSize);
+    PageInfo pageInfo = new PageInfo(gridBasicInfoMapper.selectByExample(example));
+    return pageInfo;
+}
 
 	/**
 	 * 管家解除关联网格
@@ -476,7 +506,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	@Override
 	public List<Map<String,Object>> getGridsHouseBymassifId(String massifId) {
 		List<Map<String,Object>> returnList = new ArrayList<>();
-		List<GridBasicInfo> gridBasicInfos = this.getGridsBySmcloudmassifId(massifId);
+        List<GridBasicInfo> gridBasicInfos = this.getGridsBySmcloudmassifId(massifId);
 		gridBasicInfos.forEach(grid -> {
 			List<Map<String,Object>> listObjectFir = (List<Map<String,Object>>) JSONArray.parse(grid.getGridRange());
 			returnList.addAll(listObjectFir);
@@ -485,6 +515,30 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		return returnList;
 	}
 
+	@Override
+	public List<Map<String,Object>> getGridsHouseBymassifIdPage(String massifId,Integer page,Integer pageSize) {
+		List<Map<String,Object>> returnList = new ArrayList<>();
+		PageInfo<GridBasicInfo> pageInfo = this.getGridsBySmcloudmassifIdPage(massifId, page, pageSize);
+		List<GridBasicInfo> gridBasicInfos =pageInfo.getList();
+		gridBasicInfos.forEach(grid -> {
+			List<Map<String,Object>> listObjectFir = (List<Map<String,Object>>) JSONArray.parse(grid.getGridRange());
+			returnList.addAll(listObjectFir);
+		});
+
+		if(org.apache.commons.lang3.StringUtils.isEmpty(massifId)) {
+			Map<String, Object> map = new HashMap<>(16);
+			Map<String, Object> resultMap = new HashMap<>(16);
+			map.put("pages", pageInfo.getPages());
+			map.put("total", pageInfo.getTotal());
+			map.put("pageNum", pageInfo.getPageNum());
+			map.put("pageSize", pageInfo.getPageSize());
+			map.put("nextPage", pageInfo.getNextPage());
+			map.put("prePage", pageInfo.getPrePage());
+			resultMap.put("pageInfo", map);
+			returnList.add(resultMap);
+		}
+		return returnList;
+	}
 
 
 
@@ -515,10 +569,17 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	}
 
 	@Override
-	public List<Map<String, Object>> getHouseByCondition(String divideId,String id) {
-		List<Map<String, Object>> gridsHouseBymassifId = getGridsHouseBymassifId(divideId);
-		List<GridBasicInfo> infos = new ArrayList<>();
+	public List<Map<String, Object>> getHouseByCondition(String divideId,String id,Integer pageNum,Integer pageSize) {
+		List<Map<String, Object>> gridsHouseBymassifId = getGridsHouseBymassifIdPage(divideId, pageNum, pageSize);
+
 		List<Map<String, Object>> parentId = gridsHouseBymassifId.stream().filter(e -> String.valueOf(e.get("parentId")).equals(id)).collect(Collectors.toList());
+
+		if(org.apache.commons.lang3.StringUtils.isEmpty(divideId)) {
+			List<Map<String, Object>> pageInfo = gridsHouseBymassifId.parallelStream().filter(e -> e.get("pageInfo") != null).collect(Collectors.toList());
+			Map<String, Object> map = (Map<String, Object>) pageInfo.get(0).get("pageInfo");
+			JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(map));
+			parentId.add(0, jsonObject);
+		}
 		return parentId;
 	}
 

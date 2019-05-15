@@ -33,6 +33,7 @@ import com.hypersmart.base.feign.UCFeignService;
 import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 用户管理
@@ -192,19 +193,47 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
 
     @Override
     public UserDetailValue searchUserDetailByCondition(UserDetailRb userDetailRb) {
-        UserDetailValue userDetailValue = new UserDetailValue();
-        UcOrg devideInfo = ucOrgService.get(userDetailRb.getDevideId());
-        if (BeanUtils.isNotEmpty(devideInfo)) {
-            userDetailValue.setDevideName(devideInfo.getName());
-            UcOrg projectInfo = ucOrgService.get(devideInfo.getParentId());
-            if (BeanUtils.isNotEmpty(projectInfo)) {
-                userDetailValue.setProjectName(projectInfo.getName());
-            }
+        UserDetailValue result = new UserDetailValue();
+        // 新增：如果未传地块ID 则查询所有
+        if (userDetailRb.getDevideId() == null) {
+            QueryFilter build = QueryFilter.build();
+//            build.addFilter("");
+            List<UcOrg> all = ucOrgService.getUserOrgList(userDetailRb.getUserId());
+//            List<UcOrg> all = ucOrgService.query(build);
+            if(!CollectionUtils.isEmpty(all)){
+                List<UserDetailValue> userDetailValues=new ArrayList<>();
+                for (UcOrg ucOrg : all) {
+                    UserDetailValue userDetailValue = new UserDetailValue();
+                    if (BeanUtils.isNotEmpty(ucOrg)) {
+                        userDetailValue.setDevideName(ucOrg.getName());
+                        UcOrg projectInfo = ucOrgService.get(ucOrg.getParentId());
+                        if (BeanUtils.isNotEmpty(projectInfo)) {
+                            userDetailValue.setProjectName(projectInfo.getName());
+                        }
 
+                    }
+                    List<String> jobs = ucUserMapper.serchUserJobsByUserId(userDetailRb.getUserId(), userDetailRb.getDevideId());
+                    userDetailValue.setJobs(BeanUtils.isEmpty(jobs) ? new ArrayList<>() : jobs);
+                    userDetailValues.add(userDetailValue);
+                }
+                result.setLists(userDetailValues);
+            }
+            return result;
+        }else {
+            UcOrg devideInfo = ucOrgService.get(userDetailRb.getDevideId());
+            if (BeanUtils.isNotEmpty(devideInfo)) {
+                result.setDevideName(devideInfo.getName());
+                UcOrg projectInfo = ucOrgService.get(devideInfo.getParentId());
+                if (BeanUtils.isNotEmpty(projectInfo)) {
+                    result.setProjectName(projectInfo.getName());
+                }
+
+            }
+            List<String> jobs = ucUserMapper.serchUserJobsByUserId(userDetailRb.getUserId(), userDetailRb.getDevideId());
+            result.setJobs(BeanUtils.isEmpty(jobs) ? new ArrayList<>() : jobs);
+            return result;
         }
-        List<String> jobs = ucUserMapper.serchUserJobsByUserId(userDetailRb.getUserId(), userDetailRb.getDevideId());
-        userDetailValue.setJobs(BeanUtils.isEmpty(jobs) ? new ArrayList<>() : jobs);
-        return userDetailValue;
+
     }
 
     @Override
@@ -556,6 +585,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
 
     @Override
     public Set<GroupIdentity> getByJobCodeAndOrgIdAndDimCodeDeeply(String jobCode, String orgId, String dimCode, String fullName) throws Exception {
+
         List<ObjectNode> groupIdentities = ucFeignService.getByJobCodeAndOrgIdAndDimCodeDeeply(jobCode,orgId,dimCode,fullName);
         Set<GroupIdentity> groupIdentitySet = new HashSet<>();
         groupIdentities.forEach(groupIdentity->{

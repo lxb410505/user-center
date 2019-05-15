@@ -1,6 +1,7 @@
 package com.hypersmart.usercenter.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.hypersmart.base.util.JsonUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.framework.utils.StringUtils;
@@ -18,6 +19,7 @@ import com.hypersmart.usercenter.service.GridBasicInfoHistoryService;
 import com.hypersmart.usercenter.service.GridBasicInfoService;
 import com.hypersmart.usercenter.service.GridRangeService;
 import com.hypersmart.usercenter.util.GridOperateEnum;
+import com.hypersmart.usercenter.util.HttpClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -126,7 +128,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			record.setCallFlowContent(flowContent);
 
 			// TODO 调用K2流程
-			/*HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
+			HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
 			String resultContent = httpClientUtils.httpPost(flowUrl, flowContent, null);
 			JsonNode resultNode = JsonUtil.toJsonNode(resultContent);
 			if (null != resultNode) {
@@ -141,14 +143,15 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			} else {
 				record.setCallStatus(2);
 				record.setCallErrorMessage("调用K2审批流程失败：未能收到K2任何反馈信息");
-			}*/
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			record.setCallStatus(2);
 			record.setCallErrorMessage(e.getMessage());
 		} finally {
-//			gridApprovalRecordMapper.insert(record);
-			// TODO 待调整（删除此段代码，使用上面代码）
+			gridApprovalRecordMapper.insert(record);
+
+			/*// TODO 待调整（删除此段代码，使用上面代码）
 			record.setCallStatus(1);
 			String procInstId = UUID.randomUUID().toString();
 			record.setProcInstId(procInstId);
@@ -158,7 +161,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			k2Result.setMessage("审批通过");
 			k2Result.setProcInstId(procInstId);
 			k2Result.setResultCode("1");
-			processFlowResult(k2Result);
+			processFlowResult(k2Result);*/
 		}
 	}
 
@@ -170,6 +173,9 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	@Override
 	public void processFlowResult(K2Result k2Result) {
 		GridApprovalRecord record = gridApprovalRecordMapper.getGridApprovalRecordByProcInstId(k2Result.getProcInstId());
+		if (null == record) {
+			return;
+		}
 		try {
 			if ("1".equals(k2Result.getResultCode())) {
 				// 审批通过
@@ -188,8 +194,8 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 					grid.setUpdationDate(new Date());
 					grid.setUpdatedBy(record.getSubmitterId());
 					int i = gridBasicInfoService.updateSelective(grid);
-					if(i>0){
-						gridBasicInfoService.handChangeRange(gridId,dto.getGridRange(),2);//2 修改
+					if (i > 0) {
+						gridBasicInfoService.handChangeRange(gridId, dto.getGridRange(), 2);//2 修改
 					}
 					String[] ids = {gridId};
 					gridRangeService.deleteRangeByGridIds(ids);
