@@ -6,7 +6,7 @@
         SELECT *
         FROM t_satisfaction t
         WHERE
-        t.create_time = #{time} AND
+        DATE_FORMAT(t.create_time, '%Y-%m') = #{time} AND
         t.org_code IN
         <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
             #{item.code}
