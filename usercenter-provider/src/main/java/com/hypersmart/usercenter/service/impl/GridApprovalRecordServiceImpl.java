@@ -173,6 +173,9 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	@Override
 	public void processFlowResult(K2Result k2Result) {
 		GridApprovalRecord record = gridApprovalRecordMapper.getGridApprovalRecordByProcInstId(k2Result.getProcInstId());
+		if (null == record) {
+			return;
+		}
 		try {
 			if ("1".equals(k2Result.getResultCode())) {
 				// 审批通过
@@ -191,8 +194,8 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 					grid.setUpdationDate(new Date());
 					grid.setUpdatedBy(record.getSubmitterId());
 					int i = gridBasicInfoService.updateSelective(grid);
-					if(i>0){
-						gridBasicInfoService.handChangeRange(gridId,dto.getGridRange(),2);//2 修改
+					if (i > 0) {
+						gridBasicInfoService.handChangeRange(gridId, dto.getGridRange(), 2);//2 修改
 					}
 					String[] ids = {gridId};
 					gridRangeService.deleteRangeByGridIds(ids);
