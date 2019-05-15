@@ -2,6 +2,7 @@ package com.hypersmart.usercenter.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.ContextUtils;
@@ -448,12 +449,34 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	@Override
 	public List<GridBasicInfo> getGridsBySmcloudmassifId(String massifId) {
 		Example example = new Example(GridBasicInfo.class);
+		if(org.apache.commons.lang3.StringUtils.isEmpty(massifId)) {
+            List<GridBasicInfo> infos = new ArrayList<>();
+            example.createCriteria()
+                    .andEqualTo("gridType", "building_grid")
+                    .andEqualTo("isDeleted", 0)
+                    .andEqualTo("enabledFlag", 1);
+            int i =1;
+			PageInfo<GridBasicInfo> info=null;
+            do{
+				info= doPage(i, example);
+				infos.addAll(info.getList());
+			}while (i++<=info.getPages());
+
+
+        return infos;
+        }
 		example.createCriteria().andEqualTo("stagingId", massifId)
 				.andEqualTo("gridType", "building_grid")
 				.andEqualTo("isDeleted", 0)
 				.andEqualTo("enabledFlag", 1);
+
 		return gridBasicInfoMapper.selectByExample(example);
 	}
+public  PageInfo<GridBasicInfo> doPage(int pageNum,Example example){
+    PageHelper.startPage(pageNum, 100);
+    PageInfo pageInfo = new PageInfo(gridBasicInfoMapper.selectByExample(example));
+    return pageInfo;
+}
 
 	/**
 	 * 管家解除关联网格
@@ -476,7 +499,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	@Override
 	public List<Map<String,Object>> getGridsHouseBymassifId(String massifId) {
 		List<Map<String,Object>> returnList = new ArrayList<>();
-		List<GridBasicInfo> gridBasicInfos = this.getGridsBySmcloudmassifId(massifId);
+        List<GridBasicInfo> gridBasicInfos = this.getGridsBySmcloudmassifId(massifId);
 		gridBasicInfos.forEach(grid -> {
 			List<Map<String,Object>> listObjectFir = (List<Map<String,Object>>) JSONArray.parse(grid.getGridRange());
 			returnList.addAll(listObjectFir);
