@@ -173,7 +173,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	@Override
 	public void processFlowResult(K2Result k2Result) {
 		GridApprovalRecord record = gridApprovalRecordMapper.getGridApprovalRecordByProcInstId(k2Result.getProcInstId());
-		if (null != record) {
+		if (null == record) {
 			return;
 		}
 		try {
