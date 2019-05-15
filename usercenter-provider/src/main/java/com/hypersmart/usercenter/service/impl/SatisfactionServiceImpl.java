@@ -252,7 +252,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     public List<Satisfaction> getSatisfactionDetail(String orgId, String time) {
         QueryFilter queryFilter = QueryFilter.build();
         queryFilter.addFilter("PARENT_ID_", orgId, QueryOP.EQUAL, FieldRelation.AND);
-        queryFilter.addFilter("IS_DELE_", "1", QueryOP.EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("IS_DELE_", "0", QueryOP.EQUAL, FieldRelation.AND);
         List<UcOrg> ucOrgList = ucOrgService.query(queryFilter).getRows();
         List<Satisfaction> satisfactions = new ArrayList<>();
         if (ucOrgList!=null&&ucOrgList.size()>0){
