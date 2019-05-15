@@ -215,9 +215,9 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
             String parentCode = "";
             for (UcOrg ucOrg : orgList) {
                 if (parentOrgId.equals(ucOrg.getParentId())) {
-                    if ("ORG_XingZheng".equals(ucOrg.getGrade())) {
-                        continue;//（排除行政组织）--edit by lily 0417
-                    }
+//                    if ("ORG_XingZheng".equals(ucOrg.getGrade())) {
+//                        continue;//（排除行政组织）--edit by lily 0417
+//                    }
                     UcOrgDTO ucOrgDTO = new UcOrgDTO();
                     BeanUtils.copyProperties(ucOrg, ucOrgDTO);
                     if (StringUtils.isRealEmpty(parentCode)) {
@@ -437,7 +437,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     }
 
 
-    //获取用户默认维度组织，以及条线对应的默认组织的合集
+    //获取用户默认维度组织，以及条线对应的默认组织的合集（排除行政-edit by lily 0515）
     public List<UcOrg> getUserOrgListMerge(String userId) {
         QueryFilter queryFilter = QueryFilter.build();
         //查询用户所在默认维度组织
@@ -514,7 +514,30 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
                 }
             }
         }
-        return set;
+
+
+        Set<String> xingZhengList=new HashSet<>();
+        for(UcOrg item:set){
+            if ("ORG_XingZheng".equals(item.getGrade())) {
+                xingZhengList.add(item.getId());
+            }
+        }
+
+        List<UcOrg> resultSet = new ArrayList<>();
+        for(UcOrg item:set){
+            Boolean isUnder=false;
+            for(String xzId:xingZhengList){
+                if(item.getPath().contains(xzId)){
+                    isUnder=true;
+                    break;
+                }
+            }
+            if(!isUnder){
+                resultSet.add(item);
+            }
+        }
+        //（排除行政-edit by lily 0515）
+        return resultSet;
     }
 
 
