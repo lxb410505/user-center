@@ -7,6 +7,7 @@ import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.mdm.feign.UcOrgFeignService;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.mapper.SatisfactionMapper;
 import com.hypersmart.usercenter.mapper.UcOrgMapper;
 import com.hypersmart.usercenter.model.Satisfaction;
@@ -245,6 +246,32 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             hasRealCount++;
         }
         return hasRealCount;
+    }
+
+    @Override
+    public List<Satisfaction> getSatisfactionDetail(String orgId, String time) {
+        QueryFilter queryFilter = QueryFilter.build();
+        queryFilter.addFilter("PARENT_ID_", orgId, QueryOP.EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("IS_DELE_", "1", QueryOP.EQUAL, FieldRelation.AND);
+        List<UcOrg> ucOrgList = ucOrgService.query(queryFilter).getRows();
+        List<Satisfaction> satisfactions = new ArrayList<>();
+        if (ucOrgList!=null&&ucOrgList.size()>0){
+            satisfactions = satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
+        }
+        return satisfactions;
+    }
+
+    @Override
+    public List<Satisfaction> getAllSatisfaction(String time) {
+        String userId = ContextUtil.getCurrentUser().getUserId();
+        List<UcOrg> ucOrgList = ucOrgService.getUserOrgListMerge(userId);
+        List<UcOrg> quYuList = new ArrayList<>();
+        for (UcOrg ucOrg:ucOrgList){
+            if (ucOrg.getLevel()==1){
+                quYuList.add(ucOrg);
+            }
+        }
+        return satisfactionMapper.getSatisfactionDetail(quYuList,time);
     }
 
     public static void main(String[] args) throws ParseException {
