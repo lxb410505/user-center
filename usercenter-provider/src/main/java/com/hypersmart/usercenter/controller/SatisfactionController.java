@@ -93,6 +93,12 @@ public class SatisfactionController extends BaseController {
         return this.satisfactionService.getSatisfactionDetail(orgId,time);
     }
 
+    @GetMapping({"/allSatisfaction"})
+    @ApiOperation(value = "总部满意度", httpMethod = "GET", notes = "总部满意度")
+    public List<Satisfaction> allSatisfaction(@ApiParam(name = "time", value = "时间") @RequestParam String time) {
+        return this.satisfactionService.getAllSatisfaction(time);
+    }
+
     @GetMapping({"/get/{id}"})
     @ApiOperation(value = "数据列表", httpMethod = "GET", notes = "获取单个记录")
     public Satisfaction get(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {

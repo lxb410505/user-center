@@ -7,6 +7,7 @@ import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.mdm.feign.UcOrgFeignService;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.mapper.SatisfactionMapper;
 import com.hypersmart.usercenter.mapper.UcOrgMapper;
 import com.hypersmart.usercenter.model.Satisfaction;
@@ -258,6 +259,19 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             satisfactions = satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
         }
         return satisfactions;
+    }
+
+    @Override
+    public List<Satisfaction> getAllSatisfaction(String time) {
+        String userId = ContextUtil.getCurrentUser().getUserId();
+        List<UcOrg> ucOrgList = ucOrgService.getUserOrgListMerge(userId);
+        List<UcOrg> quYuList = new ArrayList<>();
+        for (UcOrg ucOrg:ucOrgList){
+            if (ucOrg.getLevel()==1){
+                quYuList.add(ucOrg);
+            }
+        }
+        return satisfactionMapper.getSatisfactionDetail(quYuList,time);
     }
 
     public static void main(String[] args) throws ParseException {

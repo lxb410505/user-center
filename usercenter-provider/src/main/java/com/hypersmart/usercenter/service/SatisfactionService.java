@@ -22,5 +22,6 @@ public interface SatisfactionService extends IGenericService<String, Satisfactio
 
     List<Satisfaction> getSatisfactionDetail(String orgId,String time);
 
+    List<Satisfaction> getAllSatisfaction(String time);
 }
 
