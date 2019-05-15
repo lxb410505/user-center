@@ -7,6 +7,7 @@ import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.base.util.BeanUtils;
+import com.hypersmart.base.util.ContextUtils;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
@@ -160,9 +161,10 @@ public class UcUserController extends BaseController {
     public CommonResult<UserDetailValue> searchUserDetailByCondition(@RequestBody UserDetailRb userDetailRb) {
         if (StringUtil.isEmpty(userDetailRb.getUserId())) {
             return new CommonResult<>(false, "用户信息为空");
-        } else if (StringUtil.isEmpty(userDetailRb.getDevideId())) {
-            return new CommonResult<>(false, "地块信息为空");
         }
+        /*else if (StringUtil.isEmpty(userDetailRb.getDevideId())) {
+            return new CommonResult<>(false, "地块信息为空");
+        }*/
         return new CommonResult<UserDetailValue>(true, "处理成功", ucUserService.searchUserDetailByCondition(userDetailRb), 200);
     }
 
@@ -194,13 +196,16 @@ public class UcUserController extends BaseController {
     @ApiOperation(value = "根据组织Id、条线编码和职务编码获取对应条线上的对应人员", httpMethod = "GET", notes = "根据组织Id、条线编码和职务编码获取对应条线上的对应人员")
     public Set<GroupIdentity> getByJobCodeAndOrgIdAndDimCodeDeeply(
             @ApiParam(name = "jobCode", value = "职务编码") @RequestParam(required = false) String jobCode,
-            @ApiParam(name = "orgId", value = "组织Id", required = true) @RequestParam String orgId,
+            @ApiParam(name = "orgId", value = "组织Id", required = true) @RequestParam(value = "orgId",required = false,defaultValue = "") String orgId,
             @ApiParam(name = "dimCode", value = "维度编码") @RequestParam(required = false) String dimCode,
             @ApiParam(name = "fullName", value = "姓名") @RequestParam(required = false) String fullName
     )
             throws Exception {
         if (StringUtil.isEmpty(orgId)) {
+            if(null==  ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY)){
             throw new RequiredException("职务编码、组织Id为空！");
+            }
+            orgId= (String)ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
         }
         return ucUserService.getByJobCodeAndOrgIdAndDimCodeDeeply(jobCode, orgId, dimCode, fullName);
     }
