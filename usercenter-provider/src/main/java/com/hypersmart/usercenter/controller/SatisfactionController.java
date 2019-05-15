@@ -82,7 +82,7 @@ public class SatisfactionController extends BaseController {
 
     @GetMapping({"/gridsByDivideId/{massifId}"})
     @ApiOperation(value = "根据地块id获取网格", httpMethod = "GET", notes = "根据地块id获取网格")
-    public List<GridBasicInfo> gridsBySmcloudmassifId(@ApiParam(name = "userId", value = "地块id") @RequestParam String massifId) {
+    public List<GridBasicInfo> gridsBySmcloudmassifId(@ApiParam(name = "userId", value = "地块id") @PathVariable String massifId) {
         return gridBasicInfoService.getGridsBySmcloudmassifId(massifId);
     }
 
