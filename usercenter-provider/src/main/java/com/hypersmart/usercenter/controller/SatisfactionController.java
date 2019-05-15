@@ -4,6 +4,7 @@ import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.model.Satisfaction;
 import com.hypersmart.usercenter.service.SatisfactionService;
 import com.hypersmart.base.query.*;
@@ -69,7 +70,8 @@ public class SatisfactionController extends BaseController {
 
     @GetMapping({"/topLevel"})
     @ApiOperation(value = "顶级组织级别", httpMethod = "GET", notes = "获取顶级组织级别")
-    public int topLevel(@ApiParam(name = "userId", value = "用户id") @RequestParam String userId) {
+    public int topLevel() {
+        String userId = ContextUtil.getCurrentUser().getUserId();
         List<UcOrg> ucOrgList = ucOrgService.getUserOrgListMerge(userId);
         int level = 4;
         for (UcOrg org:ucOrgList){
@@ -82,7 +84,7 @@ public class SatisfactionController extends BaseController {
 
     @GetMapping({"/gridsByDivideId/{massifId}"})
     @ApiOperation(value = "根据地块id获取网格", httpMethod = "GET", notes = "根据地块id获取网格")
-    public List<GridBasicInfo> gridsBySmcloudmassifId(@ApiParam(name = "userId", value = "地块id") @PathVariable String massifId) {
+    public List<GridBasicInfo> gridsBySmcloudmassifId(@ApiParam(name = "massifId", value = "地块id") @PathVariable String massifId) {
         return gridBasicInfoService.getGridsBySmcloudmassifId(massifId);
     }
 
