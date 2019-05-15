@@ -467,10 +467,15 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                         List<UcOrgUser> l = ucOrgUserMapper.getListByOrgIdUserId(org.getId(), u.getId());
                         Boolean falg = false;
                         for (UcOrgUser o : l) {
-                            if (o.getPosId().equals(orgPost.getId())) {
-                                falg = true;
-                                existCount++;
-                                existMessage.append("第 " + userData.getExcleRow() + " 行组织人员已存在，不再重复导入");
+                            if(StringUtil.isNotEmpty(o.getPosId())){
+                                if (o.getPosId().equals(orgPost.getId())) {
+                                    falg = true;
+                                    existCount++;
+                                    existMessage.append("第 " + userData.getExcleRow() + " 行组织人员已存在，不再重复导入");
+                                    break;
+                                }
+                            }else {
+                                o.setPosId(orgPost.getId());
                                 break;
                             }
                         }
