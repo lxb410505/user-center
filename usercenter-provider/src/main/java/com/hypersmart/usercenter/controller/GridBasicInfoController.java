@@ -19,14 +19,12 @@ import com.hypersmart.usercenter.service.UcOrgUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -297,8 +295,8 @@ public class GridBasicInfoController extends BaseController {
 
 	@GetMapping({"/getHouseByCondition"})
 	@ApiOperation(value = "根据地块id，获取地块下的网格覆盖的房产信息", httpMethod = "GET", notes = "根据地块id，获取地块下的楼栋网格信息")
-	public List<Map<String,Object>> getHouseByCondition(@ApiParam(name = "divide", value = "地块id", required = true) @RequestParam("divide") String divide,@RequestParam(value = "id",required = false,defaultValue = "0") String id) {
-		List<Map<String, Object>> houseByCondition = gridBasicInfoService.getHouseByCondition(divide, id);
+	public List<Map<String,Object>> getHouseByCondition(@ApiParam(name = "divide", value = "地块id", required = true) @RequestParam(value = "divide",required = false,defaultValue = "") String divide, @RequestParam(value = "id",required = false,defaultValue = "0") String id, @RequestParam(value = "pageNum",required = false,defaultValue = "1") Integer pageNum,@RequestParam(value = "pageSize",required = false,defaultValue = "20") Integer pageSize) {
+		List<Map<String, Object>> houseByCondition = gridBasicInfoService.getHouseByCondition(divide, id,pageNum,pageSize);
 		Map<String,Object> checkMap = new HashMap<>(16);
 		List<Map<String, Object>> maps = new ArrayList<>();
 		for (Map<String, Object> map : houseByCondition) {
