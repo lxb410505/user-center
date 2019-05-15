@@ -534,7 +534,7 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 			map.put("pageSize", pageInfo.getPageSize());
 			map.put("nextPage", pageInfo.getNextPage());
 			map.put("prePage", pageInfo.getPrePage());
-			resultMap.put("pageInfo", pageInfo);
+			resultMap.put("pageInfo", map);
 			returnList.add(resultMap);
 		}
 		return returnList;
