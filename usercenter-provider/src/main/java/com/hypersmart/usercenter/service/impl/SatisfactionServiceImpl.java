@@ -247,6 +247,19 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         return hasRealCount;
     }
 
+    @Override
+    public List<Satisfaction> getSatisfactionDetail(String orgId, String time) {
+        QueryFilter queryFilter = QueryFilter.build();
+        queryFilter.addFilter("PARENT_ID_", orgId, QueryOP.EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("IS_DELE_", "1", QueryOP.EQUAL, FieldRelation.AND);
+        List<UcOrg> ucOrgList = ucOrgService.query(queryFilter).getRows();
+        List<Satisfaction> satisfactions = new ArrayList<>();
+        if (ucOrgList!=null&&ucOrgList.size()>0){
+            satisfactions = satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
+        }
+        return satisfactions;
+    }
+
     public static void main(String[] args) throws ParseException {
         String date = "2019-05-00";
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-00");
