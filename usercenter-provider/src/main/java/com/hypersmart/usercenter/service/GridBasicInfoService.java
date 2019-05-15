@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.service;
 
+import com.github.pagehelper.PageInfo;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.framework.service.IGenericService;
@@ -159,6 +160,9 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 */
 	void handChangeRange(String gridId,String gridRange,Integer action);
 
-	List<Map<String,Object>> getHouseByCondition(String divideId,String id);
+	List<Map<String, Object>> getHouseByCondition(String divide, String id, Integer pageNum, Integer pageSize);
+
+	PageInfo<GridBasicInfo> getGridsBySmcloudmassifIdPage(String massifId, Integer page, Integer pageSize);
+	List<Map<String,Object>> getGridsHouseBymassifIdPage(String massifId,Integer page,Integer pageSize);
 }
 
