@@ -11,6 +11,7 @@ public class UserDetailValue extends GenericDTO<String> implements Serializable 
     private List<String> jobs;
     private Integer stars = 2;
     private Integer rank = 90;
+    private List<UserDetailValue> lists;
 
     public String getProjectName() {
         return projectName;
@@ -50,5 +51,13 @@ public class UserDetailValue extends GenericDTO<String> implements Serializable 
 
     public void setRank(Integer rank) {
         this.rank = rank;
+    }
+
+    public List<UserDetailValue> getLists() {
+        return lists;
+    }
+
+    public void setLists(List<UserDetailValue> lists) {
+        this.lists = lists;
     }
 }
