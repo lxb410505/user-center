@@ -449,7 +449,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	@Override
 	public List<GridBasicInfo> getGridsBySmcloudmassifId(String massifId) {
 		Example example = new Example(GridBasicInfo.class);
-		if(org.apache.commons.lang3.StringUtils.isEmpty(massifId)) {
+		/*if(org.apache.commons.lang3.StringUtils.isEmpty(massifId)) {
             List<GridBasicInfo> infos = new ArrayList<>();
             example.createCriteria()
                     .andEqualTo("gridType", "building_grid")
@@ -464,7 +464,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
 
         return infos;
-        }
+        }*/
 		example.createCriteria().andEqualTo("stagingId", massifId)
 				.andEqualTo("gridType", "building_grid")
 				.andEqualTo("isDeleted", 0)
