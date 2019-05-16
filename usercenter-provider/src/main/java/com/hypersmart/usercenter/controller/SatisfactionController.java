@@ -57,11 +57,11 @@ public class SatisfactionController extends BaseController {
                                             @ApiParam(name = "endDate", value = "结束时间") @RequestParam String endDate) {
         QueryFilter queryFilter = QueryFilter.build();
         queryFilter.addFilter("org_code", orgCode, QueryOP.EQUAL, FieldRelation.AND);
-        queryFilter.addFilter("create_time", beginDate, QueryOP.GREAT_EQUAL, FieldRelation.AND);
-        queryFilter.addFilter("create_time", endDate, QueryOP.LESS_EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("effective_time", beginDate, QueryOP.GREAT_EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("effective_time", endDate, QueryOP.LESS_EQUAL, FieldRelation.AND);
         List<FieldSort> fieldSortList = new ArrayList<>();
         FieldSort fieldSort = new FieldSort();
-        fieldSort.setProperty("create_time");
+        fieldSort.setProperty("effective_time");
         fieldSort.setDirection(Direction.DESC);
         fieldSortList.add(fieldSort);
         queryFilter.setSorter(fieldSortList);
