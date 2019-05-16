@@ -19,6 +19,9 @@ import java.util.List;
  */
 
 public class GridBasicInfoDTO extends GenericDTO<String> implements Serializable {
+	//用户ID
+	private String account;
+
 	//网格编码
 	private String gridCode;
 
@@ -421,5 +424,13 @@ public class GridBasicInfoDTO extends GenericDTO<String> implements Serializable
 
 	public void setGridBasicInfoBOList(List<GridBasicInfoBO> gridBasicInfoBOList) {
 		this.gridBasicInfoBOList = gridBasicInfoBOList;
+	}
+
+	public String getAccount() {
+		return account;
+	}
+
+	public void setAccount(String account) {
+		this.account = account;
 	}
 }

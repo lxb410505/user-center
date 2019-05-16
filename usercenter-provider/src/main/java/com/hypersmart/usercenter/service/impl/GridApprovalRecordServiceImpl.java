@@ -103,8 +103,10 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 
 			// 处理上报流程的内容
 			String flowContent = "";
+
+			//网格新增
 			if (approvalType.equals(GridOperateEnum.NEW_GRID.getOperateType())) {
-				flowContent = constructingFlowContentForNewGrid(GridOperateEnum.NEW_GRID.getDescription(), approvalContent, gridTypes, formatAttributeTypes);
+				flowContent = constructingFlowContentForNewGrid("NEW_GRID",GridOperateEnum.NEW_GRID.getDescription(), approvalContent, gridTypes, formatAttributeTypes);
 			}
 
 			// 网格覆盖范围变更
@@ -114,12 +116,12 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 
 			// 管家变更
 			if (approvalType.equals(GridOperateEnum.CHANGE_HOUSEKEEPER.getOperateType())) {
-				flowContent = constructingFlowContentForChangeHousekeeper(approvalContent, gridTypes, formatAttributeTypes);
+				flowContent = constructingFlowContentForChangeHousekeeper("CHANGE_HOUSEKEEPER",approvalContent, gridTypes, formatAttributeTypes);
 			}
 
 			// 网格停用
 			if (approvalType.equals(GridOperateEnum.DISABLE_GRID.getOperateType())) {
-				flowContent = constructingFlowContentForNewGrid(GridOperateEnum.DISABLE_GRID.getDescription(), approvalContent, gridTypes, formatAttributeTypes);
+				flowContent = constructingFlowContentForNewGrid("NEW_GRID",GridOperateEnum.DISABLE_GRID.getDescription(), approvalContent, gridTypes, formatAttributeTypes);
 			}
 
 			// 解除网格管家关联
@@ -133,13 +135,31 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			String resultContent = httpClientUtils.httpPost(flowUrl, flowContent, null);
 			JsonNode resultNode = JsonUtil.toJsonNode(resultContent);
 			if (null != resultNode) {
-				if (!"0".equals(resultNode.get("CODE").asText())) {
+				String code = "";
+				if (resultNode.get("code") != null) {
+					code = resultNode.get("code").asText();
+				}else {
+					code = resultNode.get("CODE").asText();
+				}
+				if (!"0".equals(code)) {
 					// 调用K2失败
 					record.setCallStatus(2);
-					record.setCallErrorMessage(resultNode.get("RESULT").asText());
+					String message = "";
+					if (resultNode.get("message") != null) {
+						message = resultNode.get("message").asText();
+					}else {
+						message = resultNode.get("RESULT").asText();
+					}
+					record.setCallErrorMessage(message);
 				} else {
+					String procinstid = "";
+					if (resultNode.get("procinstid") != null) {
+						procinstid = resultNode.get("procinstid").asText();
+					}else {
+						procinstid = resultNode.get("PROCINSTID").asText();
+					}
 					record.setCallStatus(1);
-					record.setProcInstId(resultNode.get("PROCINSTID").asText());
+					record.setProcInstId(procinstid);
 				}
 			} else {
 				record.setCallStatus(2);
@@ -265,7 +285,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	 * @return
 	 * @throws IOException
 	 */
-	private String constructingFlowContentForNewGrid(String gridDescription, Object approvalContent,
+	private String constructingFlowContentForNewGrid(String type,String gridDescription, Object approvalContent,
 	                                                 List<Map<String, String>> gridTypes, List<Map<String, String>> formatAttributeTypes) throws IOException {
 		/**
 		 * 1.流程信息体
@@ -276,8 +296,14 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		GridBasicInfoDTO gridBasicInfo = (GridBasicInfoDTO) approvalContent;
 		Map<String, Object> flowMap = new HashMap(),
 				body = new HashMap();
-		List<Map<String, Object>> coverageAreaDetails = new ArrayList<>();
-
+//		List<Map<String, Object>> coverageAreaDetails = new ArrayList<>();
+		Map<String,Object> coverageAreaDetails = new HashMap<>();
+		if ("NEW_GRID".equals(type)) {
+			body.put("CODE", "SMPT0001");
+		}else {
+			body.put("CODE", "SMPT0004");
+		}
+		getProposer(body,gridBasicInfo);
 		body.put("TYPE", gridDescription);
 		body.put("GRIDCODE", gridBasicInfo.getGridCode());
 		body.put("GRIDNAME", gridBasicInfo.getGridName());
@@ -288,16 +314,13 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		} else {
 			body.put("HOUSEKEEPER", "");
 		}
+		body.put("REMARKS", gridBasicInfo.getGridRemark());
 		body.put("CREATIONTIME", gridBasicInfo.getCreationDate());
 		body.put("FOUNDER", ContextUtil.getCurrentUser().getFullname());
-		body.put("REMARKS", gridBasicInfo.getGridRemark());
-
 		constructingGridRanges(coverageAreaDetails, gridBasicInfo.getGridRange());
 		body.put("COVERAGEAREADETAILS", coverageAreaDetails);
-		body.put("APPLICATIONREASON", gridBasicInfo.getReason());
 
-		body.put("CODE", "SMPT0001");
-		getProposer(body,gridBasicInfo);
+//		body.put("APPLICATIONREASON", gridBasicInfo.getReason());
 		flowMap.put("DATA", body);
 
 		return JsonUtil.toJson(flowMap);
@@ -322,7 +345,8 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		GridBasicInfoDTO gridBasicInfo = (GridBasicInfoDTO) approvalContent;
 		Map<String, Object> flowMap = new HashMap(),
 				body = new HashMap();
-		List<Map<String, Object>> beforeDetails = new ArrayList<>(), afterDetails = new ArrayList<>();
+		body.put("CODE", "SMPT0002");
+		getProposer(body,gridBasicInfo);
 		body.put("TYPE", GridOperateEnum.CHANGE_SCOPE.getDescription());
 		body.put("GRIDCODE", gridBasicInfo.getGridCode());
 		body.put("GRIDNAME", gridBasicInfo.getGridName());
@@ -336,20 +360,15 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		body.put("REMARKS", gridBasicInfo.getGridRemark());
 
 		// 变更后网格覆盖范围
-		constructingGridRanges(afterDetails, gridBasicInfo.getGridRange());
-		body.put("AFTERCOVERAGEAREADETAILS", afterDetails);
+		constructingGridRanges(body, gridBasicInfo.getGridRange());
 
 		// 变更前网格覆盖范围
 		GridBasicInfo beforeGridInfo = gridApprovalRecordMapper.getBeforeGridInfo(gridBasicInfo.getId());
 		if (null != beforeGridInfo.getGridRange()) {
-			constructingGridRanges(beforeDetails, beforeGridInfo.getGridRange());
+			constructingGridRanges(body, beforeGridInfo.getGridRange());
 		}
-		body.put("BEFORECOVERAGEAREADETAILS", beforeDetails);
 		body.put("APPLICATIONREASON", gridBasicInfo.getReason());
-
-		body.put("CODE", "SMPT0002");
 //		body.put("PROPOSERDETAIL", getProposer(gridBasicInfo));
-		getProposer(body,gridBasicInfo);
 		flowMap.put("DATA", body);
 
 		return JsonUtil.toJson(flowMap);
@@ -362,7 +381,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	 * @return
 	 * @throws IOException
 	 */
-	private String constructingFlowContentForChangeHousekeeper(Object approvalContent, List<Map<String, String>> gridTypes, List<Map<String, String>> formatAttributeTypes) throws IOException {
+	private String constructingFlowContentForChangeHousekeeper(String type,Object approvalContent, List<Map<String, String>> gridTypes, List<Map<String, String>> formatAttributeTypes) throws IOException {
 
 		/**
 		 * 1.流程信息体
@@ -374,13 +393,19 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		GridBasicInfoDTO gridBasicInfoDTO = (GridBasicInfoDTO) approvalContent;
 		Map<String, Object> flowMap = new HashMap(),
 				body = new HashMap();
-		List<Map<String, Object>> details = new ArrayList<>();
 		GridBasicInfo gridInfo = gridApprovalRecordMapper.getBeforeGridInfo(gridBasicInfoDTO.getId());
+		if ("CHANGE_HOUSEKEEPER".equals(type)) {
+			body.put("CODE", "SMPT0003");
+		}else {
+			body.put("CODE", "SMPT0005");
+		}
+		getProposer(body,gridBasicInfoDTO);
 		body.put("TYPE", GridOperateEnum.CHANGE_HOUSEKEEPER.getDescription());
 		body.put("GRIDCODE", gridInfo.getGridCode());
 		body.put("GRIDNAME", gridInfo.getGridName());
 		body.put("GRIDTYPE", getDicByType(gridInfo.getGridType(), gridTypes));
 		body.put("FORMATATTRIBUTE", getDicByType(gridInfo.getFormatAttribute(), formatAttributeTypes));
+		body.put("REMARKS", gridInfo.getGridRemark());
 		if (StringUtils.isNotRealEmpty(gridInfo.getHousekeeperId())) {
 			body.put("BEFOREHOUSEKEEPER", gridApprovalRecordMapper.getUserNameById(gridInfo.getHousekeeperId()));
 		} else {
@@ -392,15 +417,11 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		} else {
 			body.put("AFTERHOUSEKEEPER", "");
 		}
-		body.put("REMARKS", gridInfo.getGridRemark());
 
 		// 网格范围
-		constructingGridRanges(details, gridInfo.getGridRange());
-		body.put("COVERAGEAREADETAILS", details);
+		constructingGridRanges(body, gridInfo.getGridRange());
 		body.put("APPLICATIONREASON", gridBasicInfoDTO.getReason());
 
-		body.put("CODE", "SMPT0003");
-		getProposer(body,gridBasicInfoDTO);
 		flowMap.put("DATA", body);
 
 		return JsonUtil.toJson(flowMap);
@@ -446,7 +467,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			gridMap.put("REMARKS", gridInfo.getGridRemark());
 
 			// 获取网格覆盖范围
-			List<Map<String, Object>> areaDetails = new ArrayList<>();
+			Map<String,Object> areaDetails = new HashMap<>();
 			constructingGridRanges(areaDetails, gridInfo.getGridRange());
 			gridMap.put("COVERAGEAREADETAILS", areaDetails);
 			removeGridDetails.add(gridMap);
@@ -454,22 +475,24 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 
 		// TODO 根据管家id，获取管家信息
 		//  (ORG_ID_,USER_ID_)uc_org_user(POS_ID_) >>> (POS_ID_)uc_org_post(POST_KEY_)   >>> (POST_KEY_)portal.portal_sys_dic(NAME_)
+		body.put("CODE", "SMPT0006");
+		getProposer(body,gridBasicInfoDTO);
+		body.put("TYPE", GridOperateEnum.HOUSEKEEPER_DISASSOCIATED.getDescription());
 		Map<String, String> housekeeper = gridApprovalRecordMapper.getHousekeeperInfoById(flowDbPortal, houseKeeperId, orgId);
 		if (null != housekeeper) {
-			body.put("NAME", housekeeper.get("FULLNAME_"));
+			body.put("HOUSEKEEPERNAME", housekeeper.get("FULLNAME_"));
 			body.put("LEVEL", housekeeper.get("NAME_"));
 			body.put("PHONE", housekeeper.get("MOBILE_"));
 		} else {
-			body.put("NAME", "");
+			body.put("HOUSEKEEPERNAME", "");
 			body.put("LEVEL", "");
 			body.put("PHONE", "");
 		}
-		body.put("TYPE", GridOperateEnum.HOUSEKEEPER_DISASSOCIATED.getDescription());
-		body.put("REMOVEGRIDDETAILS", removeGridDetails);
+		Map<String,List> map = new HashMap<>();
+		map.put("REMOVEGRIDDETAIL",removeGridDetails);
+		body.put("REMOVEGRIDDETAILS", map);
 		body.put("APPLICATIONREASON", gridBasicInfoDTO.getReason());
 
-		body.put("CODE", "SMPT0005");
-		getProposer(body,gridBasicInfoDTO);
 		flowMap.put("DATA", body);
 
 		return JsonUtil.toJson(flowMap);
@@ -478,13 +501,15 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	/**
 	 * 统一构建网格覆盖范围
 	 *
-	 * @param areaDetails
+	 * @param body
 	 * @param gridRange
 	 */
-	private void constructingGridRanges(List<Map<String, Object>> areaDetails, String gridRange) {
+	private void constructingGridRanges(Map<String,Object> body, String gridRange) {
 		if (StringUtils.isRealEmpty(gridRange)) {
 			return;
 		}
+		Map<String,List<Map<String,String>>> coverageareadetails = new HashMap<>();
+		List<Map<String,String>> list = new ArrayList<>();
 		JSONArray jsonArray = JSONArray.parseArray(gridRange);
 		List<GridRangeInfo> gridRangeInfos = jsonArray.toJavaList(GridRangeInfo.class);
 		if (!CollectionUtils.isEmpty(gridRangeInfos)) {
@@ -495,15 +520,17 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 				for (GridRangeInfo unit : unitList) {
 					List<GridRangeInfo> houseList = gridRangeInfos.stream().filter(m -> m.getLevel() == 3 && m.getParentId().equals(unit.getId())).collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(GridRangeInfo::getId))), ArrayList::new));
 					for (GridRangeInfo house : houseList) {
-						Map<String, Object> coverageAreaDetail = new HashMap();
-						coverageAreaDetail.put("STORIEDBUILDING", building.getName());
-						coverageAreaDetail.put("UNIT", unit.getName());
-						coverageAreaDetail.put("HOUSEPROPERTY", house.getName());
-						areaDetails.add(coverageAreaDetail);
+						Map<String,String> child = new HashMap<>();
+						child.put("STORIEDBUILDING", building.getName());
+						child.put("UNIT", unit.getName());
+						child.put("HOUSEPROPERTY", house.getName());
+						list.add(child);
 					}
 				}
 			}
 		}
+		coverageareadetails.put("COVERAGEAREADETAIL",list);
+		body.put("COVERAGEAREADETAILS",coverageareadetails);
 	}
 
 	/**
@@ -514,7 +541,11 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	 */
 	private void getProposer(Map body,GridBasicInfoDTO proposer) {
 		// TODO 需要传入更多信息（区域id、城区id、项目id、地块id、申请人页面选择信息）
-		body.put("NAME", ContextUtil.getCurrentUser().getFullname());
+		body.put("JURISDICTION", "0");
+//		body.put("ID", proposer.getAccount());
+		body.put("ID", "wy_xiaoxiong_zhang");
+		body.put("NAME", "张晓雄");
+//		body.put("NAME", ContextUtil.getCurrentUser().getFullname());
 		body.put("DATE", new Date());
 		body.put("PLANS", proposer.getPostId());
 		body.put("ROLE", proposer.getPostName());

@@ -11,8 +11,10 @@ import com.hypersmart.mdm.feign.UcOrgFeignService;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.mapper.SatisfactionMapper;
 import com.hypersmart.usercenter.mapper.UcOrgMapper;
+import com.hypersmart.usercenter.model.GridBasicInfo;
 import com.hypersmart.usercenter.model.Satisfaction;
 import com.hypersmart.usercenter.model.UcOrg;
+import com.hypersmart.usercenter.service.GridBasicInfoService;
 import com.hypersmart.usercenter.service.SatisfactionService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.util.ImportExcelUtil;
@@ -46,6 +48,8 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     @Autowired
     UcOrgService ucOrgService;
 
+    @Autowired
+    GridBasicInfoService gridBasicInfoService;
     //查询组织机构;
     @Autowired
     UcOrgFeignService ucOrgFeignService;
@@ -262,12 +266,18 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         List<UcOrg> list = ucOrgService.query(query).getRows();
         List<Satisfaction> satisfactions = new ArrayList<>();
         if (list!=null&&list.size()>0){
-            QueryFilter queryFilter = QueryFilter.build();
-            queryFilter.addFilter("PARENT_ID_", list.get(0).getId(), QueryOP.EQUAL, FieldRelation.AND);
-            queryFilter.addFilter("IS_DELE_", "0", QueryOP.EQUAL, FieldRelation.AND);
-            List<UcOrg> ucOrgList = ucOrgService.query(queryFilter).getRows();
-            if (ucOrgList!=null&&ucOrgList.size()>0){
-                satisfactions = satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
+            UcOrg ucOrg = list.get(0);
+            if (ucOrg.getLevel()==4){
+                List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getGridsBySmcloudmassifId(ucOrg.getId());
+                satisfactions = satisfactionMapper.getGridSatisfaction(gridBasicInfoList,time);
+            }else {
+                QueryFilter queryFilter = QueryFilter.build();
+                queryFilter.addFilter("PARENT_ID_", list.get(0).getId(), QueryOP.EQUAL, FieldRelation.AND);
+                queryFilter.addFilter("IS_DELE_", "0", QueryOP.EQUAL, FieldRelation.AND);
+                List<UcOrg> ucOrgList = ucOrgService.query(queryFilter).getRows();
+                if (ucOrgList!=null&&ucOrgList.size()>0){
+                    satisfactions = satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
+                }
             }
         }
         return satisfactions;
