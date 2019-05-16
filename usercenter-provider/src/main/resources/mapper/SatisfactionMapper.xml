@@ -2,17 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.hypersmart.usercenter.mapper.SatisfactionMapper">
-<!--    <select id="getSatisfactionDetail" resultMap="Satisfaction">-->
-<!--        SELECT *-->
-<!--        FROM t_satisfaction t-->
-<!--        WHERE-->
-<!--        DATE_FORMAT(t.create_time, '%Y-%m') = #{time} AND-->
-<!--        t.org_code IN-->
-<!--        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">-->
-<!--            #{item.code}-->
-<!--        </foreach>-->
-<!--    </select>-->
-    <select id="deleteByDate" parameterType="java.lang.String">
+    <select id="getSatisfactionDetail" resultType="com.hypersmart.usercenter.model.Satisfaction">
+        SELECT *
+        FROM t_satisfaction t
+        WHERE
+        DATE_FORMAT(t.create_time, '%Y-%m') = #{time} AND
+        t.org_code IN
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+            #{item.code}
+        </foreach>
+    </select>
+
+    <select id="deleteBydate" parameterType="java.lang.String">
     delete from  t_satisfaction where
     effective_time = #{date}
 </select>

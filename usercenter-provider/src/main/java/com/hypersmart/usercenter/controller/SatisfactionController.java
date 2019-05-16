@@ -71,14 +71,35 @@ public class SatisfactionController extends BaseController {
     @GetMapping({"/topLevel"})
     @ApiOperation(value = "顶级组织级别", httpMethod = "GET", notes = "获取顶级组织级别")
     public int topLevel() {
-        String userId = ContextUtil.getCurrentUser().getUserId();
+        int level=0;
+        Boolean hasArea=false;
+        Boolean hasProject=false;
+        Boolean hasDikuai=false;
+
+        String userId=ContextUtil.getCurrentUserId();
         List<UcOrg> ucOrgList = ucOrgService.getUserOrgListMerge(userId);
-        int level = 4;
-        for (UcOrg org:ucOrgList){
-            if (org.getLevel()<level){
-                level = org.getLevel();
+        for(UcOrg org:ucOrgList){
+            if(org.getGrade().equals("ORG_QuYu")){
+                hasArea=true;
+            }
+            else if(org.getGrade().equals("ORG_XiangMu")){
+                hasProject=true;
+            }
+            else if(org.getGrade().equals("ORG_DiKuai")){
+                hasDikuai=true;
             }
         }
+
+        if(hasArea){
+            level=1;
+        }
+        else if(hasProject){
+            level=2;
+        }
+        else if(hasDikuai){
+            level=3;
+        }
+
         return level;
     }
 
