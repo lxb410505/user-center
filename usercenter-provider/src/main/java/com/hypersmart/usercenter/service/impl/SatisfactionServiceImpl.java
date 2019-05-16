@@ -267,7 +267,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         List<Satisfaction> satisfactions = new ArrayList<>();
         if (list!=null&&list.size()>0){
             UcOrg ucOrg = list.get(0);
-            if (ucOrg.getLevel()==4){
+            if (ucOrg.getGrade().equals("ORG_DiKuai")){
                 List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getGridsBySmcloudmassifId(ucOrg.getId());
                 satisfactions = satisfactionMapper.getGridSatisfaction(gridBasicInfoList,time);
             }else {
