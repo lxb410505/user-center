@@ -35,9 +35,37 @@
         where o.IS_DELE_!=1
     </select>
 
-    <select id="deleteBydate" parameterType="java.lang.String">
+    <select id="deleteByDate" parameterType="java.lang.String">
     delete from  t_satisfaction where
     effective_time = #{date}
-</select>
+    </select>
+    <select id ="getSatisfactionListByParam" parameterType="java.util.Map" resultType="com.hypersmart.usercenter.model.Satisfaction">
+        select
+         t.id as id,
+        t.order_ as 'order',
+        t.type as type,
+        t.org_name as orgName,
+        t.org_code as orgCode,
+        t.overall_satisfaction as overallSatisfaction,
+        t.storming as storming,
+        t.stationary_phase as stationaryPhase,
+        t.old_proprietor as oldProprietor,
+        t.order_service_unit as orderServiceUnit,
+        t.esu_cleaning as esuCleaning,
+        t.esu_green as esuGreen,
+        t.engineering_service_unit as engineeringServiceUnit,
+        t.create_time as createTime,
+        t.create_by as createBy,
+        t.update_by as updateBy,
+        t.update_time as updateTime,
+        t.remark as remark,
+        t.effective_time as effectiveTime
+        from t_satisfaction t
+        where 1=1
+        and  t.orgName  in
+        (
+            #{value.name1},#{value.name2},#{value.name3},#{value.name4}
+        )
+    </select>
 
 </mapper>

@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.FieldRelation;
 import com.hypersmart.base.query.QueryFilter;
@@ -21,12 +22,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.InputStream;
+import java.lang.reflect.MalformedParameterizedTypeException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -74,6 +77,11 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             List<String> rowDataHeaderStr = new ArrayList<>();
             rowDataHeaderStr = rowDataHeader.stream().map(r -> String.valueOf(r).replace(" ", "").replace("*", "")).collect(Collectors.toList());
 
+            for (int i = 0; i < rowDataHeaderStr.size(); i++) {
+                if(rowDataHeaderStr.get(i).isEmpty()){
+                    rowDataHeaderStr.remove(i);
+                }
+            }
             boolean hasError = false;
             for (int i = 0; i < rowDataHeaderStr.size(); i++) {
                 if (!headArr[i].equals(rowDataHeaderStr.get(i))) {
@@ -100,14 +108,14 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             }
 
         } catch (Exception e) {
-            new CommonResult(importState, e.toString());
+            new CommonResult(false, e.toString());
         }
-        return new CommonResult(importState, "成功导入");
+        return new CommonResult(true, "成功导入");
     }
 
     @Override
     public CommonResult CheckHasExist(String date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-00");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Satisfaction satisfaction = new Satisfaction();
         QueryFilter queryFilter = QueryFilter.build();
 
@@ -128,13 +136,18 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         return null;
     }
 
+    @Override
+    public List<Satisfaction> getSatisfactionListByParam(JSONObject json) {
+        return satisfactionMapper.getSatisfactionListByParam(JSONObject.toJavaObject(json, Map.class));
+    }
+
     private void doData(StringBuffer message, List<Satisfaction> satisfactions, List<List<Object>> tempResourceImportList,String date) throws Exception {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-00");
         for (int i = 2; i < tempResourceImportList.size(); i++) {
             List<Object> rowData = tempResourceImportList.get(i);
             System.out.println(rowData);
 
-            String[] split = rowData.get(0).toString().split(".");
+            String[] split = rowData.get(0).toString().split("\\.");
 
             String orgCode = checkData(message, rowData, split);
 
@@ -204,21 +217,15 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                         throw new Exception("请检查数据是否为空");
                     }
                 }
+                break;
             case 4:
-                //校验是否有不合法空值；楼栋网格除外
-                for (Object v :
-                        rowData) {
-                    if (v.toString() == null || v.toString().length() <= 0) {
-                        message.append("请检查数据是否为空");
+
+                for (int j = 0; j < rowData.size(); j++) {
+                    if (j < 7 && (rowData.get(j).toString() == null || rowData.get(j).toString().length() <= 0)) {
                         throw new Exception("请检查数据是否为空");
                     }
-                    for (int j = 0; j < rowData.size(); j++) {
-                        if (j < 7 && (rowData.get(j).toString() == null || rowData.get(j).toString().length() <= 0)) {
-                            throw new Exception("请检查数据是否为空");
-                        }
-                    }
                 }
-
+                break;
 
             default:
 
@@ -228,7 +235,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     }
 
     private Integer getRealCount(List<List<Object>> tempResourceImportList) {
-         Integer hasRealCount = null;
+         Integer hasRealCount = 1;
         for (int x = 1; x < tempResourceImportList.size(); x++) {
             List<Object> rowData = tempResourceImportList.get(x);
             int length = rowData.size();

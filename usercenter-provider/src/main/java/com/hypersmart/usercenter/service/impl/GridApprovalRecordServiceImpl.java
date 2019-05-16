@@ -177,7 +177,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		String message = "0";
 		GridApprovalRecord record = gridApprovalRecordMapper.getGridApprovalRecordByProcInstId(k2Result.getProcInstId());
 		if (null == record) {
-			return;
+			return null;
 		}
 		try {
 			if ("1".equals(k2Result.getResultCode())) {

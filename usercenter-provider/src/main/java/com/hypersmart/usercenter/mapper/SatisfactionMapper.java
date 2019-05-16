@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import com.hypersmart.usercenter.model.UcOrg;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -17,4 +18,5 @@ import java.util.List;
 public interface SatisfactionMapper extends GenericMapper<Satisfaction> {
     List<Satisfaction> getSatisfactionDetail(@Param("orgList")List<UcOrg> orgList,@Param("time")String time);
     void deleteByDate(@Param("date") String date);
+    List<Satisfaction> getSatisfactionListByParam(@Param("value")Map value);
 }
