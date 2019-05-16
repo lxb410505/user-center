@@ -57,11 +57,11 @@ public class SatisfactionController extends BaseController {
                                             @ApiParam(name = "endDate", value = "结束时间") @RequestParam String endDate) {
         QueryFilter queryFilter = QueryFilter.build();
         queryFilter.addFilter("org_code", orgCode, QueryOP.EQUAL, FieldRelation.AND);
-        queryFilter.addFilter("create_time", beginDate, QueryOP.GREAT_EQUAL, FieldRelation.AND);
-        queryFilter.addFilter("create_time", endDate, QueryOP.LESS_EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("effective_time", beginDate, QueryOP.GREAT_EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("effective_time", endDate, QueryOP.LESS_EQUAL, FieldRelation.AND);
         List<FieldSort> fieldSortList = new ArrayList<>();
         FieldSort fieldSort = new FieldSort();
-        fieldSort.setProperty("create_time");
+        fieldSort.setProperty("effective_time");
         fieldSort.setDirection(Direction.DESC);
         fieldSortList.add(fieldSort);
         queryFilter.setSorter(fieldSortList);
@@ -79,14 +79,16 @@ public class SatisfactionController extends BaseController {
         String userId=ContextUtil.getCurrentUserId();
         List<UcOrg> ucOrgList = ucOrgService.getUserOrgListMerge(userId);
         for(UcOrg org:ucOrgList){
-            if(org.getGrade().equals("ORG_QuYu")){
-                hasArea=true;
-            }
-            else if(org.getGrade().equals("ORG_XiangMu")){
-                hasProject=true;
-            }
-            else if(org.getGrade().equals("ORG_DiKuai")){
-                hasDikuai=true;
+            if("1".equals(org.getDisabled())){
+                if("ORG_QuYu".equals(org.getGrade())){
+                    hasArea=true;
+                }
+                else if("ORG_XiangMu".equals(org.getGrade())){
+                    hasProject=true;
+                }
+                else if("ORG_DiKuai".equals(org.getGrade())){
+                    hasDikuai=true;
+                }
             }
         }
 
