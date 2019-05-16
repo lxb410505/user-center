@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.service;
 
+import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.framework.service.IGenericService;
 import com.hypersmart.usercenter.model.GridApprovalRecord;
 import com.hypersmart.usercenter.model.K2Result;
@@ -24,5 +25,5 @@ public interface GridApprovalRecordService extends IGenericService<String, GridA
 	 *
 	 * @param k2Result
 	 */
-	void processFlowResult(K2Result k2Result);
+	CommonResult<String> processFlowResult(K2Result k2Result);
 }
