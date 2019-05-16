@@ -3,12 +3,12 @@
 
 <mapper namespace="com.hypersmart.usercenter.mapper.SatisfactionMapper">
     <select id="getSatisfactionDetail" resultType="com.hypersmart.usercenter.model.Satisfaction">
-        SELECT
+        select
+        o.NAME_ as orgName,
         t.id as id,
         t.order_ as 'order',
         t.type as type,
         t.org_code as orgCode,
-        o.NAME_ as orgName,
         t.overall_satisfaction as overallSatisfaction,
         t.storming as storming,
         t.stationary_phase as stationaryPhase,
@@ -23,13 +23,16 @@
         t.update_time as updateTime,
         t.remark as remark,
         t.effective_time as effectiveTime
-        FROM uc_org o LEFT JOIN t_satisfaction t ON o.CODE_=t.org_code
-        WHERE o.IS_DELE_!=1 AND
-        DATE_FORMAT(t.effective_time, '%Y-%m') = #{time} AND
-        t.org_code IN
+        from uc_org o
+        LEFT JOIN (
+        SELECT * FROM  t_satisfaction WHERE
+        DATE_FORMAT(effective_time, '%Y-%m') = #{time} AND
+        org_code IN
         <foreach collection="orgList" item="item" index="index" open="(" close=")" separator=",">
             #{item.code}
         </foreach>
+        ) t on o.CODE_=org_code
+        where o.IS_DELE_!=1
     </select>
 
     <select id="deleteBydate" parameterType="java.lang.String">
