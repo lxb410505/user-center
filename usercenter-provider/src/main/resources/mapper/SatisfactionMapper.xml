@@ -62,10 +62,21 @@
         t.effective_time as effectiveTime
         from t_satisfaction t
         where 1=1
-        and  t.orgName  in
-        (
+        <if test="value.name1!=null or value.name2!=null or value.name3!=null or value.name4!=null">
+            and  t.org_Name  in
+            (
             #{value.name1},#{value.name2},#{value.name3},#{value.name4}
-        )
+            )
+        </if>
+
+        <if test="value.beginDate!=null ">
+        <![CDATA[
+            and  t.effective_time >= #{value.beginDate}
+            and t.effective_time <= #{value.endDate}
+            ]]>
+        </if>
+
+
     </select>
 
 </mapper>
