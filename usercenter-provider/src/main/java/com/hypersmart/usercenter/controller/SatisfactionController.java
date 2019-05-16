@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
@@ -46,10 +47,13 @@ public class SatisfactionController extends BaseController {
     @ApiOperation(value = "数据列表", httpMethod = "POST", notes = "获取列表")
     public PageList<Satisfaction> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
 
-
         return this.satisfactionService.query(queryFilter);
     }
+    @PostMapping("/querylist")
+    public List<Satisfaction> querylist( @RequestBody JSONObject json) {
 
+        return this.satisfactionService.getSatisfactionListByParam(json);
+    }
     @GetMapping({"/listByOrg"})
     @ApiOperation(value = "数据列表", httpMethod = "GET", notes = "获取列表")
     public PageList<Satisfaction> listByOrg(@ApiParam(name = "orgCode", value = "组织编码") @RequestParam String orgCode,

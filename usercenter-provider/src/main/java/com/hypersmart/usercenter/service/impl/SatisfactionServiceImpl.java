@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.FieldRelation;
 import com.hypersmart.base.query.QueryFilter;
@@ -21,12 +22,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.InputStream;
+import java.lang.reflect.MalformedParameterizedTypeException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -112,7 +115,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
     @Override
     public CommonResult CheckHasExist(String date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-00");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Satisfaction satisfaction = new Satisfaction();
         QueryFilter queryFilter = QueryFilter.build();
 
@@ -131,6 +134,11 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public List<Satisfaction> getSatisfactionListByParam(JSONObject json) {
+        return satisfactionMapper.getSatisfactionListByParam(JSONObject.toJavaObject(json, Map.class));
     }
 
     private void doData(StringBuffer message, List<Satisfaction> satisfactions, List<List<Object>> tempResourceImportList,String date) throws Exception {
