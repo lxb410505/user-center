@@ -3,10 +3,29 @@
 
 <mapper namespace="com.hypersmart.usercenter.mapper.SatisfactionMapper">
     <select id="getSatisfactionDetail" resultType="com.hypersmart.usercenter.model.Satisfaction">
-        SELECT *
+        SELECT
+        t.id as id,
+        t.order_ as order,
+        t.type as type,
+        t.org_code as orgCode,
+        t.org_name as orgName,
+        t.overall_satisfaction as overallSatisfaction,
+        t.storming as storming,
+        t.stationary_phase as stationaryPhase,
+        t.old_proprietor as oldProprietor,
+        t.order_service_unit as orderServiceUnit,
+        t.esu_cleaning as esuCleaning,
+        t.esu_green as esuGreen,
+        t.engineering_service_unit as engineeringServiceUnit,
+        t.create_time as createTime,
+        t.create_by as createBy,
+        t.update_by as updateBy,
+        t.update_time as updateTime,
+        t.remark as remark,
+        t.effective_time as effectiveTime
         FROM t_satisfaction t
         WHERE
-        DATE_FORMAT(t.create_time, '%Y-%m') = #{time} AND
+        DATE_FORMAT(t.effective_time, '%Y-%m') = #{time} AND
         t.org_code IN
         <foreach collection="orgList" item="item" index="index" open="(" close=")" separator=",">
             #{item.code}
