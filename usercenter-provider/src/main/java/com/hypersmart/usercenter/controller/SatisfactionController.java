@@ -79,14 +79,16 @@ public class SatisfactionController extends BaseController {
         String userId=ContextUtil.getCurrentUserId();
         List<UcOrg> ucOrgList = ucOrgService.getUserOrgListMerge(userId);
         for(UcOrg org:ucOrgList){
-            if(org.getGrade().equals("ORG_QuYu")){
-                hasArea=true;
-            }
-            else if(org.getGrade().equals("ORG_XiangMu")){
-                hasProject=true;
-            }
-            else if(org.getGrade().equals("ORG_DiKuai")){
-                hasDikuai=true;
+            if("1".equals(org.getDisabled())){
+                if("ORG_QuYu".equals(org.getGrade())){
+                    hasArea=true;
+                }
+                else if("ORG_XiangMu".equals(org.getGrade())){
+                    hasProject=true;
+                }
+                else if("ORG_DiKuai".equals(org.getGrade())){
+                    hasDikuai=true;
+                }
             }
         }
 

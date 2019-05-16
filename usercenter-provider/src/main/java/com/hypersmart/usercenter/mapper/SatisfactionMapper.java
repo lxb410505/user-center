@@ -15,6 +15,6 @@ import java.util.List;
  * @date 2019-05-14 17:23:33
  */
 public interface SatisfactionMapper extends GenericMapper<Satisfaction> {
-    List<Satisfaction> getSatisfactionDetail(List<UcOrg> orgList,String time);
+    List<Satisfaction> getSatisfactionDetail(@Param("orgList")List<UcOrg> orgList,@Param("time")String time);
     void deleteByDate(@Param("date") String date);
 }
