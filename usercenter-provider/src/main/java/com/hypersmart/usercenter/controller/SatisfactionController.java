@@ -19,7 +19,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -54,11 +58,18 @@ public class SatisfactionController extends BaseController {
     @ApiOperation(value = "数据列表", httpMethod = "GET", notes = "获取列表")
     public PageList<Satisfaction> listByOrg(@ApiParam(name = "orgCode", value = "组织编码") @RequestParam String orgCode,
                                             @ApiParam(name = "beginDate", value = "起始时间") @RequestParam String beginDate,
-                                            @ApiParam(name = "endDate", value = "结束时间") @RequestParam String endDate) {
+                                            @ApiParam(name = "endDate", value = "结束时间") @RequestParam String endDate) throws ParseException {
         QueryFilter queryFilter = QueryFilter.build();
         queryFilter.addFilter("org_code", orgCode, QueryOP.EQUAL, FieldRelation.AND);
-        queryFilter.addFilter("effective_time", beginDate, QueryOP.GREAT_EQUAL, FieldRelation.AND);
-        queryFilter.addFilter("effective_time", endDate, QueryOP.LESS_EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("effective_time", beginDate+"-01", QueryOP.GREAT_EQUAL, FieldRelation.AND);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        Date dt = sdf.parse(endDate);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(dt);
+        calendar.add(Calendar.MONTH, 1);
+        Date dt1 = calendar.getTime();
+        String reStr = sdf.format(dt1);
+        queryFilter.addFilter("effective_time", reStr+"-01", QueryOP.LESS, FieldRelation.AND);
         List<FieldSort> fieldSortList = new ArrayList<>();
         FieldSort fieldSort = new FieldSort();
         fieldSort.setProperty("effective_time");
