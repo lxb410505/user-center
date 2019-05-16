@@ -176,9 +176,6 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		boolean importState = true;
 		String message = "0";
 		GridApprovalRecord record = gridApprovalRecordMapper.getGridApprovalRecordByProcInstId(k2Result.getProcInstId());
-		if (null == record) {
-			return null;
-		}
 		try {
 			if ("1".equals(k2Result.getResultCode())) {
 				// 审批通过
