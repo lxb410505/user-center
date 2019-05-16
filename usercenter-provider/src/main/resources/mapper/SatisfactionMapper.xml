@@ -34,8 +34,8 @@
         t.id as id,
         t.order_ as 'order',
         t.type as type,
-        t.org_name as orgName,
-        t.org_code as orgCode,
+        o.grid_name as orgName,
+        o.grid_code as orgCode,
         t.overall_satisfaction as overallSatisfaction,
         t.storming as storming,
         t.stationary_phase as stationaryPhase,
@@ -53,9 +53,9 @@
         FROM grid_basic_info o LEFT JOIN t_satisfaction t
         ON t.org_code=o.grid_code
         AND
-        DATE_FORMAT(effective_time, '%Y-%m') = #{time}
+        DATE_FORMAT(t.effective_time, '%Y-%m') = #{time}
         WHERE
-        org_code IN
+        o.grid_code IN
         <foreach collection="orgList" item="item" index="index" open="(" close=")" separator=",">
             #{item.gridCode}
         </foreach>
