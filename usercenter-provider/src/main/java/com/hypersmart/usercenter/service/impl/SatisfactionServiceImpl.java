@@ -142,7 +142,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     }
 
     private void doData(StringBuffer message, List<Satisfaction> satisfactions, List<List<Object>> tempResourceImportList,String date) throws Exception {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-00");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         for (int i = 2; i < tempResourceImportList.size(); i++) {
             List<Object> rowData = tempResourceImportList.get(i);
             System.out.println(rowData);
