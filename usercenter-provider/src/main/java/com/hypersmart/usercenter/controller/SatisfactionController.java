@@ -60,7 +60,7 @@ public class SatisfactionController extends BaseController {
     }
     @GetMapping({"/listByOrg"})
     @ApiOperation(value = "数据列表", httpMethod = "GET", notes = "获取列表")
-    public PageList<Satisfaction> listByOrg(@ApiParam(name = "orgCode", value = "组织编码") @RequestParam String orgCode,
+    public List<Satisfaction> listByOrg(@ApiParam(name = "orgCode", value = "组织编码") @RequestParam String orgCode,
                                             @ApiParam(name = "beginDate", value = "起始时间") @RequestParam String beginDate,
                                             @ApiParam(name = "endDate", value = "结束时间") @RequestParam String endDate) throws ParseException {
         QueryFilter queryFilter = QueryFilter.build();
@@ -80,7 +80,7 @@ public class SatisfactionController extends BaseController {
         fieldSort.setDirection(Direction.DESC);
         fieldSortList.add(fieldSort);
         queryFilter.setSorter(fieldSortList);
-        return this.satisfactionService.query(queryFilter);
+        return this.satisfactionService.query(queryFilter).getRows();
     }
 
     @GetMapping({"/topLevel"})
