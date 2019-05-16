@@ -82,14 +82,13 @@ public class SatisfactionController extends BaseController {
         calendar.setTime(begin);
         Map<String, Satisfaction> resMap = new HashMap<>();
         while (begin.getTime() <= end.getTime()) {
-            resMap.put(sdf.format(begin), null);
+            resMap.put(sdf.format(begin), new Satisfaction());
             calendar.setTime(begin);
             calendar.add(Calendar.MONTH, 1);
             begin = calendar.getTime();
         }
         for (Satisfaction satisfaction : list) {
-            Date satisfactionDate = satisfaction.getEffectiveTime();
-            resMap.put(sdf.format(satisfactionDate), satisfaction);
+            resMap.put(sdf.format(satisfaction.getEffectiveTime()), satisfaction);
         }
         return resMap;
     }
