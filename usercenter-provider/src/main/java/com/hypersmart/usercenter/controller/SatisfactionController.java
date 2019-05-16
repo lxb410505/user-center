@@ -5,6 +5,7 @@ import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.model.Satisfaction;
 import com.hypersmart.usercenter.service.SatisfactionService;
@@ -57,7 +58,7 @@ public class SatisfactionController extends BaseController {
 
     @GetMapping({"/listByOrg"})
     @ApiOperation(value = "数据列表", httpMethod = "GET", notes = "获取列表")
-    public Map<String, Satisfaction> listByOrg(@ApiParam(name = "orgCode", value = "组织编码") @RequestParam String orgCode,
+    public List<Satisfaction> listByOrg(@ApiParam(name = "orgCode", value = "组织编码") @RequestParam String orgCode,
                                                @ApiParam(name = "beginDate", value = "起始时间") @RequestParam String beginDate,
                                                @ApiParam(name = "endDate", value = "结束时间") @RequestParam String endDate) throws ParseException {
         QueryFilter queryFilter = QueryFilter.build();
@@ -80,17 +81,35 @@ public class SatisfactionController extends BaseController {
         queryFilter.setSorter(fieldSortList);
         List<Satisfaction> list = this.satisfactionService.query(queryFilter).getRows();
         calendar.setTime(begin);
-        Map<String, Satisfaction> resMap = new HashMap<>();
+        List<Satisfaction> tempList=new ArrayList<>();
         while (begin.getTime() <= end.getTime()) {
-            resMap.put(sdf.format(begin), new Satisfaction());
+            Satisfaction temp =new Satisfaction();
+            temp.setEffectiveTime(begin);
+            tempList.add(temp);
             calendar.setTime(begin);
             calendar.add(Calendar.MONTH, 1);
             begin = calendar.getTime();
         }
-        for (Satisfaction satisfaction : list) {
-            resMap.put(sdf.format(satisfaction.getEffectiveTime()), satisfaction);
+        for (Satisfaction s:tempList){
+            for (Satisfaction satisfaction : list) {
+                if (sdf.format(satisfaction.getEffectiveTime()).equals(sdf.format(s.getEffectiveTime()))){
+//                    Collections.replaceAll(tempList,s,satisfaction);
+                    BeanUtils.mergeObject(satisfaction,s);
+                }
+            }
         }
-        return resMap;
+//        Map<String, Satisfaction> resMap = new HashMap<>();
+//        while (begin.getTime() <= end.getTime()) {
+//            resMap.put(sdf.format(begin), new Satisfaction());
+//            calendar.setTime(begin);
+//            calendar.add(Calendar.MONTH, 1);
+//            begin = calendar.getTime();
+//        }
+//        for (Satisfaction satisfaction : list) {
+//            resMap.put(sdf.format(satisfaction.getEffectiveTime()), satisfaction);
+//        }
+//        return resMap;
+        return tempList;
     }
 
     @GetMapping({"/topLevel"})
@@ -135,6 +154,13 @@ public class SatisfactionController extends BaseController {
     @GetMapping({"/satisfactionDetail"})
     @ApiOperation(value = "满意度明细", httpMethod = "GET", notes = "获取满意度明细")
     public List<Satisfaction> satisfactionDetail(@ApiParam(name = "orgCode", value = "组织编码") @RequestParam String orgCode,
+                                                 @ApiParam(name = "time", value = "时间") @RequestParam String time) {
+        return this.satisfactionService.getSatisfactionDetail(orgCode, time);
+    }
+
+    @GetMapping({"/singleSatisfaction"})
+    @ApiOperation(value = "单组织单月满意度", httpMethod = "GET", notes = "单组织单月满意度")
+    public List<Satisfaction> singleSatisfaction(@ApiParam(name = "orgCode", value = "组织编码") @RequestParam String orgCode,
                                                  @ApiParam(name = "time", value = "时间") @RequestParam String time) {
         return this.satisfactionService.getSatisfactionDetail(orgCode, time);
     }

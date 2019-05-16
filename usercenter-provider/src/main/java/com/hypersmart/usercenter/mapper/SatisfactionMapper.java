@@ -21,4 +21,5 @@ public interface SatisfactionMapper extends GenericMapper<Satisfaction> {
     void deleteByDate(@Param("date") String date);
     List<Satisfaction> getSatisfactionListByParam(@Param("value")Map value);
     List<Satisfaction> getGridSatisfaction(@Param("orgList")List<GridBasicInfo> list,@Param("time")String time);
+    List<Satisfaction> getSingleSatisfaction(@Param("orgCode")String orgCode,@Param("time")String time);
 }
