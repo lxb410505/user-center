@@ -9,6 +9,7 @@ import com.hypersmart.usercenter.bo.HouseKeeperBO;
 import com.hypersmart.usercenter.constant.GridErrorCode;
 import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
+import com.hypersmart.usercenter.dto.RangeDTO;
 import com.hypersmart.usercenter.model.GridBasicInfo;
 
 import java.util.List;
@@ -143,7 +144,7 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 * @param massifId
 	 * @return
 	 */
-	List<Map<String,Object>> getGridsHouseBymassifId(String massifId);
+	List<RangeDTO> getGridsHouseBymassifId(String massifId);
 
 	/**
 	 * 根据房产id获取网格
