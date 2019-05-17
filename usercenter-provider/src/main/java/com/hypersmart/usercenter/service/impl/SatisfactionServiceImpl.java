@@ -151,17 +151,47 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             List<Object> rowData = tempResourceImportList.get(i);
             System.out.println(rowData);
 
-            String[] split = rowData.get(0).toString().split("\\.");
-            if(split.length==3){
+            //String[] split = rowData.get(0).toString().split("\\.");
+            int type=0 ;
+            if(rowData.get(1).toString()!=null){
+                if(rowData.get(1).toString().equals("区域")){
+                     type=1;
+                }
+                if(rowData.get(1).toString().equals("项目")){
+                    type=2;
+                }
+                if(rowData.get(1).toString().equals("地块")){
+                    type=3;
+                }
+                if(rowData.get(1).toString().equals("网格")){
+                    type=4;
+                }
+                if(type==0){
+                    throw new Exception("第"+(i+1)+"行 分类内容错误");
+                }
+            }else{
+                throw new Exception("第"+(i+1)+"行 网格没有对应得分类");
+            }
+            //获取上一级别得组织对象；
+            List<Object> lastOrgRow = null;
+            if(i>2){
+                for (int j = i; j >2; j--) {
+                    List<Object> objects = tempResourceImportList.get(j);
+                    if(objects.get(0).toString().split("\\.").length+1==rowData.get(0).toString().split("\\.").length){
+                        lastOrgRow=objects;
+                    }
+                }
+            }
+        if(type==3){
                 rowDataLevel3=rowData;
             }
-            if(split.length!=3&&split.length!=4){
+            if(type!=3&&type!=4){
                 rowDataLevel3=null;
             }
-            if(split.length==4&&rowDataLevel3==null){
+            if(type==4&&rowDataLevel3==null){
                 throw new Exception("第"+(i+1)+"行 网格没有对应得上级组织");
             }
-            String orgCode = checkData(rowDataLevel3,i,message, rowData, split);
+            String orgCode = checkData(lastOrgRow,rowDataLevel3,i,message, rowData, type);
 
             //新增数据;
             Satisfaction satisfaction = new Satisfaction();
@@ -176,7 +206,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             satisfaction.setOldProprietor(new BigDecimal(rowData.get(6).toString()));
             satisfaction.setEffectiveTime(formatter.parse(date));
             satisfaction.setOrgCode(orgCode);
-            if (split.length < 4) {
+            if (type < 4) {
                 satisfaction.setOrderServiceUnit(new BigDecimal(rowData.get(7).toString()));
                 satisfaction.setEsuCleaning(new BigDecimal(rowData.get(8).toString()));
                 satisfaction.setEsuGreen(new BigDecimal(rowData.get(9).toString()));
@@ -196,8 +226,9 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         return null;
     }
 
-    private String checkData(List<Object> parentRow,int rowNun,StringBuffer message, List<Object> rowData, String[] split) throws Exception {
-
+    private String checkData(List<Object> lastLevelRow,List<Object> parentRow,int rowNun,StringBuffer message, List<Object> rowData, int type) throws Exception {
+        //todo
+        //校验与前面行得数据得归属关系;
 
 
         //校验是否有组织不匹配；根据层级和姓名，查询是否有组织匹配
@@ -206,7 +237,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         String orgCode=null;
         boolean hasOrg=false;
 
-        if(split.length==4){
+        if(type==4){
             //网格组织校验
             //todo
             ucOrg.setName(parentRow.get(2).toString());
@@ -228,19 +259,19 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             orgCode=gridBasicInfos.get(0).getGridCode();
             hasOrg=true;
         }else{
-            if(split.length==1){
+            if(type==1){
                 ucOrg.setLevel(1);
             }
-            if(split.length==2){
+            if(type==2){
                 ucOrg.setLevel(3);
             }
-            if(split.length==3){
+            if(type==3){
                 ucOrg.setLevel(4);
             }
 
             List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
             if(ucOrgs.size()<=0){
-                throw new Exception("第"+rowNun+"行："+rowData.get(2).toString()+"组织名称不存在或组织名与对应得层级不符");//8
+                throw new Exception("第"+rowNun+"行："+rowData.get(2).toString()+"组织名称不存在或组织名与对应得分类/层级不符");//8
             }
             orgCode=ucOrgs.get(0).getCode();
             hasOrg=true;
@@ -253,7 +284,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         }
         //校验是否为数字
         //todo
-        switch (split.length) {
+        switch (type) {
             case 0:
                 throw new Exception("请检查是否有空行");
 
