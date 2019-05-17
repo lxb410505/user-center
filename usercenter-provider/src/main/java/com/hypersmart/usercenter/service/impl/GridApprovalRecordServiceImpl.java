@@ -116,7 +116,12 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 
 			// 管家变更
 			if (approvalType.equals(GridOperateEnum.CHANGE_HOUSEKEEPER.getOperateType())) {
-				flowContent = constructingFlowContentForChangeHousekeeper("CHANGE_HOUSEKEEPER",approvalContent, gridTypes, formatAttributeTypes);
+				flowContent = constructingFlowContentForChangeHousekeeper(approvalContent, gridTypes, formatAttributeTypes);
+			}
+
+			// 管家绑定网格
+			if (approvalType.equals(GridOperateEnum.LINK_HOUSEKEEPER.getOperateType())) {
+				flowContent = constructingFlowContentForLinkHousekeeper(approvalContent, gridTypes, formatAttributeTypes);
 			}
 
 			// 网格停用
@@ -141,7 +146,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 				}else {
 					code = resultNode.get("CODE").asText();
 				}
-				if (!"0".equals(code)) {
+				if (!"1".equals(code)) {
 					// 调用K2失败
 					record.setCallStatus(2);
 					String message = "";
@@ -381,7 +386,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	 * @return
 	 * @throws IOException
 	 */
-	private String constructingFlowContentForChangeHousekeeper(String type,Object approvalContent, List<Map<String, String>> gridTypes, List<Map<String, String>> formatAttributeTypes) throws IOException {
+	private String constructingFlowContentForChangeHousekeeper(Object approvalContent, List<Map<String, String>> gridTypes, List<Map<String, String>> formatAttributeTypes) throws IOException {
 
 		/**
 		 * 1.流程信息体
@@ -394,11 +399,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		Map<String, Object> flowMap = new HashMap(),
 				body = new HashMap();
 		GridBasicInfo gridInfo = gridApprovalRecordMapper.getBeforeGridInfo(gridBasicInfoDTO.getId());
-		if ("CHANGE_HOUSEKEEPER".equals(type)) {
-			body.put("CODE", "SMPT0003");
-		}else {
-			body.put("CODE", "SMPT0005");
-		}
+		body.put("CODE", "SMPT0003");
 		getProposer(body,gridBasicInfoDTO);
 		body.put("TYPE", GridOperateEnum.CHANGE_HOUSEKEEPER.getDescription());
 		body.put("GRIDCODE", gridInfo.getGridCode());
@@ -422,6 +423,58 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		constructingGridRanges(body, gridInfo.getGridRange());
 		body.put("APPLICATIONREASON", gridBasicInfoDTO.getReason());
 
+		flowMap.put("DATA", body);
+
+		return JsonUtil.toJson(flowMap);
+	}
+
+	/**
+	 * 构建 K2流程消息体（管家关联网格）
+	 *
+	 * @param approvalContent
+	 * @return
+	 * @throws IOException
+	 */
+	private String constructingFlowContentForLinkHousekeeper(Object approvalContent, List<Map<String, String>> gridTypes, List<Map<String, String>> formatAttributeTypes) throws IOException {
+
+		/**
+		 * 1.流程信息体
+		 * 2.流程信息主体
+		 * 3.申请人信息
+		 * 4.事项信息
+		 * 5.网格覆盖范围
+		 */
+		GridBasicInfoDTO gridBasicInfoDTO = (GridBasicInfoDTO) approvalContent;
+		Map<String, Object> flowMap = new HashMap(),
+				body = new HashMap();
+		GridBasicInfo gridInfo = gridApprovalRecordMapper.getBeforeGridInfo(gridBasicInfoDTO.getId());
+		body.put("CODE", "SMPT0005");
+		getProposer(body,gridBasicInfoDTO);
+		body.put("TYPE", GridOperateEnum.LINK_HOUSEKEEPER.getDescription());
+		Map<String, String> housekeeper = gridApprovalRecordMapper.getHousekeeperInfoById(flowDbPortal, gridBasicInfoDTO.getHousekeeperId(), gridBasicInfoDTO.getStagingId());
+		if (null != housekeeper) {
+			body.put("HOUSEKEEPERNAME", housekeeper.get("FULLNAME_"));
+			body.put("LEVEL", housekeeper.get("NAME_"));
+			body.put("PHONE", housekeeper.get("MOBILE_"));
+		} else {
+			body.put("HOUSEKEEPERNAME", "");
+			body.put("LEVEL", "");
+			body.put("PHONE", "");
+		}
+		List<Map<String,Object>> gridDetail = new ArrayList<>();
+		Map<String,Object> gridDetailChild = new HashMap<>();
+		gridDetailChild.put("GRIDCODE", gridInfo.getGridCode());
+		gridDetailChild.put("GRIDNAME", gridInfo.getGridName());
+		gridDetailChild.put("GRIDTYPE", getDicByType(gridInfo.getGridType(), gridTypes));
+		gridDetailChild.put("FORMATATTRIBUTE", getDicByType(gridInfo.getFormatAttribute(), formatAttributeTypes));
+		gridDetailChild.put("REMARKS", gridInfo.getGridRemark());
+
+		// 网格范围
+		constructingGridRangesLink(gridDetailChild, gridInfo.getGridRange());
+		Map<String,List> griddetails = new HashMap<>();
+		gridDetail.add(gridDetailChild);
+		griddetails.put("GRIDDETAIL",gridDetail);
+		body.put("GRIDDETAILS",griddetails);
 		flowMap.put("DATA", body);
 
 		return JsonUtil.toJson(flowMap);
@@ -531,6 +584,41 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		}
 		coverageareadetails.put("COVERAGEAREADETAIL",list);
 		body.put("COVERAGEAREADETAILS",coverageareadetails);
+	}
+
+	/**
+	 * 统一构建网格覆盖范围
+	 *
+	 * @param gridDetail
+	 * @param gridRange
+	 */
+	private void constructingGridRangesLink(Map<String,Object> gridDetail, String gridRange) {
+		if (StringUtils.isRealEmpty(gridRange)) {
+			return;
+		}
+		List<Map<String,String>> list = new ArrayList<>();
+		Map<String,List<Map<String,String>>> coverageareadetails = new HashMap<>();
+		JSONArray jsonArray = JSONArray.parseArray(gridRange);
+		List<GridRangeInfo> gridRangeInfos = jsonArray.toJavaList(GridRangeInfo.class);
+		if (!CollectionUtils.isEmpty(gridRangeInfos)) {
+			// 判断类型，获取对应的楼栋单元房产信息
+			List<GridRangeInfo> buidlingList = gridRangeInfos.stream().filter(m -> m.getLevel() == 1).collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(GridRangeInfo::getId))), ArrayList::new));
+			for (GridRangeInfo building : buidlingList) {
+				List<GridRangeInfo> unitList = gridRangeInfos.stream().filter(m -> m.getLevel() == 2 && m.getParentId().equals(building.getId())).collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(GridRangeInfo::getId))), ArrayList::new));
+				for (GridRangeInfo unit : unitList) {
+					List<GridRangeInfo> houseList = gridRangeInfos.stream().filter(m -> m.getLevel() == 3 && m.getParentId().equals(unit.getId())).collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(GridRangeInfo::getId))), ArrayList::new));
+					for (GridRangeInfo house : houseList) {
+						Map<String,String> child = new HashMap<>();
+						child.put("STORIEDBUILDING", building.getName());
+						child.put("UNIT", unit.getName());
+						child.put("HOUSEPROPERTY", house.getName());
+						list.add(child);
+					}
+				}
+			}
+		}
+		coverageareadetails.put("ITEM",list);
+		gridDetail.put("COVERAGEAREADETAILS",coverageareadetails);
 	}
 
 	/**
