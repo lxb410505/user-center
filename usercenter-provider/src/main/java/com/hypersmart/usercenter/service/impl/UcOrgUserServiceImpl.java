@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
@@ -370,8 +371,14 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         List<QueryField> querys = queryFilter.getQuerys();
 
 
-        List<RangeDTO> gridsHouseBymassifId = gridBasicInfoService.getGridsHouseBymassifId((String) querys.get(0).getValue());
-        List<String> collect = gridsHouseBymassifId.stream().filter(e -> "3".equals(e.getLevel())).map(RangeDTO::getId).distinct().collect(Collectors.toList());
+        List<Map<String, Object>> gridsHouseBymassifIdPage = gridBasicInfoService.getGridsHouseBymassifIdPage((String) querys.get(0).getValue(), 1, 200);
+
+
+        List<String> collect =  gridsHouseBymassifIdPage.parallelStream()
+                .filter(e -> Integer.valueOf(e.get("level").toString())==3)
+                .map(e->(String)e.get("id"))
+                .collect(Collectors.toList());
+
         return collect;
 
     }
