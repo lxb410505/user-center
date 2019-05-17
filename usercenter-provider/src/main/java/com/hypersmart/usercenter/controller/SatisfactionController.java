@@ -1,11 +1,19 @@
 package com.hypersmart.usercenter.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.util.BeanUtils;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.model.Satisfaction;
 import com.hypersmart.usercenter.service.SatisfactionService;
+import com.hypersmart.base.query.*;
+import com.hypersmart.usercenter.model.GridBasicInfo;
+import com.hypersmart.usercenter.model.UcOrg;
+import com.hypersmart.usercenter.service.GridBasicInfoService;
+import com.hypersmart.usercenter.service.UcOrgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -13,11 +21,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
- * 
- *
  * @author magellan
  * @email magellan
  * @date 2019-05-14 13:37:39
@@ -29,12 +37,145 @@ public class SatisfactionController extends BaseController {
     @Resource
     SatisfactionService satisfactionService;
 
+    @Resource
+    UcOrgService ucOrgService;
+
+    @Resource
+    GridBasicInfoService gridBasicInfoService;
+
     @PostMapping({"/list"})
-    @ApiOperation(value = "数据列表}", httpMethod = "POST", notes = "获取列表")
+    @ApiOperation(value = "数据列表", httpMethod = "POST", notes = "获取列表")
     public PageList<Satisfaction> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
 
-
         return this.satisfactionService.query(queryFilter);
+    }
+
+    @PostMapping("/querylist")
+    public List<Satisfaction> querylist(@RequestBody JSONObject json) {
+
+        return this.satisfactionService.getSatisfactionListByParam(json);
+    }
+
+    @GetMapping({"/listByOrg"})
+    @ApiOperation(value = "数据列表", httpMethod = "GET", notes = "获取列表")
+    public List<Satisfaction> listByOrg(@ApiParam(name = "orgCode", value = "组织编码") @RequestParam String orgCode,
+                                               @ApiParam(name = "beginDate", value = "起始时间") @RequestParam String beginDate,
+                                               @ApiParam(name = "endDate", value = "结束时间") @RequestParam String endDate) throws ParseException {
+        QueryFilter queryFilter = QueryFilter.build();
+        queryFilter.addFilter("org_code", orgCode, QueryOP.EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("effective_time", beginDate + "-01", QueryOP.GREAT_EQUAL, FieldRelation.AND);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        Date end = sdf.parse(endDate);
+        Date begin = sdf.parse(beginDate);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(end);
+        calendar.add(Calendar.MONTH, 1);
+        Date dt1 = calendar.getTime();
+        String reStr = sdf.format(dt1);
+        queryFilter.addFilter("effective_time", reStr + "-01", QueryOP.LESS, FieldRelation.AND);
+        List<FieldSort> fieldSortList = new ArrayList<>();
+        FieldSort fieldSort = new FieldSort();
+        fieldSort.setProperty("effective_time");
+        fieldSort.setDirection(Direction.ASC);
+        fieldSortList.add(fieldSort);
+        queryFilter.setSorter(fieldSortList);
+        List<Satisfaction> list = this.satisfactionService.query(queryFilter).getRows();
+        calendar.setTime(begin);
+        List<Satisfaction> tempList=new ArrayList<>();
+        while (begin.getTime() <= end.getTime()) {
+            Satisfaction temp =new Satisfaction();
+            temp.setEffectiveTime(begin);
+            tempList.add(temp);
+            calendar.setTime(begin);
+            calendar.add(Calendar.MONTH, 1);
+            begin = calendar.getTime();
+        }
+        for (Satisfaction s:tempList){
+            for (Satisfaction satisfaction : list) {
+                if (sdf.format(satisfaction.getEffectiveTime()).equals(sdf.format(s.getEffectiveTime()))){
+//                    Collections.replaceAll(tempList,s,satisfaction);
+                    BeanUtils.mergeObject(satisfaction,s);
+                }
+            }
+        }
+//        Map<String, Satisfaction> resMap = new HashMap<>();
+//        while (begin.getTime() <= end.getTime()) {
+//            resMap.put(sdf.format(begin), new Satisfaction());
+//            calendar.setTime(begin);
+//            calendar.add(Calendar.MONTH, 1);
+//            begin = calendar.getTime();
+//        }
+//        for (Satisfaction satisfaction : list) {
+//            resMap.put(sdf.format(satisfaction.getEffectiveTime()), satisfaction);
+//        }
+//        return resMap;
+        return tempList;
+    }
+
+    @GetMapping({"/topLevel"})
+    @ApiOperation(value = "顶级组织级别", httpMethod = "GET", notes = "获取顶级组织级别")
+    public int topLevel() {
+        int level = 0;
+        Boolean hasArea = false;
+        Boolean hasProject = false;
+        Boolean hasDikuai = false;
+
+        String userId = ContextUtil.getCurrentUserId();
+        List<UcOrg> ucOrgList = ucOrgService.getUserOrgListMerge(userId);
+        for (UcOrg org : ucOrgList) {
+            if ("1".equals(org.getDisabled())) {
+                if ("ORG_QuYu".equals(org.getGrade())) {
+                    hasArea = true;
+                } else if ("ORG_XiangMu".equals(org.getGrade())) {
+                    hasProject = true;
+                } else if ("ORG_DiKuai".equals(org.getGrade())) {
+                    hasDikuai = true;
+                }
+            }
+        }
+
+        if (hasArea) {
+            level = 1;
+        } else if (hasProject) {
+            level = 2;
+        } else if (hasDikuai) {
+            level = 3;
+        }
+
+        return level;
+    }
+
+    @GetMapping({"/gridsByDivideId/{massifId}"})
+    @ApiOperation(value = "根据地块id获取网格", httpMethod = "GET", notes = "根据地块id获取网格")
+    public List<GridBasicInfo> gridsBySmcloudmassifId(@ApiParam(name = "massifId", value = "地块id") @PathVariable String massifId) {
+        return gridBasicInfoService.getGridsBySmcloudmassifId(massifId);
+    }
+
+    @GetMapping({"/satisfactionDetail"})
+    @ApiOperation(value = "满意度明细", httpMethod = "GET", notes = "获取满意度明细")
+    public List<Satisfaction> satisfactionDetail(@ApiParam(name = "orgCode", value = "组织编码") @RequestParam String orgCode,
+                                                 @ApiParam(name = "time", value = "时间") @RequestParam String time) {
+        return this.satisfactionService.getSatisfactionDetail(orgCode, time);
+    }
+
+    @GetMapping({"/singleSatisfaction"})
+    @ApiOperation(value = "单组织单月满意度", httpMethod = "GET", notes = "单组织单月满意度")
+    public List<Satisfaction> singleSatisfaction(@ApiParam(name = "orgCode", value = "组织编码") @RequestParam String orgCode,
+                                                 @ApiParam(name = "time", value = "时间") @RequestParam String time) {
+        return this.satisfactionService.getSatisfactionDetail(orgCode, time);
+    }
+
+    @GetMapping({"/appSatisfaction"})
+    @ApiOperation(value = "单组织单月满意度", httpMethod = "GET", notes = "单组织单月满意度")
+    public Satisfaction appSatisfaction(@ApiParam(name = "orgId", value = "组织id") @RequestParam String orgId,
+                                                 @ApiParam(name = "time", value = "时间") @RequestParam String time) {
+        return this.satisfactionService.getSingleSatisfaction(orgId, time);
+    }
+
+    @GetMapping({"/allSatisfaction"})
+    @ApiOperation(value = "总部满意度", httpMethod = "GET", notes = "总部满意度")
+    public List<Satisfaction> allSatisfaction(@ApiParam(name = "time", value = "时间") @RequestParam String time) {
+        return this.satisfactionService.getAllSatisfaction(time);
     }
 
     @GetMapping({"/get/{id}"})
@@ -83,25 +224,28 @@ public class SatisfactionController extends BaseController {
         this.satisfactionService.delete(aryIds);
         return new CommonResult(true, "批量删除成功");
     }
+
     /**
      * 通过Excle导入科目余额设置
      *
      * @param file Excel文件
      * @return
      */
-    @RequestMapping(value = "/importData/{date}" ,method = RequestMethod.POST)
-    public CommonResult<String> importData(MultipartFile file,@PathVariable("date")String date) throws Exception {
-        CommonResult<String> result = this.satisfactionService.importData(file,date);
+    @RequestMapping(value = "/importData/{date}", method = RequestMethod.POST)
+    public CommonResult<String> importData(MultipartFile file, @PathVariable("date") String date) throws Exception {
+
+        CommonResult<String> result = this.satisfactionService.importData(file, date);
         return result;
     }
 
     /**
      * 查询当月是否已有数据；
+     *
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/check/data/{date}" ,method = RequestMethod.GET)
-    public CommonResult CheckHasExist(@PathVariable("date")String date) throws Exception {
+    @RequestMapping(value = "/check/data/{date}", method = RequestMethod.GET)
+    public CommonResult CheckHasExist(@PathVariable("date") String date) throws Exception {
         return satisfactionService.CheckHasExist(date);
     }
 }

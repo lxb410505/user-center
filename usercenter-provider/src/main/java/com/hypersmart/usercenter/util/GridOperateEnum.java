@@ -11,6 +11,7 @@ public enum GridOperateEnum {
 	NEW_GRID("newGrid", "新增网格"),
 	CHANGE_SCOPE("changeScope", "网格覆盖范围变更"),
 	CHANGE_HOUSEKEEPER("changeHousekeeper", "网格管家变更"),
+	LINK_HOUSEKEEPER("linkHousekeeper", "管家关联网格"),
 	DISABLE_GRID("disableGrid", "网格停用"),
 	HOUSEKEEPER_DISASSOCIATED("housekeeperDisassociated", "解除网格管家关联");
 
