@@ -146,7 +146,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 				}else {
 					code = resultNode.get("CODE").asText();
 				}
-				if (!"1".equals(code)) {
+				if (!"0".equals(code)) {
 					// 调用K2失败
 					record.setCallStatus(2);
 					String message = "";
