@@ -370,7 +370,9 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
 
 
         List<Map<String, Object>> maps = gridBasicInfoService.getGridsHouseBymassifId((String) querys.get(0).getValue());
-        return maps.stream().map(e -> (String) e.get("id")).collect(Collectors.toList());
+        List<String> collect = maps.stream().filter(e -> "3".equals(e.get("level").toString())).map(e -> (String) e.get("id")).distinct().collect(Collectors.toList());
+        return collect;
+
     }
 }
 
