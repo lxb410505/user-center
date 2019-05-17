@@ -76,22 +76,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                 throw new Exception("文件数据超过3000条");
             }
             //从第二行开始是表头
-            List<Object> rowDataHeader = tempResourceImportList.get(1);
-            List<String> rowDataHeaderStr = new ArrayList<>();
-            rowDataHeaderStr = rowDataHeader.stream().map(r -> String.valueOf(r).replace(" ", "").replace("*", "")).collect(Collectors.toList());
-
-            for (int i = 0; i < rowDataHeaderStr.size(); i++) {
-                if(rowDataHeaderStr.get(i).isEmpty()){
-                    rowDataHeaderStr.remove(i);
-                }
-            }
-            boolean hasError = false;
-            for (int i = 0; i < rowDataHeaderStr.size(); i++) {
-                if (!headArr[i].equals(rowDataHeaderStr.get(i))) {
-                    hasError = true;
-                    break;
-                }
-            }
+            boolean hasError = isHasError(headArr, tempResourceImportList);
             if (hasError) {
                 message.append("标题栏数据顺序或格式不正确");
                 importState = false;
@@ -114,6 +99,26 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             return  new CommonResult(false, e.getMessage());
         }
         return new CommonResult(true, "成功导入");
+    }
+
+    private boolean isHasError(String[] headArr, List<List<Object>> tempResourceImportList) {
+        List<Object> rowDataHeader = tempResourceImportList.get(1);
+        List<String> rowDataHeaderStr = new ArrayList<>();
+        rowDataHeaderStr = rowDataHeader.stream().map(r -> String.valueOf(r).replace(" ", "").replace("*", "")).collect(Collectors.toList());
+
+        for (int i = 0; i < rowDataHeaderStr.size(); i++) {
+            if(rowDataHeaderStr.get(i).isEmpty()){
+                rowDataHeaderStr.remove(i);
+            }
+        }
+        boolean hasError = false;
+        for (int i = 0; i < rowDataHeaderStr.size(); i++) {
+            if (!headArr[i].equals(rowDataHeaderStr.get(i))) {
+                hasError = true;
+                break;
+            }
+        }
+        return hasError;
     }
 
     @Override
@@ -191,7 +196,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             if(type==4&&rowDataLevel3==null){
                 throw new Exception("第"+(i+1)+"行 网格没有对应得上级组织");
             }
-            String orgCode = checkData(lastOrgRow,rowDataLevel3,i,message, rowData, type);
+            String orgCode = checkData(lastOrgRow,rowDataLevel3,i+1,message, rowData, type);
 
             //新增数据;
             Satisfaction satisfaction = new Satisfaction();
