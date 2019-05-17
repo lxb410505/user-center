@@ -165,6 +165,13 @@ public class SatisfactionController extends BaseController {
         return this.satisfactionService.getSatisfactionDetail(orgCode, time);
     }
 
+    @GetMapping({"/appSatisfaction"})
+    @ApiOperation(value = "单组织单月满意度", httpMethod = "GET", notes = "单组织单月满意度")
+    public Satisfaction appSatisfaction(@ApiParam(name = "orgCode", value = "组织编码") @RequestParam String orgCode,
+                                                 @ApiParam(name = "time", value = "时间") @RequestParam String time) {
+        return this.satisfactionService.getSingleSatisfaction(orgCode, time);
+    }
+
     @GetMapping({"/allSatisfaction"})
     @ApiOperation(value = "总部满意度", httpMethod = "GET", notes = "总部满意度")
     public List<Satisfaction> allSatisfaction(@ApiParam(name = "time", value = "时间") @RequestParam String time) {
