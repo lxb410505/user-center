@@ -1,0 +1,388 @@
+package com.hypersmart.usercenter.service.impl;
+
+import com.alibaba.fastjson.JSONObject;
+import com.hypersmart.base.model.CommonResult;
+import com.hypersmart.base.query.FieldRelation;
+import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.query.QueryOP;
+import com.hypersmart.base.util.StringUtil;
+import com.hypersmart.framework.service.GenericService;
+import com.hypersmart.mdm.feign.UcOrgFeignService;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
+import com.hypersmart.usercenter.mapper.SatisfactionMapper;
+import com.hypersmart.usercenter.mapper.UcOrgMapper;
+import com.hypersmart.usercenter.model.GridBasicInfo;
+import com.hypersmart.usercenter.model.Satisfaction;
+import com.hypersmart.usercenter.model.UcOrg;
+import com.hypersmart.usercenter.service.GridBasicInfoService;
+import com.hypersmart.usercenter.service.SatisfactionService;
+import com.hypersmart.usercenter.service.UcOrgService;
+import com.hypersmart.usercenter.util.ImportExcelUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import java.io.InputStream;
+import java.lang.reflect.MalformedParameterizedTypeException;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * @author magellan
+ * @email magellan
+ * @date 2019-05-14 13:37:39
+ */
+@Service("satisfactionServiceImpl")
+public class SatisfactionServiceImpl extends GenericService<String, Satisfaction> implements SatisfactionService {
+
+    public SatisfactionServiceImpl(SatisfactionMapper mapper) {
+        super(mapper);
+    }
+    @Autowired
+    UcOrgService ucOrgService;
+    @Autowired
+    GridBasicInfoService gridBasicInfoService ;
+    //查询组织机构;
+    @Autowired
+    UcOrgFeignService ucOrgFeignService;
+    @Resource
+    SatisfactionMapper satisfactionMapper;
+    @Override
+    public CommonResult<String> importData(MultipartFile file,String date) {
+        StringBuffer message = new StringBuffer();
+        boolean importState = true;
+        List<Satisfaction> satisfactions = new ArrayList<>();
+        try {
+            if (file.isEmpty()) {
+                message.append("导入文件丢失，请重新选择文件");
+            }
+            String[] headArr = {"序列", "分类", "组织名称", "综合满意度", "磨合期", "稳定期",
+                    "老业主", "秩序服务单元", "环境服务单元-保洁", "环境服务单元-绿化", "工程服务单元"};
+            InputStream in = file.getInputStream();
+            List<List<Object>> tempResourceImportList = new ImportExcelUtil().getBankListByExcelFromTwo(in, file.getOriginalFilename());
+
+            Integer hasRealCount=getRealCount(tempResourceImportList);
+
+            if (hasRealCount > 3000) {
+                message.append("文件数据超过3000条！");
+                importState = false;
+                throw new Exception("文件数据超过3000条");
+            }
+            //从第二行开始是表头
+            List<Object> rowDataHeader = tempResourceImportList.get(1);
+            List<String> rowDataHeaderStr = new ArrayList<>();
+            rowDataHeaderStr = rowDataHeader.stream().map(r -> String.valueOf(r).replace(" ", "").replace("*", "")).collect(Collectors.toList());
+
+            for (int i = 0; i < rowDataHeaderStr.size(); i++) {
+                if(rowDataHeaderStr.get(i).isEmpty()){
+                    rowDataHeaderStr.remove(i);
+                }
+            }
+            boolean hasError = false;
+            for (int i = 0; i < rowDataHeaderStr.size(); i++) {
+                if (!headArr[i].equals(rowDataHeaderStr.get(i))) {
+                    hasError = true;
+                    break;
+                }
+            }
+            if (hasError) {
+                message.append("标题栏数据顺序或格式不正确");
+                importState = false;
+                throw new Exception("标题栏数据顺序或格式不正确");
+
+            }
+
+            //处理导入的数据；
+            if (importState) {
+
+                doData(message, satisfactions, tempResourceImportList,date);
+
+                satisfactionMapper.deleteByDate(date);
+
+                insertBatch(satisfactions);
+
+            }
+
+        } catch (Exception e) {
+            return  new CommonResult(false, e.getMessage());
+        }
+        return new CommonResult(true, "成功导入");
+    }
+
+    @Override
+    public CommonResult CheckHasExist(String date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Satisfaction satisfaction = new Satisfaction();
+        QueryFilter queryFilter = QueryFilter.build();
+
+        try {
+            Date day = formatter.parse(date);
+            satisfaction.setEffectiveTime(day);
+            queryFilter.addFilter("effective_time",date, QueryOP.EQUAL, FieldRelation.AND);
+            List<Satisfaction> satisfactions = selectAll(satisfaction);
+            satisfactions=query(queryFilter).getRows();
+            if(satisfactions!=null&&satisfactions.size()>0){
+                return new CommonResult(false,"已存在数据");
+            }else{
+                return new CommonResult(true,"没有数据");
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return new CommonResult(true,"没有数据");
+    }
+
+    @Override
+    public List<Satisfaction> getSatisfactionListByParam(JSONObject json) {
+        return satisfactionMapper.getSatisfactionListByParam(JSONObject.toJavaObject(json, Map.class));
+    }
+
+    private void doData(StringBuffer message, List<Satisfaction> satisfactions, List<List<Object>> tempResourceImportList,String date) throws Exception {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        List<Object> rowDataLevel3=null;
+        for (int i = 2; i < tempResourceImportList.size(); i++) {
+            List<Object> rowData = tempResourceImportList.get(i);
+            System.out.println(rowData);
+
+            String[] split = rowData.get(0).toString().split("\\.");
+            if(split.length==3){
+                rowDataLevel3=rowData;
+            }
+            if(split.length!=3&&split.length!=4){
+                rowDataLevel3=null;
+            }
+            if(split.length==4&&rowDataLevel3==null){
+                throw new Exception("第"+(i+1)+"行 网格没有对应得上级组织");
+            }
+            String orgCode = checkData(rowDataLevel3,i,message, rowData, split);
+
+            //新增数据;
+            Satisfaction satisfaction = new Satisfaction();
+            //satisfaction.setCreateBy();
+            satisfaction.setCreateTime(new Date());
+            satisfaction.setOrder(rowData.get(0).toString());
+            satisfaction.setType(rowData.get(1).toString());
+            satisfaction.setOrgName(rowData.get(2).toString());
+            satisfaction.setOverallSatisfaction(new BigDecimal(rowData.get(3).toString()));
+            satisfaction.setStorming(new BigDecimal(rowData.get(4).toString()));
+            satisfaction.setStationaryPhase(new BigDecimal(rowData.get(5).toString()));
+            satisfaction.setOldProprietor(new BigDecimal(rowData.get(6).toString()));
+            satisfaction.setEffectiveTime(formatter.parse(date));
+            satisfaction.setOrgCode(orgCode);
+            if (split.length < 4) {
+                satisfaction.setOrderServiceUnit(new BigDecimal(rowData.get(7).toString()));
+                satisfaction.setEsuCleaning(new BigDecimal(rowData.get(8).toString()));
+                satisfaction.setEsuGreen(new BigDecimal(rowData.get(9).toString()));
+                satisfaction.setEngineeringServiceUnit(new BigDecimal(rowData.get(10).toString()));
+
+            }
+            satisfactions.add(satisfaction);
+
+        }
+    }
+
+    /**
+     * 校验是否重复
+     * @return
+     */
+    private String checkRepeatId(){
+        return null;
+    }
+
+    private String checkData(List<Object> parentRow,int rowNun,StringBuffer message, List<Object> rowData, String[] split) throws Exception {
+
+
+
+        //校验是否有组织不匹配；根据层级和姓名，查询是否有组织匹配
+        UcOrg ucOrg = new UcOrg();
+        ucOrg.setName(rowData.get(2).toString());
+        String orgCode=null;
+        boolean hasOrg=false;
+
+        if(split.length==4){
+            //网格组织校验
+            //todo
+            ucOrg.setName(parentRow.get(2).toString());
+            ucOrg.setLevel(4);
+            List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
+            if(ucOrgs.size()<=0){
+                throw new Exception("第"+rowNun+"行："+rowData.get(2).toString()+"该网格对应得上级组织错误或缺失，请检查格式");
+            }
+            String parentId=ucOrgs.get(0).getId();
+            GridBasicInfo gridBasicInfo = new GridBasicInfo();
+            gridBasicInfo.setGridName(rowData.get(2).toString());
+            gridBasicInfo.setStagingId(parentId);
+            List<GridBasicInfo> gridBasicInfos = gridBasicInfoService.selectAll(gridBasicInfo);
+
+            if(gridBasicInfos.size()<=0){
+                throw new Exception("第"+rowNun+"行："+rowData.get(2).toString()+"没有该网格");//8
+
+            }
+            orgCode=gridBasicInfos.get(0).getGridCode();
+            hasOrg=true;
+        }else{
+            if(split.length==1){
+                ucOrg.setLevel(1);
+            }
+            if(split.length==2){
+                ucOrg.setLevel(3);
+            }
+            if(split.length==3){
+                ucOrg.setLevel(4);
+            }
+
+            List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
+            if(ucOrgs.size()<=0){
+                throw new Exception("第"+rowNun+"行："+rowData.get(2).toString()+"组织名称不存在或组织名与对应得层级不符");//8
+            }
+            orgCode=ucOrgs.get(0).getCode();
+            hasOrg=true;
+        }
+
+
+        if(!hasOrg){
+            throw new Exception("第"+rowNun+"行："+rowData.get(2).toString()+"该组织名称与系统数据不匹配，请修改后重试。");
+
+        }
+        //校验是否为数字
+        //todo
+        switch (split.length) {
+            case 0:
+                throw new Exception("请检查是否有空行");
+
+            case 1:
+            case 2:
+            case 3:
+
+                //  6   第XX行 { 必填项的表头名称，如分类 }缺少
+                //  校验是否有不合法空值；
+                for (Object v :
+                        rowData) {
+                    if (v.toString() == null || v.toString().length() <= 0) {
+                        message.append("请检查数据是否为空");
+                        throw new Exception("第"+rowNun+"行："+"请检查数据是否缺少");
+                    }
+
+                }
+                for (int i = 3; i < rowData.size(); i++) {
+                    if(!isBigDecimal(rowData.get(i).toString())){
+                        throw new Exception("第"+rowNun+"行："+"数值格式错误（比如不是数字）");
+                    }
+                }
+                break;
+            case 4:
+
+                for (int j = 0; j < rowData.size(); j++) {
+                    if (j < 7 && (rowData.get(j).toString() == null || rowData.get(j).toString().length() <= 0)) {
+                        throw new Exception("第"+rowNun+"行："+"请检查数据是否缺少");
+                    }
+                    if(j >2&&j < 7 && !isBigDecimal(rowData.get(j).toString())){
+                        throw new Exception("第"+rowNun+"行："+"数值格式错误（比如不是数字）");
+                    }
+                }
+                break;
+
+            default:
+
+
+        }
+        return orgCode;
+    }
+
+    private Integer getRealCount(List<List<Object>> tempResourceImportList) {
+         Integer hasRealCount = 1;
+        for (int x = 1; x < tempResourceImportList.size(); x++) {
+            List<Object> rowData = tempResourceImportList.get(x);
+            int length = rowData.size();
+            Boolean isEmptyRow = true;
+            for (int s = 0; s < length; s++) {
+                if (StringUtil.isNotEmpty(String.valueOf(rowData.get(s)))) {
+                    isEmptyRow = false;
+                }
+            }
+            if (isEmptyRow) {
+                //整行为空，忽略
+                continue;
+            }
+
+            hasRealCount++;
+        }
+        return hasRealCount;
+    }
+
+    @Override
+    public List<Satisfaction> getSatisfactionDetail(String orgCode, String time) {
+        QueryFilter query = QueryFilter.build();
+        query.addFilter("CODE_", orgCode, QueryOP.EQUAL);
+        List<UcOrg> list = ucOrgService.query(query).getRows();
+        List<Satisfaction> satisfactions = new ArrayList<>();
+        if (list!=null&&list.size()>0){
+            UcOrg ucOrg = list.get(0);
+            if (ucOrg.getGrade().equals("ORG_DiKuai")){
+                List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getGridsBySmcloudmassifId(ucOrg.getId());
+                satisfactions = satisfactionMapper.getGridSatisfaction(gridBasicInfoList,time);
+            }else {
+                QueryFilter queryFilter = QueryFilter.build();
+                queryFilter.addFilter("PARENT_ID_", list.get(0).getId(), QueryOP.EQUAL, FieldRelation.AND);
+                queryFilter.addFilter("IS_DELE_", "0", QueryOP.EQUAL, FieldRelation.AND);
+                List<UcOrg> ucOrgList = ucOrgService.query(queryFilter).getRows();
+                if (ucOrgList!=null&&ucOrgList.size()>0){
+                    satisfactions = satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
+                }
+            }
+        }
+        return satisfactions;
+    }
+
+    @Override
+    public Satisfaction getSingleSatisfaction(String orgId, String time) {
+        UcOrg ucOrg = ucOrgService.get(orgId);
+        Satisfaction satisfaction = new Satisfaction();
+        if (ucOrg!=null){
+            List<Satisfaction> list = satisfactionMapper.getSingleSatisfaction(ucOrg.getCode(),time);
+            if (list!=null&&list.size()>0){
+                satisfaction = list.get(0);
+            }
+        }
+        return satisfaction;
+    }
+
+
+    @Override
+    public List<Satisfaction> getAllSatisfaction(String time) {
+        String userId = ContextUtil.getCurrentUser().getUserId();
+        List<UcOrg> ucOrgList = ucOrgService.getUserOrgListMerge(userId);
+        List<UcOrg> quYuList = new ArrayList<>();
+        for (UcOrg ucOrg:ucOrgList){
+            if (ucOrg.getLevel()==1){
+                quYuList.add(ucOrg);
+            }
+        }
+        return satisfactionMapper.getSatisfactionDetail(quYuList,time);
+    }
+
+    public static void main(String[] args) throws ParseException {
+        String date = "2019-05-00";
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-00");
+        Date parse = formatter.parse(date);
+        String ss=formatter.format(parse);
+        System.out.println(ss);
+    }
+    private  boolean isBigDecimal(String integer) {
+        try{
+            BigDecimal bd = new BigDecimal(integer);
+            //bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
+            return true;
+        }catch(NumberFormatException e)
+        {
+            return false;
+        }
+    }
+}

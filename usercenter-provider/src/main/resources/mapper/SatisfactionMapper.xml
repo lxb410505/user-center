@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.SatisfactionMapper">
+    <select id="getSingleSatisfaction" resultType="com.hypersmart.usercenter.model.Satisfaction">
+        select
+        t.id as id,
+        t.order_ as 'order',
+        t.type as type,
+        t.org_name as orgName,
+        t.org_code as orgCode,
+        t.overall_satisfaction as overallSatisfaction,
+        t.storming as storming,
+        t.stationary_phase as stationaryPhase,
+        t.old_proprietor as oldProprietor,
+        t.order_service_unit as orderServiceUnit,
+        t.esu_cleaning as esuCleaning,
+        t.esu_green as esuGreen,
+        t.engineering_service_unit as engineeringServiceUnit,
+        t.create_time as createTime,
+        t.create_by as createBy,
+        t.update_by as updateBy,
+        t.update_time as updateTime,
+        t.remark as remark,
+        t.effective_time as effectiveTime
+        FROM t_satisfaction t
+        WHERE
+        DATE_FORMAT(effective_time, '%Y-%m') = #{time}
+        AND
+        org_code = #{orgCode}
+    </select>
+    <select id="getGridSatisfaction" resultType="com.hypersmart.usercenter.model.Satisfaction">
+        select
+        t.id as id,
+        t.order_ as 'order',
+        t.type as type,
+        o.grid_name as orgName,
+        o.grid_code as orgCode,
+        t.overall_satisfaction as overallSatisfaction,
+        t.storming as storming,
+        t.stationary_phase as stationaryPhase,
+        t.old_proprietor as oldProprietor,
+        t.order_service_unit as orderServiceUnit,
+        t.esu_cleaning as esuCleaning,
+        t.esu_green as esuGreen,
+        t.engineering_service_unit as engineeringServiceUnit,
+        t.create_time as createTime,
+        t.create_by as createBy,
+        t.update_by as updateBy,
+        t.update_time as updateTime,
+        t.remark as remark,
+        t.effective_time as effectiveTime
+        FROM grid_basic_info o LEFT JOIN t_satisfaction t
+        ON t.org_code=o.grid_code
+        AND
+        DATE_FORMAT(t.effective_time, '%Y-%m') = #{time}
+        WHERE
+        o.grid_code IN
+        <foreach collection="orgList" item="item" index="index" open="(" close=")" separator=",">
+            #{item.gridCode}
+        </foreach>
+    </select>
+
+    <select id="getSatisfactionDetail" resultType="com.hypersmart.usercenter.model.Satisfaction">
+        SELECT
+        t.id as id,
+        t.order_ as 'order',
+        t.type as type,
+        t.org_code as orgCode,
+        o.NAME_ as orgName,
+        t.overall_satisfaction as overallSatisfaction,
+        t.storming as storming,
+        t.stationary_phase as stationaryPhase,
+        t.old_proprietor as oldProprietor,
+        t.order_service_unit as orderServiceUnit,
+        t.esu_cleaning as esuCleaning,
+        t.esu_green as esuGreen,
+        t.engineering_service_unit as engineeringServiceUnit,
+        t.create_time as createTime,
+        t.create_by as createBy,
+        t.update_by as updateBy,
+        t.update_time as updateTime,
+        t.remark as remark,
+        t.effective_time as effectiveTime
+        FROM uc_org o left JOIN t_satisfaction t ON t.org_code=o.CODE_ and DATE_FORMAT(t.effective_time, '%Y-%m') = #{time}
+        and  t.org_code IN
+        <foreach collection="orgList" item="item" index="index" open="(" close=")" separator=",">
+            #{item.code}
+        </foreach>
+        WHERE o.IS_DELE_!=1 and o.CODE_ in
+        <foreach collection="orgList" item="item" index="index" open="(" close=")" separator=",">
+            #{item.code}
+        </foreach>
+    </select>
+
+    <select id="deleteByDate" parameterType="java.lang.String">
+    delete from  t_satisfaction where
+    effective_time = #{date}
+    </select>
+    <select id ="getSatisfactionListByParam" parameterType="java.util.Map" resultType="com.hypersmart.usercenter.model.Satisfaction">
+        select
+         t.id as id,
+        t.order_ as 'order',
+        t.type as type,
+        t.org_name as orgName,
+        t.org_code as orgCode,
+        t.overall_satisfaction as overallSatisfaction,
+        t.storming as storming,
+        t.stationary_phase as stationaryPhase,
+        t.old_proprietor as oldProprietor,
+        t.order_service_unit as orderServiceUnit,
+        t.esu_cleaning as esuCleaning,
+        t.esu_green as esuGreen,
+        t.engineering_service_unit as engineeringServiceUnit,
+        t.create_time as createTime,
+        t.create_by as createBy,
+        t.update_by as updateBy,
+        t.update_time as updateTime,
+        t.remark as remark,
+        t.effective_time as effectiveTime
+        from t_satisfaction t
+        where 1=1
+        <if test="value.name1!=null or value.name2!=null or value.name3!=null or value.name4!=null">
+            and  t.org_Name  in
+            (
+            #{value.name1},#{value.name2},#{value.name3},#{value.name4}
+            )
+        </if>
+
+        <if test="value.beginDate!=null ">
+        <![CDATA[
+            and  t.effective_time >= #{value.beginDate}
+            and t.effective_time <= #{value.endDate}
+            ]]>
+        </if>
+
+
+    </select>
+
+</mapper>
