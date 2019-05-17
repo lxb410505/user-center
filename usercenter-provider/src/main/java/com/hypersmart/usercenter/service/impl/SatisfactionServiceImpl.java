@@ -341,6 +341,18 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         return satisfactions;
     }
 
+    @Override
+    public Satisfaction getSingleSatisfaction(String orgId, String time) {
+        UcOrg ucOrg = ucOrgService.get(orgId);
+        Satisfaction satisfaction = new Satisfaction();
+        if (ucOrg!=null){
+            List<Satisfaction> list = satisfactionMapper.getSingleSatisfaction(ucOrg.getCode(),time);
+            if (list!=null&&list.size()>0){
+                satisfaction = list.get(0);
+            }
+        }
+        return satisfaction;
+    }
 
 
     @Override
