@@ -301,12 +301,10 @@ public class GridBasicInfoController extends BaseController {
 		Map<String,Object> checkMap = new HashMap<>(16);
 		List<Map<String, Object>> maps = new ArrayList<>();
 		for (Map<String, Object> map : houseByCondition) {
-			for (String s : map.keySet()) {
-				if(!checkMap.containsValue(map.get("id"))){
-					checkMap.put(s,map.get("id"));
-					maps.add(map);
-				}
-			}
+		    if(!checkMap.containsKey(map.get("id"))){
+                checkMap.put((String) map.get("id"),map);
+                maps.add(map);
+            }
 		}
 		return maps;
 	}
