@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.FieldRelation;
 import com.hypersmart.base.query.QueryFilter;
@@ -10,8 +11,10 @@ import com.hypersmart.mdm.feign.UcOrgFeignService;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.mapper.SatisfactionMapper;
 import com.hypersmart.usercenter.mapper.UcOrgMapper;
+import com.hypersmart.usercenter.model.GridBasicInfo;
 import com.hypersmart.usercenter.model.Satisfaction;
 import com.hypersmart.usercenter.model.UcOrg;
+import com.hypersmart.usercenter.service.GridBasicInfoService;
 import com.hypersmart.usercenter.service.SatisfactionService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.util.ImportExcelUtil;
@@ -21,12 +24,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.InputStream;
+import java.lang.reflect.MalformedParameterizedTypeException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +48,8 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     @Autowired
     UcOrgService ucOrgService;
 
+    @Autowired
+    GridBasicInfoService gridBasicInfoService;
     //查询组织机构;
     @Autowired
     UcOrgFeignService ucOrgFeignService;
@@ -74,6 +81,11 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             List<String> rowDataHeaderStr = new ArrayList<>();
             rowDataHeaderStr = rowDataHeader.stream().map(r -> String.valueOf(r).replace(" ", "").replace("*", "")).collect(Collectors.toList());
 
+            for (int i = 0; i < rowDataHeaderStr.size(); i++) {
+                if(rowDataHeaderStr.get(i).isEmpty()){
+                    rowDataHeaderStr.remove(i);
+                }
+            }
             boolean hasError = false;
             for (int i = 0; i < rowDataHeaderStr.size(); i++) {
                 if (!headArr[i].equals(rowDataHeaderStr.get(i))) {
@@ -100,14 +112,14 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             }
 
         } catch (Exception e) {
-            new CommonResult(importState, e.toString());
+            new CommonResult(false, e.toString());
         }
-        return new CommonResult(importState, "成功导入");
+        return new CommonResult(true, "成功导入");
     }
 
     @Override
     public CommonResult CheckHasExist(String date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-00");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Satisfaction satisfaction = new Satisfaction();
         QueryFilter queryFilter = QueryFilter.build();
 
@@ -128,13 +140,18 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         return null;
     }
 
+    @Override
+    public List<Satisfaction> getSatisfactionListByParam(JSONObject json) {
+        return satisfactionMapper.getSatisfactionListByParam(JSONObject.toJavaObject(json, Map.class));
+    }
+
     private void doData(StringBuffer message, List<Satisfaction> satisfactions, List<List<Object>> tempResourceImportList,String date) throws Exception {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-00");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         for (int i = 2; i < tempResourceImportList.size(); i++) {
             List<Object> rowData = tempResourceImportList.get(i);
             System.out.println(rowData);
 
-            String[] split = rowData.get(0).toString().split(".");
+            String[] split = rowData.get(0).toString().split("\\.");
 
             String orgCode = checkData(message, rowData, split);
 
@@ -204,21 +221,15 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                         throw new Exception("请检查数据是否为空");
                     }
                 }
+                break;
             case 4:
-                //校验是否有不合法空值；楼栋网格除外
-                for (Object v :
-                        rowData) {
-                    if (v.toString() == null || v.toString().length() <= 0) {
-                        message.append("请检查数据是否为空");
+
+                for (int j = 0; j < rowData.size(); j++) {
+                    if (j < 7 && (rowData.get(j).toString() == null || rowData.get(j).toString().length() <= 0)) {
                         throw new Exception("请检查数据是否为空");
                     }
-                    for (int j = 0; j < rowData.size(); j++) {
-                        if (j < 7 && (rowData.get(j).toString() == null || rowData.get(j).toString().length() <= 0)) {
-                            throw new Exception("请检查数据是否为空");
-                        }
-                    }
                 }
-
+                break;
 
             default:
 
@@ -228,7 +239,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     }
 
     private Integer getRealCount(List<List<Object>> tempResourceImportList) {
-         Integer hasRealCount = null;
+         Integer hasRealCount = 1;
         for (int x = 1; x < tempResourceImportList.size(); x++) {
             List<Object> rowData = tempResourceImportList.get(x);
             int length = rowData.size();
@@ -249,16 +260,40 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     }
 
     @Override
-    public List<Satisfaction> getSatisfactionDetail(String orgId, String time) {
-        QueryFilter queryFilter = QueryFilter.build();
-        queryFilter.addFilter("PARENT_ID_", orgId, QueryOP.EQUAL, FieldRelation.AND);
-        queryFilter.addFilter("IS_DELE_", "1", QueryOP.EQUAL, FieldRelation.AND);
-        List<UcOrg> ucOrgList = ucOrgService.query(queryFilter).getRows();
+    public List<Satisfaction> getSatisfactionDetail(String orgCode, String time) {
+        QueryFilter query = QueryFilter.build();
+        query.addFilter("CODE_", orgCode, QueryOP.EQUAL);
+        List<UcOrg> list = ucOrgService.query(query).getRows();
         List<Satisfaction> satisfactions = new ArrayList<>();
-        if (ucOrgList!=null&&ucOrgList.size()>0){
-            satisfactions = satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
+        if (list!=null&&list.size()>0){
+            UcOrg ucOrg = list.get(0);
+            if (ucOrg.getGrade().equals("ORG_DiKuai")){
+                List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getGridsBySmcloudmassifId(ucOrg.getId());
+                satisfactions = satisfactionMapper.getGridSatisfaction(gridBasicInfoList,time);
+            }else {
+                QueryFilter queryFilter = QueryFilter.build();
+                queryFilter.addFilter("PARENT_ID_", list.get(0).getId(), QueryOP.EQUAL, FieldRelation.AND);
+                queryFilter.addFilter("IS_DELE_", "0", QueryOP.EQUAL, FieldRelation.AND);
+                List<UcOrg> ucOrgList = ucOrgService.query(queryFilter).getRows();
+                if (ucOrgList!=null&&ucOrgList.size()>0){
+                    satisfactions = satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
+                }
+            }
         }
         return satisfactions;
+    }
+
+    @Override
+    public Satisfaction getSingleSatisfaction(String orgId, String time) {
+        UcOrg ucOrg = ucOrgService.get(orgId);
+        Satisfaction satisfaction = new Satisfaction();
+        if (ucOrg!=null){
+            List<Satisfaction> list = satisfactionMapper.getSingleSatisfaction(ucOrg.getCode(),time);
+            if (list!=null&&list.size()>0){
+                satisfaction = list.get(0);
+            }
+        }
+        return satisfaction;
     }
 
     @Override

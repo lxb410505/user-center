@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.framework.service.IGenericService;
 import com.hypersmart.usercenter.model.Satisfaction;
@@ -19,9 +20,9 @@ public interface SatisfactionService extends IGenericService<String, Satisfactio
     CommonResult<String> importData(MultipartFile file, String date);
     //导入前调用检查是否有重复导入
     CommonResult CheckHasExist(String date);
-
-    List<Satisfaction> getSatisfactionDetail(String orgId,String time);
-
+    List<Satisfaction> getSatisfactionListByParam(JSONObject json);
+    List<Satisfaction> getSatisfactionDetail(String orgCode,String time);
+    Satisfaction getSingleSatisfaction(String orgId, String time);
     List<Satisfaction> getAllSatisfaction(String time);
 }
 

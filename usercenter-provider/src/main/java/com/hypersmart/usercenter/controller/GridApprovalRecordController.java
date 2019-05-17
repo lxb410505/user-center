@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.controller;
 
+import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.usercenter.model.K2Result;
 import com.hypersmart.usercenter.service.GridApprovalRecordService;
 import io.swagger.annotations.Api;
@@ -23,7 +24,7 @@ public class GridApprovalRecordController {
 	@PostMapping({"/receiveFlowResult"})
 	@ApiOperation(value = "接收流程处理结果", httpMethod = "POST", notes = "接收流程处理结果")
 	@Async
-	public void receiveFlowResult(@RequestBody K2Result k2Result) {
-		gridApprovalRecordService.processFlowResult(k2Result);
+	public CommonResult<String> receiveFlowResult(@RequestBody K2Result k2Result) {
+		return gridApprovalRecordService.processFlowResult(k2Result);
 	}
 }
