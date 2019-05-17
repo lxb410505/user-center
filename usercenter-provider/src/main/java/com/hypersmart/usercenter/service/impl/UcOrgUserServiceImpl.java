@@ -7,6 +7,7 @@ import com.hypersmart.base.util.ContextUtils;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
+import com.hypersmart.usercenter.dto.RangeDTO;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
 import com.hypersmart.usercenter.mapper.UcUserMapper;
 import com.hypersmart.usercenter.model.Divide;
@@ -369,8 +370,8 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         List<QueryField> querys = queryFilter.getQuerys();
 
 
-        List<Map<String, Object>> maps = gridBasicInfoService.getGridsHouseBymassifId((String) querys.get(0).getValue());
-        List<String> collect = maps.stream().filter(e -> "3".equals(e.get("level").toString())).map(e -> (String) e.get("id")).distinct().collect(Collectors.toList());
+        List<RangeDTO> gridsHouseBymassifId = gridBasicInfoService.getGridsHouseBymassifId((String) querys.get(0).getValue());
+        List<String> collect = gridsHouseBymassifId.stream().filter(e -> "3".equals(e.getLevel())).map(RangeDTO::getId).distinct().collect(Collectors.toList());
         return collect;
 
     }
