@@ -318,17 +318,30 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     }
 
     @Override
-    public List<Satisfaction> getSatisfactionDetail(String orgId, String time) {
-        QueryFilter queryFilter = QueryFilter.build();
-        queryFilter.addFilter("PARENT_ID_", orgId, QueryOP.EQUAL, FieldRelation.AND);
-        queryFilter.addFilter("IS_DELE_", "0", QueryOP.EQUAL, FieldRelation.AND);
-        List<UcOrg> ucOrgList = ucOrgService.query(queryFilter).getRows();
+    public List<Satisfaction> getSatisfactionDetail(String orgCode, String time) {
+        QueryFilter query = QueryFilter.build();
+        query.addFilter("CODE_", orgCode, QueryOP.EQUAL);
+        List<UcOrg> list = ucOrgService.query(query).getRows();
         List<Satisfaction> satisfactions = new ArrayList<>();
-        if (ucOrgList!=null&&ucOrgList.size()>0){
-            satisfactions = satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
+        if (list!=null&&list.size()>0){
+            UcOrg ucOrg = list.get(0);
+            if (ucOrg.getGrade().equals("ORG_DiKuai")){
+                List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getGridsBySmcloudmassifId(ucOrg.getId());
+                satisfactions = satisfactionMapper.getGridSatisfaction(gridBasicInfoList,time);
+            }else {
+                QueryFilter queryFilter = QueryFilter.build();
+                queryFilter.addFilter("PARENT_ID_", list.get(0).getId(), QueryOP.EQUAL, FieldRelation.AND);
+                queryFilter.addFilter("IS_DELE_", "0", QueryOP.EQUAL, FieldRelation.AND);
+                List<UcOrg> ucOrgList = ucOrgService.query(queryFilter).getRows();
+                if (ucOrgList!=null&&ucOrgList.size()>0){
+                    satisfactions = satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
+                }
+            }
         }
         return satisfactions;
     }
+
+
 
     @Override
     public List<Satisfaction> getAllSatisfaction(String time) {

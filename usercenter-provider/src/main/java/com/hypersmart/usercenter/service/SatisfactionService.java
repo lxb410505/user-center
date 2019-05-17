@@ -21,8 +21,8 @@ public interface SatisfactionService extends IGenericService<String, Satisfactio
     //导入前调用检查是否有重复导入
     CommonResult CheckHasExist(String date);
     List<Satisfaction> getSatisfactionListByParam(JSONObject json);
-    List<Satisfaction> getSatisfactionDetail(String orgId,String time);
-
+    List<Satisfaction> getSatisfactionDetail(String orgCode,String time);
+    Satisfaction getSingleSatisfaction(String orgId, String time);
     List<Satisfaction> getAllSatisfaction(String time);
 }
 
