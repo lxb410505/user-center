@@ -167,9 +167,9 @@ public class SatisfactionController extends BaseController {
 
     @GetMapping({"/appSatisfaction"})
     @ApiOperation(value = "单组织单月满意度", httpMethod = "GET", notes = "单组织单月满意度")
-    public Satisfaction appSatisfaction(@ApiParam(name = "orgCode", value = "组织编码") @RequestParam String orgCode,
+    public Satisfaction appSatisfaction(@ApiParam(name = "orgId", value = "组织id") @RequestParam String orgId,
                                                  @ApiParam(name = "time", value = "时间") @RequestParam String time) {
-        return this.satisfactionService.getSingleSatisfaction(orgCode, time);
+        return this.satisfactionService.getSingleSatisfaction(orgId, time);
     }
 
     @GetMapping({"/allSatisfaction"})
