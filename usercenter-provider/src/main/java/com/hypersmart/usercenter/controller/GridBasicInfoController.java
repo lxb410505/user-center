@@ -13,6 +13,7 @@ import com.hypersmart.usercenter.bo.HouseKeeperBO;
 import com.hypersmart.usercenter.constant.GridErrorCode;
 import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
+import com.hypersmart.usercenter.dto.RangeDTO;
 import com.hypersmart.usercenter.model.GridBasicInfo;
 import com.hypersmart.usercenter.service.GridBasicInfoService;
 import com.hypersmart.usercenter.service.UcOrgUserService;
@@ -280,8 +281,8 @@ public class GridBasicInfoController extends BaseController {
 
 	@GetMapping({"/getGridsHouse/{id}"})
 	@ApiOperation(value = "根据地块id，获取地块下的网格覆盖的房产信息", httpMethod = "GET", notes = "根据地块id，获取地块下的楼栋网格信息")
-	public List<Map<String,Object>> getGridsHouse(@ApiParam(name = "id", value = "地块id", required = true) @PathVariable String id) {
-		List<Map<String,Object>> gridHouses = gridBasicInfoService.getGridsHouseBymassifId(id);
+	public List<RangeDTO> getGridsHouse(@ApiParam(name = "id", value = "地块id", required = true) @PathVariable String id) {
+		List<RangeDTO> gridHouses = gridBasicInfoService.getGridsHouseBymassifId(id);
 		return gridHouses;
 	}
 
@@ -300,12 +301,10 @@ public class GridBasicInfoController extends BaseController {
 		Map<String,Object> checkMap = new HashMap<>(16);
 		List<Map<String, Object>> maps = new ArrayList<>();
 		for (Map<String, Object> map : houseByCondition) {
-			for (String s : map.keySet()) {
-				if(!checkMap.containsValue(map.get("id"))){
-					checkMap.put(s,map.get("id"));
-					maps.add(map);
-				}
-			}
+		    if(!checkMap.containsKey(map.get("id"))){
+                checkMap.put((String) map.get("id"),map);
+                maps.add(map);
+            }
 		}
 		return maps;
 	}
