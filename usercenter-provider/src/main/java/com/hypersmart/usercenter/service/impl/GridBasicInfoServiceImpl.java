@@ -17,6 +17,7 @@ import com.hypersmart.usercenter.constant.GridErrorCode;
 import com.hypersmart.usercenter.constant.GridTypeConstants;
 import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
+import com.hypersmart.usercenter.dto.RangeDTO;
 import com.hypersmart.usercenter.mapper.GridApprovalRecordMapper;
 import com.hypersmart.usercenter.mapper.GridBasicInfoMapper;
 import com.hypersmart.usercenter.mapper.UcOrgParamsMapper;
@@ -435,7 +436,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 				dto.setCityName(gridBasicInfoDTO.getCityName());
 				dto.setProjectName(gridBasicInfoDTO.getProjectName());
 				dto.setStagingName(gridBasicInfoDTO.getStagingName());
-				gridApprovalRecordService.callApproval(GridOperateEnum.CHANGE_HOUSEKEEPER.getOperateType(), id, dto);
+				dto.setStagingId(gridBasicInfoDTO.getStagingId());
+				gridApprovalRecordService.callApproval(GridOperateEnum.LINK_HOUSEKEEPER.getOperateType(), id, dto);
 			}
 		}
 		return GridErrorCode.SUCCESS;
@@ -504,15 +506,20 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 	}
 
 	@Override
-	public List<Map<String,Object>> getGridsHouseBymassifId(String massifId) {
-		List<Map<String,Object>> returnList = new ArrayList<>();
+	public List<RangeDTO> getGridsHouseBymassifId(String massifId) {
+		List<RangeDTO> returnList = new ArrayList<>();
         List<GridBasicInfo> gridBasicInfos = this.getGridsBySmcloudmassifId(massifId);
-		gridBasicInfos.forEach(grid -> {
+        for(int i=0;i<gridBasicInfos.size();i++){
+        	List<RangeDTO> listObjectFir = (List<RangeDTO>) JSONArray.parse(gridBasicInfos.get(i).getGridRange());
+			returnList.addAll(listObjectFir);
+		}
+		/*gridBasicInfos.forEach(grid -> {
 			List<Map<String,Object>> listObjectFir = (List<Map<String,Object>>) JSONArray.parse(grid.getGridRange());
 			returnList.addAll(listObjectFir);
-			/*returnList.addAll(JsonUtil.to)*/
-		});
-		return returnList;
+			*//*returnList.addAll(JsonUtil.to)*//*
+		});*/
+		Set<RangeDTO> set = new HashSet<>(returnList);
+		return new ArrayList<>(set);
 	}
 
 	@Override
