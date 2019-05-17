@@ -47,9 +47,8 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     }
     @Autowired
     UcOrgService ucOrgService;
-
     @Autowired
-    GridBasicInfoService gridBasicInfoService;
+    GridBasicInfoService gridBasicInfoService ;
     //查询组织机构;
     @Autowired
     UcOrgFeignService ucOrgFeignService;
@@ -112,7 +111,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             }
 
         } catch (Exception e) {
-            new CommonResult(false, e.toString());
+            return  new CommonResult(false, e.getMessage());
         }
         return new CommonResult(true, "成功导入");
     }
@@ -137,7 +136,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return null;
+        return new CommonResult(true,"没有数据");
     }
 
     @Override
@@ -147,13 +146,22 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
     private void doData(StringBuffer message, List<Satisfaction> satisfactions, List<List<Object>> tempResourceImportList,String date) throws Exception {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        List<Object> rowDataLevel3=null;
         for (int i = 2; i < tempResourceImportList.size(); i++) {
             List<Object> rowData = tempResourceImportList.get(i);
             System.out.println(rowData);
 
             String[] split = rowData.get(0).toString().split("\\.");
-
-            String orgCode = checkData(message, rowData, split);
+            if(split.length==3){
+                rowDataLevel3=rowData;
+            }
+            if(split.length!=3&&split.length!=4){
+                rowDataLevel3=null;
+            }
+            if(split.length==4&&rowDataLevel3==null){
+                throw new Exception("第"+(i+1)+"行 网格没有对应得上级组织");
+            }
+            String orgCode = checkData(rowDataLevel3,i,message, rowData, split);
 
             //新增数据;
             Satisfaction satisfaction = new Satisfaction();
@@ -180,27 +188,67 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         }
     }
 
-    private String checkData(StringBuffer message, List<Object> rowData, String[] split) throws Exception {
+    /**
+     * 校验是否重复
+     * @return
+     */
+    private String checkRepeatId(){
+        return null;
+    }
+
+    private String checkData(List<Object> parentRow,int rowNun,StringBuffer message, List<Object> rowData, String[] split) throws Exception {
+
+
+
         //校验是否有组织不匹配；根据层级和姓名，查询是否有组织匹配
         UcOrg ucOrg = new UcOrg();
         ucOrg.setName(rowData.get(2).toString());
-        List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
         String orgCode=null;
         boolean hasOrg=false;
-        if(ucOrgs.size()<=0){
-            throw new Exception(""+rowData.get(2).toString()+"该组织名称与系统数据不匹配，请修改后重试。");
 
-        }
-        for (UcOrg ucOrg1 :
-                ucOrgs) {
-            if(ucOrg1.getLevel().equals(split.length)){
-                orgCode=ucOrg1.getCode();
-                hasOrg=true;
+        if(split.length==4){
+            //网格组织校验
+            //todo
+            ucOrg.setName(parentRow.get(2).toString());
+            ucOrg.setLevel(4);
+            List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
+            if(ucOrgs.size()<=0){
+                throw new Exception("第"+rowNun+"行："+rowData.get(2).toString()+"该网格对应得上级组织错误或缺失，请检查格式");
+            }
+            String parentId=ucOrgs.get(0).getId();
+            GridBasicInfo gridBasicInfo = new GridBasicInfo();
+            gridBasicInfo.setGridName(rowData.get(2).toString());
+            gridBasicInfo.setStagingId(parentId);
+            List<GridBasicInfo> gridBasicInfos = gridBasicInfoService.selectAll(gridBasicInfo);
+
+            if(gridBasicInfos.size()<=0){
+                throw new Exception("第"+rowNun+"行："+rowData.get(2).toString()+"没有该网格");//8
+
+            }
+            orgCode=gridBasicInfos.get(0).getGridCode();
+            hasOrg=true;
+        }else{
+            if(split.length==1){
+                ucOrg.setLevel(1);
+            }
+            if(split.length==2){
+                ucOrg.setLevel(3);
+            }
+            if(split.length==3){
+                ucOrg.setLevel(4);
             }
 
+            List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
+            if(ucOrgs.size()<=0){
+                throw new Exception("第"+rowNun+"行："+rowData.get(2).toString()+"组织名称不存在或组织名与对应得层级不符");//8
+            }
+            orgCode=ucOrgs.get(0).getCode();
+            hasOrg=true;
         }
+
+
         if(!hasOrg){
-            throw new Exception(""+rowData.get(2).toString()+"该组织名称与系统数据不匹配，请修改后重试。");
+            throw new Exception("第"+rowNun+"行："+rowData.get(2).toString()+"该组织名称与系统数据不匹配，请修改后重试。");
 
         }
         //校验是否为数字
@@ -213,12 +261,19 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             case 2:
             case 3:
 
-                //校验是否有不合法空值；
+                //  6   第XX行 { 必填项的表头名称，如分类 }缺少
+                //  校验是否有不合法空值；
                 for (Object v :
                         rowData) {
                     if (v.toString() == null || v.toString().length() <= 0) {
                         message.append("请检查数据是否为空");
-                        throw new Exception("请检查数据是否为空");
+                        throw new Exception("第"+rowNun+"行："+"请检查数据是否缺少");
+                    }
+
+                }
+                for (int i = 3; i < rowData.size(); i++) {
+                    if(!isBigDecimal(rowData.get(i).toString())){
+                        throw new Exception("第"+rowNun+"行："+"数值格式错误（比如不是数字）");
                     }
                 }
                 break;
@@ -226,7 +281,10 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
                 for (int j = 0; j < rowData.size(); j++) {
                     if (j < 7 && (rowData.get(j).toString() == null || rowData.get(j).toString().length() <= 0)) {
-                        throw new Exception("请检查数据是否为空");
+                        throw new Exception("第"+rowNun+"行："+"请检查数据是否缺少");
+                    }
+                    if(j >2&&j < 7 && !isBigDecimal(rowData.get(j).toString())){
+                        throw new Exception("第"+rowNun+"行："+"数值格式错误（比如不是数字）");
                     }
                 }
                 break;
@@ -296,6 +354,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         return satisfaction;
     }
 
+
     @Override
     public List<Satisfaction> getAllSatisfaction(String time) {
         String userId = ContextUtil.getCurrentUser().getUserId();
@@ -315,5 +374,15 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         Date parse = formatter.parse(date);
         String ss=formatter.format(parse);
         System.out.println(ss);
+    }
+    private  boolean isBigDecimal(String integer) {
+        try{
+            BigDecimal bd = new BigDecimal(integer);
+            //bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
+            return true;
+        }catch(NumberFormatException e)
+        {
+            return false;
+        }
     }
 }
