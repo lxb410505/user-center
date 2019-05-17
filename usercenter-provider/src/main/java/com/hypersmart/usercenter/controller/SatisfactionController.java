@@ -6,6 +6,7 @@ import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.util.BeanUtils;
+import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.model.Satisfaction;
 import com.hypersmart.usercenter.service.SatisfactionService;
@@ -114,35 +115,58 @@ public class SatisfactionController extends BaseController {
 
     @GetMapping({"/topLevel"})
     @ApiOperation(value = "顶级组织级别", httpMethod = "GET", notes = "获取顶级组织级别")
-    public int topLevel() {
+    public Map<String,Object> topLevel() {
         int level = 0;
-        Boolean hasArea = false;
-        Boolean hasProject = false;
-        Boolean hasDikuai = false;
+        String area = "";
+        String areaName = "";
+        String project = "";
+        String projectName = "";
+        String dikuai = "";
+        String dikuaiName = "";
+        String name = "";
+        String code = "";
 
         String userId = ContextUtil.getCurrentUserId();
         List<UcOrg> ucOrgList = ucOrgService.getUserOrgListMerge(userId);
         for (UcOrg org : ucOrgList) {
             if ("1".equals(org.getDisabled())) {
                 if ("ORG_QuYu".equals(org.getGrade())) {
-                    hasArea = true;
+                    if(StringUtil.isEmpty(area)){
+                        area = org.getCode();
+                        areaName=org.getName();
+                    }
+
                 } else if ("ORG_XiangMu".equals(org.getGrade())) {
-                    hasProject = true;
+                    if(StringUtil.isEmpty(project)){
+                        project = org.getCode();
+                        projectName=org.getName();
+                    }
                 } else if ("ORG_DiKuai".equals(org.getGrade())) {
-                    hasDikuai = true;
+                    if(StringUtil.isEmpty(dikuai)) {
+                        dikuai = org.getCode();
+                        dikuaiName = org.getName();
+                    }
                 }
             }
         }
-
-        if (hasArea) {
+        if (StringUtil.isNotEmpty(area)) {
             level = 1;
-        } else if (hasProject) {
+            name=areaName;
+            code=area;
+        } else if (StringUtil.isNotEmpty(project)) {
             level = 2;
-        } else if (hasDikuai) {
+            name=projectName;
+            code=project;
+        } else if (StringUtil.isNotEmpty(dikuai)) {
             level = 3;
+            name=dikuaiName;
+            code=dikuai;
         }
-
-        return level;
+        Map<String,Object> map = new HashMap<>();
+        map.put("level",level);
+        map.put("name",name);
+        map.put("code",code);
+        return map;
     }
 
     @GetMapping({"/gridsByDivideId/{massifId}"})
