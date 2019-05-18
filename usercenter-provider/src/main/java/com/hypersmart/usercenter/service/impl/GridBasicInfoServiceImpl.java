@@ -529,7 +529,9 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 		List<GridBasicInfo> gridBasicInfos =pageInfo.getList();
 		gridBasicInfos.forEach(grid -> {
 			List<Map<String,Object>> listObjectFir = (List<Map<String,Object>>) JSONArray.parse(grid.getGridRange());
-			returnList.addAll(listObjectFir);
+			if(!CollectionUtils.isEmpty(listObjectFir)) {
+                returnList.addAll(listObjectFir);
+            }
 		});
 
 		if(org.apache.commons.lang3.StringUtils.isEmpty(massifId)) {
