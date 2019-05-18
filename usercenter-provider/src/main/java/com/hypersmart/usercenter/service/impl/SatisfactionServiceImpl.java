@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -94,6 +96,36 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                 if(objects.get(0)==null||objects.get(0).toString().length()<=0){
                     throw new Exception("第"+(i+1)+"行序列为空");
                 }else{
+                    //对小数点问题进行处理；
+                    if(objects.get(0).toString().length()>=4){
+                        String substring = objects.get(0).toString().substring(objects.get(0).toString().length() - 3);
+                        String[] split = objects.get(0).toString().split("\\.");
+                        if(substring.equals(".10")&&split.length==2){
+                            List<Object> o2=tempResourceImportList.get(i-1);
+                            if(o2!=null&&o2.get(0)!=null&&o2.get(0).toString().length()>0){
+//                            if(o2.get(0).toString().substring(o2.get(0).toString().length()-3).equals("\\.1")){
+//
+//                            }
+                                String[] split1 = o2.get(0).toString().split("\\.");
+                                if(split1.length==1){
+                                    //替换值
+                                    id[i-2]=objects.get(0).toString().substring(0,objects.get(0).toString().lastIndexOf("0"));
+                                    List<Object> objects1=objects;
+                                    objects1.remove(0);
+                                    objects1.add(0,id[i-2]);
+                                    tempResourceImportList.remove(i);
+                                    tempResourceImportList.add(i,objects1);
+
+                                }
+                            }
+                        }
+                    }
+
+
+
+
+                }
+                if(id[i-2]==null){
                     id[i-2]=objects.get(0).toString();
                 }
             }
@@ -188,25 +220,33 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         List<Object> rowDataLevel3 = null;
         for (int i = 2; i < tempResourceImportList.size(); i++) {
             List<Object> rowData = tempResourceImportList.get(i);
-            System.out.println(rowData);
 
-            //String[] split = rowData.get(0).toString().split("\\.");
+            boolean checkHasSpecialStr = checkHasSpecialStr(rowData.get(0).toString());
+            if(checkHasSpecialStr){
+                throw new Exception("第" + (i + 1) + "行: 序列错误,包含除.以外特殊字符。");
+            }
+
+            String[] split = rowData.get(0).toString().split("\\.");
+            int length=split.length;
+            if(length<1){
+                throw new Exception("第" + (i + 1) + "行 序列错误。");
+            }
             int type = 0;
             if (rowData.get(1).toString() != null) {
-                if (rowData.get(1).toString().equals("区域")) {
+                if (rowData.get(1).toString().equals("区域")&&length==1) {
                     type = 1;
                 }
-                if (rowData.get(1).toString().equals("项目")) {
+                if (rowData.get(1).toString().equals("项目")&&length==2) {
                     type = 2;
                 }
-                if (rowData.get(1).toString().equals("地块")) {
+                if (rowData.get(1).toString().equals("地块")&&length==3) {
                     type = 3;
                 }
-                if (rowData.get(1).toString().equals("网格")) {
+                if (rowData.get(1).toString().equals("网格")&&length==4) {
                     type = 4;
                 }
                 if (type == 0) {
-                    throw new Exception("第" + (i + 1) + "行 分类内容错误");
+                    throw new Exception("第" + (i + 1) + "行 分类内容错误或分类和序列层级不匹配！");
                 }
             } else {
                 throw new Exception("第" + (i + 1) + "行 网格没有对应得分类");
@@ -236,20 +276,39 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             Satisfaction satisfaction = new Satisfaction();
             //satisfaction.setCreateBy();
             satisfaction.setCreateTime(new Date());
+
             satisfaction.setOrder(rowData.get(0).toString());
             satisfaction.setType(rowData.get(1).toString());
             satisfaction.setOrgName(rowData.get(2).toString());
-            satisfaction.setOverallSatisfaction(new BigDecimal(rowData.get(3).toString()));
-            satisfaction.setStorming(new BigDecimal(rowData.get(4).toString()));
-            satisfaction.setStationaryPhase(new BigDecimal(rowData.get(5).toString()));
-            satisfaction.setOldProprietor(new BigDecimal(rowData.get(6).toString()));
+            if(rowData.get(3)!=null&&StringUtil.isNotEmpty(rowData.get(3).toString())){
+                satisfaction.setOverallSatisfaction(new BigDecimal(rowData.get(3).toString()));
+            }
+            if(rowData.get(4)!=null&&StringUtil.isNotEmpty(rowData.get(4).toString())){
+                satisfaction.setStorming(new BigDecimal(rowData.get(4).toString()));
+            }
+            if(rowData.get(5)!=null&&StringUtil.isNotEmpty(rowData.get(5).toString())){
+                satisfaction.setStationaryPhase(new BigDecimal(rowData.get(5).toString()));
+            }
+            if(rowData.get(6)!=null&&StringUtil.isNotEmpty(rowData.get(6).toString())){
+                satisfaction.setOldProprietor(new BigDecimal(rowData.get(6).toString()));
+            }
             satisfaction.setEffectiveTime(formatter.parse(date));
             satisfaction.setOrgCode(orgCode);
             if (type < 4) {
-                satisfaction.setOrderServiceUnit(new BigDecimal(rowData.get(7).toString()));
-                satisfaction.setEsuCleaning(new BigDecimal(rowData.get(8).toString()));
-                satisfaction.setEsuGreen(new BigDecimal(rowData.get(9).toString()));
-                satisfaction.setEngineeringServiceUnit(new BigDecimal(rowData.get(10).toString()));
+                if(rowData.get(7)!=null&&StringUtil.isNotEmpty(rowData.get(7).toString())){
+                    satisfaction.setOrderServiceUnit(new BigDecimal(rowData.get(7).toString()));
+                }
+                if(rowData.get(8)!=null&&StringUtil.isNotEmpty(rowData.get(8).toString())){
+                    satisfaction.setEsuCleaning(new BigDecimal(rowData.get(8).toString()));
+                }
+
+                if(rowData.get(9)!=null&&StringUtil.isNotEmpty(rowData.get(9).toString())){
+                    satisfaction.setEsuGreen(new BigDecimal(rowData.get(9).toString()));
+                }
+
+                if(rowData.get(10)!=null&&StringUtil.isNotEmpty(rowData.get(10).toString())){
+                    satisfaction.setEngineeringServiceUnit(new BigDecimal(rowData.get(10).toString()));
+                }
 
             }
             satisfactions.add(satisfaction);
@@ -294,7 +353,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             List<GridBasicInfo> gridBasicInfos = gridBasicInfoService.selectAll(gridBasicInfo);
 
             if (gridBasicInfos.size() <= 0) {
-                throw new Exception("第" + rowNun + "行：" + rowData.get(2).toString() + "没有该网格");//8
+                throw new Exception("第" + rowNun + "行："  + "没有该网格"+ rowData.get(2).toString());//8
 
             }
             orgCode = gridBasicInfos.get(0).getGridCode();
@@ -344,16 +403,16 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
                 //  6   第XX行 { 必填项的表头名称，如分类 }缺少
                 //  校验是否有不合法空值；
-                for (Object v :
-                        rowData) {
-                    if (v.toString() == null || v.toString().length() <= 0) {
-                        message.append("请检查数据是否为空");
-                        throw new Exception("第" + rowNun + "行：" + "请检查数据是否缺少");
-                    }
-
-                }
+//                for (Object v :
+//                        rowData) {
+//                    if (v.toString() == null || v.toString().length() <= 0) {
+//                        message.append("请检查数据是否为空");
+//                        throw new Exception("第" + rowNun + "行：" + "请检查数据是否缺少");
+//                    }
+//
+//                }
                 for (int i = 3; i < rowData.size(); i++) {
-                    if (!isBigDecimal(rowData.get(i).toString())) {
+                    if (rowData.get(i)!=null&&rowData.get(i).toString()!=null&&rowData.get(i).toString().trim().length()>0&&!isBigDecimal(rowData.get(i).toString())) {
                         throw new Exception("第" + rowNun + "行：" + "数值格式错误（比如不是数字）");
                     }
                 }
@@ -361,10 +420,10 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             case 4:
 
                 for (int j = 0; j < rowData.size(); j++) {
-                    if (j < 7 && (rowData.get(j).toString() == null || rowData.get(j).toString().length() <= 0)) {
-                        throw new Exception("第" + rowNun + "行：" + "请检查数据是否缺少");
-                    }
-                    if (j > 2 && j < 7 && !isBigDecimal(rowData.get(j).toString())) {
+//                    if (j < 7 && (rowData.get(j).toString() == null || rowData.get(j).toString().length() <= 0)) {
+//                        throw new Exception("第" + rowNun + "行：" + "请检查数据是否缺少");
+//                    }
+                    if (rowData.get(j)!=null&&rowData.get(j).toString()!=null&&rowData.get(j).toString().trim().length()>0&&j > 2 && j < 7 && !isBigDecimal(rowData.get(j).toString())) {
                         throw new Exception("第" + rowNun + "行：" + "数值格式错误（比如不是数字）");
                     }
                 }
@@ -455,6 +514,8 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     }
 
     public static void main(String[] args) throws ParseException {
+        String str="1.1.1";
+        //checkHasSpecialStr(str);
         String date = "2019-05-00";
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-00");
         Date parse = formatter.parse(date);
@@ -477,6 +538,13 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         }
         System.out.println(ucOrgs.toString());
         System.out.println(ucOrgs.get(0));
+    }
+
+    private boolean  checkHasSpecialStr(String str) {
+        String regEx="[`~!@#$%^&*()+=|{}':;',\\[\\]<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+        Pattern p=Pattern.compile(regEx);
+        Matcher m=p.matcher(str);
+        return m.find();
     }
 
     private boolean isBigDecimal(String integer) {
