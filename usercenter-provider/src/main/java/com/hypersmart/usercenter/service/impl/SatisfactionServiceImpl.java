@@ -88,13 +88,13 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
             //基础校验 看看有没有相等的序列；
             //1取所有序列
-            String[] id = new String[tempResourceImportList.size()-2];
+            String[] id = new String[tempResourceImportList.size() - 2];
             for (int i = 2; i < tempResourceImportList.size(); i++) {
                 List<Object> objects = tempResourceImportList.get(i);
-                if(objects.get(0)==null||objects.get(0).toString().length()<=0){
-                    throw new Exception("第"+(i+1)+"行序列为空");
-                }else{
-                    id[i-2]=objects.get(0).toString();
+                if (objects.get(0) == null || objects.get(0).toString().length() <= 0) {
+                    throw new Exception("第" + (i + 1) + "行序列为空");
+                } else {
+                    id[i - 2] = objects.get(0).toString();
                 }
             }
 
@@ -119,6 +119,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
     /**
      * 校验是否含有重复序列;
+     *
      * @param b
      */
     public void checkHasEqualId(String b[]) throws Exception {
@@ -414,6 +415,24 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             if (ucOrg.getGrade().equals("ORG_DiKuai")) {
                 List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getGridsBySmcloudmassifId(ucOrg.getId());
                 satisfactions = satisfactionMapper.getGridSatisfaction(gridBasicInfoList, time);
+            } else if (ucOrg.getGrade().equals("ORG_QuYu")) {
+                QueryFilter queryFilter = QueryFilter.build();
+                queryFilter.addFilter("PARENT_ID_", list.get(0).getId(), QueryOP.EQUAL, FieldRelation.AND);
+                queryFilter.addFilter("IS_DELE_", "0", QueryOP.EQUAL, FieldRelation.AND);
+                List<UcOrg> chengQuList = ucOrgService.query(queryFilter).getRows();
+                if (chengQuList != null && chengQuList.size() > 0) {
+                    List<String> chengQuIdList = new ArrayList<>();
+                    for (UcOrg chengQu : chengQuList) {
+                        chengQuIdList.add(chengQu.getId());
+                    }
+                    QueryFilter filter = QueryFilter.build();
+                    filter.addFilter("IS_DELE_", "0", QueryOP.EQUAL, FieldRelation.AND);
+                    filter.addFilter("PARENT_ID_", chengQuIdList, QueryOP.IN, FieldRelation.AND);
+                    List<UcOrg> projectList = ucOrgService.query(filter).getRows();
+                    if (projectList != null && projectList.size() > 0) {
+                        satisfactions = satisfactionMapper.getSatisfactionDetail(projectList, time);
+                    }
+                }
             } else {
                 QueryFilter queryFilter = QueryFilter.build();
                 queryFilter.addFilter("PARENT_ID_", list.get(0).getId(), QueryOP.EQUAL, FieldRelation.AND);
