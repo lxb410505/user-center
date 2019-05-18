@@ -342,6 +342,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             ucOrg.setName(parentRow.get(2).toString());
             //ucOrg.setLevel(4);
             ucOrg.setGrade("ORG_DiKuai");
+            ucOrg.setIsDele("0");
             List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
             if (ucOrgs.size() <= 0) {
                 throw new Exception("第" + rowNun + "行：" + rowData.get(2).toString() + "该网格对应得上级组织错误或缺失，请检查格式");
