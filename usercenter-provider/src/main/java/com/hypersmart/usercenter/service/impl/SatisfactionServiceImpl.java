@@ -151,6 +151,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
     /**
      * 校验是否含有重复序列;
+     *
      * @param b
      */
     public void checkHasEqualId(String b[]) throws Exception {
@@ -473,6 +474,24 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             if (ucOrg.getGrade().equals("ORG_DiKuai")) {
                 List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getGridsBySmcloudmassifId(ucOrg.getId());
                 satisfactions = satisfactionMapper.getGridSatisfaction(gridBasicInfoList, time);
+            } else if (ucOrg.getGrade().equals("ORG_QuYu")) {
+                QueryFilter queryFilter = QueryFilter.build();
+                queryFilter.addFilter("PARENT_ID_", list.get(0).getId(), QueryOP.EQUAL, FieldRelation.AND);
+                queryFilter.addFilter("IS_DELE_", "0", QueryOP.EQUAL, FieldRelation.AND);
+                List<UcOrg> chengQuList = ucOrgService.query(queryFilter).getRows();
+                if (chengQuList != null && chengQuList.size() > 0) {
+                    List<String> chengQuIdList = new ArrayList<>();
+                    for (UcOrg chengQu : chengQuList) {
+                        chengQuIdList.add(chengQu.getId());
+                    }
+                    QueryFilter filter = QueryFilter.build();
+                    filter.addFilter("IS_DELE_", "0", QueryOP.EQUAL, FieldRelation.AND);
+                    filter.addFilter("PARENT_ID_", chengQuIdList, QueryOP.IN, FieldRelation.AND);
+                    List<UcOrg> projectList = ucOrgService.query(filter).getRows();
+                    if (projectList != null && projectList.size() > 0) {
+                        satisfactions = satisfactionMapper.getSatisfactionDetail(projectList, time);
+                    }
+                }
             } else {
                 QueryFilter queryFilter = QueryFilter.build();
                 queryFilter.addFilter("PARENT_ID_", list.get(0).getId(), QueryOP.EQUAL, FieldRelation.AND);
@@ -514,8 +533,6 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     }
 
     public static void main(String[] args) throws ParseException {
-        String str="1.1.1";
-        //checkHasSpecialStr(str);
         String date = "2019-05-00";
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-00");
         Date parse = formatter.parse(date);
