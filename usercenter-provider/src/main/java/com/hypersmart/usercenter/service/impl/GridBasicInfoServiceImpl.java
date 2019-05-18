@@ -511,7 +511,9 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
         List<GridBasicInfo> gridBasicInfos = this.getGridsBySmcloudmassifId(massifId);
         for(int i=0;i<gridBasicInfos.size();i++){
         	List<RangeDTO> listObjectFir = (List<RangeDTO>) JSONArray.parse(gridBasicInfos.get(i).getGridRange());
-			returnList.addAll(listObjectFir);
+        	if(!CollectionUtils.isEmpty(listObjectFir)) {
+                returnList.addAll(listObjectFir);
+            }
 		}
 		/*gridBasicInfos.forEach(grid -> {
 			List<Map<String,Object>> listObjectFir = (List<Map<String,Object>>) JSONArray.parse(grid.getGridRange());
