@@ -98,31 +98,8 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                 }else{
                     //对小数点问题进行处理；
                     if(objects.get(0).toString().length()>=4){
-                        String substring = objects.get(0).toString().substring(objects.get(0).toString().length() - 3);
-                        String[] split = objects.get(0).toString().split("\\.");
-                        if(substring.equals(".10")&&split.length==2){
-                            List<Object> o2=tempResourceImportList.get(i-1);
-                            if(o2!=null&&o2.get(0)!=null&&o2.get(0).toString().length()>0){
-//                            if(o2.get(0).toString().substring(o2.get(0).toString().length()-3).equals("\\.1")){
-//
-//                            }
-                                String[] split1 = o2.get(0).toString().split("\\.");
-                                if(split1.length==1){
-                                    //替换值
-                                    id[i-2]=objects.get(0).toString().substring(0,objects.get(0).toString().lastIndexOf("0"));
-                                    List<Object> objects1=objects;
-                                    objects1.remove(0);
-                                    objects1.add(0,id[i-2]);
-                                    tempResourceImportList.remove(i);
-                                    tempResourceImportList.add(i,objects1);
-
-                                }
-                            }
-                        }
+                        fixId(tempResourceImportList, id, i, objects);
                     }
-
-
-
 
                 }
                 if(id[i-2]==null){
@@ -147,6 +124,28 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             return new CommonResult(false, e.getMessage());
         }
         return new CommonResult(true, "成功导入");
+    }
+
+    private void fixId(List<List<Object>> tempResourceImportList, String[] id, int i, List<Object> objects) {
+        String substring = objects.get(0).toString().substring(objects.get(0).toString().length() - 3);
+        String[] split = objects.get(0).toString().split("\\.");
+        if(substring.equals(".10")&&split.length==2){
+            List<Object> o2=tempResourceImportList.get(i-1);
+
+            if(o2!=null&&o2.get(0)!=null&&o2.get(0).toString().length()>0){
+                String[] split1 = o2.get(0).toString().split("\\.");
+                if(split1.length==1){
+                    //替换值
+                    id[i-2]=objects.get(0).toString().substring(0,objects.get(0).toString().lastIndexOf("0"));
+                    List<Object> objects1=objects;
+                    objects1.remove(0);
+                    objects1.add(0,id[i-2]);
+                    tempResourceImportList.remove(i);
+                    tempResourceImportList.add(i,objects1);
+
+                }
+            }
+        }
     }
 
     /**
@@ -341,7 +340,8 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             //网格组织校验
             //todo
             ucOrg.setName(parentRow.get(2).toString());
-            ucOrg.setLevel(4);
+            //ucOrg.setLevel(4);
+            ucOrg.setGrade("ORG_DiKuai");
             List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
             if (ucOrgs.size() <= 0) {
                 throw new Exception("第" + rowNun + "行：" + rowData.get(2).toString() + "该网格对应得上级组织错误或缺失，请检查格式");
@@ -361,13 +361,16 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             hasOrg = true;
         } else {
             if (type == 1) {
-                ucOrg.setLevel(1);
+               // ucOrg.setLevel(1);
+                ucOrg.setGrade("ORG_QuYu");
             }
             if (type == 2) {
-                ucOrg.setLevel(3);
+                //ucOrg.setLevel(3);
+                ucOrg.setGrade("ORG_XiangMu");
             }
             if (type == 3) {
-                ucOrg.setLevel(4);
+                //ucOrg.setLevel(4);
+                ucOrg.setGrade("ORG_DiKuai");
             }
             ucOrg.setIsDele("0");
             List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
