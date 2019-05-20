@@ -126,7 +126,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 
 			// 网格停用
 			if (approvalType.equals(GridOperateEnum.DISABLE_GRID.getOperateType())) {
-				flowContent = constructingFlowContentForNewGrid("NEW_GRID",GridOperateEnum.DISABLE_GRID.getDescription(), approvalContent, gridTypes, formatAttributeTypes);
+				flowContent = constructingFlowContentForNewGrid("DISABLE_GRID",GridOperateEnum.DISABLE_GRID.getDescription(), approvalContent, gridTypes, formatAttributeTypes);
 			}
 
 			// 解除网格管家关联
@@ -630,8 +630,8 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	private void getProposer(Map body,GridBasicInfoDTO proposer) {
 		// TODO 需要传入更多信息（区域id、城区id、项目id、地块id、申请人页面选择信息）
 		body.put("JURISDICTION", "0");
-		body.put("ID", "wy_xiaoxiong_zhang");
-		body.put("NAME", "张晓雄");
+//		body.put("ID", "wy_xiaoxiong_zhang");
+//		body.put("NAME", "张晓雄");
 		body.put("ID", proposer.getAccount());
 		body.put("NAME", ContextUtil.getCurrentUser().getFullname());
 		body.put("DATE", new Date());
