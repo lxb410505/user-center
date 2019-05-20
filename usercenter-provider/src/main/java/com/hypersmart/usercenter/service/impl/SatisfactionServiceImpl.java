@@ -20,6 +20,7 @@ import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.util.ImportExcelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -510,18 +511,17 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     }
 
     @Override
-    public Satisfaction getSingleSatisfaction(String orgId, String time) {
-        UcOrg ucOrg = ucOrgService.get(orgId);
-        Satisfaction satisfaction = new Satisfaction();
-        if (ucOrg != null) {
-            List<Satisfaction> list = satisfactionMapper.getSingleSatisfaction(ucOrg.getCode(), time);
-            if (list != null && list.size() > 0) {
-                satisfaction = list.get(0);
+    public Satisfaction getSingleSatisfaction(String orgIds, String time) {
+        List<UcOrg> ucOrg = ucOrgService.getByIds(orgIds.split(","));
+        List<String> orgCodes = ucOrg.stream().map(UcOrg::getCode).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(ucOrg)) {
+            List<Satisfaction> list = satisfactionMapper.getSatisfactionAvg(orgCodes, time);
+            if(!CollectionUtils.isEmpty(list)){
+                return list.get(0);
             }
         }
-        return satisfaction;
+        return null;
     }
-
 
     @Override
     public List<Satisfaction> getAllSatisfaction(String time) {
