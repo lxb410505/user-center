@@ -136,7 +136,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			record.setCallFlowContent(flowContent);
 
 			// TODO 调用K2流程
-			/*HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
+			HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
 			String resultContent = httpClientUtils.httpPost(flowUrl, flowContent, null);
 			JsonNode resultNode = JsonUtil.toJsonNode(resultContent);
 			if (null != resultNode) {
@@ -169,16 +169,16 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			} else {
 				record.setCallStatus(2);
 				record.setCallErrorMessage("调用K2审批流程失败：未能收到K2任何反馈信息");
-			}*/
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			record.setCallStatus(2);
 			record.setCallErrorMessage(e.getMessage());
 		} finally {
-//			gridApprovalRecordMapper.insert(record);
+			gridApprovalRecordMapper.insert(record);
 
 			// TODO 待调整（删除此段代码，使用上面代码）
-			record.setCallStatus(1);
+/*			record.setCallStatus(1);
 			String procInstId = UUID.randomUUID().toString();
 			record.setProcInstId(procInstId);
 			gridApprovalRecordMapper.insert(record);
@@ -187,7 +187,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			k2Result.setMessage("审批通过");
 			k2Result.setProcInstId(procInstId);
 			k2Result.setResultCode("1");
-			processFlowResult(k2Result);
+			processFlowResult(k2Result);*/
 		}
 	}
 
