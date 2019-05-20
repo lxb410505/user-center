@@ -135,7 +135,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 							map1.put((String) o.get("name"),null);
 						}
 					}
-					map.put("gridRange", new ArrayList<>(set));
+					map.put("gridRange", JSONArray.toJSONString(new ArrayList<>(set)));
 				}
 			}
 		}
