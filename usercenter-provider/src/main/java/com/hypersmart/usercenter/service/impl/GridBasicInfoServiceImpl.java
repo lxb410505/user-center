@@ -24,6 +24,7 @@ import com.hypersmart.usercenter.mapper.UcOrgParamsMapper;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
 import com.hypersmart.usercenter.mapper.UcUserMapper;
 import com.hypersmart.usercenter.model.GridBasicInfo;
+import com.hypersmart.usercenter.model.GridRange;
 import com.hypersmart.usercenter.model.UcOrgParams;
 import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.usercenter.service.*;
@@ -122,6 +123,21 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		List<Map<String, Object>> query = new ArrayList<>();
 		if (type == 0) {
 			query = this.gridBasicInfoMapper.quertList(queryFilter.getParams());
+			for (Map<String, Object> map : query) {
+				List<JSONObject>  listObjectFir=  JSONArray.parseArray((String) map.get("gridRange"),JSONObject.class);
+				Set<Object> set = new HashSet<>();
+ 				Map<String,Object> map1 = new HashMap<>();
+
+				if(!CollectionUtils.isEmpty(listObjectFir)) {
+					for (JSONObject o : listObjectFir) {
+						if (3 != Integer.valueOf((Integer) o.get("level")) &&!map1.containsKey(o.get("name"))) {
+							set.add(o);
+							map1.put((String) o.get("name"),null);
+						}
+					}
+					map.put("gridRange", new ArrayList<>(set));
+				}
+			}
 		}
 		if (type == 1) {
 			query = this.gridBasicInfoMapper.queryAssociateList(queryFilter.getParams());
