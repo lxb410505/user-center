@@ -8,6 +8,7 @@ import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
+import com.hypersmart.usercenter.bo.SatisfactionBo;
 import com.hypersmart.usercenter.model.Satisfaction;
 import com.hypersmart.usercenter.service.SatisfactionService;
 import com.hypersmart.base.query.*;
@@ -195,14 +196,25 @@ public class SatisfactionController extends BaseController {
         return this.satisfactionService.getSatisfactionDetail(orgCode, time);
     }
 
-    @GetMapping({"/appSatisfaction"})
-    @ApiOperation(value = "单组织单月满意度", httpMethod = "GET", notes = "单组织单月满意度")
-    public Satisfaction appSatisfaction(@ApiParam(name = "orgIds", value = "组织id") @RequestParam String orgIds,
-                                                 @ApiParam(name = "time", value = "时间") @RequestParam String time) {
-        if(StringUtil.isEmpty(orgIds) || StringUtil.isEmpty(time)){
-            return null;
+    @PostMapping({"/appSatisfaction"})
+    @ApiOperation(value = "单组织单月满意度", httpMethod = "POST", notes = "单组织单月满意度")
+    public CommonResult<Satisfaction> appSatisfaction(@ApiParam(name = "orgIds", value = "组织id") @RequestBody SatisfactionBo bo) {
+        CommonResult<Satisfaction> result=new CommonResult<>();
+        result.setState(true);
+        if(CollectionUtils.isEmpty(bo.getOrgIds()) || StringUtil.isEmpty(bo.getTime())){
+            result.setState(false);
+            result.setMessage("参数有误");
+            return result;
         }
-        return this.satisfactionService.getSingleSatisfaction(orgIds, time);
+        Satisfaction singleSatisfaction = this.satisfactionService.getSingleSatisfaction(bo.getOrgIds(), bo.getTime());
+        if(singleSatisfaction==null){
+            result.setState(false);
+            result.setMessage("暂无数据");
+        }else{
+            result.setMessage("成功");
+            result.setValue(singleSatisfaction);
+        }
+        return result;
     }
 
     @GetMapping({"/allSatisfaction"})

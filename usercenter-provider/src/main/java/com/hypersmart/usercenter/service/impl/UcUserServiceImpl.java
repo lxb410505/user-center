@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.exception.RequiredException;
+import com.hypersmart.base.feign.PortalFeignService;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.JsonUtil;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.hypersmart.base.feign.UCFeignService;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -67,6 +69,8 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
     private UcRoleMapper ucRoleMapper;
     @Resource
     private UcUserRoleMapper ucUserRoleMapper;
+    @Resource
+    private PortalFeignService portalFeignService;
     /*@Resource
     private UcOrgPostSwjMapper ucOrgPostSwjMapper;
     @Resource
@@ -285,12 +289,11 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
         List<ImportUserData> importUserDataList = new ArrayList<>();
         Integer errorCount = 0;//错误数量
         //总部，或者根据地区code获取区域,改！！
-        /*UcOrg orgZb = ucOrgMapper.getByOrgName("总部").get(0);
-        if(BeanUtils.isEmpty(orgZb)){
-            message.append("上级组织/总部不存在");
-            stat=true;
-        }*/
         if (stat != true) {
+            UcOrg orgZb = ucOrgMapper.getByOrgName("世茂天成物业集团","0").get(0);
+            if(BeanUtils.isEmpty(orgZb)){
+                message.append("世茂天成物业集团组织为查询到");
+            }
             for (int i = 1; i < listob.size(); i++) {
                 long beforeLength = message.length();//用于判断本条信息是否有误
                 List<Object> lo = listob.get(i);//获取行内内容
@@ -305,7 +308,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                         lo.add(0, String.valueOf(listob.get(i - 1).get(0)));
                     }
                     String firstOrgName = String.valueOf(lo.get(0));
-                    List<UcOrg> list = ucOrgMapper.getByOrgName(firstOrgName);
+                    List<UcOrg> list = ucOrgMapper.getByOrgName(firstOrgName,orgZb.getId());
                     if (BeanUtils.isEmpty(list)) {
                         message.append("第").append(i + 1).append("行，一级单位查询失败；");
                     } else {
@@ -313,7 +316,6 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                         importUserData.setFirstUnit(firstOrg);
                     }
                 }
-
                 //处理二级单位
                 if ((lo.get(1) == null || "".equals(lo.get(1))) && i == 1) {
                     message.append("第").append(i + 1).append("行，二级单位不能为空，必须填写完整名称或者“/”；");
@@ -385,7 +387,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                     }
                 }
                 //备注是否含有人员
-                if (lo.get(10).equals("暂时无人")) {
+                if (lo.get(10).equals("暂时无人") || lo.get(10).equals("K2账号信息错误") || lo.get(10).equals("K2账号与人员姓名不匹配")) {
                     importUserData.setExistUser(false);
                 } else {
                     importUserData.setExistUser(true);
@@ -465,9 +467,30 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                         orgPost.setOrgId(org.getId());
                         orgPost.setPosName(userData.getPosName());
                         orgPost.setPostKey(userData.getPostKey());
-                        String code = toPinYin(org.getName()) + "-" + toPinYin(userData.getOrgJob().getName()) + "-" + toPinYin(userData.getPosName());
+                        //岗位编码流水号
+                        String request = portalFeignService.getNextIdByAlias("gwbm");//CDJY{yyyy}{NO}
+                        String newContractCode="";
+                        if (!StringUtil.isEmpty(request)) {
+                            try {
+                                Map<String, Object> mapRep = JsonUtil.toMap(request);
+                                Object state = mapRep.get("state");
+                                if (state.equals(true)) {
+                                    newContractCode=mapRep.get("value").toString();
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        String code = newContractCode;
+                        if (StringUtil.isEmpty(code)){
+                            ResourceErrorCode resourceErrorCode2 = ResourceErrorCode.IMPORT_EXCEPTION;
+                            String emptyCodeMsg = "岗位编码流水号生成失败";
+                            resourceErrorCode2.setMessage(emptyCodeMsg);
+                            return resourceErrorCode2;
+                        }
+                        /*String code = toPinYin(org.getName()) + toPinYin(userData.getOrgJob().getName()) + toPinYin(userData.getPosName());
                         Integer num = ucOrgPostMapper.getPostCodeLookLikeCount(code);
-                        code = num>0?code+num:code;
+                        code = num>0?code+num:code;*/
                         orgPost.setCode(code);
                         //编码orgPost.setCode(**);是否为主岗位orgPost.setIsCharge(**);更新时间;是否删除;版本号
                         orgPost.setIsCharge(Integer.valueOf(0));
@@ -505,6 +528,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                                 }
                             }else {
                                 o.setPosId(orgPost.getId());
+                                falg = true;
                                 break;
                             }
                         }

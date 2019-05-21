@@ -42,7 +42,7 @@ public interface UcOrgMapper extends GenericMapper<UcOrg> {
 
     List<UcOrg> getChildrenOrgByCondition(@Param("path")String path, @Param("ids")Set<String> ids, @Param("grade")String grade);
 
-    List<UcOrg> getByOrgName(@Param("orgName") String orgName);
+    List<UcOrg> getByOrgName(@Param("orgName") String orgName ,@Param("parentId") String parentId);
 
     UcOrg getByOrgNameParentId(@Param("orgName") String orgName,@Param("parentId") String parentId);
 }
