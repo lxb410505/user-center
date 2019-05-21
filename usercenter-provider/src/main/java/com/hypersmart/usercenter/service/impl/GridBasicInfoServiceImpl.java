@@ -94,7 +94,18 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		 *    支持排序的字段：区域、项目、地块、分期、管家名称、管家手机号、岗位等级
 		 */
 		// 地块id从前台传入，无须在后台过滤数据权限
-		Object orgId = ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
+		boolean flag = false;
+		Object orgId=null;
+		for (QueryField query : queryFilter.getQuerys()) {
+			if("divideId".equals(query.getParamName()) && null!=query.getValue()){
+				flag=true;
+				break;
+			}
+		}
+		if(!flag){
+			orgId= ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
+		}
+
 		if (orgId != null) {
 			queryFilter.getParams().put("massifId", orgId.toString());
 		} else {
