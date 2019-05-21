@@ -1,6 +1,7 @@
 package com.hypersmart.usercenter.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
+import com.hypersmart.base.util.UniqueIdUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.usercenter.bo.GridRangeBO;
 import com.hypersmart.usercenter.dto.GridRangeInfo;
@@ -54,7 +55,7 @@ public class GridRangeServiceImpl extends GenericService<String, GridRange> impl
         if(!CollectionUtils.isEmpty(gridRangeInfoList)) {
             for(GridRangeInfo gridRangeInfo : gridRangeInfoList) {
                 GridRange gridRange = new GridRange();
-                gridRange.setId(UUID.randomUUID().toString());
+                gridRange.setId(UniqueIdUtil.getSuid());
                 gridRange.setGridId(gridId);
                 gridRange.setRangeType(gridRangeInfo.getLevel().toString());
                 gridRange.setResourceId(gridRangeInfo.getId());

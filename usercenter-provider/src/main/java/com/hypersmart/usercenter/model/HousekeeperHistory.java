@@ -28,7 +28,7 @@ public class HousekeeperHistory implements Serializable{
 private static final long serialVersionUID=1L;
 
         @Id
-        @KeySql(genId = com.hypersmart.base.id.genId.UUIdGenId.class)
+        @KeySql(genId = com.hypersmart.base.id.genId.Suid.class)
                 @Column(name = "id")
     @ApiModelProperty("用户主键")
         private String id;

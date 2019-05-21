@@ -8,6 +8,7 @@ import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.ContextUtils;
 import com.hypersmart.base.util.StringUtil;
+import com.hypersmart.base.util.UniqueIdUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.bo.GridBasicInfoBO;
@@ -230,7 +231,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 				}
 			}
 			GridBasicInfo gridBasicInfo = new GridBasicInfo();
-			gridBasicInfo.setId(UUID.randomUUID().toString());
+			gridBasicInfo.setId(UniqueIdUtil.getSuid());
 			gridBasicInfo.setAreaId(gridBasicInfoDTO.getAreaId());
 			gridBasicInfo.setCityId(gridBasicInfoDTO.getCityId());
 			gridBasicInfo.setProjectId(gridBasicInfoDTO.getProjectId());

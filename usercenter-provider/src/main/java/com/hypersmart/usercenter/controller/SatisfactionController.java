@@ -198,11 +198,23 @@ public class SatisfactionController extends BaseController {
 
     @PostMapping({"/appSatisfaction"})
     @ApiOperation(value = "单组织单月满意度", httpMethod = "POST", notes = "单组织单月满意度")
-    public Satisfaction appSatisfaction(@ApiParam(name = "orgIds", value = "组织id") @RequestBody SatisfactionBo bo) {
+    public CommonResult<Satisfaction> appSatisfaction(@ApiParam(name = "orgIds", value = "组织id") @RequestBody SatisfactionBo bo) {
+        CommonResult<Satisfaction> result=new CommonResult<>();
+        result.setState(true);
         if(CollectionUtils.isEmpty(bo.getOrgIds()) || StringUtil.isEmpty(bo.getTime())){
-            return null;
+            result.setState(false);
+            result.setMessage("参数有误");
+            return result;
         }
-        return this.satisfactionService.getSingleSatisfaction(bo.getOrgIds(), bo.getTime());
+        Satisfaction singleSatisfaction = this.satisfactionService.getSingleSatisfaction(bo.getOrgIds(), bo.getTime());
+        if(singleSatisfaction==null){
+            result.setState(false);
+            result.setMessage("暂无数据");
+        }else{
+            result.setMessage("成功");
+            result.setValue(singleSatisfaction);
+        }
+        return result;
     }
 
     @GetMapping({"/allSatisfaction"})
