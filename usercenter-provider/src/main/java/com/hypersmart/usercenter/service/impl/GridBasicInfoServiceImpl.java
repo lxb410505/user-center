@@ -37,6 +37,9 @@ import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -140,8 +143,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			query = this.gridBasicInfoMapper.quertList(queryFilter.getParams());
 			for (Map<String, Object> map : query) {
 				List<JSONObject>  listObjectFir=  JSONArray.parseArray((String) map.get("gridRange"),JSONObject.class);
-				Set<Object> set = new HashSet<>();
- 				Map<String,Object> map1 = new HashMap<>();
+				List<JSONObject> set = new ArrayList<>();
+ 				Map<String,Object> map1 = new HashMap<>(16);
 
 				if(!CollectionUtils.isEmpty(listObjectFir)) {
 					for (JSONObject o : listObjectFir) {
@@ -150,7 +153,10 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 							map1.put((String) o.get("name"),null);
 						}
 					}
-					map.put("gridRange", JSONArray.toJSONString(new ArrayList<>(set)));
+					// 对楼栋单元房产进行排序
+					Map<JSONObject, Integer> name = set.stream().collect(Collectors.toMap(o -> o, e -> sortListByNum((String) e.get("name"))));
+					List<Map.Entry<JSONObject, Integer>> collect = name.entrySet().stream().sorted(this::compare).collect(Collectors.toList());
+					map.put("gridRange", JSONArray.toJSONString(collect));
 				}
 			}
 		}
@@ -166,6 +172,10 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			return pageList;
 		}
 		return new PageList<>(query);
+	}
+
+	private int compare(Map.Entry<JSONObject, Integer> map1, Map.Entry<JSONObject, Integer> map2) {
+		return map1.getValue()-map2.getValue();
 	}
 
 	/**
@@ -634,4 +644,12 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 		return parentId;
 	}
 
+	Pattern compile = Pattern.compile("\\d+");
+	public int sortListByNum(String s){
+		Matcher matcher = compile.matcher(s);
+		if(matcher.find()){
+			return Integer.valueOf(matcher.group());
+		}
+		return 0;
+	}
 }
