@@ -8,6 +8,7 @@ import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
+import com.hypersmart.usercenter.bo.SatisfactionBo;
 import com.hypersmart.usercenter.model.Satisfaction;
 import com.hypersmart.usercenter.service.SatisfactionService;
 import com.hypersmart.base.query.*;
@@ -197,12 +198,11 @@ public class SatisfactionController extends BaseController {
 
     @PostMapping({"/appSatisfaction"})
     @ApiOperation(value = "单组织单月满意度", httpMethod = "POST", notes = "单组织单月满意度")
-    public Satisfaction appSatisfaction(@ApiParam(name = "orgIds", value = "组织id") @RequestParam String orgIds,
-                                                 @ApiParam(name = "time", value = "时间") @RequestParam String time) {
-        if(StringUtil.isEmpty(orgIds) || StringUtil.isEmpty(time)){
+    public Satisfaction appSatisfaction(@ApiParam(name = "orgIds", value = "组织id") @RequestBody SatisfactionBo bo) {
+        if(CollectionUtils.isEmpty(bo.getOrgIds()) || StringUtil.isEmpty(bo.getTime())){
             return null;
         }
-        return this.satisfactionService.getSingleSatisfaction(orgIds, time);
+        return this.satisfactionService.getSingleSatisfaction(bo.getOrgIds(), bo.getTime());
     }
 
     @GetMapping({"/allSatisfaction"})
