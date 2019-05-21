@@ -97,7 +97,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		boolean flag = false;
 		Object orgId=null;
 		for (QueryField query : queryFilter.getQuerys()) {
-			if("divideId".equals(query.getParamName()) && null!=query.getValue()){
+			if("massifId".equals(query.getParamName()) && null!=query.getValue()){
 				flag=true;
 				break;
 			}
