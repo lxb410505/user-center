@@ -1,6 +1,7 @@
 package com.hypersmart.usercenter.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hypersmart.base.id.genId.Suid;
 import com.hypersmart.base.id.genId.UUIdGenId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -25,7 +26,7 @@ public class GridApprovalRecord implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@KeySql(genId = UUIdGenId.class)
+	@KeySql(genId = Suid.class)
 	@Column(name = "id")
 	@ApiModelProperty("主键")
 	private String id;
