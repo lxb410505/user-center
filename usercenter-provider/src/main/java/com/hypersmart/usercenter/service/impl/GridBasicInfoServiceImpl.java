@@ -156,7 +156,18 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 					// 对楼栋单元房产进行排序
 					Map<JSONObject, Integer> name = set.stream().collect(Collectors.toMap(o -> o, e -> sortListByNum((String) e.get("name"))));
 					List<Map.Entry<JSONObject, Integer>> collect = name.entrySet().stream().sorted(this::compare).collect(Collectors.toList());
-					map.put("gridRange", JSONArray.toJSONString(collect));
+					List<JSONObject> objects = collect.stream().map(e -> e.getKey()).collect(Collectors.toList());
+					map.put("gridRange", JSONArray.toJSONString(objects));
+				}
+			}
+			Map<String,Object> checkMap = new HashMap<>();
+			Iterator<Map<String, Object>> mapIterator = query.iterator();
+			while (mapIterator.hasNext()){
+				Map<String, Object> next = mapIterator.next();
+				if(!checkMap.containsKey(next.get("gridName"))) {
+					checkMap.put((String) next.get("gridName"), null);
+				}else{
+					mapIterator.remove();
 				}
 			}
 		}
