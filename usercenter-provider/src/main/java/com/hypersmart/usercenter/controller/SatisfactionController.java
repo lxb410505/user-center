@@ -8,6 +8,7 @@ import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
+import com.hypersmart.usercenter.bo.SatisfactionBo;
 import com.hypersmart.usercenter.model.Satisfaction;
 import com.hypersmart.usercenter.service.SatisfactionService;
 import com.hypersmart.base.query.*;
@@ -18,6 +19,7 @@ import com.hypersmart.usercenter.service.UcOrgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -194,11 +196,13 @@ public class SatisfactionController extends BaseController {
         return this.satisfactionService.getSatisfactionDetail(orgCode, time);
     }
 
-    @GetMapping({"/appSatisfaction"})
-    @ApiOperation(value = "单组织单月满意度", httpMethod = "GET", notes = "单组织单月满意度")
-    public Satisfaction appSatisfaction(@ApiParam(name = "orgId", value = "组织id") @RequestParam String orgId,
-                                                 @ApiParam(name = "time", value = "时间") @RequestParam String time) {
-        return this.satisfactionService.getSingleSatisfaction(orgId, time);
+    @PostMapping({"/appSatisfaction"})
+    @ApiOperation(value = "单组织单月满意度", httpMethod = "POST", notes = "单组织单月满意度")
+    public Satisfaction appSatisfaction(@ApiParam(name = "orgIds", value = "组织id") @RequestBody SatisfactionBo bo) {
+        if(CollectionUtils.isEmpty(bo.getOrgIds()) || StringUtil.isEmpty(bo.getTime())){
+            return null;
+        }
+        return this.satisfactionService.getSingleSatisfaction(bo.getOrgIds(), bo.getTime());
     }
 
     @GetMapping({"/allSatisfaction"})

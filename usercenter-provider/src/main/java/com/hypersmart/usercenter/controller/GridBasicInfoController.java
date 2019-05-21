@@ -301,8 +301,8 @@ public class GridBasicInfoController extends BaseController {
 		Map<String,Object> checkMap = new HashMap<>(16);
 		List<Map<String, Object>> maps = new ArrayList<>();
 		for (Map<String, Object> map : houseByCondition) {
-		    if(!checkMap.containsKey(map.get("id"))){
-                checkMap.put((String) map.get("id"),map);
+		    if(!checkMap.containsKey(map.get("name"))){
+                checkMap.put((String) map.get("name"),map);
                 maps.add(map);
             }
 		}

@@ -22,7 +22,7 @@ public interface SatisfactionService extends IGenericService<String, Satisfactio
     CommonResult CheckHasExist(String date);
     List<Satisfaction> getSatisfactionListByParam(JSONObject json);
     List<Satisfaction> getSatisfactionDetail(String orgCode,String time);
-    Satisfaction getSingleSatisfaction(String orgId, String time);
+    Satisfaction getSingleSatisfaction(List<String> orgIds, String time);
     List<Satisfaction> getAllSatisfaction(String time);
 }
 

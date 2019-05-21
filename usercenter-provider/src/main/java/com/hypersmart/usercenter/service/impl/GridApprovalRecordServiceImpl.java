@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.util.JsonUtil;
-import com.hypersmart.base.util.UniqueIdUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
@@ -89,7 +88,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	public void callApproval(String approvalType, String gridId, Object approvalContent) {
 		GridApprovalRecord record = new GridApprovalRecord();
 		try {
-			String recordId = UniqueIdUtil.getSuid();
+			String recordId = UUID.randomUUID().toString();
 			record.setGridId(gridId);
 			record.setId(recordId);
 			record.setApprovalType(approvalType);
@@ -127,7 +126,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 
 			// 网格停用
 			if (approvalType.equals(GridOperateEnum.DISABLE_GRID.getOperateType())) {
-				flowContent = constructingFlowContentForNewGrid("NEW_GRID",GridOperateEnum.DISABLE_GRID.getDescription(), approvalContent, gridTypes, formatAttributeTypes);
+				flowContent = constructingFlowContentForNewGrid("DISABLE_GRID",GridOperateEnum.DISABLE_GRID.getDescription(), approvalContent, gridTypes, formatAttributeTypes);
 			}
 
 			// 解除网格管家关联
@@ -137,7 +136,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			record.setCallFlowContent(flowContent);
 
 			// TODO 调用K2流程
-			/*HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
+			HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
 			String resultContent = httpClientUtils.httpPost(flowUrl, flowContent, null);
 			JsonNode resultNode = JsonUtil.toJsonNode(resultContent);
 			if (null != resultNode) {
@@ -170,17 +169,17 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			} else {
 				record.setCallStatus(2);
 				record.setCallErrorMessage("调用K2审批流程失败：未能收到K2任何反馈信息");
-			}*/
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			record.setCallStatus(2);
 			record.setCallErrorMessage(e.getMessage());
 		} finally {
-//			gridApprovalRecordMapper.insert(record);
+			gridApprovalRecordMapper.insert(record);
 
 			// TODO 待调整（删除此段代码，使用上面代码）
-			record.setCallStatus(1);
-			String procInstId = UniqueIdUtil.getSuid();
+/*			record.setCallStatus(1);
+			String procInstId = UUID.randomUUID().toString();
 			record.setProcInstId(procInstId);
 			gridApprovalRecordMapper.insert(record);
 
@@ -188,7 +187,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			k2Result.setMessage("审批通过");
 			k2Result.setProcInstId(procInstId);
 			k2Result.setResultCode("1");
-			processFlowResult(k2Result);
+			processFlowResult(k2Result);*/
 		}
 	}
 
@@ -202,9 +201,6 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		boolean importState = true;
 		String message = "0";
 		GridApprovalRecord record = gridApprovalRecordMapper.getGridApprovalRecordByProcInstId(k2Result.getProcInstId());
-		if (null == record) {
-			return null;
-		}
 		try {
 			if ("1".equals(k2Result.getResultCode())) {
 				// 审批通过
@@ -634,10 +630,10 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	private void getProposer(Map body,GridBasicInfoDTO proposer) {
 		// TODO 需要传入更多信息（区域id、城区id、项目id、地块id、申请人页面选择信息）
 		body.put("JURISDICTION", "0");
-//		body.put("ID", proposer.getAccount());
-		body.put("ID", "wy_xiaoxiong_zhang");
-		body.put("NAME", "张晓雄");
-//		body.put("NAME", ContextUtil.getCurrentUser().getFullname());
+//		body.put("ID", "wy_xiaoxiong_zhang");
+//		body.put("NAME", "张晓雄");
+		body.put("ID", proposer.getAccount());
+		body.put("NAME", ContextUtil.getCurrentUser().getFullname());
 		body.put("DATE", new Date());
 		body.put("PLANS", proposer.getPostId());
 		body.put("ROLE", proposer.getPostName());
