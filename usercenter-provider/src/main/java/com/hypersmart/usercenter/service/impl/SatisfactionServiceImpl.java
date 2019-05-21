@@ -511,8 +511,8 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     }
 
     @Override
-    public Satisfaction getSingleSatisfaction(String orgIds, String time) {
-        List<UcOrg> ucOrg = ucOrgService.getByIds(orgIds.split(","));
+    public Satisfaction getSingleSatisfaction(List<String> orgIds, String time) {
+        List<UcOrg> ucOrg = ucOrgService.getByIds(orgIds.toArray(new String[orgIds.size()]));
         List<String> orgCodes = ucOrg.stream().map(UcOrg::getCode).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(ucOrg)) {
             List<Satisfaction> list = satisfactionMapper.getSatisfactionAvg(orgCodes, time);
