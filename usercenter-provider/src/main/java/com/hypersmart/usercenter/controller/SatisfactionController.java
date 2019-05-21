@@ -205,8 +205,8 @@ public class SatisfactionController extends BaseController {
         return this.satisfactionService.getSingleSatisfaction(orgIds, time);
     }
 
-    @GetMapping({"/allSatisfaction"})
-    @ApiOperation(value = "总部满意度", httpMethod = "GET", notes = "总部满意度")
+    @PostMapping({"/allSatisfaction"})
+    @ApiOperation(value = "总部满意度", httpMethod = "POST", notes = "总部满意度")
     public List<Satisfaction> allSatisfaction(@ApiParam(name = "time", value = "时间") @RequestParam String time) {
         return this.satisfactionService.getAllSatisfaction(time);
     }
