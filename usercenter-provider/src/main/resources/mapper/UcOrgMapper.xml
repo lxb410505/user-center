@@ -168,6 +168,9 @@
             <if test="orgName!=null and orgName!=''">
                 AND NAME_=#{orgName}
             </if>
+            <if test="parentId!=null and parentId!=''">
+                AND (PARENT_ID_='0' or PARENT_ID_=#{parentId})
+            </if>
         </where>
     </select>
 
