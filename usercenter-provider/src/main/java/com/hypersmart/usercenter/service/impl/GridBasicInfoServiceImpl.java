@@ -96,26 +96,30 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		// 地块id从前台传入，无须在后台过滤数据权限
 		boolean flag = false;
 		Object orgId=null;
-		for (QueryField query : queryFilter.getQuerys()) {
-			if("massifId".equals(query.getParamName()) && null!=query.getValue()){
+		Iterator<QueryField> iterator = queryFilter.getQuerys().iterator();
+		while (iterator.hasNext() ) {
+			QueryField next = iterator.next();
+			if("massifId".equals(next.getProperty()) && null!= next.getValue()){
 				flag=true;
+				orgId= next.getValue();
+				iterator.remove();
 				break;
 			}
 		}
 		if(!flag){
 			orgId= ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
 		}
-
 		if (orgId != null) {
 			queryFilter.getParams().put("massifId", orgId.toString());
-		} else {
+		}
+		/*else {
 			PageList<Map<String, Object>> pageList = new PageList();
 			pageList.setTotal(0);
 			pageList.setPage(1);
 			pageList.setPageSize(10);
 			pageList.setRows(new ArrayList<>());
 			return pageList;
-		}
+		}*/
 
 		//根据创建时间倒叙排序
 		List<FieldSort> fieldSortList = queryFilter.getSorter();
@@ -152,6 +156,14 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		}
 		if (type == 1) {
 			query = this.gridBasicInfoMapper.queryAssociateList(queryFilter.getParams());
+		}
+		if(CollectionUtils.isEmpty(query)){
+			PageList<Map<String, Object>> pageList = new PageList();
+			pageList.setTotal(0);
+			pageList.setPage(1);
+			pageList.setPageSize(10);
+			pageList.setRows(new ArrayList<>());
+			return pageList;
 		}
 		return new PageList<>(query);
 	}
