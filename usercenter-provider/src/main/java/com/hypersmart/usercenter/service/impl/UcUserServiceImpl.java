@@ -387,7 +387,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                     }
                 }
                 //备注是否含有人员
-                if (lo.get(10).equals("暂时无人")) {
+                if (lo.get(10).equals("暂时无人") || lo.get(10).equals("K2账号信息错误") || lo.get(10).equals("K2账号与人员姓名不匹配")) {
                     importUserData.setExistUser(false);
                 } else {
                     importUserData.setExistUser(true);
