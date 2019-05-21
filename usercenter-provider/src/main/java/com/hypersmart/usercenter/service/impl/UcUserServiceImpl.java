@@ -528,6 +528,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                                 }
                             }else {
                                 o.setPosId(orgPost.getId());
+                                falg = true;
                                 break;
                             }
                         }
