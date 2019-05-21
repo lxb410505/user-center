@@ -7,6 +7,7 @@ import com.hypersmart.base.query.Direction;
 import com.hypersmart.base.query.FieldSort;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.util.UniqueIdUtil;
 import com.hypersmart.usercenter.model.UcUserWorkHistory;
 import com.hypersmart.usercenter.service.UcUserWorkHistoryService;
 import io.swagger.annotations.Api;
@@ -72,7 +73,7 @@ public class UcWorkHistoryController extends BaseController {
 		ucUserWorkHistory.setStatus(status);
 		ucUserWorkHistory.setAccount(account);
 		ucUserWorkHistory.setUserId(userId);
-		ucUserWorkHistory.setId(UUID.randomUUID().toString().replaceAll("-",""));
+		ucUserWorkHistory.setId(UniqueIdUtil.getSuid().replaceAll("-",""));
 		int i = ucUserWorkHistoryService.save(ucUserWorkHistory);
 		if (i>0) {
 			commonResult.setState(true);

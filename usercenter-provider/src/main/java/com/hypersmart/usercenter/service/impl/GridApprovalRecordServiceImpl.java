@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.util.JsonUtil;
+import com.hypersmart.base.util.UniqueIdUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
@@ -88,7 +89,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	public void callApproval(String approvalType, String gridId, Object approvalContent) {
 		GridApprovalRecord record = new GridApprovalRecord();
 		try {
-			String recordId = UUID.randomUUID().toString();
+			String recordId = UniqueIdUtil.getSuid();
 			record.setGridId(gridId);
 			record.setId(recordId);
 			record.setApprovalType(approvalType);
@@ -179,7 +180,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 
 			// TODO 待调整（删除此段代码，使用上面代码）
 			record.setCallStatus(1);
-			String procInstId = UUID.randomUUID().toString();
+			String procInstId = UniqueIdUtil.getSuid();
 			record.setProcInstId(procInstId);
 			gridApprovalRecordMapper.insert(record);
 

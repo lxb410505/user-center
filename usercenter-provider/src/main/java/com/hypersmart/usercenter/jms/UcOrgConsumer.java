@@ -3,6 +3,7 @@ package com.hypersmart.usercenter.jms;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.JsonUtil;
+import com.hypersmart.base.util.UniqueIdUtil;
 import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.usercenter.model.GridBasicInfo;
 import com.hypersmart.usercenter.model.UcOrg;
@@ -53,7 +54,7 @@ public class UcOrgConsumer {
                     String[] idArray = idPath.split("\\.");
                     GridBasicInfo gridBasicInfo = new GridBasicInfo();
                     GridBasicInfo gridBasicInfo1 = new GridBasicInfo();
-                    gridBasicInfo.setId(UUID.randomUUID().toString());
+                    gridBasicInfo.setId(UniqueIdUtil.getSuid());
                     gridBasicInfo.setGridCode("WGP001");
                     gridBasicInfo.setGridName("公区网格");
                     gridBasicInfo.setGridType("public_area_grid");
@@ -82,7 +83,7 @@ public class UcOrgConsumer {
                     gridBasicInfo.setEnabledFlag(1);
                     gridBasicInfo.setIsDeleted(0);
                     gridBasicInfoService.insert(gridBasicInfo);
-                    gridBasicInfo1.setId(UUID.randomUUID().toString());
+                    gridBasicInfo1.setId(UniqueIdUtil.getSuid());
                     gridBasicInfo1.setGridCode("WGS001");
                     gridBasicInfo1.setGridName("服务中心网格");
                     gridBasicInfo1.setGridType("service_center_grid");
