@@ -365,6 +365,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 				dto.setCityName(gridBasicInfoDTO.getCityName());
 				dto.setProjectName(gridBasicInfoDTO.getProjectName());
 				dto.setStagingName(gridBasicInfoDTO.getStagingName());
+				dto.setAccount(gridBasicInfoDTO.getAccount());
 				gridApprovalRecordService.callApproval(GridOperateEnum.DISABLE_GRID.getOperateType(), gridInfo.getId(), dto);
 			}
 		}

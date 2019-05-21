@@ -18,6 +18,7 @@ import com.hypersmart.usercenter.service.UcOrgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -196,13 +197,16 @@ public class SatisfactionController extends BaseController {
 
     @GetMapping({"/appSatisfaction"})
     @ApiOperation(value = "单组织单月满意度", httpMethod = "GET", notes = "单组织单月满意度")
-    public Satisfaction appSatisfaction(@ApiParam(name = "orgId", value = "组织id") @RequestParam String orgId,
+    public Satisfaction appSatisfaction(@ApiParam(name = "orgIds", value = "组织id") @RequestParam String orgIds,
                                                  @ApiParam(name = "time", value = "时间") @RequestParam String time) {
-        return this.satisfactionService.getSingleSatisfaction(orgId, time);
+        if(StringUtil.isEmpty(orgIds) || StringUtil.isEmpty(time)){
+            return null;
+        }
+        return this.satisfactionService.getSingleSatisfaction(orgIds, time);
     }
 
-    @GetMapping({"/allSatisfaction"})
-    @ApiOperation(value = "总部满意度", httpMethod = "GET", notes = "总部满意度")
+    @PostMapping({"/allSatisfaction"})
+    @ApiOperation(value = "总部满意度", httpMethod = "POST", notes = "总部满意度")
     public List<Satisfaction> allSatisfaction(@ApiParam(name = "time", value = "时间") @RequestParam String time) {
         return this.satisfactionService.getAllSatisfaction(time);
     }

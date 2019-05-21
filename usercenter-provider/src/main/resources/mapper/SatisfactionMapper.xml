@@ -29,6 +29,36 @@
         AND
         org_code = #{orgCode}
     </select>
+    <select id="getSatisfactionAvg" resultType="com.hypersmart.usercenter.model.Satisfaction">
+        select
+        t.id as id,
+        t.order_ as 'order',
+        t.type as type,
+        t.org_name as orgName,
+        t.org_code as orgCode,
+        ROUND(sum(t.overall_satisfaction)/count(t.overall_satisfaction),4) as overallSatisfaction,
+        ROUND(sum(t.storming)/count(t.storming),4) as storming,
+        ROUND(sum(t.stationary_phase)/count(t.stationary_phase),4) as stationaryPhase,
+        ROUND(sum(t.old_proprietor)/count(t.old_proprietor),4) as oldProprietor,
+        ROUND(sum(t.order_service_unit)/count(t.order_service_unit),4) as orderServiceUnit,
+        ROUND(sum(t.esu_cleaning)/count(t.esu_cleaning),4) as esuCleaning,
+        ROUND(sum(t.esu_green)/count(t.esu_green),4) as esuGreen,
+        ROUND(sum(t.engineering_service_unit)/count(t.engineering_service_unit),4) as engineeringServiceUnit,
+        t.create_time as createTime,
+        t.create_by as createBy,
+        t.update_by as updateBy,
+        t.update_time as updateTime,
+        t.remark as remark,
+        t.effective_time as effectiveTime
+        FROM t_satisfaction t
+        WHERE
+        DATE_FORMAT(effective_time, '%Y-%m') = #{time}
+        AND
+        org_code IN
+        <foreach collection="orgCodes" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
     <select id="getGridSatisfaction" resultType="com.hypersmart.usercenter.model.Satisfaction">
         select
         t.id as id,
