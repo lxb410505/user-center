@@ -260,4 +260,30 @@ public class ImportExcelUtil {
         }
         return true;
     }
+    /**
+     * 获取查询数量
+     *
+     * @param tempResourceImportList
+     * @return
+     */
+    public static  Integer getRealCount(List<List<Object>> tempResourceImportList) {
+        Integer hasRealCount = 1;
+        for (int x = 1; x < tempResourceImportList.size(); x++) {
+            List<Object> rowData = tempResourceImportList.get(x);
+            int length = rowData.size();
+            Boolean isEmptyRow = true;
+            for (int s = 0; s < length; s++) {
+                if (StringUtil.isNotEmpty(String.valueOf(rowData.get(s)))) {
+                    isEmptyRow = false;
+                }
+            }
+            if (isEmptyRow) {
+                //整行为空，忽略
+                continue;
+            }
+
+            hasRealCount++;
+        }
+        return hasRealCount;
+    }
 }
