@@ -175,10 +175,10 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			record.setCallStatus(2);
 			record.setCallErrorMessage(e.getMessage());
 		} finally {
-//			gridApprovalRecordMapper.insert(record);
+			gridApprovalRecordMapper.insert(record);
 
 			// TODO 待调整（删除此段代码，使用上面代码）
-			record.setCallStatus(1);
+/*			record.setCallStatus(1);
 			String procInstId = UUID.randomUUID().toString();
 			record.setProcInstId(procInstId);
 			gridApprovalRecordMapper.insert(record);
@@ -187,7 +187,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			k2Result.setMessage("审批通过");
 			k2Result.setProcInstId(procInstId);
 			k2Result.setResultCode("1");
-			processFlowResult(k2Result);
+			processFlowResult(k2Result);*/
 		}
 	}
 
