@@ -2,6 +2,7 @@ package com.hypersmart.usercenter.service;
 
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.usercenter.dto.GroupIdentityDTO;
 import com.hypersmart.usercenter.dto.UserDetailRb;
 import com.hypersmart.usercenter.dto.UserDetailValue;
 import com.hypersmart.usercenter.model.GroupIdentity;
@@ -60,5 +61,6 @@ public interface UcUserService extends IGenericService<String, UcUser> {
 
     Set<GroupIdentity> getByJobCodeAndOrgIdAndDimCodeDeeply(String jobCode, String orgId, String dimCode, String fullName) throws Exception;
 
+    Set<GroupIdentityDTO> getByJobCodeAndOrgIdAndDimCodeDeeplyWithPost(String jobCode, String orgId, String dimCode, String fullName);
 }
 
