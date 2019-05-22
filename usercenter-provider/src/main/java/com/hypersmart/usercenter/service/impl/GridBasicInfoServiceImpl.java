@@ -515,10 +515,12 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 		List<GridBasicInfoBO> gridBasicInfoBOList = gridBasicInfoDTO.getGridBasicInfoBOList();
 		List<String> IdList = gridBasicInfoBOList.stream().map(map -> map.getId()).collect(Collectors.toList());
 		String[] ids = (String[]) IdList.toArray(new String[IdList.size()]);
-		gridBasicInfoDTO.setIds(ids);
-
+		for (String id : ids) {
+			String[] arr = {id};
+			gridBasicInfoDTO.setIds(arr);
 		// 调用K2
-		gridApprovalRecordService.callApproval(GridOperateEnum.HOUSEKEEPER_DISASSOCIATED.getOperateType(), "", gridBasicInfoDTO);
+			gridApprovalRecordService.callApproval(GridOperateEnum.HOUSEKEEPER_DISASSOCIATED.getOperateType(), id, gridBasicInfoDTO);
+		}
 		return GridErrorCode.SUCCESS;
 	}
 
