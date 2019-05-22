@@ -430,4 +430,17 @@ public class UcOrgController extends BaseController {
     public PageList<UcOrg> getOrgList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
         return this.ucOrgService.query(queryFilter);
     }
+
+    /**
+     * 根据组织id获取上级组织grade
+     */
+    @GetMapping({"/getParentGrade/{orgId}"})
+    @ApiOperation(value = "获取上级组织grade}", httpMethod = "POST", notes = "获取上级组织grade")
+    public String getParentGrade(@ApiParam(name = "orgId", value = "组织id") @PathVariable String orgId) {
+        UcOrg ucOrg = ucOrgService.get(orgId);
+        if (ucOrg!=null){
+            return  ucOrg.getGrade();
+        }
+        return null;
+    }
 }
