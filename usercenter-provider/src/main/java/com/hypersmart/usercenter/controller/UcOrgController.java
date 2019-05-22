@@ -439,7 +439,11 @@ public class UcOrgController extends BaseController {
     public String getParentGrade(@ApiParam(name = "orgId", value = "组织id") @PathVariable String orgId) {
         UcOrg ucOrg = ucOrgService.get(orgId);
         if (ucOrg!=null){
-            return  ucOrg.getGrade();
+            String parentId = ucOrg.getParentId();
+            UcOrg parent = ucOrgService.get(parentId);
+            if (parent!=null){
+                return parent.getGrade();
+            }
         }
         return null;
     }
