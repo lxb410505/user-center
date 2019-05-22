@@ -41,4 +41,22 @@
             </if>
         </where>
     </select>
+
+    <select id="getPostNameByUserIds" resultType="com.hypersmart.usercenter.dto.UserPostDTO">
+        select
+        t.userId as userId,
+        uop.POS_NAME_ as postName
+        from
+        (select
+        uou.USER_ID_ as userId,
+        uou.POS_ID_ as postId
+        from uc_org_user uou
+        where
+        uou.USER_ID_ in
+        <foreach collection="userIds" index="index" item="userId" open="(" separator="," close=")">
+             #{userId}
+        </foreach>
+        ) as t left join uc_org_post uop
+        on t.postId = uop.ID_
+    </select>
 </mapper>
