@@ -136,7 +136,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			record.setCallFlowContent(flowContent);
 
 			// TODO 调用K2流程
-			HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
+			/*HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
 			String resultContent = httpClientUtils.httpPost(flowUrl, flowContent, null);
 			JsonNode resultNode = JsonUtil.toJsonNode(resultContent);
 			if (null != resultNode) {
@@ -169,7 +169,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			} else {
 				record.setCallStatus(2);
 				record.setCallErrorMessage("调用K2审批流程失败：未能收到K2任何反馈信息");
-			}
+			}*/
 		} catch (IOException e) {
 			e.printStackTrace();
 			record.setCallStatus(2);
@@ -267,7 +267,6 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 				}
 			} else {
 				// 审批不通过
-				record = new GridApprovalRecord();
 				record.setApprovalStatus(3);
 				record.setApprovalOpinion(k2Result.getMessage());
 				importState = false;

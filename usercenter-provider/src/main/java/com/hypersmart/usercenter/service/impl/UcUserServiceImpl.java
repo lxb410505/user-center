@@ -12,9 +12,7 @@ import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.base.util.UniqueIdUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.uc.api.impl.model.Org;
-import com.hypersmart.usercenter.dto.ImportUserData;
-import com.hypersmart.usercenter.dto.UserDetailRb;
-import com.hypersmart.usercenter.dto.UserDetailValue;
+import com.hypersmart.usercenter.dto.*;
 import com.hypersmart.usercenter.mapper.*;
 import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.UcDemensionService;
@@ -625,5 +623,63 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
             }
         });
         return groupIdentitySet;
+    }
+
+    @Override
+    public Set<GroupIdentityDTO> getByJobCodeAndOrgIdAndDimCodeDeeplyWithPost(String jobCode, String orgId, String dimCode, String fullName) {
+        List<ObjectNode> groupIdentities = ucFeignService.getByJobCodeAndOrgIdAndDimCodeDeeply(jobCode,orgId,dimCode,fullName);
+        Set<GroupIdentity> groupIdentitySet = new HashSet<>();
+        Set<String> userIdSet = new HashSet<>();
+        Set<GroupIdentityDTO> groupIdentityDTOSet = new HashSet<>();
+        groupIdentities.forEach(groupIdentity->{
+            try{
+                GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(),GroupIdentity.class);
+                GroupIdentityDTO groupIdentityDTO = new GroupIdentityDTO();
+                org.springframework.beans.BeanUtils.copyProperties(groupIdentity1, groupIdentityDTO);
+                groupIdentityDTOSet.add(groupIdentityDTO);
+                userIdSet.add(groupIdentity1.getId());
+                //根据上下班状态获取上班人员
+                String status = ucUserWorkHistoryService.queryLatest(groupIdentity1.getId());
+                if(com.hypersmart.framework.utils.StringUtils.isNotRealEmpty(status) && "0".equals(status)){
+                    groupIdentitySet.add(groupIdentity1);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+        if (userIdSet != null && userIdSet.size() > 0){
+            List<UserPostDTO> list = ucOrgPostMapper.getPostNameByUserIds(userIdSet);
+            Map<String,List<String>> map = new HashMap<>();
+            for (UserPostDTO userPostDTO : list){
+                if (map.get(userPostDTO.getUserId()) == null){
+                    List<String> postList = new ArrayList<>();
+                    postList.add(userPostDTO.getPostName());
+                    map.put(userPostDTO.getUserId(),postList);
+                }else{
+                    List<String> postList = map.get(userPostDTO.getUserId());
+                    postList.add(userPostDTO.getPostName());
+                    map.put(userPostDTO.getUserId(),postList);
+                }
+            }
+            for (GroupIdentityDTO groupIdentityDTO : groupIdentityDTOSet){
+                String postName = "";
+                List<String> strList = map.get(groupIdentityDTO.getId());
+                if (strList != null && strList.size() > 0){
+                    for (int i = 0,l = strList.size(); i < l; i++){
+                        if (strList.get(i) != null){
+                            if (i < (strList.size() - 1)){
+                                postName += (strList.get(i) + ",");
+                            }else {
+                                postName += strList.get(i);
+                            }
+
+                        }
+                    }
+                }
+                groupIdentityDTO.setPostName(postName);
+            }
+        }
+
+        return groupIdentityDTOSet;
     }
 }
