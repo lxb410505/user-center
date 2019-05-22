@@ -12,6 +12,7 @@ import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
+import com.hypersmart.usercenter.dto.GroupIdentityDTO;
 import com.hypersmart.usercenter.dto.UserDetailRb;
 import com.hypersmart.usercenter.dto.UserDetailValue;
 import com.hypersmart.usercenter.model.GradeDemCode;
@@ -209,6 +210,27 @@ public class UcUserController extends BaseController {
         }
         return ucUserService.getByJobCodeAndOrgIdAndDimCodeDeeply(jobCode, orgId, dimCode, fullName);
     }
+
+    @RequestMapping(value = {"/users/getByJobCodeAndOrgIdAndDimCodeDeeplyWithPost"}, method = {
+            org.springframework.web.bind.annotation.RequestMethod.GET}, produces = {
+            "application/json; charset=utf-8"})
+    @ApiOperation(value = "根据组织Id、条线编码和职务编码获取对应条线上的对应人员", httpMethod = "GET", notes = "根据组织Id、条线编码和职务编码获取对应条线上的对应人员")
+    public Set<GroupIdentityDTO> getByJobCodeAndOrgIdAndDimCodeDeeplyWithPost(
+            @ApiParam(name = "jobCode", value = "职务编码") @RequestParam(required = false) String jobCode,
+            @ApiParam(name = "orgId", value = "组织Id", required = true) @RequestParam(value = "orgId",required = false,defaultValue = "") String orgId,
+            @ApiParam(name = "dimCode", value = "维度编码") @RequestParam(required = false) String dimCode,
+            @ApiParam(name = "fullName", value = "姓名") @RequestParam(required = false) String fullName
+    )
+            throws Exception {
+        if (StringUtil.isEmpty(orgId)) {
+            if(null==  ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY)){
+                throw new RequiredException("职务编码、组织Id为空！");
+            }
+            orgId= (String)ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
+        }
+        return ucUserService.getByJobCodeAndOrgIdAndDimCodeDeeplyWithPost(jobCode, orgId, dimCode, fullName);
+    }
+
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增用户管理信息", httpMethod = "POST", notes = "保存用户管理")
 //    public CommonResult<String> post(@ApiParam(name = "ucUser", value = "用户管理业务对象", required = true) @RequestBody UcUser model) {
