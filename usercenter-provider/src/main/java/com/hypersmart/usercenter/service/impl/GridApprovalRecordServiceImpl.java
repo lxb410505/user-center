@@ -267,7 +267,6 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 				}
 			} else {
 				// 审批不通过
-				record = new GridApprovalRecord();
 				record.setApprovalStatus(3);
 				record.setApprovalOpinion(k2Result.getMessage());
 				importState = false;
