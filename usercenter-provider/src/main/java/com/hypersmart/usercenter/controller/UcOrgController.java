@@ -435,7 +435,7 @@ public class UcOrgController extends BaseController {
      * 根据组织id获取上级组织grade
      */
     @GetMapping({"/getParentGrade/{orgId}"})
-    @ApiOperation(value = "获取上级组织grade}", httpMethod = "POST", notes = "获取上级组织grade")
+    @ApiOperation(value = "获取上级组织grade}", httpMethod = "GET", notes = "获取上级组织grade")
     public String getParentGrade(@ApiParam(name = "orgId", value = "组织id") @PathVariable String orgId) {
         UcOrg ucOrg = ucOrgService.get(orgId);
         if (ucOrg!=null){
