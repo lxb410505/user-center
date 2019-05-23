@@ -3,6 +3,7 @@ package com.hypersmart.usercenter.controller;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
+import com.hypersmart.base.query.QueryField;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.usercenter.model.QualityCheck;
@@ -12,8 +13,11 @@ import io.swagger.annotations.ApiOperation;
 import com.hypersmart.framework.model.ResponseData;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -32,7 +36,15 @@ public class QualityCheckController extends BaseController {
     @PostMapping({"/list"})
     @ApiOperation(value = "数据列表}", httpMethod = "POST", notes = "获取列表")
     public PageList<QualityCheck> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
-        return this.qualityCheckService.query(queryFilter);
+       /* Map<String, Object> params = queryFilter.getParams();
+        Object effectiveTime = params.get("effective_time");
+        String effectiveTimeChange = effectiveTime.toString() + "-01";
+        params.put("effective_time",effectiveTimeChange);
+        queryFilter.setParams(params);
+        List<QueryField> querys = queryFilter.getQuerys();*/
+
+        PageList<QualityCheck> query = this.qualityCheckService.query(queryFilter);
+        return query;
     }
 
     @GetMapping({"/get/{id}"})
@@ -80,5 +92,29 @@ public class QualityCheckController extends BaseController {
         String[] aryIds = ids.split(",");
         this.qualityCheckService.delete(aryIds);
         return new CommonResult(true, "批量删除成功");
+    }
+
+    /**
+     * 查询当月是否已有数据；
+     *
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/check/data/{date}", method = RequestMethod.GET)
+    public CommonResult CheckHasExist(@PathVariable("date") String date) throws Exception {
+        return qualityCheckService.CheckHasExist(date);
+    }
+
+    /**
+     * 通过Excle导入科目余额设置
+     *
+     * @param file Excel文件
+     * @return
+     */
+    @RequestMapping(value = "/importData/{date}", method = RequestMethod.POST)
+    public CommonResult<String> importData(MultipartFile file, @PathVariable("date") String date) throws Exception {
+
+        CommonResult<String> result = this.qualityCheckService.importData(file, date);
+        return result;
     }
 }
