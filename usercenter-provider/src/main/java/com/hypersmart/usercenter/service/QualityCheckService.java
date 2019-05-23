@@ -15,5 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 public interface QualityCheckService extends IGenericService<String, QualityCheck> {
 
     public CommonResult<String> importData(MultipartFile file, String date) ;
+    CommonResult CheckHasExist(String date);
 }
 

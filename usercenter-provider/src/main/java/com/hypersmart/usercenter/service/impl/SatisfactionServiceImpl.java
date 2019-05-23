@@ -71,7 +71,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             String[] headArr = {"序列", "分类", "组织名称", "综合满意度", "磨合期", "稳定期",
                     "老业主", "秩序服务单元", "环境服务单元-保洁", "环境服务单元-绿化", "工程服务单元"};
             InputStream in = file.getInputStream();
-            List<List<Object>> tempResourceImportList = new ImportExcelUtil().getBankListByExcelFromTwo(in, file.getOriginalFilename());
+            List<List<Object>> tempResourceImportList = new ImportExcelUtil().getBankListByExcel4Statis(in, file.getOriginalFilename());
 
             Integer hasRealCount = getRealCount(tempResourceImportList);
 
@@ -100,6 +100,18 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                     //对小数点问题进行处理；
                     if(objects.get(0).toString().length()>=4){
                         fixId(tempResourceImportList, id, i, objects);
+                    }
+                    if(objects.get(0).toString()!=null&&objects.get(0).toString().split("\\.").length>1){
+                        //替换1.0这种数据为1
+                        String[] split = objects.get(0).toString().split("\\.");
+                        if(split.length>1&&split[split.length-1].equals("0")){
+                            String objects1=objects.get(0).toString();
+                            objects.remove(0);
+                            objects.add(0,objects1.substring(0,objects1.lastIndexOf(".")));
+                            tempResourceImportList.remove(i);
+                            tempResourceImportList.add(i,objects);
+                        }
+
                     }
 
                 }
@@ -135,7 +147,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
             if(o2!=null&&o2.get(0)!=null&&o2.get(0).toString().length()>0){
                 String[] split1 = o2.get(0).toString().split("\\.");
-                if(split1.length==1){
+                if(split1.length==1||(split1.length>1&&(split1[1].equals("00")|| split1[1].equals("0")))){
                     //替换值
                     id[i-2]=objects.get(0).toString().substring(0,objects.get(0).toString().lastIndexOf("0"));
                     List<Object> objects1=objects;
