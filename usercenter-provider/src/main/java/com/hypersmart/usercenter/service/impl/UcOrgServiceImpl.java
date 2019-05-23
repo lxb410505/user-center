@@ -130,6 +130,72 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     }
 
 
+//    @Override
+//    /**
+//     *  获取用户权限列表（区域层级的组织）
+//     *  diasbled:1->有权限 2：->无权限只能查看
+//     * */
+//    public List<UcOrg> getUserRegionOrgList(String userId) {
+//        QueryFilter queryFilter = QueryFilter.build();
+//        //根据用户查询人与组织关系
+//        List<UcOrgUser> list = ucOrgUserService.getUserOrg(userId);
+//        if (null == list || list.size() <= 0) {
+//            return new ArrayList<>();
+//        }
+//        String orgIds = "";
+//        for (int i = 0; i < list.size(); i++) {
+//            if (i == 0) {
+//                orgIds = list.get(i).getOrgId();
+//            } else {
+//                orgIds = orgIds + "," + list.get(i).getOrgId();
+//            }
+//        }
+//        //根据组织id获取组织信息
+//        QueryFilter orgQuery = QueryFilter.build();
+//        orgQuery.addFilter("id", orgIds, QueryOP.IN, FieldRelation.AND);
+//        orgQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+//        List<UcOrg> returnList = this.query(orgQuery).getRows();
+//        //根据组织获取子级
+//        List<UcOrg> set = new ArrayList<>();
+//        List<String> ids = new ArrayList<>();
+//        for (UcOrg ucOrg : returnList) {
+//            QueryFilter childQuery = QueryFilter.build();
+//            childQuery.addFilter("path", ucOrg.getPath(), QueryOP.RIGHT_LIKE, FieldRelation.AND);
+//            childQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+//            List<UcOrg> orgs = this.query(childQuery).getRows();
+//            for (UcOrg org : orgs) {
+//                if (!ids.contains(org.getId())) {
+//                    org.setDisabled("1");
+//                    set.add(org);
+//                    ids.add(org.getId());
+//                }
+//            }
+//            if (!ids.contains(ucOrg.getId())) {
+//                ucOrg.setDisabled("1");
+//                set.add(ucOrg);
+//                ids.add(ucOrg.getId());
+//            }
+//        }
+//        //根据组织查询父级组织
+//        for (UcOrg ucOrg : returnList) {
+//            String[] paths = ucOrg.getPath().split("\\.");
+//            for (int i = 0; i < paths.length; i++) {
+//                QueryFilter query = QueryFilter.build();
+//                query.addFilter("id", paths[i], QueryOP.EQUAL, FieldRelation.AND);
+//                query.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+//                List<UcOrg> voList = this.query(query).getRows();
+//                for (UcOrg vo : voList) {
+//                    if (!ids.contains(vo.getId())) {
+//                        vo.setDisabled("2");
+//                        set.add(vo);
+//                        ids.add(vo.getId());
+//                    }
+//                }
+//            }
+//        }
+//        return set;
+//    }
+
     public List<UcOrg> getUserOrgList2(String userId) {
         QueryFilter queryFilter = QueryFilter.build();
         //根据用户查询人与组织关系
