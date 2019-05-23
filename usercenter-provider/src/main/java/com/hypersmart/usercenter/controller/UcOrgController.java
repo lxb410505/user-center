@@ -14,14 +14,12 @@ import com.hypersmart.usercenter.service.UcOrgUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.web.bind.annotation.*;
 import tk.mybatis.mapper.util.StringUtil;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 组织架构
@@ -353,6 +351,16 @@ public class UcOrgController extends BaseController {
         String[] orgIds = fullPath.split("\\.");
         List<UcOrg> orgList = this.ucOrgService.getByIds(orgIds);
         return orgList;
+    }
+
+    @GetMapping({"getAllOrgByOrgId"})
+    @ApiOperation(value = "获取当前组织及其所有上级组织列表", httpMethod = "GET", notes = "获取当前组织及其所有上级组织列表")
+    public List<UcOrg> getAllOrgByOrgId(@ApiParam(name = "id", value = "业务对象主键", required = true)
+                                           @RequestParam("id") String id) {
+        String[] orgIds = id.split("\\.");
+        List<UcOrg> orgList = this.ucOrgService.getByIds(ArrayUtils.remove(orgIds, 0));
+        return orgList;
+
     }
 
     /**
