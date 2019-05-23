@@ -15,5 +15,6 @@ import com.hypersmart.framework.service.IGenericService;
  */
 public interface UcOrgPostService extends IGenericService<String, UcOrgPost> {
     PageList<ObjectNode> getJobPage(QueryFilter filter);
+    PageList<ObjectNode> getJobPage2(QueryFilter filter);
 }
 
