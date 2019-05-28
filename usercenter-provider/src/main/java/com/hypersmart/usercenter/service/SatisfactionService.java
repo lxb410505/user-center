@@ -2,6 +2,8 @@ package com.hypersmart.usercenter.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hypersmart.base.model.CommonResult;
+import com.hypersmart.base.query.PageList;
+import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.framework.service.IGenericService;
 import com.hypersmart.usercenter.model.Satisfaction;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,5 +26,6 @@ public interface SatisfactionService extends IGenericService<String, Satisfactio
     List<Satisfaction> getSatisfactionDetail(String orgCode,String time);
     Satisfaction getSingleSatisfaction(List<String> orgIds, String time);
     List<Satisfaction> getAllSatisfaction(String time);
+    PageList<Satisfaction> getListBySearch(QueryFilter queryFilter);
 }
 

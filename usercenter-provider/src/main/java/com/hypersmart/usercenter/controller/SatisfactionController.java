@@ -49,13 +49,8 @@ public class SatisfactionController extends BaseController {
     @PostMapping({"/list"})
     @ApiOperation(value = "数据列表", httpMethod = "POST", notes = "获取列表")
     public PageList<Satisfaction> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
-        List<FieldSort> sortList = new ArrayList<>();
-        FieldSort fieldSort = new FieldSort();
-        fieldSort.setDirection(Direction.ASC);
-        fieldSort.setProperty("order_");
-        sortList.add(fieldSort);
-        queryFilter.setSorter(sortList);
-        return this.satisfactionService.query(queryFilter);
+
+        return this.satisfactionService.getListBySearch(queryFilter);
     }
 
     @PostMapping("/querylist")

@@ -161,7 +161,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 					map.put("gridRange", JSONArray.toJSONString(objects));
 				}
 			}
-			Map<String,Object> checkMap = new HashMap<>();
+			/*Map<String,Object> checkMap = new HashMap<>();
 			Iterator<Map<String, Object>> mapIterator = query.iterator();
 			while (mapIterator.hasNext()){
 				Map<String, Object> next = mapIterator.next();
@@ -170,7 +170,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 				}else{
 					mapIterator.remove();
 				}
-			}
+			}*/
 		}
 		if (type == 1) {
 			query = this.gridBasicInfoMapper.queryAssociateList(queryFilter.getParams());
