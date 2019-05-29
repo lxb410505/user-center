@@ -149,9 +149,10 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
 				if(!CollectionUtils.isEmpty(listObjectFir)) {
 					for (JSONObject o : listObjectFir) {
-						if (3 != Integer.valueOf((Integer) o.get("level")) &&!map1.containsKey(o.get("name"))) {
+						String key=o.get("parentId").toString()+o.get("name").toString();
+						if (3 != Integer.valueOf((Integer) o.get("level")) &&!map1.containsKey(key)) {
 							set.add(o);
-							map1.put((String) o.get("name"),null);
+							map1.put(key,null);
 						}
 					}
 					// 对楼栋单元房产进行排序
