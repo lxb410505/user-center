@@ -95,6 +95,15 @@
         and  IS_DELE_ = 0
     </select>
 
+    <select id="getUserRegionOrg" resultMap="UcOrgUser">
+        select
+        <include refid="BaseAttribute"/>
+        from
+        uc_org_user,uc_org
+        where USER_ID_ = #{userId} and  uc_org_user.
+        and  IS_DELE_ = 0
+    </select>
+
     <!--<select id="getUserIdOrgByOrgIds" resultMap="java.lang.String">-->
         <!--select-->
         <!--ID_-->
