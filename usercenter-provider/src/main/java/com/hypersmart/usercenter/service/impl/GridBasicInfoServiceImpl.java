@@ -339,7 +339,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	public GridErrorCode changeHousekeeper(GridBasicInfoDTO gridBasicInfoDTO) {
 		GridErrorCode gridErrorCode = GridErrorCode.SUCCESS;
 		// 调用K2
-		gridApprovalRecordService.callApproval(GridOperateEnum.CHANGE_HOUSEKEEPER.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
+//		gridApprovalRecordService.callApproval(GridOperateEnum.CHANGE_HOUSEKEEPER.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
 		return gridErrorCode;
 	}
 
