@@ -79,7 +79,13 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	
 	@Autowired
     private UcUserMapper ucUserMapper;
-	
+
+	@Resource
+	private GridBasicInfoService gridBasicInfoService;
+
+	@Resource
+	private GridBasicInfoHistoryService gridBasicInfoHistoryService;
+
 	public GridBasicInfoServiceImpl(GridBasicInfoMapper mapper) {
 		super(mapper);
 	}
@@ -338,7 +344,23 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	@Override
 	public GridErrorCode changeHousekeeper(GridBasicInfoDTO gridBasicInfoDTO) {
 		GridErrorCode gridErrorCode = GridErrorCode.SUCCESS;
-		// 调用K2
+		GridBasicInfo grid = gridBasicInfoService.get(gridBasicInfoDTO.getId());
+		if(grid!=null){
+			gridBasicInfoHistoryService.saveGridBasicInfoHistory(grid, 0);
+			if ("".equals(gridBasicInfoDTO.getHousekeeperId())) {
+				grid.setHousekeeperId(null);
+			} else {
+				grid.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
+			}
+			grid.setUpdateTimes(grid.getUpdateTimes() + 1);
+			grid.setUpdationDate(new Date());
+			grid.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
+			gridBasicInfoService.updateSelective(grid);
+		}else{
+			gridErrorCode=GridErrorCode.UPDATE_EXCEPTION;
+		}
+
+//		// 调用K2
 //		gridApprovalRecordService.callApproval(GridOperateEnum.CHANGE_HOUSEKEEPER.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
 		return gridErrorCode;
 	}
