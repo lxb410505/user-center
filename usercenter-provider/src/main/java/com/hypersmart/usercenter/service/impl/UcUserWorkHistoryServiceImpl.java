@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.service.impl;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.query.PageBean;
 import com.hypersmart.base.query.PageList;
@@ -8,6 +9,7 @@ import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.framework.mapper.GenericMapper;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.usercenter.mapper.UcUserWorkHistoryMapper;
+import com.hypersmart.usercenter.model.GroupIdentity;
 import com.hypersmart.usercenter.model.UcUserWorkHistory;
 import com.hypersmart.usercenter.service.UcUserWorkHistoryService;
 import org.apache.commons.collections.CollectionUtils;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -64,5 +67,11 @@ public class UcUserWorkHistoryServiceImpl extends GenericService<String, UcUserW
     @Override
     public String queryLatest(String username) {
         return ucUserWorkHistoryMapper.queryLatest(username);
+    }
+
+    @Override
+    public  List<UcUserWorkHistory> queryUserWorkStatusList(List<String> userIds)
+    {
+        return ucUserWorkHistoryMapper.queryUserWorkStatusList(userIds);
     }
 }

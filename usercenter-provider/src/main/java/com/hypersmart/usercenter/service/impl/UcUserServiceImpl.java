@@ -612,14 +612,29 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
 
         List<ObjectNode> groupIdentities = ucFeignService.getByJobCodeAndOrgIdAndDimCodeDeeply(jobCode,orgId,dimCode,fullName);
         Set<GroupIdentity> groupIdentitySet = new HashSet<>();
+        List<String> gList=new ArrayList<>();
+        groupIdentities.forEach(groupIdentity-> {
+                    try {
+                        GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(), GroupIdentity.class);
+                        gList.add(groupIdentity1.getId());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+        List<UcUserWorkHistory > statusList = ucUserWorkHistoryService.queryUserWorkStatusList(gList);
         groupIdentities.forEach(groupIdentity->{
             try{
                 GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(),GroupIdentity.class);
-                //根据上下班状态获取上班人员
-                String status = ucUserWorkHistoryService.queryLatest(groupIdentity1.getId());
-                if(com.hypersmart.framework.utils.StringUtils.isNotRealEmpty(status) && "0".equals(status)){
-                    groupIdentitySet.add(groupIdentity1);
+                for (UcUserWorkHistory ucUserWorkHistory:statusList
+                     ) {
+                    if(ucUserWorkHistory.getUserId()!=null && ucUserWorkHistory.getUserId().equals(groupIdentity1.getId()))
+                    {
+                        if(com.hypersmart.framework.utils.StringUtils.isNotRealEmpty(ucUserWorkHistory.getStatus()) && "0".equals(ucUserWorkHistory.getStatus())){
+                            groupIdentitySet.add(groupIdentity1);
+                        }
+                    }
                 }
+
             }catch (Exception e){
                 e.printStackTrace();
             }
