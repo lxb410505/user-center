@@ -92,7 +92,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             String dikuai = params.get("dikuai").toString();
             UcOrg ucOrg = new UcOrg();
             ucOrg.setName(dikuai);
-            ucOrg.setIsDele("0");
+            ucOrg.setIsDele("1");
             ucOrg.setGrade("ORG_DiKuai");
             List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
             List<String> orgNames = new ArrayList<>();
@@ -123,7 +123,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                 ) {
             String dikuai = "";
             UcOrg ucOrg = new UcOrg();
-            ucOrg.setIsDele("0");
+            ucOrg.setIsDele("1");
             if (params.get("xiangmu") != null) {
                 dikuai = params.get("xiangmu").toString();
                 ucOrg.setGrade("ORG_XiangMu");
@@ -489,7 +489,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             ucOrg.setName(parentRow.get(2).toString());
             //ucOrg.setLevel(4);
             ucOrg.setGrade("ORG_DiKuai");
-            ucOrg.setIsDele("0");
+            ucOrg.setIsDele("1");
             List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
             if (ucOrgs.size() <= 0) {
                 throw new Exception("第" + rowNun + "行：" + rowData.get(2).toString() + "该网格对应得上级组织错误或缺失，请检查格式");
@@ -520,7 +520,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                 //ucOrg.setLevel(4);
                 ucOrg.setGrade("ORG_DiKuai");
             }
-            ucOrg.setIsDele("0");
+            ucOrg.setIsDele("1");
             List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
             if (ucOrgs.size() <= 0) {
                 throw new Exception("第" + rowNun + "行：" + rowData.get(2).toString() + "组织名称不存在或组织名与对应得分类/层级不符");//8
