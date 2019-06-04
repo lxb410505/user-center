@@ -86,6 +86,11 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	 */
 	@Override
 	public void callApproval(String approvalType, String gridId, Object approvalContent) {
+		new Thread(()->{
+			handCallApproval(approvalType,gridId,approvalContent);
+		}).start();
+	}
+	private void handCallApproval(String approvalType, String gridId, Object approvalContent){
 		GridApprovalRecord record = new GridApprovalRecord();
 		try {
 			String recordId = UUID.randomUUID().toString();
