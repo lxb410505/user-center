@@ -50,4 +50,16 @@
             create_time DESC
         LIMIT 1
     </select>
+
+    <select id="queryUserWorkStatusList" resultType="com.hypersmart.usercenter.model.UcUserWorkHistory">
+        SELECT
+        status,
+        user_id as userId
+        FROM
+        uc_user_work_his
+        WHERE  user_id in
+            <foreach collection="userIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+    </select>
 </mapper>
