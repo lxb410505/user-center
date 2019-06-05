@@ -184,7 +184,7 @@
             <if test="whereSql!=null">
                 ${whereSql}
             </if>
-            and (approvalStatus is null or approvalStatus !=1)
+            and (approvalStatus is null or approvalStatus =2)
         </where>
         <if test="orderBySql!=null">
             ORDER BY ${orderBySql}

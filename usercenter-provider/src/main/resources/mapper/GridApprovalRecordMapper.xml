@@ -118,5 +118,15 @@
         create_date DESC
         LIMIT 1
     </select>
-
+    <select id="getNewGridRejectRecord" resultMap="gridApprovalRecord">
+        select
+        <include refid="BaseAttribute"/>
+        from grid_approval_record
+        where grid_id = #{gridId}
+        and approval_type='newGrid'
+        and approval_status=3
+        ORDER BY
+        create_date DESC
+        LIMIT 1
+    </select>
 </mapper>
