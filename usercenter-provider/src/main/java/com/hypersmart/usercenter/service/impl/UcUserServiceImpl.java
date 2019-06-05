@@ -609,6 +609,9 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
     public Set<GroupIdentity> getByJobCodeAndOrgIdAndDimCodeDeeply(String jobCode, String orgId, String dimCode, String fullName) throws Exception {
 
         List<ObjectNode> groupIdentities = ucFeignService.getByJobCodeAndOrgIdAndDimCodeDeeply(jobCode,orgId,dimCode,fullName);
+        if(groupIdentities==null||groupIdentities.size()<=0){
+            return null;
+        }
         Set<GroupIdentity> groupIdentitySet = new HashSet<>();
         List<String> gList=new ArrayList<>();
         groupIdentities.forEach(groupIdentity-> {
