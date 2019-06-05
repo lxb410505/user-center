@@ -24,10 +24,7 @@ import com.hypersmart.usercenter.mapper.GridBasicInfoMapper;
 import com.hypersmart.usercenter.mapper.UcOrgParamsMapper;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
 import com.hypersmart.usercenter.mapper.UcUserMapper;
-import com.hypersmart.usercenter.model.GridBasicInfo;
-import com.hypersmart.usercenter.model.GridRange;
-import com.hypersmart.usercenter.model.UcOrgParams;
-import com.hypersmart.usercenter.model.UcUser;
+import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.*;
 import com.hypersmart.usercenter.util.GridOperateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -328,7 +325,15 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			gridBasicInfo.setUpdationDate(new Date());
 			gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
 			num = this.updateSelective(gridBasicInfo);
+			if(num>0){
+				GridApprovalRecord newGridRejectRecord = gridApprovalRecordMapper.getNewGridRejectRecord(gridBasicInfoDTO.getId());
+				if(newGridRejectRecord!=null){
+					//驳回的网格
+					gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfo.getId(), gridBasicInfoDTO);
+				}
+			}
 		}
+
 		if (num < 1) {
 			gridErrorCode = GridErrorCode.UPDATE_EXCEPTION;
 		}
