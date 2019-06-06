@@ -211,8 +211,8 @@
 
     <select id="getUserByUnitId" resultMap="baseMap">
         SELECT
-        ID_,FULLNAME_
-        FROM uc_user
+        u.ID_,u.FULLNAME_
+        FROM uc_user u
         join
          (SELECT DISTINCT
         housekeeper_id
@@ -222,7 +222,17 @@
         WHERE
          gr.range_type = #{unitType}
        AND gr.resource_id = #{unitId}
-      ) as  B  ON uc_user.ID_ =B.housekeeper_id
+      ) as  B  ON u.ID_ =B.housekeeper_id
+      JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+        JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
+        JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
+        JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
+        WHERE
+        uoj.CODE_ = 'guanjia'
+        AND dem.CODE_ = 'smsf'
+        AND org.GRADE_ = 'ORG_DiKuai'
+        and u.IS_DELE_ = 0 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
       	limit 1
     </select>
 
@@ -309,6 +319,25 @@
                 AND u.ACCOUNT_=#{account}
             </if>
         </where>
+    </select>
+
+    <select id="getUserByDivideId" resultMap="baseMap">
+        SELECT
+        u.ID_,u.FULLNAME_
+        FROM uc_user u
+        JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+        JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
+        JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
+        JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
+        JOIN grid_basic_info info ON u.ID_ = info.housekeeper_id
+        WHERE
+        uoj.CODE_ = 'guanjia'
+        AND dem.CODE_ = 'smsf'
+        AND org.GRADE_ = 'ORG_DiKuai'
+        and u.IS_DELE_ = 0 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
+        and info.grid_type = #{gridType} and info.staging_id = #{divideId} and info.housekeeper_id is not null
+        limit 1
     </select>
 
 </mapper>
