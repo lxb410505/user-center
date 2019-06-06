@@ -54,18 +54,19 @@ public class GridWorkOrderController {
     @PostMapping("/getUserByDivideId")
     public UcUser getUserByDivideId(@RequestParam("divideId") String divideId,@RequestParam("gridType")String gridType){
         if(StringUtil.isNotEmpty(divideId) && StringUtil.isNotEmpty(divideId)){
-            QueryFilter query = QueryFilter.build();
-                query.addFilter("gridType",gridType, QueryOP.EQUAL,FieldRelation.AND);
-            query.addFilter("stagingId",divideId,QueryOP.EQUAL,FieldRelation.AND);
-            query.addFilter("housekeeperId","",QueryOP.NOTNULL,FieldRelation.AND);
-            PageList<GridBasicInfo> page = gridBasicInfoService.query(query);
-            if(null != page && null != page.getRows() && page.getRows().size()>0){
-                GridBasicInfo info = page.getRows().get(0);
-                UcUser ucUser = ucUserService.get(info.getHousekeeperId());
-                if(null != ucUser && StringUtil.isNotEmpty(ucUser.getId())){
-                    return ucUser;
-                }
-            }
+            return ucUserService.getUserByDivideId(divideId, gridType);
+//            QueryFilter query = QueryFilter.build();
+//                query.addFilter("gridType",gridType, QueryOP.EQUAL,FieldRelation.AND);
+//            query.addFilter("stagingId",divideId,QueryOP.EQUAL,FieldRelation.AND);
+//            query.addFilter("housekeeperId","",QueryOP.NOTNULL,FieldRelation.AND);
+//            PageList<GridBasicInfo> page = gridBasicInfoService.query(query);
+//            if(null != page && null != page.getRows() && page.getRows().size()>0){
+//                GridBasicInfo info = page.getRows().get(0);
+//                UcUser ucUser = ucUserService.get(info.getHousekeeperId());
+//                if(null != ucUser && StringUtil.isNotEmpty(ucUser.getId())){
+//                    return ucUser;
+//                }
+//            }
         }
         return new UcUser();
     }
