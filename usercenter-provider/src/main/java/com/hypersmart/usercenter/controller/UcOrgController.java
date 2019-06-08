@@ -455,4 +455,11 @@ public class UcOrgController extends BaseController {
         }
         return null;
     }
+
+    @GetMapping({"getDefaultListByGrade"})
+    @ApiOperation(value = "获取组织参数信息", httpMethod = "GET", notes = "获取组织参数信息")
+    public List<UcOrg> getDefaultListByGrade(@ApiParam(name = "grade", value = "参数值", required = true) @RequestParam("grade") String grade
+    ) {
+        return  this.ucOrgService.getDefaultOrgListByGrade(grade);
+    }
 }

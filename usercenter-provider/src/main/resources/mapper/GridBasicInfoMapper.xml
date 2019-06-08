@@ -167,7 +167,7 @@
         uoj.CODE_ = 'guanjia'
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
-        and u.IS_DELE_ = 0 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
+        and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
         ) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId where g.staging_id = #{massifId} and g.is_deleted = 0
         ) as t
         LEFT JOIN (
@@ -184,7 +184,7 @@
             <if test="whereSql!=null">
                 ${whereSql}
             </if>
-            and (approvalStatus is null or approvalStatus !=1)
+            and (approvalStatus is null or approvalStatus =2)
         </where>
         <if test="orderBySql!=null">
             ORDER BY ${orderBySql}
@@ -234,7 +234,7 @@
         uoj.CODE_ = 'guanjia'
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
-        and u.IS_DELE_ = 0 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
+        and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
         ) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId
         where g.id = #{id}
     </select>

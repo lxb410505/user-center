@@ -385,7 +385,8 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                     }
                 }
                 //备注是否含有人员
-                if (lo.get(10).equals("暂时无人") || lo.get(10).equals("K2账号信息错误") || lo.get(10).equals("K2账号与人员姓名不匹配")) {
+                //modify by Gary    lo.size() > 10
+                if (lo.size() > 10 && (lo.get(10).equals("暂时无人") || lo.get(10).equals("K2账号信息错误") || lo.get(10).equals("K2账号与人员姓名不匹配"))) {
                     importUserData.setExistUser(false);
                 } else {
                     importUserData.setExistUser(true);
@@ -453,7 +454,9 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                     UcOrgPost orgPost = null;
                     if (!BeanUtils.isEmpty(orgPosts)){
                         for (UcOrgPost post : orgPosts){
-                            if (post.getPosName().equals(userData.getPosName()) && post.getPostKey().equals(userData.getPostKey())){
+                            //nullpoint process add by gary according to the error log
+                            if (null != post.getPosName() && post.getPosName().equals(userData.getPosName())
+                                    && null != post.getPostKey() && post.getPostKey().equals(userData.getPostKey())){
                                 orgPost=post;
                             }
                         }
@@ -699,5 +702,11 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
         }
 
         return groupIdentityDTOSet;
+    }
+
+
+    @Override
+    public UcUser getUserByDivideId(String divideId, String gridType) {
+        return ucUserMapper.getUserByDivideId(divideId, gridType);
     }
 }

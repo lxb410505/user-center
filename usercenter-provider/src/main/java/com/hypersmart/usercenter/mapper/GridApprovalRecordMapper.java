@@ -63,4 +63,6 @@ public interface GridApprovalRecordMapper extends GenericMapper<GridApprovalReco
 	 */
 	GridApprovalRecord getGridApprovalRecordByProcInstId(@Param("procInstId") String procInstId);
 
+	GridApprovalRecord getNewGridRejectRecord(@Param("gridId") String gridId);
+
 }
