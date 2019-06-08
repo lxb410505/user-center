@@ -218,6 +218,12 @@ public class SatisfactionController extends BaseController {
         return this.satisfactionService.getAllSatisfaction(time);
     }
 
+    @GetMapping({"/getAllSatisfactionNoAuth"})
+    @ApiOperation(value = "总部满意度不过滤权限", httpMethod = "GET", notes = "总部满意度不过滤权限")
+    public List<Satisfaction> getAllSatisfactionNoAuth(@ApiParam(name = "time", value = "时间") @RequestParam String time) {
+        return this.satisfactionService.getAllSatisfactionNoAuth(time);
+    }
+
     @GetMapping({"/get/{id}"})
     @ApiOperation(value = "数据列表", httpMethod = "GET", notes = "获取单个记录")
     public Satisfaction get(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {

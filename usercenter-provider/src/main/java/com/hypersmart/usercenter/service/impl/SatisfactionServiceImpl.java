@@ -682,6 +682,13 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         return satisfactionMapper.getSatisfactionDetail(quYuList, time);
     }
 
+    @Override
+    public List<Satisfaction> getAllSatisfactionNoAuth(String time) {
+        String userId = ContextUtil.getCurrentUser().getUserId();
+        List<UcOrg> ucOrgList = ucOrgService.getDefaultOrgListByGrade("ORG_QuYu");
+        return satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
+    }
+
     public static void main(String[] args) throws ParseException {
         String date = "2019-05-00";
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-00");
