@@ -52,7 +52,7 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
 
     List<UcOrg> getDefaultOrgList();
     List<UcOrgParams> getOrgParams(String code, String value);
-
+    List<UcOrg> getDefaultOrgListByGrade(String grade);
 
 }
 
