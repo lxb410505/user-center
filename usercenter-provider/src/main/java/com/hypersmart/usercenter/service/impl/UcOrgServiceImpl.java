@@ -661,6 +661,27 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
 
     }
 
+    public List<UcOrg> getDefaultOrgListByGrade(String grade) {
+        QueryFilter queryFilter = QueryFilter.build();
+        queryFilter.setPageBean(null);
+        queryFilter.addFilter("IS_DELE_", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("IS_DEFAULT_", 1, QueryOP.EQUAL, FieldRelation.AND);
+        PageList<UcDemension> demensionPageList = ucDemensionService.query(queryFilter);
+        if (demensionPageList.getRows().size() > 0) {
+            UcDemension demension = demensionPageList.getRows().get(0);
+
+            QueryFilter queryFilter2 = QueryFilter.build();
+            queryFilter2.setPageBean(null);
+            queryFilter2.addFilter("IS_DELE_", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+            queryFilter2.addFilter("DEM_ID_", demension.getId(), QueryOP.EQUAL, FieldRelation.AND);
+            queryFilter2.addFilter("GRADE_", grade, QueryOP.EQUAL, FieldRelation.AND);
+            PageList<UcOrg> pageList = this.query(queryFilter2);
+            return pageList.getRows();
+        } else {
+            return null;
+        }
+    }
+
 
     public List<UcOrgParams> getOrgParams(String code, String value) {
 

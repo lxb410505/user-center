@@ -361,7 +361,12 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     public List<Satisfaction> getSatisfactionListByParam(JSONObject json) {
         return satisfactionMapper.getSatisfactionListByParam(JSONObject.toJavaObject(json, Map.class));
     }
+    private BigDecimal getBigDecimal(String bdstr) {
 
+        BigDecimal bdv = new BigDecimal(bdstr);//字符串转成bigdecimal
+        bdv = bdv.setScale(2, BigDecimal.ROUND_HALF_UP);
+        return bdv;
+    }
     private void doData(StringBuffer message, List<Satisfaction> satisfactions, List<List<Object>> tempResourceImportList, String date) throws Exception {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         List<Object> rowDataLevel3 = null;
@@ -428,33 +433,33 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             satisfaction.setType(rowData.get(1).toString());
             satisfaction.setOrgName(rowData.get(2).toString());
             if (rowData.get(3) != null && StringUtil.isNotEmpty(rowData.get(3).toString())) {
-                satisfaction.setOverallSatisfaction(new BigDecimal(rowData.get(3).toString()));
+                satisfaction.setOverallSatisfaction(getBigDecimal(rowData.get(3).toString()));
             }
             if (rowData.get(4) != null && StringUtil.isNotEmpty(rowData.get(4).toString())) {
-                satisfaction.setStorming(new BigDecimal(rowData.get(4).toString()));
+                satisfaction.setStorming(getBigDecimal(rowData.get(4).toString()));
             }
             if (rowData.get(5) != null && StringUtil.isNotEmpty(rowData.get(5).toString())) {
-                satisfaction.setStationaryPhase(new BigDecimal(rowData.get(5).toString()));
+                satisfaction.setStationaryPhase(getBigDecimal(rowData.get(5).toString()));
             }
             if (rowData.get(6) != null && StringUtil.isNotEmpty(rowData.get(6).toString())) {
-                satisfaction.setOldProprietor(new BigDecimal(rowData.get(6).toString()));
+                satisfaction.setOldProprietor(getBigDecimal(rowData.get(6).toString()));
             }
             satisfaction.setEffectiveTime(formatter.parse(date));
             satisfaction.setOrgCode(orgCode);
             if (type < 4) {
                 if (rowData.get(7) != null && StringUtil.isNotEmpty(rowData.get(7).toString())) {
-                    satisfaction.setOrderServiceUnit(new BigDecimal(rowData.get(7).toString()));
+                    satisfaction.setOrderServiceUnit(getBigDecimal(rowData.get(7).toString()));
                 }
                 if (rowData.get(8) != null && StringUtil.isNotEmpty(rowData.get(8).toString())) {
-                    satisfaction.setEsuCleaning(new BigDecimal(rowData.get(8).toString()));
+                    satisfaction.setEsuCleaning(getBigDecimal(rowData.get(8).toString()));
                 }
 
                 if (rowData.get(9) != null && StringUtil.isNotEmpty(rowData.get(9).toString())) {
-                    satisfaction.setEsuGreen(new BigDecimal(rowData.get(9).toString()));
+                    satisfaction.setEsuGreen(getBigDecimal(rowData.get(9).toString()));
                 }
 
                 if (rowData.get(10) != null && StringUtil.isNotEmpty(rowData.get(10).toString())) {
-                    satisfaction.setEngineeringServiceUnit(new BigDecimal(rowData.get(10).toString()));
+                    satisfaction.setEngineeringServiceUnit(getBigDecimal(rowData.get(10).toString()));
                 }
 
             }
@@ -680,6 +685,13 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             }
         }
         return satisfactionMapper.getSatisfactionDetail(quYuList, time);
+    }
+
+    @Override
+    public List<Satisfaction> getAllSatisfactionNoAuth(String time) {
+        String userId = ContextUtil.getCurrentUser().getUserId();
+        List<UcOrg> ucOrgList = ucOrgService.getDefaultOrgListByGrade("ORG_QuYu");
+        return satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
     }
 
     public static void main(String[] args) throws ParseException {
