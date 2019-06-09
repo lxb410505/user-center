@@ -27,4 +27,11 @@
         and is_deleted = 0
 		AND enabled_flag = 1;
     </select>
+
+    <select id="getServiceIdByStagingId" resultType="java.lang.String">
+        select service_grid_id
+        from stage_servicegird_ref
+        where staging_id=#{stagingId}
+        and is_deleted = 0;
+    </select>
 </mapper>

@@ -21,4 +21,6 @@ public interface StageServiceGirdRefMapper extends GenericMapper<StageServiceGir
     List<Map<String, Object>> getServiceGridByGridId(String id);
 
     Map<String,Object> getServiceGridIdByStagingId(String stagingId);
+
+    String getServiceIdByStagingId(String stagingId);
 }
