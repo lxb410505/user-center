@@ -146,7 +146,7 @@
         where t.staging_id=#{massifId}
         AND t.grid_type!='service_center_grid'
         AND t.is_deleted = 0
-        ) as a GROUP BY stagingId,id
+        ) as a
         ) g
         LEFT JOIN (
         SELECT
@@ -305,7 +305,7 @@
         AND t.grid_type !='service_center_grid'
         AND t.is_deleted = 0
         AND t.enabled_flag = 1
-        ) as a GROUP BY stagingId,id
+        ) as
         ) g LEFT JOIN (
         SELECT
         u.ID_ AS houseKeeperId,
