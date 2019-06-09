@@ -87,6 +87,10 @@ public class GridBasicInfoDTO extends GenericDTO<String> implements Serializable
 
 	private String formatAttributeName;
 
+	private List<String> stagingIds;
+
+	private String serviceGridId;
+
 	//首次创建时间
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -432,5 +436,21 @@ public class GridBasicInfoDTO extends GenericDTO<String> implements Serializable
 
 	public void setAccount(String account) {
 		this.account = account;
+	}
+
+	public List<String> getStagingIds() {
+		return stagingIds;
+	}
+
+	public void setStagingIds(List<String> stagingIds) {
+		this.stagingIds = stagingIds;
+	}
+
+	public String getServiceGridId() {
+		return serviceGridId;
+	}
+
+	public void setServiceGridId(String serviceGridId) {
+		this.serviceGridId = serviceGridId;
 	}
 }

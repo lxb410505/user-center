@@ -76,7 +76,8 @@
         grid_remark AS gridRemark,
         format_attribute AS formatAttribute,
         housekeeper_id AS housekeeperId,
-        creation_date AS creationDate
+        creation_date AS creationDate,
+        staging_id AS stagingId
         FROM
         grid_basic_info
         WHERE id IN

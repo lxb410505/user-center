@@ -19,11 +19,7 @@ import com.hypersmart.usercenter.constant.GridTypeConstants;
 import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridBasicInfoSimpleDTO;
 import com.hypersmart.usercenter.dto.RangeDTO;
-import com.hypersmart.usercenter.mapper.GridApprovalRecordMapper;
-import com.hypersmart.usercenter.mapper.GridBasicInfoMapper;
-import com.hypersmart.usercenter.mapper.UcOrgParamsMapper;
-import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
-import com.hypersmart.usercenter.mapper.UcUserMapper;
+import com.hypersmart.usercenter.mapper.*;
 import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.*;
 import com.hypersmart.usercenter.util.GridOperateEnum;
@@ -34,11 +30,13 @@ import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 网格基础信息表
@@ -82,6 +80,14 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
 	@Resource
 	private GridBasicInfoHistoryService gridBasicInfoHistoryService;
+
+	@Resource
+    private PublicGirdPercentService publicGirdPercentService;
+
+	@Resource
+    private StageServiceGirdRefService stageServiceGirdRefService;
+	@Resource
+	private StageServiceGirdRefMapper stageServiceGirdRefMapper;
 
 	public GridBasicInfoServiceImpl(GridBasicInfoMapper mapper) {
 		super(mapper);
@@ -164,6 +170,32 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 					List<JSONObject> objects = collect.stream().map(e -> e.getKey()).collect(Collectors.toList());
 					map.put("gridRange", JSONArray.toJSONString(objects));
 				}
+				if(map.get("projectId")==null){
+					UcOrg ucOrg = ucOrgService.get(orgId.toString());
+					if(ucOrg!=null){
+						String[] split = ucOrg.getPath().split("\\.");
+						if(ucOrg.getLevel()==3){
+							map.put("areaId",split[2]);
+							map.put("projectId",split[3]);
+						}else{
+							map.put("areaId",split[2]);
+							map.put("cityId",split[3]);
+							map.put("projectId",split[4]);
+						}
+						UcOrg areaId = ucOrgService.get(map.get("areaId").toString());
+						UcOrg cityId = ucOrgService.get(map.get("cityId").toString());
+						UcOrg projectId = ucOrgService.get(map.get("projectId").toString());
+						if(areaId!=null){
+							map.put("areaName",areaId.getName());
+						}
+						if(cityId!=null){
+							map.put("cityName",cityId.getName());
+						}
+						if(projectId!=null){
+							map.put("projectName",projectId.getName());
+						}
+					}
+				}
 			}
 			/*Map<String,Object> checkMap = new HashMap<>();
 			Iterator<Map<String, Object>> mapIterator = query.iterator();
@@ -209,7 +241,27 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			gridRangeBO.setGridId(objectMap.get("id").toString());
 			gridRangeBO.setStagingId(objectMap.get("stagingId").toString());
 			List<String> rangeList = gridRangeService.getAllRange(gridRangeBO);
+
 			objectMap.put("allRange", rangeList);
+			if(GridTypeConstants.SERVICE_CENTER_GRID.equals(objectMap.get("gridType"))){
+				if(objectMap.get("stagingId")!=null){
+					Map<String, Object> stagingId = stageServiceGirdRefMapper.getServiceGridIdByStagingId(objectMap.get("stagingId").toString());
+
+					if(stagingId!=null && stagingId.get("service_grid_id")!=null){
+						objectMap.put("serviceGridId",stagingId.get("service_grid_id").toString());
+						List<Map<String, Object>> list = stageServiceGirdRefMapper.getServiceGridByGridId(stagingId.get("service_grid_id").toString());
+						if(!CollectionUtils.isEmpty(list)){
+							List<Object> stagingIds = list.stream().map(o -> o.get("stagingId")).collect(Collectors.toList());
+							List<Object> stagingNames = list.stream().map(o -> o.get("stagingName")).collect(Collectors.toList());
+							objectMap.put("stagingIds", stagingIds);
+							objectMap.put("orgNames", stagingNames);
+						}
+					}
+
+				}
+
+			}
+
 		}
 		return objectMap;
 	}
@@ -235,49 +287,62 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 				}
 			}
 			GridBasicInfo gridBasicInfo = new GridBasicInfo();
-			gridBasicInfo.setId(UniqueIdUtil.getSuid());
-			gridBasicInfo.setAreaId(gridBasicInfoDTO.getAreaId());
-			gridBasicInfo.setCityId(gridBasicInfoDTO.getCityId());
-			gridBasicInfo.setProjectId(gridBasicInfoDTO.getProjectId());
+			if(GridTypeConstants.SERVICE_CENTER_GRID.equals(gridBasicInfoDTO.getGridType())){
+				num = handleServiceCenterGrid(gridBasicInfoDTO,1);
+			}else{
+				gridBasicInfo.setAreaId(gridBasicInfoDTO.getAreaId());
+				gridBasicInfo.setCityId(gridBasicInfoDTO.getCityId());
+				gridBasicInfo.setProjectId(gridBasicInfoDTO.getProjectId());
 //            gridBasicInfo.setMassifId(gridBasicInfoDTO.getMassifId());
-			gridBasicInfo.setStagingId(gridBasicInfoDTO.getStagingId());
-			gridBasicInfo.setGridCode(gridBasicInfoDTO.getGridCode());
-			gridBasicInfo.setGridName(gridBasicInfoDTO.getGridName());
-			if (GridTypeConstants.BUILDING_GRID.equals(gridBasicInfoDTO.getGridType())) {
+				gridBasicInfo.setStagingId(gridBasicInfoDTO.getStagingId());
+				gridBasicInfo.setId(UniqueIdUtil.getSuid());
+				gridBasicInfo.setGridCode(gridBasicInfoDTO.getGridCode());
+				gridBasicInfo.setGridName(gridBasicInfoDTO.getGridName());
+				if (GridTypeConstants.BUILDING_GRID.equals(gridBasicInfoDTO.getGridType())) {
+					gridBasicInfo.setGridRange(gridBasicInfoDTO.getGridRange());
+				}
+				gridBasicInfo.setGridRemark(gridBasicInfoDTO.getGridRemark());
+				gridBasicInfo.setGridType(gridBasicInfoDTO.getGridType());
+				if ("".equals(gridBasicInfoDTO.getHousekeeperId())) {
+					gridBasicInfo.setHousekeeperId(null);
+				} else {
+					gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
+				}
+				gridBasicInfo.setFormatAttribute(gridBasicInfoDTO.getFormatAttribute());
+				gridBasicInfo.setSecondFormatAttribute(gridBasicInfoDTO.getSecondFormatAttribute());
+				gridBasicInfo.setThirdFormatAttribute(gridBasicInfoDTO.getThirdFormatAttribute());
+				gridBasicInfo.setCreationDate(new Date());
+				gridBasicInfo.setUpdationDate(new Date());
+				gridBasicInfo.setCreatedBy(ContextUtil.getCurrentUser().getUserId());
+				gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
+				//网格范围
 				gridBasicInfo.setGridRange(gridBasicInfoDTO.getGridRange());
-			}
-			gridBasicInfo.setGridRemark(gridBasicInfoDTO.getGridRemark());
-			gridBasicInfo.setGridType(gridBasicInfoDTO.getGridType());
-			if ("".equals(gridBasicInfoDTO.getHousekeeperId())) {
-				gridBasicInfo.setHousekeeperId(null);
-			} else {
-				gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
-			}
-			gridBasicInfo.setFormatAttribute(gridBasicInfoDTO.getFormatAttribute());
-			gridBasicInfo.setSecondFormatAttribute(gridBasicInfoDTO.getSecondFormatAttribute());
-			gridBasicInfo.setThirdFormatAttribute(gridBasicInfoDTO.getThirdFormatAttribute());
-			gridBasicInfo.setCreationDate(new Date());
-			gridBasicInfo.setUpdationDate(new Date());
-			gridBasicInfo.setCreatedBy(ContextUtil.getCurrentUser().getUserId());
-			gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
-			//网格范围
-			gridBasicInfo.setGridRange(gridBasicInfoDTO.getGridRange());
-			//新增
-			num = this.insertSelective(gridBasicInfo);
-			//网格覆盖范围表记录
-			if (GridTypeConstants.BUILDING_GRID.equals(gridBasicInfoDTO.getGridType()) && !StringUtils.isEmpty(gridBasicInfoDTO.getGridRange())) {
-				//记录数据
-				gridRangeService.recordRange(gridBasicInfoDTO.getGridRange(), gridBasicInfo.getId());
+				//新增
+				num = this.insertSelective(gridBasicInfo);
+
+				//网格覆盖范围表记录
+				if (GridTypeConstants.BUILDING_GRID.equals(gridBasicInfoDTO.getGridType()) && !StringUtils.isEmpty(gridBasicInfoDTO.getGridRange())) {
+					//记录数据
+					gridRangeService.recordRange(gridBasicInfoDTO.getGridRange(), gridBasicInfo.getId());
+				}
+
+				// 调用K2
+				gridBasicInfoDTO.setId(gridBasicInfo.getId());
+				gridBasicInfoDTO.setCreationDate(gridBasicInfo.getCreationDate());
+				gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfo.getId(), gridBasicInfoDTO);
+				if(num>0){
+					//增加gridRange 字段的缓存
+					handChangeRange(gridBasicInfo.getId(),gridBasicInfo.getGridRange(),1);//1 新增
+				}
 			}
 
-			// 调用K2
-			gridBasicInfoDTO.setId(gridBasicInfo.getId());
-			gridBasicInfoDTO.setCreationDate(gridBasicInfo.getCreationDate());
-			gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfo.getId(), gridBasicInfoDTO);
 			if(num>0){
-				//增加gridRange 字段的缓存
-				handChangeRange(gridBasicInfo.getId(),gridBasicInfo.getGridRange(),1);//1 新增
-			}
+                if(GridTypeConstants.PUBLIC_AREA_GRID.equals(gridBasicInfoDTO.getGridType())){//公区网格
+                    addPublicGirdPercent(gridBasicInfo.getGridCode(),gridBasicInfo.getId(),gridBasicInfo.getGridName(),
+                            gridBasicInfo.getStagingId());
+                }
+            }
+
 		}
 		if (num < 1) {
 			gridErrorCode = GridErrorCode.INSERT_EXCEPTION;
@@ -286,7 +351,124 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
 		return gridErrorCode;
 	}
+	private void addPublicGirdPercent(String gridCode,String gridId,String gridName,String stagingId){
+        PublicGirdPercent publicGirdPercent=new PublicGirdPercent();
+        publicGirdPercent.setAreaPercent(new BigDecimal(100));
+        publicGirdPercent.setPublicGridCode(gridCode);
+        publicGirdPercent.setPublicGridId(gridId);
+        UcOrg ucOrg = ucOrgService.get(stagingId);
+        publicGirdPercent.setPublicGridName(gridName);
+        publicGirdPercent.setId(UniqueIdUtil.getSuid());
+        publicGirdPercent.setStagingId(stagingId);
+        publicGirdPercent.setStagingName(ucOrg!=null?ucOrg.getName():"");
+        publicGirdPercent.setCreationDate(new Date());
+        publicGirdPercent.setUpdationDate(new Date());
+        publicGirdPercent.setCreatedBy(ContextUtil.getCurrentUser().getUserId());
+        publicGirdPercent.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
+        publicGirdPercent.setEnabledFlag(1);
+        publicGirdPercent.setIsDeleted(0);
+        publicGirdPercentService.insertSelective(publicGirdPercent);
+    }
+    private Integer handleServiceCenterGrid(GridBasicInfoDTO gridBasicInfoDTO,Integer action){
+		int num=0;
+		//查询所传地块 查询服务网格
+		if(!CollectionUtils.isEmpty(gridBasicInfoDTO.getStagingIds())){
+			QueryFilter queryFilter=QueryFilter.build(GridBasicInfo.class);
+			queryFilter.addFilter("enabledFlag",1,QueryOP.EQUAL,FieldRelation.AND);
+			queryFilter.addFilter("isDeleted",0,QueryOP.EQUAL,FieldRelation.AND);
+			queryFilter.addFilter("stagingId",gridBasicInfoDTO.getStagingIds(),QueryOP.IN,FieldRelation.AND);
+			queryFilter.addFilter("gridType",GridTypeConstants.SERVICE_CENTER_GRID,QueryOP.EQUAL,FieldRelation.AND);
+			PageList<GridBasicInfo> query = gridBasicInfoService.query(queryFilter);
+			if(query!=null && !CollectionUtils.isEmpty(query.getRows())){
+				for(GridBasicInfo gridBasicInfo: query.getRows()){
+					gridBasicInfo.setGridCode(gridBasicInfoDTO.getGridCode());
+					gridBasicInfo.setGridName(gridBasicInfoDTO.getGridName());
+					gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
+				}
+				int i = gridBasicInfoService.updateBatch(query.getRows());
+				if(i>0){
+					if(action.equals(1)){
+						String uuId=UniqueIdUtil.getSuid();
+						return addStageServiceGirdRef(gridBasicInfoDTO.getGridCode(),gridBasicInfoDTO.getGridName(),uuId,gridBasicInfoDTO.getStagingIds());
+					}else{
+						QueryFilter qf=QueryFilter.build(StageServiceGirdRef.class);
+						qf.addFilter("isDeleted",0,QueryOP.EQUAL,FieldRelation.AND);
+						qf.addFilter("enabledFlag",1,QueryOP.EQUAL,FieldRelation.AND);
+						qf.addFilter("serviceGridId",gridBasicInfoDTO.getServiceGridId(),QueryOP.EQUAL,FieldRelation.AND);
+						PageList<StageServiceGirdRef> stageServiceGirdRefPageList = stageServiceGirdRefService.query(qf);
+						if(!CollectionUtils.isEmpty(query.getRows()) && query.getRows().size()>0){
+							List<StageServiceGirdRef> updateRef=new ArrayList<>();
+							List<String> updateStagingIds=new ArrayList<>();
+							List<StageServiceGirdRef> rows = stageServiceGirdRefPageList.getRows();
+							List<String> stagingIds = gridBasicInfoDTO.getStagingIds();
+							for(StageServiceGirdRef ref:rows){
+								for(String staginId: stagingIds){
+									if(staginId.equals(ref.getStagingId())){
+										updateStagingIds.add(staginId);
+										updateRef.add(ref);
+									}
+								}
+							}
+							if(updateRef.size()>0){
+								//更新
+								if(updateRef.size()>0){
+									for(StageServiceGirdRef ref:updateRef){
+										ref.setServiceGridName(gridBasicInfoDTO.getGridCode());
+										ref.setServiceGridCode(gridBasicInfoDTO.getGridCode());
+										num=stageServiceGirdRefService.update(ref);
+									}
+								}
+								//删除
+								rows.removeAll(updateRef);
+								if(rows.size()>0){
+									for(StageServiceGirdRef ref:rows){
+										ref.setIsDeleted(1);
+										num=stageServiceGirdRefService.update(ref);
+									}
+								}
+								//新增
+								stagingIds.removeAll(updateStagingIds);
+								stagingIds=stagingIds.stream().distinct().collect(Collectors.toList());
+								if(stagingIds.size()>0){
+									num=addStageServiceGirdRef(gridBasicInfoDTO.getGridCode(),gridBasicInfoDTO.getGridName(),gridBasicInfoDTO.getServiceGridId()
+											,stagingIds);
+								}
+							}
+						}
+					}
 
+				}
+			}
+		}
+		return num;
+	}
+	//新增
+    private Integer addStageServiceGirdRef(String gridCode,String gridName,String serviceGridId,List<String> stagingIds){
+		int num=0;
+        if(!CollectionUtils.isEmpty(stagingIds)){
+            List<StageServiceGirdRef> stageServiceGirdRefs=new ArrayList<>();
+
+            for(String stagingId:stagingIds){
+                StageServiceGirdRef stageServiceGirdRef=new StageServiceGirdRef();
+                stageServiceGirdRefs.add(stageServiceGirdRef);
+                stageServiceGirdRef.setServiceGridCode(gridCode);
+                stageServiceGirdRef.setServiceGridId(serviceGridId);
+                stageServiceGirdRef.setServiceGridName(gridName);
+                stageServiceGirdRef.setId(UniqueIdUtil.getSuid());
+                stageServiceGirdRef.setStagingId(stagingId);
+                UcOrg ucOrg = ucOrgService.get(stagingId);
+                stageServiceGirdRef.setStagingName(ucOrg!=null?ucOrg.getName():"");
+                stageServiceGirdRef.setCreationDate(new Date());
+                stageServiceGirdRef.setUpdationDate(new Date());
+                stageServiceGirdRef.setCreatedBy(ContextUtil.getCurrentUser().getUserId());
+                stageServiceGirdRef.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
+                stageServiceGirdRef.setEnabledFlag(1);
+                stageServiceGirdRef.setIsDeleted(0);
+            }
+            return stageServiceGirdRefService.insertBatch(stageServiceGirdRefs);
+        }
+        return num;
+    }
 	/**
 	 * 修改网格
 	 *
@@ -306,30 +488,35 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
             gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfoDTO);*/
 			//修改网格
 			GridBasicInfo gridBasicInfo = new GridBasicInfo();
-			gridBasicInfo.setId(gridBasicInfoDTO.getId());
-			gridBasicInfo.setGridName(gridBasicInfoDTO.getGridName());
-			gridBasicInfo.setGridRemark(gridBasicInfoDTO.getGridRemark());
-			gridBasicInfo.setFormatAttribute(gridBasicInfoDTO.getFormatAttribute());
-			if (StringUtil.isEmpty(gridBasicInfoDTO.getSecondFormatAttribute())) {
-				gridBasicInfo.setSecondFormatAttribute("");
-			} else {
-				gridBasicInfo.setSecondFormatAttribute(gridBasicInfoDTO.getSecondFormatAttribute());
-			}
-			if (StringUtil.isEmpty(gridBasicInfoDTO.getThirdFormatAttribute())) {
-				gridBasicInfo.setThirdFormatAttribute("");
-			} else {
-				gridBasicInfo.setThirdFormatAttribute(gridBasicInfoDTO.getThirdFormatAttribute());
-			}
-			//只要记录历史记录updateTimes都加1
-			gridBasicInfo.setUpdateTimes(gridBasicInfoOld.getUpdateTimes() + 1);
-			gridBasicInfo.setUpdationDate(new Date());
-			gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
-			num = this.updateSelective(gridBasicInfo);
-			if(num>0){
-				GridApprovalRecord newGridRejectRecord = gridApprovalRecordMapper.getNewGridRejectRecord(gridBasicInfoDTO.getId());
-				if(newGridRejectRecord!=null){
-					//驳回的网格
-					gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfo.getId(), gridBasicInfoDTO);
+			if(GridTypeConstants.SERVICE_CENTER_GRID.equals(gridBasicInfoDTO.getGridType())){
+				num = handleServiceCenterGrid(gridBasicInfoDTO, 2);
+			}else{
+				gridBasicInfo.setId(gridBasicInfoDTO.getId());
+				gridBasicInfo.setGridName(gridBasicInfoDTO.getGridName());
+				gridBasicInfo.setGridRemark(gridBasicInfoDTO.getGridRemark());
+				gridBasicInfo.setFormatAttribute(gridBasicInfoDTO.getFormatAttribute());
+				if (StringUtil.isEmpty(gridBasicInfoDTO.getSecondFormatAttribute())) {
+					gridBasicInfo.setSecondFormatAttribute("");
+				} else {
+					gridBasicInfo.setSecondFormatAttribute(gridBasicInfoDTO.getSecondFormatAttribute());
+				}
+				if (StringUtil.isEmpty(gridBasicInfoDTO.getThirdFormatAttribute())) {
+					gridBasicInfo.setThirdFormatAttribute("");
+				} else {
+					gridBasicInfo.setThirdFormatAttribute(gridBasicInfoDTO.getThirdFormatAttribute());
+				}
+				//只要记录历史记录updateTimes都加1
+				gridBasicInfo.setUpdateTimes(gridBasicInfoOld.getUpdateTimes() + 1);
+				gridBasicInfo.setUpdationDate(new Date());
+				gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
+				num = this.updateSelective(gridBasicInfo);
+				//TODO 暂时不调用k2
+				if(num>0){
+					GridApprovalRecord newGridRejectRecord = gridApprovalRecordMapper.getNewGridRejectRecord(gridBasicInfoDTO.getId());
+					if(newGridRejectRecord!=null){
+						//驳回的网格
+						gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfo.getId(), gridBasicInfoDTO);
+					}
 				}
 			}
 		}
@@ -349,18 +536,55 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	@Override
 	public GridErrorCode changeHousekeeper(GridBasicInfoDTO gridBasicInfoDTO) {
 		GridErrorCode gridErrorCode = GridErrorCode.SUCCESS;
+
 		GridBasicInfo grid = gridBasicInfoService.get(gridBasicInfoDTO.getId());
 		if(grid!=null){
-			gridBasicInfoHistoryService.saveGridBasicInfoHistory(grid, 0);
-			if ("".equals(gridBasicInfoDTO.getHousekeeperId())) {
-				grid.setHousekeeperId(null);
-			} else {
-				grid.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
+			if(GridTypeConstants.SERVICE_CENTER_GRID.equals(grid.getGridType())){
+				Map<String, Object> stagingId = stageServiceGirdRefMapper.getServiceGridIdByStagingId(grid.getStagingId());
+				if(stagingId!=null && stagingId.get("service_grid_id")!=null){
+					QueryFilter qf=QueryFilter.build(StageServiceGirdRef.class);
+					qf.addFilter("isDeleted",0,QueryOP.EQUAL,FieldRelation.AND);
+					qf.addFilter("enabledFlag",1,QueryOP.EQUAL,FieldRelation.AND);
+					qf.addFilter("serviceGridId",stagingId.get("service_grid_id").toString(),QueryOP.EQUAL,FieldRelation.AND);
+
+					PageList<StageServiceGirdRef> stageServiceGirdRefPageList = stageServiceGirdRefService.query(qf);
+					if(stageServiceGirdRefPageList.getRows().size()>0){
+						List<String> collect = stageServiceGirdRefPageList.getRows().stream().map(StageServiceGirdRef::getStagingId).collect(Collectors.toList());
+						QueryFilter queryFilter=QueryFilter.build(GridBasicInfo.class);
+						queryFilter.addFilter("gridType",GridTypeConstants.SERVICE_CENTER_GRID,QueryOP.EQUAL,FieldRelation.AND);
+						queryFilter.addFilter("isDeleted",0,QueryOP.EQUAL,FieldRelation.AND);
+						queryFilter.addFilter("enabledFlag",1,QueryOP.EQUAL,FieldRelation.AND);
+						queryFilter.addFilter("stagingId",collect,QueryOP.IN,FieldRelation.AND);
+						PageList<GridBasicInfo> query = gridBasicInfoService.query(queryFilter);
+						if(query.getRows().size()>0){
+							for(GridBasicInfo gridBasicInfo:query.getRows()){
+								gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo, 0);
+								if ("".equals(gridBasicInfoDTO.getHousekeeperId())) {
+									gridBasicInfo.setHousekeeperId(null);
+								} else {
+									gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
+								}
+								gridBasicInfo.setUpdateTimes(grid.getUpdateTimes() + 1);
+								gridBasicInfo.setUpdationDate(new Date());
+								gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
+								gridBasicInfoService.updateSelective(gridBasicInfo);
+							}
+						}
+					}
+				}
+			}else{
+				gridBasicInfoHistoryService.saveGridBasicInfoHistory(grid, 0);
+				if ("".equals(gridBasicInfoDTO.getHousekeeperId())) {
+					grid.setHousekeeperId(null);
+				} else {
+					grid.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
+				}
+				grid.setUpdateTimes(grid.getUpdateTimes() + 1);
+				grid.setUpdationDate(new Date());
+				grid.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
+				gridBasicInfoService.updateSelective(grid);
 			}
-			grid.setUpdateTimes(grid.getUpdateTimes() + 1);
-			grid.setUpdationDate(new Date());
-			grid.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
-			gridBasicInfoService.updateSelective(grid);
+
 		}else{
 			gridErrorCode=GridErrorCode.UPDATE_EXCEPTION;
 		}
@@ -410,25 +634,44 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		List<GridBasicInfo> gridBasicInfos = gridApprovalRecordMapper.getGridInfoByIds(ids);
 		if (!CollectionUtils.isEmpty(gridBasicInfos)) {
 			for (GridBasicInfo gridInfo : gridBasicInfos) {
-				GridBasicInfoDTO dto = new GridBasicInfoDTO();
-				dto.setId(gridInfo.getId());
-				dto.setGridCode(gridInfo.getGridCode());
-				dto.setGridName(gridInfo.getGridName());
-				dto.setGridType(gridInfo.getGridType());
-				dto.setFormatAttribute(gridInfo.getFormatAttribute());
-				dto.setHousekeeperId(gridInfo.getHousekeeperId());
-				dto.setGridRemark(gridInfo.getGridRemark());
-				dto.setPostId(gridBasicInfoDTO.getPostId());
-				dto.setPostName(gridBasicInfoDTO.getPostName());
-				dto.setReason(gridBasicInfoDTO.getReason());
-				dto.setGridRange(gridInfo.getGridRange());
-				dto.setCreationDate(gridInfo.getCreationDate());
-				dto.setAreaName(gridBasicInfoDTO.getAreaName());
-				dto.setCityName(gridBasicInfoDTO.getCityName());
-				dto.setProjectName(gridBasicInfoDTO.getProjectName());
-				dto.setStagingName(gridBasicInfoDTO.getStagingName());
-				dto.setAccount(gridBasicInfoDTO.getAccount());
-				gridApprovalRecordService.callApproval(GridOperateEnum.DISABLE_GRID.getOperateType(), gridInfo.getId(), dto);
+				if(GridTypeConstants.SERVICE_CENTER_GRID.equals(gridInfo.getGridType())) {
+					Map<String, Object> stagingId = stageServiceGirdRefMapper.getServiceGridIdByStagingId(gridInfo.getStagingId());
+					if (stagingId != null && stagingId.get("service_grid_id") != null) {
+						QueryFilter qf = QueryFilter.build(StageServiceGirdRef.class);
+						qf.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND);
+						qf.addFilter("enabledFlag", 1, QueryOP.EQUAL, FieldRelation.AND);
+						qf.addFilter("serviceGridId", stagingId.get("service_grid_id").toString(), QueryOP.EQUAL, FieldRelation.AND);
+						PageList<StageServiceGirdRef> stageServiceGirdRefPageList = stageServiceGirdRefService.query(qf);
+						if (stageServiceGirdRefPageList.getRows().size() > 0) {
+							for(StageServiceGirdRef ref:stageServiceGirdRefPageList.getRows()){
+								ref.setEnabledFlag(0);
+							}
+							stageServiceGirdRefService.updateBatch(stageServiceGirdRefPageList.getRows());
+						}
+					}
+				}else{
+					GridBasicInfoDTO dto = new GridBasicInfoDTO();
+					dto.setId(gridInfo.getId());
+					dto.setGridCode(gridInfo.getGridCode());
+					dto.setGridName(gridInfo.getGridName());
+					dto.setGridType(gridInfo.getGridType());
+					dto.setFormatAttribute(gridInfo.getFormatAttribute());
+					dto.setHousekeeperId(gridInfo.getHousekeeperId());
+					dto.setGridRemark(gridInfo.getGridRemark());
+					dto.setPostId(gridBasicInfoDTO.getPostId());
+					dto.setPostName(gridBasicInfoDTO.getPostName());
+					dto.setReason(gridBasicInfoDTO.getReason());
+					dto.setGridRange(gridInfo.getGridRange());
+					dto.setCreationDate(gridInfo.getCreationDate());
+					dto.setAreaName(gridBasicInfoDTO.getAreaName());
+					dto.setCityName(gridBasicInfoDTO.getCityName());
+					dto.setProjectName(gridBasicInfoDTO.getProjectName());
+					dto.setStagingName(gridBasicInfoDTO.getStagingName());
+					dto.setAccount(gridBasicInfoDTO.getAccount());
+					gridApprovalRecordService.callApproval(GridOperateEnum.DISABLE_GRID.getOperateType(), gridInfo.getId(), dto);
+				}
+
+
 			}
 		}
 		return gridErrorCode;
@@ -443,18 +686,37 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	@Override
 	public GridErrorCode deleteGridList(GridBasicInfoBO gridBasicInfoBO) {
 		GridErrorCode gridErrorCode = GridErrorCode.SUCCESS;
-		Integer num = 0;
-		gridBasicInfoBO.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
-		//主表更新
-		num = gridBasicInfoMapper.deleteGridInfo(gridBasicInfoBO);
-		//范围表更新
-		gridRangeService.deleteRangeByGridIds(gridBasicInfoBO.getIds());
-		if (num < 1) {
-			gridErrorCode = GridErrorCode.DELETE_EXCEPTION;
+		if(GridTypeConstants.SERVICE_CENTER_GRID.equals(gridBasicInfoBO.getGridType())){
+			Map<String, Object> stagingId = stageServiceGirdRefMapper.getServiceGridIdByStagingId(gridBasicInfoBO.getStagingId());
+			if (stagingId != null && stagingId.get("service_grid_id") != null) {
+				QueryFilter qf = QueryFilter.build(StageServiceGirdRef.class);
+				qf.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND);
+				qf.addFilter("serviceGridId", stagingId.get("service_grid_id").toString(), QueryOP.EQUAL, FieldRelation.AND);
+				PageList<StageServiceGirdRef> stageServiceGirdRefPageList = stageServiceGirdRefService.query(qf);
+				if(stageServiceGirdRefPageList.getRows().size()>0){
+					for(StageServiceGirdRef grf:stageServiceGirdRefPageList.getRows()){
+						grf.setIsDeleted(1);
+						grf.setCreatedBy(ContextUtil.getCurrentUser().getUserId());
+					}
+					stageServiceGirdRefService.updateBatch(stageServiceGirdRefPageList.getRows());
+				}
+			}
 		}else{
-			//增加gridRange 字段的缓存
-			handChangeRange(gridBasicInfoBO.getId(),null,3);//3 删除
+			Integer num = 0;
+			gridBasicInfoBO.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
+			//主表更新
+			num = gridBasicInfoMapper.deleteGridInfo(gridBasicInfoBO);
+			//范围表更新
+			gridRangeService.deleteRangeByGridIds(gridBasicInfoBO.getIds());
+			if (num < 1) {
+				gridErrorCode = GridErrorCode.DELETE_EXCEPTION;
+			}else{
+				//增加gridRange 字段的缓存
+				handChangeRange(gridBasicInfoBO.getId(),null,3);//3 删除
+			}
 		}
+
+
 		return gridErrorCode;
 	}
 
@@ -516,24 +778,60 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		// 调用K2
 		if (!CollectionUtils.isEmpty(IdList)) {
 			for (String id : IdList) {
-				GridBasicInfoDTO dto = new GridBasicInfoDTO();
-				dto.setId(id);
-				dto.setPostId(gridBasicInfoDTO.getPostId());
-				dto.setPostName(gridBasicInfoDTO.getPostName());
-				dto.setReason(gridBasicInfoDTO.getReason());
-				dto.setHousekeeperId(housekeeperId);
-				dto.setAreaName(gridBasicInfoDTO.getAreaName());
-				dto.setCityName(gridBasicInfoDTO.getCityName());
-				dto.setProjectName(gridBasicInfoDTO.getProjectName());
-				dto.setStagingName(gridBasicInfoDTO.getStagingName());
-				dto.setStagingId(gridBasicInfoDTO.getStagingId());
-				dto.setAccount(gridBasicInfoDTO.getAccount());
-				gridApprovalRecordService.callApproval(GridOperateEnum.LINK_HOUSEKEEPER.getOperateType(), id, dto);
+				GridBasicInfo gridBasicInfo = gridBasicInfoService.get(id);
+				if(gridBasicInfo!=null && GridTypeConstants.SERVICE_CENTER_GRID.equals(gridBasicInfo.getGridType())){
+					List<GridBasicInfo> infos = getGridBasicInfo(gridBasicInfo.getStagingId());
+					if(!CollectionUtils.isEmpty(infos)){
+						for(GridBasicInfo info:infos){
+							info.setHousekeeperId(housekeeperId);
+						}
+						gridBasicInfoService.updateBatch(infos);
+					}
+
+				}else{
+					GridBasicInfoDTO dto = new GridBasicInfoDTO();
+					dto.setId(id);
+					dto.setPostId(gridBasicInfoDTO.getPostId());
+					dto.setPostName(gridBasicInfoDTO.getPostName());
+					dto.setReason(gridBasicInfoDTO.getReason());
+					dto.setHousekeeperId(housekeeperId);
+					dto.setAreaName(gridBasicInfoDTO.getAreaName());
+					dto.setCityName(gridBasicInfoDTO.getCityName());
+					dto.setProjectName(gridBasicInfoDTO.getProjectName());
+					dto.setStagingName(gridBasicInfoDTO.getStagingName());
+					dto.setStagingId(gridBasicInfoDTO.getStagingId());
+					dto.setAccount(gridBasicInfoDTO.getAccount());
+					gridApprovalRecordService.callApproval(GridOperateEnum.LINK_HOUSEKEEPER.getOperateType(), id, dto);
+				}
 			}
 		}
 		return GridErrorCode.SUCCESS;
 	}
+	private List<GridBasicInfo> getGridBasicInfo(String id){
+		List<GridBasicInfo> gridBasicInfos= new ArrayList<>();
+		Map<String, Object> stagingId = stageServiceGirdRefMapper.getServiceGridIdByStagingId(id);
+		if(stagingId!=null && stagingId.get("service_grid_id")!=null) {
+			QueryFilter qf = QueryFilter.build(StageServiceGirdRef.class);
+			qf.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND);
+			qf.addFilter("enabledFlag", 1, QueryOP.EQUAL, FieldRelation.AND);
+			qf.addFilter("serviceGridId", stagingId.get("service_grid_id").toString(), QueryOP.EQUAL, FieldRelation.AND);
 
+			PageList<StageServiceGirdRef> stageServiceGirdRefPageList = stageServiceGirdRefService.query(qf);
+			if (stageServiceGirdRefPageList.getRows().size() > 0) {
+				List<String> collect = stageServiceGirdRefPageList.getRows().stream().map(StageServiceGirdRef::getStagingId).collect(Collectors.toList());
+				QueryFilter queryFilter = QueryFilter.build(GridBasicInfo.class);
+				queryFilter.addFilter("gridType", GridTypeConstants.SERVICE_CENTER_GRID, QueryOP.EQUAL, FieldRelation.AND);
+				queryFilter.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND);
+				queryFilter.addFilter("enabledFlag", 1, QueryOP.EQUAL, FieldRelation.AND);
+				queryFilter.addFilter("stagingId", collect, QueryOP.IN, FieldRelation.AND);
+				PageList<GridBasicInfo> query = gridBasicInfoService.query(queryFilter);
+				if(query!=null && query.getRows()!=null && query.getRows().size()>0){
+					gridBasicInfos=query.getRows();
+				}
+			}
+		}
+		return gridBasicInfos;
+	}
 	/**
 	 * 根据地块id，获取地块下的楼栋网格
 	 *
@@ -590,6 +888,16 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 		List<String> IdList = gridBasicInfoBOList.stream().map(map -> map.getId()).collect(Collectors.toList());
 		String[] ids = (String[]) IdList.toArray(new String[IdList.size()]);
 		for (String id : ids) {
+			GridBasicInfo gridBasicInfo = gridBasicInfoService.get(id);
+			if(gridBasicInfo!=null && GridTypeConstants.SERVICE_CENTER_GRID.equals(gridBasicInfo.getStagingId())){
+				List<GridBasicInfo> infos = getGridBasicInfo(gridBasicInfo.getStagingId());
+				if(!CollectionUtils.isEmpty(infos)){
+					for(GridBasicInfo info:infos){
+						info.setHousekeeperId("");
+					}
+					gridBasicInfoService.updateBatch(infos);
+				}
+			}
 			String[] arr = {id};
 			gridBasicInfoDTO.setIds(arr);
 		// 调用K2

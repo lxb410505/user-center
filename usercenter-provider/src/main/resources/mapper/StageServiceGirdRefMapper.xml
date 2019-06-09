@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.StageServiceGirdRefMapper">
+    <select id="getServiceGridByStagingIds" resultType="java.lang.String">
+        select staging_id
+        from stage_servicegird_ref
+        <where>
+            <if test="whereSql!=null">
+                ${whereSql}
+            </if>
+        </where>
+    </select>
+    <select id="getServiceGridByGridId" resultType="java.util.Map">
+        select
+        staging_id as stagingId,
+        staging_name as stagingName
+        from stage_servicegird_ref
+        where service_grid_id=#{id}
+        and is_deleted = 0
+		AND enabled_flag = 1;
+    </select>
+    <select id="getServiceGridIdByStagingId" resultType="java.util.Map">
+        select staging_id,service_grid_id
+        from stage_servicegird_ref
+        where staging_id=#{stagingId}
+        and is_deleted = 0
+		AND enabled_flag = 1;
+    </select>
+</mapper>
