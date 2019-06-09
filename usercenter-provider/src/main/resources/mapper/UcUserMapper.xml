@@ -210,30 +210,28 @@
     </select>
 
     <select id="getUserByUnitId" resultMap="baseMap">
-        SELECT
-        u.ID_,u.FULLNAME_
-        FROM uc_user u
-        join
-         (SELECT DISTINCT
-        housekeeper_id
+        SELECT DISTINCT
+            u.ID_,
+            u.FULLNAME_
         FROM
-        grid_basic_info info
+            uc_user u
+        JOIN grid_basic_info info ON u.ID_ = info.housekeeper_id
         JOIN grid_range gr ON info.id = gr.grid_id
-        WHERE
-         gr.range_type = #{unitType}
-       AND gr.resource_id = #{unitId}
-      ) as  B  ON u.ID_ =B.housekeeper_id
-      JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
+        JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
         JOIN uc_org org ON uou.ORG_ID_ = org.ID_
         JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
         JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
         JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
         WHERE
-        uoj.CODE_ = 'guanjia'
+            gr.range_type = #{unitType}
+        AND gr.resource_id = #{unitId}
+        AND uoj.CODE_ = 'guanjia'
         AND dem.CODE_ = 'smsf'
+        AND org.ID_ = info.staging_id
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
-      	limit 1
+        AND info.is_deleted = 0 AND info.enabled_flag = 1
+        LIMIT 1
     </select>
 
     <select id="searchUserByCondition" resultMap="baseMap" parameterType="java.util.Map">
@@ -336,6 +334,7 @@
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
+        and org.ID_ = #{divideId} and info.enabled_flag = 1 and info.is_deleted = 0
         and info.grid_type = #{gridType} and info.staging_id = #{divideId} and info.housekeeper_id is not null
         limit 1
     </select>
