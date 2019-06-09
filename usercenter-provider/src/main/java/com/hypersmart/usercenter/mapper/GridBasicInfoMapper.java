@@ -86,4 +86,6 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
      * @return
      */
     List<String> getServiceGridByStagingIds(Map<String, Object> params);
+
+    Integer updateHousekeeperId(String id);
 }

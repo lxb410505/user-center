@@ -248,6 +248,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 					Map<String, Object> stagingId = stageServiceGirdRefMapper.getServiceGridIdByStagingId(objectMap.get("stagingId").toString());
 
 					if(stagingId!=null && stagingId.get("service_grid_id")!=null){
+						objectMap.put("gridName",stagingId.get("service_grid_name"));
+						objectMap.put("gridCode",stagingId.get("service_grid_code"));
 						objectMap.put("serviceGridId",stagingId.get("service_grid_id").toString());
 						List<Map<String, Object>> list = stageServiceGirdRefMapper.getServiceGridByGridId(stagingId.get("service_grid_id").toString());
 						if(!CollectionUtils.isEmpty(list)){
@@ -381,8 +383,6 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			PageList<GridBasicInfo> query = gridBasicInfoService.query(queryFilter);
 			if(query!=null && !CollectionUtils.isEmpty(query.getRows())){
 				for(GridBasicInfo gridBasicInfo: query.getRows()){
-					gridBasicInfo.setGridCode(gridBasicInfoDTO.getGridCode());
-					gridBasicInfo.setGridName(gridBasicInfoDTO.getGridName());
 					gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
 				}
 				int i = gridBasicInfoService.updateBatch(query.getRows());
@@ -424,6 +424,17 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 									for(StageServiceGirdRef ref:rows){
 										ref.setIsDeleted(1);
 										num=stageServiceGirdRefService.update(ref);
+										QueryFilter queryFilter1=QueryFilter.build(GridBasicInfo.class);
+										queryFilter.addFilter("isDeleted",0,QueryOP.EQUAL,FieldRelation.AND);
+										queryFilter.addFilter("enabledFlag",1,QueryOP.EQUAL,FieldRelation.AND);
+										queryFilter.addFilter("stagingId",ref.getStagingId(),QueryOP.EQUAL,FieldRelation.AND);
+										queryFilter.addFilter("gridType",GridTypeConstants.SERVICE_CENTER_GRID,QueryOP.EQUAL,FieldRelation.AND);
+										PageList<GridBasicInfo> query1 = gridBasicInfoService.query(queryFilter);
+										if(query1!=null && !CollectionUtils.isEmpty(query1.getRows())){
+											GridBasicInfo gridBasicInfo = query1.getRows().get(0);
+											gridBasicInfo.setHousekeeperId("");
+											gridBasicInfoService.update(gridBasicInfo);
+										}
 									}
 								}
 								//新增
@@ -559,8 +570,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 						if(query.getRows().size()>0){
 							for(GridBasicInfo gridBasicInfo:query.getRows()){
 								gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo, 0);
-								if ("".equals(gridBasicInfoDTO.getHousekeeperId())) {
-									gridBasicInfo.setHousekeeperId(null);
+								if (StringUtils.isEmpty(gridBasicInfoDTO.getHousekeeperId())) {
+									gridBasicInfo.setHousekeeperId("");
 								} else {
 									gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
 								}
@@ -649,6 +660,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 							stageServiceGirdRefService.updateBatch(stageServiceGirdRefPageList.getRows());
 						}
 					}
+					gridBasicInfoMapper.updateHousekeeperId(gridInfo.getId());
 				}else{
 					GridBasicInfoDTO dto = new GridBasicInfoDTO();
 					dto.setId(gridInfo.getId());
@@ -706,6 +718,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 						stageServiceGirdRefService.updateBatch(stageServiceGirdRefPageList.getRows());
 					}
 				}
+				gridBasicInfoMapper.updateHousekeeperId(id);
 			}else{
 				dtoIds.add(id);
 			}
