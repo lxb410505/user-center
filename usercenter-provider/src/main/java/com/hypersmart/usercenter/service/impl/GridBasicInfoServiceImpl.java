@@ -686,35 +686,47 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	@Override
 	public GridErrorCode deleteGridList(GridBasicInfoBO gridBasicInfoBO) {
 		GridErrorCode gridErrorCode = GridErrorCode.SUCCESS;
-		if(GridTypeConstants.SERVICE_CENTER_GRID.equals(gridBasicInfoBO.getGridType())){
-			Map<String, Object> stagingId = stageServiceGirdRefMapper.getServiceGridIdByStagingId(gridBasicInfoBO.getStagingId());
-			if (stagingId != null && stagingId.get("service_grid_id") != null) {
-				QueryFilter qf = QueryFilter.build(StageServiceGirdRef.class);
-				qf.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND);
-				qf.addFilter("serviceGridId", stagingId.get("service_grid_id").toString(), QueryOP.EQUAL, FieldRelation.AND);
-				PageList<StageServiceGirdRef> stageServiceGirdRefPageList = stageServiceGirdRefService.query(qf);
-				if(stageServiceGirdRefPageList.getRows().size()>0){
-					for(StageServiceGirdRef grf:stageServiceGirdRefPageList.getRows()){
-						grf.setIsDeleted(1);
-						grf.setCreatedBy(ContextUtil.getCurrentUser().getUserId());
+
+		String[] ids = gridBasicInfoBO.getIds();
+		List<String> dtoIds=new ArrayList<>();
+		for(String id:ids){
+			GridBasicInfo gridBasicInfo = gridBasicInfoService.get(id);
+			if(GridTypeConstants.SERVICE_CENTER_GRID.equals(gridBasicInfo.getGridType())){
+				String serviceId = stageServiceGirdRefMapper.getServiceIdByStagingId(gridBasicInfo.getStagingId());
+				if (!StringUtils.isEmpty(serviceId)) {
+					QueryFilter qf = QueryFilter.build(StageServiceGirdRef.class);
+					qf.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND);
+					qf.addFilter("serviceGridId", serviceId, QueryOP.EQUAL, FieldRelation.AND);
+					PageList<StageServiceGirdRef> stageServiceGirdRefPageList = stageServiceGirdRefService.query(qf);
+					if(stageServiceGirdRefPageList.getRows().size()>0){
+						for(StageServiceGirdRef grf:stageServiceGirdRefPageList.getRows()){
+							grf.setIsDeleted(1);
+							grf.setCreatedBy(ContextUtil.getCurrentUser().getUserId());
+						}
+						stageServiceGirdRefService.updateBatch(stageServiceGirdRefPageList.getRows());
 					}
-					stageServiceGirdRefService.updateBatch(stageServiceGirdRefPageList.getRows());
 				}
-			}
-		}else{
-			Integer num = 0;
-			gridBasicInfoBO.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
-			//主表更新
-			num = gridBasicInfoMapper.deleteGridInfo(gridBasicInfoBO);
-			//范围表更新
-			gridRangeService.deleteRangeByGridIds(gridBasicInfoBO.getIds());
-			if (num < 1) {
-				gridErrorCode = GridErrorCode.DELETE_EXCEPTION;
 			}else{
-				//增加gridRange 字段的缓存
-				handChangeRange(gridBasicInfoBO.getId(),null,3);//3 删除
+				dtoIds.add(id);
 			}
 		}
+			if(dtoIds.size()>0){
+				Integer num = 0;
+				String [] newStr=new String[dtoIds.size()];
+				dtoIds.toArray(newStr);
+				gridBasicInfoBO.setIds(newStr);
+				gridBasicInfoBO.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
+				//主表更新
+				num = gridBasicInfoMapper.deleteGridInfo(gridBasicInfoBO);
+				//范围表更新
+				gridRangeService.deleteRangeByGridIds(gridBasicInfoBO.getIds());
+				if (num < 1) {
+					gridErrorCode = GridErrorCode.DELETE_EXCEPTION;
+				}else{
+					//增加gridRange 字段的缓存
+					handChangeRange(gridBasicInfoBO.getId(),null,3);//3 删除
+				}
+			}
 
 
 		return gridErrorCode;

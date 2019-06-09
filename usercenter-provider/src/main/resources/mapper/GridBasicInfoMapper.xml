@@ -145,7 +145,7 @@
         from grid_basic_info t
         where t.staging_id=#{massifId}
         AND t.grid_type!='service_center_grid'
-        AND t.enabled_flag = 1
+        AND t.is_deleted = 0
         ) as a GROUP BY stagingId,id
         ) g
         LEFT JOIN (
@@ -353,7 +353,7 @@
     </select>
 
     <select id="getGridById" parameterType="java.lang.String" resultType="java.util.Map">
-        select g.id as id,
+        select DISTINCT g.id as id,
         g.grid_range as gridRange,
         g.grid_name as gridName,
         g.grid_type as gridType,
