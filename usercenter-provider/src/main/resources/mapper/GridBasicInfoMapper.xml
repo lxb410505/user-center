@@ -51,64 +51,150 @@
     </select>
 
     <select id="quertList" parameterType="java.util.Map" resultType="java.util.Map">
-        select t.*, r.procInstId, r.approvalStatus from (
-            select g.id as id,
-            g.grid_range as gridRange,
-            g.grid_name as gridName,
-            g.grid_type as gridType,
-            g.grid_code as gridCode,
-            g.grid_remark as gridRemark,
-            g.area_id as areaId,
-            g.project_id as projectId,
-            g.city_id as cityId,
-            g.staging_id as stagingId,
-            g.staging_id as divideId,
-            g.housekeeper_id as housekeeperId,
-            g.format_attribute as formatAttribute,
-            g.second_format_attribute as secondFormatAttribute,
-            g.third_format_attribute as thirdFormatAttribute,
-            concat('',g.enabled_flag,'') as enabledFlag,
-            g.is_deleted as isDeleted,
-            g.creation_date as creationDate,
-            (select org.NAME_ from uc_org org where ID_ = g.area_id) as areaName,
-            (select org.NAME_ from uc_org org where ID_ = g.project_id) as projectName,
-            (select org.NAME_ from uc_org org where ID_ = g.city_id) as cityName,
-            (select org.NAME_ from uc_org org where ID_ = g.staging_id) as stagingName,
-            k.fullName as housekeeperName
-            from grid_basic_info g LEFT JOIN (
-            SELECT
-                u.ID_ AS houseKeeperId,
-                uou.ID_ AS id,
-                u.FULLNAME_ AS fullName,
-                u.MOBILE_ AS mobile,
-                u.ACCOUNT_ AS account,
-                post.ID_ AS `postId`,
-                post.POS_NAME_ AS posName,
-                org.NAME_ AS divideName,
-                org.ID_ AS divideId
-                FROM
-                uc_user u
-                JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
-                JOIN uc_org org ON uou.ORG_ID_ = org.ID_
-                JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
-                JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
-                JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
-                WHERE
-                uoj.CODE_ = 'guanjia'
-                AND dem.CODE_ = 'smsf'
-                AND org.GRADE_ = 'ORG_DiKuai'
-                and u.IS_DELE_ = 0 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
-            ) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId where g.staging_id = #{massifId} and g.is_deleted = 0 group by g.grid_name
-        ) as t
+        SELECT
+        t.*, r.procInstId,
+        r.approvalStatus
+        FROM
+        (
+        SELECT
+        g.*,
+        (
+        SELECT
+        org.NAME_
+        FROM
+        uc_org org
+        WHERE
+        ID_ = g.areaId
+        ) AS areaName,
+        (
+        SELECT
+        org.NAME_
+        FROM
+        uc_org org
+        WHERE
+        ID_ = g.projectId
+        ) AS projectName,
+        (
+        SELECT
+        org.NAME_
+        FROM
+        uc_org org
+        WHERE
+        ID_ = g.cityId
+        ) AS cityName,
+        (
+        SELECT
+        org.NAME_
+        FROM
+        uc_org org
+        WHERE
+        ID_ = g.stagingId
+        ) AS stagingName,
+        k.fullName AS housekeeperName
+        FROM
+        (
+        SELECT * from
+        (
+        select
+        t.id AS id,
+        t.grid_range AS gridRange,
+        t.grid_name AS gridName,
+        t.grid_type AS gridType,
+        t.grid_code AS gridCode,
+        t.grid_remark AS gridRemark,
+        null AS areaId,
+        null AS projectId,
+        null AS cityId,
+        s.staging_id AS stagingId,
+        t.staging_id AS divideId,
+        t.housekeeper_id AS housekeeperId,
+        t.format_attribute AS formatAttribute,
+        t.second_format_attribute AS secondFormatAttribute,
+        t.third_format_attribute AS thirdFormatAttribute,
+        concat('', s.enabled_flag, '') AS enabledFlag,
+        t.is_deleted AS isDeleted,
+        t.creation_date AS creationDate
+        FROM
+        stage_servicegird_ref s LEFT JOIN grid_basic_info t
+        ON t.staging_id = s.staging_id
+        where
+        s.staging_id =#{massifId}
+        and s.is_deleted = 0
+        and
+        t.is_deleted = 0
+        UNION
+        select
+        t.id AS id,
+        t.grid_range AS gridRange,
+        t.grid_name AS gridName,
+        t.grid_type AS gridType,
+        t.grid_code AS gridCode,
+        t.grid_remark AS gridRemark,
+        t.area_id AS areaId,
+        t.project_id AS projectId,
+        t.city_id AS cityId,
+        t.staging_id AS stagingId,
+        t.staging_id AS divideId,
+        t.housekeeper_id AS housekeeperId,
+        t.format_attribute AS formatAttribute,
+        t.second_format_attribute AS secondFormatAttribute,
+        t.third_format_attribute AS thirdFormatAttribute,
+        concat('', t.enabled_flag, '') AS enabledFlag,
+        t.is_deleted AS isDeleted,
+        t.creation_date AS creationDate
+        from grid_basic_info t
+        where t.staging_id=#{massifId}
+        AND t.grid_type!='service_center_grid'
+        AND t.enabled_flag = 1
+        ) as a GROUP BY stagingId,id
+        ) g
         LEFT JOIN (
-            SELECT
-            gr.grid_id,
-            gr.approval_status AS approvalStatus,
-            gr.proc_inst_Id AS procInstId
-            FROM
-            grid_approval_record gr
-            WHERE
-            gr.create_date = ( SELECT max( create_date ) FROM grid_approval_record WHERE grid_id = gr.grid_id )
+        SELECT
+        u.ID_ AS houseKeeperId,
+        uou.ID_ AS id,
+        u.FULLNAME_ AS fullName,
+        u.MOBILE_ AS mobile,
+        u.ACCOUNT_ AS account,
+        post.ID_ AS `postId`,
+        post.POS_NAME_ AS posName,
+        org.NAME_ AS divideName,
+        org.ID_ AS divideId
+        FROM
+        uc_user u
+        JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+        JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
+        JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
+        JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
+        WHERE
+        uoj.CODE_ = 'guanjia'
+        AND dem.CODE_ = 'smsf'
+        AND org.GRADE_ = 'ORG_DiKuai'
+        AND u.IS_DELE_ = 0
+        AND uou.IS_DELE_ = 0
+        AND org.IS_DELE_ = 0
+        AND post.IS_DELE_ = 0
+        AND uoj.IS_DELE_ = 0
+        AND dem.IS_DELE_ = 0
+        ) AS k ON  g.housekeeperId = k.houseKeeperId
+        group by g.gridName
+        ) AS t
+        LEFT JOIN (
+        SELECT
+        gr.grid_id,
+        gr.approval_status AS approvalStatus,
+        gr.proc_inst_Id AS procInstId
+        FROM
+        grid_approval_record gr
+        WHERE
+        gr.create_date = (
+        SELECT
+        max(create_date)
+        FROM
+        grid_approval_record
+        WHERE
+        grid_id = gr.grid_id
+        )
         ) r ON r.grid_id = t.id
         <where>
             <if test="whereSql!=null">
@@ -121,31 +207,106 @@
     </select>
 
     <select id="queryAssociateList" parameterType="java.util.Map" resultType="java.util.Map">
-        select t.*, r.procInstId, r.approvalStatus from (
-        select g.id as id,
-        g.grid_range as gridRange,
-        g.grid_name as gridName,
-        g.grid_type as gridType,
-        g.grid_code as gridCode,
-        g.grid_remark as gridRemark,
-        g.area_id as areaId,
-        g.project_id as projectId,
-        g.city_id as cityId,
-        g.staging_id as stagingId,
-        g.staging_id as divideId,
-        g.housekeeper_id as housekeeperId,
-        g.format_attribute as formatAttribute,
-        g.second_format_attribute as secondFormatAttribute,
-        g.third_format_attribute as thirdFormatAttribute,
-        concat('',g.enabled_flag,'') as enabledFlag,
-        g.is_deleted as isDeleted,
-        g.creation_date as creationDate,
-        (select org.NAME_ from uc_org org where ID_ = g.area_id) as areaName,
-        (select org.NAME_ from uc_org org where ID_ = g.project_id) as projectName,
-        (select org.NAME_ from uc_org org where ID_ = g.city_id) as cityName,
-        (select org.NAME_ from uc_org org where ID_ = g.staging_id) as stagingName,
-        k.fullName as housekeeperName
-        from grid_basic_info g LEFT JOIN (
+        SELECT
+        t.*, r.procInstId,
+        r.approvalStatus
+        FROM
+        (
+        SELECT
+        g.*,
+        (
+        SELECT
+        org.NAME_
+        FROM
+        uc_org org
+        WHERE
+        ID_ = g.areaId
+        ) AS areaName,
+        (
+        SELECT
+        org.NAME_
+        FROM
+        uc_org org
+        WHERE
+        ID_ = g.projectId
+        ) AS projectName,
+        (
+        SELECT
+        org.NAME_
+        FROM
+        uc_org org
+        WHERE
+        ID_ = g.cityId
+        ) AS cityName,
+        (
+        SELECT
+        org.NAME_
+        FROM
+        uc_org org
+        WHERE
+        ID_ = g.stagingId
+        ) AS stagingName,
+        k.fullName AS housekeeperName
+        FROM
+        (
+        SELECT * from
+        (
+        select
+        t.id AS id,
+        t.grid_range AS gridRange,
+        t.grid_name AS gridName,
+        t.grid_type AS gridType,
+        t.grid_code AS gridCode,
+        t.grid_remark AS gridRemark,
+        null AS areaId,
+        null AS projectId,
+        null AS cityId,
+        s.staging_id AS stagingId,
+        t.staging_id AS divideId,
+        t.housekeeper_id AS housekeeperId,
+        t.format_attribute AS formatAttribute,
+        t.second_format_attribute AS secondFormatAttribute,
+        t.third_format_attribute AS thirdFormatAttribute,
+        concat('', s.enabled_flag, '') AS enabledFlag,
+        t.is_deleted AS isDeleted,
+        t.creation_date AS creationDate
+        FROM
+        stage_servicegird_ref s LEFT JOIN grid_basic_info t
+        ON t.staging_id = s.staging_id
+        where
+        s.staging_id =#{massifId}
+        and s.is_deleted = 0
+        AND s.enabled_flag = 1
+        and
+        t.is_deleted = 0
+        AND t.enabled_flag = 1
+        UNION
+        select
+        t.id AS id,
+        t.grid_range AS gridRange,
+        t.grid_name AS gridName,
+        t.grid_type AS gridType,
+        t.grid_code AS gridCode,
+        t.grid_remark AS gridRemark,
+        t.area_id AS areaId,
+        t.project_id AS projectId,
+        t.city_id AS cityId,
+        t.staging_id AS stagingId,
+        t.staging_id AS divideId,
+        t.housekeeper_id AS housekeeperId,
+        t.format_attribute AS formatAttribute,
+        t.second_format_attribute AS secondFormatAttribute,
+        t.third_format_attribute AS thirdFormatAttribute,
+        concat('', t.enabled_flag, '') AS enabledFlag,
+        t.is_deleted AS isDeleted,
+        t.creation_date AS creationDate
+        from grid_basic_info t
+        where t.staging_id=#{massifId}
+        AND t.grid_type !='service_center_grid'
+        AND t.is_deleted = 0
+        AND t.enabled_flag = 1
+        ) as a GROUP BY stagingId,id
+        ) g LEFT JOIN (
         SELECT
         u.ID_ AS houseKeeperId,
         uou.ID_ AS id,
@@ -168,7 +329,7 @@
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
-        ) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId where g.staging_id = #{massifId} and g.is_deleted = 0
+        ) as k on g.housekeeperId = k.houseKeeperId
         ) as t
         LEFT JOIN (
         SELECT
@@ -331,5 +492,14 @@
             <foreach collection="list" item="stagingId" open="(" separator="," close=")">
                 #{stagingId}
             </foreach>
-    </select> 
+    </select>
+    <select id="getServiceGridByStagingIds" resultType="java.lang.String">
+        select  staging_id
+        from uc.grid_basic_info
+        <where>
+            <if test="whereSql!=null">
+                ${whereSql}
+            </if>
+        </where>
+    </select>
 </mapper>

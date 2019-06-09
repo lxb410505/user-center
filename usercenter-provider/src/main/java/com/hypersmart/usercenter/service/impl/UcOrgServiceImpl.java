@@ -16,15 +16,15 @@ import com.hypersmart.usercenter.model.UcDemension;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UcOrgParams;
 import com.hypersmart.usercenter.model.UcOrgUser;
-import com.hypersmart.usercenter.service.UcDemensionService;
-import com.hypersmart.usercenter.service.UcOrgParamsService;
-import com.hypersmart.usercenter.service.UcOrgService;
-import com.hypersmart.usercenter.service.UcOrgUserService;
+import com.hypersmart.usercenter.service.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * 组织架构
@@ -47,6 +47,9 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
 
     @Autowired
     UcOrgParamsMapper ucOrgParamsMapper;
+
+    @Autowired
+    private StageServiceGirdRefService stageServiceGirdRefService;
 
     public UcOrgServiceImpl(UcOrgMapper mapper) {
         super(mapper);
@@ -711,5 +714,11 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
 //        else {
 //            return  null;
 //        }
+    }
+
+    public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor)
+    {
+        Map<Object, Boolean> map = new ConcurrentHashMap<>();
+        return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 }

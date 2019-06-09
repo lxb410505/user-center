@@ -79,4 +79,11 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
      * @return
      */
     List<GridBasicInfo> getGridBasicInfoByHouseKeeperID(List<String> list);
+
+    /**
+     * 获取所有有公区网格的地块
+     * @param params
+     * @return
+     */
+    List<String> getServiceGridByStagingIds(Map<String, Object> params);
 }

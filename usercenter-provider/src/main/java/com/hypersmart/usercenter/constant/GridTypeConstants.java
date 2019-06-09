@@ -11,5 +11,6 @@ public class GridTypeConstants {
 
     public static final String PUBLIC_AREA_GRID = "public_area_grid";
 
-    public static final String SERVICE_CENTRE_GRID = "service_centre_grid";
+    public static final String SERVICE_CENTER_GRID = "service_center_grid";
+
 }
