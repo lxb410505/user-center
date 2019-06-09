@@ -32,6 +32,7 @@
         select service_grid_id
         from stage_servicegird_ref
         where staging_id=#{stagingId}
-        and is_deleted = 0;
+        and is_deleted = 0
+        limit 1;
     </select>
 </mapper>
