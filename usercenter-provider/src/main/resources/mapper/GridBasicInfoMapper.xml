@@ -176,7 +176,7 @@
         AND post.IS_DELE_ = 0
         AND uoj.IS_DELE_ = 0
         AND dem.IS_DELE_ = 0
-        ) AS k ON  g.housekeeperId = k.houseKeeperId
+        ) AS k ON  g.housekeeperId = k.houseKeeperId  and g.stagingId = k.divideId
         group by g.gridName
         ) AS t
         LEFT JOIN (
@@ -329,7 +329,7 @@
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
-        ) as k on g.housekeeperId = k.houseKeeperId
+        ) as k on g.housekeeperId = k.houseKeeperId  and g.stagingId = k.divideId
         ) as t
         LEFT JOIN (
         SELECT
