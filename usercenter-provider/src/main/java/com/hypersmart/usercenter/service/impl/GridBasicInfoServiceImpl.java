@@ -429,6 +429,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 									for(StageServiceGirdRef ref:updateRef){
 										ref.setServiceGridName(gridBasicInfoDTO.getGridName());
 										ref.setServiceGridCode(gridBasicInfoDTO.getGridCode());
+										ref.setIsShared(isShare);
 										num=stageServiceGirdRefService.update(ref);
 									}
 								}
