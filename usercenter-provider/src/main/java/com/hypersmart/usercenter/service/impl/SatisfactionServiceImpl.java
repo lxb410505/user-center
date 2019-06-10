@@ -362,9 +362,8 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         return satisfactionMapper.getSatisfactionListByParam(JSONObject.toJavaObject(json, Map.class));
     }
     private BigDecimal getBigDecimal(String bdstr) {
-
         BigDecimal bdv = new BigDecimal(bdstr);//字符串转成bigdecimal
-        bdv = bdv.setScale(2, BigDecimal.ROUND_HALF_UP);
+        bdv = bdv.setScale(4, BigDecimal.ROUND_HALF_UP);
         return bdv;
     }
     private void doData(StringBuffer message, List<Satisfaction> satisfactions, List<List<Object>> tempResourceImportList, String date) throws Exception {
