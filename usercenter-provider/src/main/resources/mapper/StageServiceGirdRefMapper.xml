@@ -21,7 +21,11 @@
 		AND enabled_flag = 1;
     </select>
     <select id="getServiceGridIdByStagingId" resultType="java.util.Map">
-        select staging_id,service_grid_id
+        select
+        staging_id,
+        service_grid_id,
+        service_grid_name,
+        service_grid_code
         from stage_servicegird_ref
         where staging_id=#{stagingId}
         and is_deleted = 0

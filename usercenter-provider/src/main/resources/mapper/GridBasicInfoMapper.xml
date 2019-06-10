@@ -39,14 +39,45 @@
         a.staging_id,
         a.housekeeper_id
         FROM
-        grid_basic_info a
+        (
+        SELECT * from
+        (
+        select
+        t.id AS id,
+        s.service_grid_name AS grid_name,
+        t.housekeeper_id AS housekeeper_id,
+        s.staging_id AS staging_id,
+        s.creation_date AS creation_date
+        FROM
+        stage_servicegird_ref s LEFT JOIN grid_basic_info t
+        ON t.staging_id = s.staging_id and t.grid_type='service_center_grid'
         where
-        a.is_deleted = 0
-        and a.enabled_flag = 1
-        and
         <foreach collection="houseKeeperBO" index="index" item="houseKeeper" open="(" separator="or" close=")">
-            (a.housekeeper_id =#{houseKeeper.houseKeeperId} and a.staging_id = #{houseKeeper.divideId})
+            (t.housekeeper_id =#{houseKeeper.houseKeeperId} and t.staging_id = #{houseKeeper.divideId})
         </foreach>
+        and s.is_deleted = 0
+        and s.enabled_flag = 1
+        and
+        t.is_deleted = 0
+        and t.enabled_flag = 1
+        UNION
+        select
+        t.id AS id,
+        t.grid_name AS grid_name,
+        t.housekeeper_id AS housekeeper_id,
+        t.staging_id AS staging_id,
+        t.creation_date AS creation_date
+        from grid_basic_info t
+        where
+        <foreach collection="houseKeeperBO" index="index" item="houseKeeper" open="(" separator="or" close=")">
+            (t.housekeeper_id =#{houseKeeper.houseKeeperId} and t.staging_id = #{houseKeeper.divideId})
+        </foreach>
+        and
+        t.is_deleted = 0
+        and t.enabled_flag = 1
+        AND t.grid_type!='service_center_grid'
+        ) as g
+        ) a
         order by a.creation_date desc
     </select>
 
@@ -98,13 +129,13 @@
         select
         t.id AS id,
         t.grid_range AS gridRange,
-        t.grid_name AS gridName,
+        s.service_grid_name AS gridName,
         t.grid_type AS gridType,
-        t.grid_code AS gridCode,
+        s.service_grid_code AS gridCode,
         t.grid_remark AS gridRemark,
-        null AS areaId,
-        null AS projectId,
-        null AS cityId,
+        t.area_id AS areaId,
+        t.project_id AS projectId,
+        t.city_id AS cityId,
         s.staging_id AS stagingId,
         t.staging_id AS divideId,
         t.housekeeper_id AS housekeeperId,
@@ -113,10 +144,11 @@
         t.third_format_attribute AS thirdFormatAttribute,
         concat('', s.enabled_flag, '') AS enabledFlag,
         t.is_deleted AS isDeleted,
-        t.creation_date AS creationDate
+        t.creation_date AS creationDate,
+        s.id AS serviceGridId
         FROM
         stage_servicegird_ref s LEFT JOIN grid_basic_info t
-        ON t.staging_id = s.staging_id
+        ON t.staging_id = s.staging_id and t.grid_type='service_center_grid'
         where
         s.staging_id =#{massifId}
         and s.is_deleted = 0
@@ -141,7 +173,8 @@
         t.third_format_attribute AS thirdFormatAttribute,
         concat('', t.enabled_flag, '') AS enabledFlag,
         t.is_deleted AS isDeleted,
-        t.creation_date AS creationDate
+        t.creation_date AS creationDate,
+        null AS serviceGridId
         from grid_basic_info t
         where t.staging_id=#{massifId}
         AND t.grid_type!='service_center_grid'
@@ -177,7 +210,7 @@
         AND uoj.IS_DELE_ = 0
         AND dem.IS_DELE_ = 0
         ) AS k ON  g.housekeeperId = k.houseKeeperId  and g.stagingId = k.divideId
-        group by g.gridName
+        group by g.gridName,g.enabledFlag
         ) AS t
         LEFT JOIN (
         SELECT
@@ -254,9 +287,9 @@
         select
         t.id AS id,
         t.grid_range AS gridRange,
-        t.grid_name AS gridName,
+        s.service_grid_name  AS gridName,
         t.grid_type AS gridType,
-        t.grid_code AS gridCode,
+        s.service_grid_code AS gridCode,
         t.grid_remark AS gridRemark,
         null AS areaId,
         null AS projectId,
@@ -272,7 +305,7 @@
         t.creation_date AS creationDate
         FROM
         stage_servicegird_ref s LEFT JOIN grid_basic_info t
-        ON t.staging_id = s.staging_id
+        ON t.staging_id = s.staging_id and t.grid_type='service_center_grid'
         where
         s.staging_id =#{massifId}
         and s.is_deleted = 0
@@ -305,7 +338,7 @@
         AND t.grid_type !='service_center_grid'
         AND t.is_deleted = 0
         AND t.enabled_flag = 1
-        ) as
+        ) as a
         ) g LEFT JOIN (
         SELECT
         u.ID_ AS houseKeeperId,
@@ -502,4 +535,7 @@
             </if>
         </where>
     </select>
+    <update id="updateHousekeeperId">
+        update uc.grid_basic_info set housekeeper_id=NULL ,grid_remark="" where id=#{id};
+    </update>
 </mapper>

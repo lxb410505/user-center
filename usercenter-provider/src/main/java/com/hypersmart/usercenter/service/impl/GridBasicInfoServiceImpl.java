@@ -182,9 +182,18 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 							map.put("cityId",split[3]);
 							map.put("projectId",split[4]);
 						}
-						UcOrg areaId = ucOrgService.get(map.get("areaId").toString());
-						UcOrg cityId = ucOrgService.get(map.get("cityId").toString());
-						UcOrg projectId = ucOrgService.get(map.get("projectId").toString());
+						UcOrg areaId=null;
+						if(map.get("areaId")!=null){
+							areaId = ucOrgService.get(map.get("areaId").toString());
+						}
+						UcOrg cityId=null;
+						if(map.get("cityId")!=null){
+							cityId = ucOrgService.get(map.get("cityId").toString());
+						}
+						UcOrg projectId=null;
+						if(map.get("projectId")!=null){
+							projectId = ucOrgService.get(map.get("projectId").toString());
+						}
 						if(areaId!=null){
 							map.put("areaName",areaId.getName());
 						}
@@ -248,6 +257,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 					Map<String, Object> stagingId = stageServiceGirdRefMapper.getServiceGridIdByStagingId(objectMap.get("stagingId").toString());
 
 					if(stagingId!=null && stagingId.get("service_grid_id")!=null){
+						objectMap.put("gridName",stagingId.get("service_grid_name"));
+						objectMap.put("gridCode",stagingId.get("service_grid_code"));
 						objectMap.put("serviceGridId",stagingId.get("service_grid_id").toString());
 						List<Map<String, Object>> list = stageServiceGirdRefMapper.getServiceGridByGridId(stagingId.get("service_grid_id").toString());
 						if(!CollectionUtils.isEmpty(list)){
@@ -381,9 +392,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			PageList<GridBasicInfo> query = gridBasicInfoService.query(queryFilter);
 			if(query!=null && !CollectionUtils.isEmpty(query.getRows())){
 				for(GridBasicInfo gridBasicInfo: query.getRows()){
-					gridBasicInfo.setGridCode(gridBasicInfoDTO.getGridCode());
-					gridBasicInfo.setGridName(gridBasicInfoDTO.getGridName());
 					gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
+					gridBasicInfo.setGridRemark(gridBasicInfoDTO.getGridRemark());
 				}
 				int i = gridBasicInfoService.updateBatch(query.getRows());
 				if(i>0){
@@ -424,6 +434,18 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 									for(StageServiceGirdRef ref:rows){
 										ref.setIsDeleted(1);
 										num=stageServiceGirdRefService.update(ref);
+										QueryFilter queryFilter1=QueryFilter.build(GridBasicInfo.class);
+										queryFilter.addFilter("isDeleted",0,QueryOP.EQUAL,FieldRelation.AND);
+										queryFilter.addFilter("enabledFlag",1,QueryOP.EQUAL,FieldRelation.AND);
+										queryFilter.addFilter("stagingId",ref.getStagingId(),QueryOP.EQUAL,FieldRelation.AND);
+										queryFilter.addFilter("gridType",GridTypeConstants.SERVICE_CENTER_GRID,QueryOP.EQUAL,FieldRelation.AND);
+										PageList<GridBasicInfo> query1 = gridBasicInfoService.query(queryFilter);
+										if(query1!=null && !CollectionUtils.isEmpty(query1.getRows())){
+											GridBasicInfo gridBasicInfo = query1.getRows().get(0);
+											gridBasicInfo.setHousekeeperId(null);
+											gridBasicInfo.setGridRemark("");
+											gridBasicInfoService.update(gridBasicInfo);
+										}
 									}
 								}
 								//新增
@@ -559,7 +581,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 						if(query.getRows().size()>0){
 							for(GridBasicInfo gridBasicInfo:query.getRows()){
 								gridBasicInfoHistoryService.saveGridBasicInfoHistory(gridBasicInfo, 0);
-								if ("".equals(gridBasicInfoDTO.getHousekeeperId())) {
+								if (StringUtils.isEmpty(gridBasicInfoDTO.getHousekeeperId())) {
 									gridBasicInfo.setHousekeeperId(null);
 								} else {
 									gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
@@ -649,6 +671,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 							stageServiceGirdRefService.updateBatch(stageServiceGirdRefPageList.getRows());
 						}
 					}
+					gridBasicInfoMapper.updateHousekeeperId(gridInfo.getId());
 				}else{
 					GridBasicInfoDTO dto = new GridBasicInfoDTO();
 					dto.setId(gridInfo.getId());
@@ -706,6 +729,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 						stageServiceGirdRefService.updateBatch(stageServiceGirdRefPageList.getRows());
 					}
 				}
+				gridBasicInfoMapper.updateHousekeeperId(id);
 			}else{
 				dtoIds.add(id);
 			}
@@ -905,7 +929,7 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 				List<GridBasicInfo> infos = getGridBasicInfo(gridBasicInfo.getStagingId());
 				if(!CollectionUtils.isEmpty(infos)){
 					for(GridBasicInfo info:infos){
-						info.setHousekeeperId("");
+						info.setHousekeeperId(null);
 					}
 					gridBasicInfoService.updateBatch(infos);
 				}
