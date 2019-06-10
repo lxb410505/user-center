@@ -397,7 +397,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 				}
 				int i = gridBasicInfoService.updateBatch(query.getRows());
 				Integer isShare=0;
-				if(i>1){
+				if(!CollectionUtils.isEmpty(gridBasicInfoDTO.getStagingIds()) && gridBasicInfoDTO.getStagingIds().size()>1){
 					isShare=1;
 				}
 				if(i>0){
