@@ -423,7 +423,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 									}
 								}
 							}
-							if(updateRef.size()>0){
+
 								//更新
 								if(updateRef.size()>0){
 									for(StageServiceGirdRef ref:updateRef){
@@ -459,7 +459,6 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 									num=addStageServiceGirdRef(gridBasicInfoDTO.getGridCode(),gridBasicInfoDTO.getGridName(),gridBasicInfoDTO.getServiceGridId()
 											,stagingIds,isShare);
 								}
-							}
 						}
 					}
 
