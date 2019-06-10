@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  * @date 2019-01-10 11:23:58
  */
 @RestController
-@RequestMapping(value = {"/grid-api/grid-basic-info"}, produces = {"application/json;charset=UTF-8"})
+@RequestMapping(value = {"/grid-api/grid-basic-info/list"}, produces = {"application/json;charset=UTF-8"})
 @Api(tags = {"gridBasicInfoController"})
 public class GridBasicInfoController extends BaseController {
 	@Resource
