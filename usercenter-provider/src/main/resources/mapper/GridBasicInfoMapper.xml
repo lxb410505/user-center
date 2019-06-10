@@ -132,13 +132,21 @@
         s.service_grid_name AS gridName,
         t.grid_type AS gridType,
         s.service_grid_code AS gridCode,
-        t.grid_remark AS gridRemark,
+        case s.enabled_flag
+        when 1 then t.grid_remark
+        else NULL
+        end
+         AS gridRemark,
         t.area_id AS areaId,
         t.project_id AS projectId,
         t.city_id AS cityId,
         s.staging_id AS stagingId,
         t.staging_id AS divideId,
-        t.housekeeper_id AS housekeeperId,
+        case s.enabled_flag
+        when 1 then t.housekeeper_id
+        else NULL
+        end
+        AS housekeeperId,
         t.format_attribute AS formatAttribute,
         t.second_format_attribute AS secondFormatAttribute,
         t.third_format_attribute AS thirdFormatAttribute,

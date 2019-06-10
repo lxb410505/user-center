@@ -396,10 +396,14 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 					gridBasicInfo.setGridRemark(gridBasicInfoDTO.getGridRemark());
 				}
 				int i = gridBasicInfoService.updateBatch(query.getRows());
+				Integer isShare=0;
+				if(!CollectionUtils.isEmpty(gridBasicInfoDTO.getStagingIds()) && gridBasicInfoDTO.getStagingIds().size()>1){
+					isShare=1;
+				}
 				if(i>0){
 					if(action.equals(1)){
 						String uuId=UniqueIdUtil.getSuid();
-						return addStageServiceGirdRef(gridBasicInfoDTO.getGridCode(),gridBasicInfoDTO.getGridName(),uuId,gridBasicInfoDTO.getStagingIds());
+						return addStageServiceGirdRef(gridBasicInfoDTO.getGridCode(),gridBasicInfoDTO.getGridName(),uuId,gridBasicInfoDTO.getStagingIds(),isShare);
 					}else{
 						QueryFilter qf=QueryFilter.build(StageServiceGirdRef.class);
 						qf.addFilter("isDeleted",0,QueryOP.EQUAL,FieldRelation.AND);
@@ -419,12 +423,13 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 									}
 								}
 							}
-							if(updateRef.size()>0){
+
 								//更新
 								if(updateRef.size()>0){
 									for(StageServiceGirdRef ref:updateRef){
-										ref.setServiceGridName(gridBasicInfoDTO.getGridCode());
+										ref.setServiceGridName(gridBasicInfoDTO.getGridName());
 										ref.setServiceGridCode(gridBasicInfoDTO.getGridCode());
+										ref.setIsShared(isShare);
 										num=stageServiceGirdRefService.update(ref);
 									}
 								}
@@ -453,9 +458,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 								stagingIds=stagingIds.stream().distinct().collect(Collectors.toList());
 								if(stagingIds.size()>0){
 									num=addStageServiceGirdRef(gridBasicInfoDTO.getGridCode(),gridBasicInfoDTO.getGridName(),gridBasicInfoDTO.getServiceGridId()
-											,stagingIds);
+											,stagingIds,isShare);
 								}
-							}
 						}
 					}
 
@@ -465,7 +469,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		return num;
 	}
 	//新增
-    private Integer addStageServiceGirdRef(String gridCode,String gridName,String serviceGridId,List<String> stagingIds){
+    private Integer addStageServiceGirdRef(String gridCode,String gridName,String serviceGridId,List<String> stagingIds,Integer isShare){
 		int num=0;
         if(!CollectionUtils.isEmpty(stagingIds)){
             List<StageServiceGirdRef> stageServiceGirdRefs=new ArrayList<>();
@@ -486,6 +490,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 stageServiceGirdRef.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
                 stageServiceGirdRef.setEnabledFlag(1);
                 stageServiceGirdRef.setIsDeleted(0);
+				stageServiceGirdRef.setIsShared(isShare);
             }
             return stageServiceGirdRefService.insertBatch(stageServiceGirdRefs);
         }
