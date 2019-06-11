@@ -17,8 +17,7 @@
         staging_name as stagingName
         from stage_servicegird_ref
         where service_grid_id=#{id}
-        and is_deleted = 0
-		AND enabled_flag = 1;
+        and is_deleted = 0;
     </select>
     <select id="getServiceGridIdByStagingId" resultType="java.util.Map">
         select
@@ -30,6 +29,17 @@
         where staging_id=#{stagingId}
         and is_deleted = 0
 		AND enabled_flag = 1
+		limit 1;
+    </select>
+    <select id="getServiceGridIdByStagingIdNotEnableFlag" resultType="java.util.Map">
+        select
+        staging_id,
+        service_grid_id,
+        service_grid_name,
+        service_grid_code
+        from stage_servicegird_ref
+        where staging_id=#{stagingId}
+        and is_deleted = 0
 		limit 1;
     </select>
 

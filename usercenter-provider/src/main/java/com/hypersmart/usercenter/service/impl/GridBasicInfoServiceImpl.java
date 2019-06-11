@@ -254,7 +254,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			objectMap.put("allRange", rangeList);
 			if(GridTypeConstants.SERVICE_CENTER_GRID.equals(objectMap.get("gridType"))){
 				if(objectMap.get("stagingId")!=null){
-					Map<String, Object> stagingId = stageServiceGirdRefMapper.getServiceGridIdByStagingId(objectMap.get("stagingId").toString());
+					Map<String, Object> stagingId = stageServiceGirdRefMapper.getServiceGridIdByStagingIdNotEnableFlag(objectMap.get("stagingId").toString());
 
 					if(stagingId!=null && stagingId.get("service_grid_id")!=null){
 						objectMap.put("gridName",stagingId.get("service_grid_name"));
@@ -533,7 +533,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 					gridBasicInfo.setThirdFormatAttribute(gridBasicInfoDTO.getThirdFormatAttribute());
 				}
 				//只要记录历史记录updateTimes都加1
-				gridBasicInfo.setUpdateTimes(gridBasicInfoOld.getUpdateTimes() + 1);
+				Integer updateTimes = gridBasicInfoOld.getUpdateTimes();
+				gridBasicInfo.setUpdateTimes(updateTimes==null?0:updateTimes + 1);
 				gridBasicInfo.setUpdationDate(new Date());
 				gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
 				num = this.updateSelective(gridBasicInfo);
@@ -591,7 +592,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 								} else {
 									gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
 								}
-								gridBasicInfo.setUpdateTimes(grid.getUpdateTimes() + 1);
+								Integer updateTimes = grid.getUpdateTimes();
+								gridBasicInfo.setUpdateTimes(updateTimes==null?0: updateTimes+ 1);
 								gridBasicInfo.setUpdationDate(new Date());
 								gridBasicInfo.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
 								gridBasicInfoService.updateSelective(gridBasicInfo);
@@ -606,7 +608,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 				} else {
 					grid.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
 				}
-				grid.setUpdateTimes(grid.getUpdateTimes() + 1);
+				Integer updateTimes = grid.getUpdateTimes();
+				grid.setUpdateTimes(updateTimes==null? 0:updateTimes+ 1);
 				grid.setUpdationDate(new Date());
 				grid.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
 				gridBasicInfoService.updateSelective(grid);
