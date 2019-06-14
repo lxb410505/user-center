@@ -218,7 +218,6 @@
         AND uoj.IS_DELE_ = 0
         AND dem.IS_DELE_ = 0
         ) AS k ON  g.housekeeperId = k.houseKeeperId  and g.stagingId = k.divideId
-        group by g.gridName,g.enabledFlag
         ) AS t
         LEFT JOIN (
         SELECT
