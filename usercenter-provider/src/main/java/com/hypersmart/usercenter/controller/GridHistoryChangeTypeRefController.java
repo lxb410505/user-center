@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.controller;
 
+import com.hypersmart.base.aop.norepeat.NoRepeatSubmit;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
@@ -44,6 +45,7 @@ public class GridHistoryChangeTypeRefController extends BaseController {
 
 
     @PostMapping({"add"})
+    @NoRepeatSubmit
     @ApiOperation(value = "新增网格历史网格内容变更类型关系表信息", httpMethod = "POST", notes = "保存网格历史网格内容变更类型关系表")
     public CommonResult<String> post(@ApiParam(name = "gridHistoryChangeTypeRef", value = "网格历史网格内容变更类型关系表业务对象", required = true) @RequestBody GridHistoryChangeTypeRef model) {
         String msg = "添加网格历史网格内容变更类型关系表成功";
@@ -52,6 +54,7 @@ public class GridHistoryChangeTypeRefController extends BaseController {
     }
 
     @PutMapping({"update"})
+    @NoRepeatSubmit
     @ApiOperation(value = "更新指定id的 网格历史网格内容变更类型关系表 信息（更新全部信息）", httpMethod = "PUT", notes = "更新指定id的 网格历史网格内容变更类型关系表 信息（更新全部信息）")
     public CommonResult<String> put(@ApiParam(name = "gridHistoryChangeTypeRef", value = "网格历史网格内容变更类型关系表业务对象", required = true) @RequestBody GridHistoryChangeTypeRef model) {
         String msg = "更新网格历史网格内容变更类型关系表成功";
@@ -60,6 +63,7 @@ public class GridHistoryChangeTypeRefController extends BaseController {
     }
 
     @PatchMapping({"update"})
+    @NoRepeatSubmit
     @ApiOperation(value = "更新指定id的 网格历史网格内容变更类型关系表 信息（更新部分信息）", httpMethod = "PATCH", notes = "更新指定id的 网格历史网格内容变更类型关系表 信息（更新部分信息）")
     public CommonResult<String> patch(@ApiParam(name = "gridHistoryChangeTypeRef", value = "网格历史网格内容变更类型关系表业务对象", required = true) @RequestBody GridHistoryChangeTypeRef model) {
         String msg = "更新网格历史网格内容变更类型关系表成功";

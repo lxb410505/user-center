@@ -1,6 +1,7 @@
 package com.hypersmart.usercenter.controller;
 
 
+import com.hypersmart.base.aop.norepeat.NoRepeatSubmit;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageBean;
@@ -77,6 +78,7 @@ public class GridBasicInfoController extends BaseController {
 	 * @return
 	 */
 	@PostMapping({"/save"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "新增网格基础信息表信息", httpMethod = "POST", notes = "保存网格基础信息表")
 	public CommonResult<String> create(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
 		CommonResult commonResult = new CommonResult();
@@ -98,6 +100,7 @@ public class GridBasicInfoController extends BaseController {
 	 * @return
 	 */
 	@PostMapping({"/update"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "更新指定id的 网格基础信息表 信息（更新全部信息）", httpMethod = "POST", notes = "更新指定id的 网格基础信息表 信息（更新全部信息）")
 	public CommonResult<String> edit(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
 		CommonResult commonResult = new CommonResult();
@@ -131,6 +134,7 @@ public class GridBasicInfoController extends BaseController {
 	 * @return
 	 */
 	@PostMapping({"/changeHousekeeper"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "变更网格管家", httpMethod = "POST", notes = "变更网格管家")
 	public CommonResult<String> changeHousekeeper(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
 		CommonResult commonResult = new CommonResult();
@@ -152,6 +156,7 @@ public class GridBasicInfoController extends BaseController {
 	 * @return
 	 */
 	@PostMapping({"/changeRange"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "变更映射楼栋", httpMethod = "POST", notes = "变更映射楼栋")
 	public CommonResult<String> changeRange(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
 		CommonResult commonResult = new CommonResult();
@@ -174,6 +179,7 @@ public class GridBasicInfoController extends BaseController {
 	 * @return
 	 */
 	@PostMapping({"/disable"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "禁用网格基础信息表记录", httpMethod = "POST", notes = "禁用网格基础信息表记录")
 	public CommonResult<String> disable(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
 		CommonResult commonResult = new CommonResult();
@@ -253,6 +259,7 @@ public class GridBasicInfoController extends BaseController {
 
 
 	@PostMapping({"/associatedGrid"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "关联网格", httpMethod = "POST", notes = "关联网格")
 	public List<GridBasicInfo> associatedGrid(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
 		// 调用service
@@ -261,6 +268,7 @@ public class GridBasicInfoController extends BaseController {
 	}
 
 	@PostMapping({"/disassociatedGrid"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "取消关联网格", httpMethod = "POST", notes = "取消关联网格")
 	public List<GridBasicInfo> disassociatedGrid(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
 		// 调用service

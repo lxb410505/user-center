@@ -1,6 +1,7 @@
 package com.hypersmart.usercenter.controller;
 
 
+import com.hypersmart.base.aop.norepeat.NoRepeatSubmit;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.Direction;
@@ -60,6 +61,7 @@ public class UcWorkHistoryController extends BaseController {
      * @return
      */
     @GetMapping("save")
+	@NoRepeatSubmit
     @ApiOperation(value = "新增上下班记录", httpMethod = "POST", notes = "新增上下班记录")
     public CommonResult<String> create(@ApiParam(name = "ucUserWorkHistory", value = "新增上下班记录", required = true)  @RequestParam(value = "status",required = false) String status, @RequestParam(value = "account",required = false) String account,@RequestParam(value = "userId",required = false) String userId) {
 		CommonResult commonResult = new CommonResult();
