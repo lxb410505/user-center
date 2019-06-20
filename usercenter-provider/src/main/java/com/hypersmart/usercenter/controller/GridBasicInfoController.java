@@ -223,6 +223,15 @@ public class GridBasicInfoController extends BaseController {
 		PageBean pageBean = queryFilter.getPageBean();
 		PageList<Map<String, Object>> pageList = ucOrgUserService.quertListFive(queryFilter);
 		if (pageList != null && pageList.getRows() != null && pageList.getRows().size() > 0) {
+			List<String> ids=new ArrayList<>();
+			List <Map<String,Object>>  temp= pageList.getRows().stream().filter(// 过滤去重
+					v -> {
+						boolean flag = !ids.contains(v.get("houseKeeperId").toString());
+						ids.add(v.get("houseKeeperId").toString());
+						return flag;
+					}
+			).collect(Collectors.toList());
+			pageList.setRows(temp);
 			List<HouseKeeperBO> houseKeeperBOList = new ArrayList<>();
 			for (Map<String, Object> objectMap : pageList.getRows()) {
 				HouseKeeperBO houseKeeperBO = new HouseKeeperBO();
