@@ -221,7 +221,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 					grid.setUpdatedBy(record.getSubmitterId());
 					int i = gridBasicInfoService.updateSelective(grid);
 					if (i > 0) {
-						if(GridTypeConstants.PUBLIC_AREA_GRID.equals(dto.getGridType())){
+						if(GridTypeConstants.BUILDING_GRID.equals(dto.getGridType())){
 							gridBasicInfoService.handChangeRange(gridId, dto.getGridRange(), 2);//2 修改
 						}
 					}
