@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.controller;
 
+import com.hypersmart.base.aop.norepeat.NoRepeatSubmit;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
@@ -44,6 +45,7 @@ public class HousekeeperHistoryController extends BaseController {
 
 
     @PostMapping({"add"})
+    @NoRepeatSubmit
     @ApiOperation(value = "新增管家历史记录表-管家快照信息", httpMethod = "POST", notes = "保存管家历史记录表-管家快照")
     public CommonResult<String> post(@ApiParam(name = "housekeeperHistory", value = "管家历史记录表-管家快照业务对象", required = true) @RequestBody HousekeeperHistory model) {
         String msg = "添加管家历史记录表-管家快照成功";
@@ -52,6 +54,7 @@ public class HousekeeperHistoryController extends BaseController {
     }
 
     @PutMapping({"update"})
+    @NoRepeatSubmit
     @ApiOperation(value = "更新指定id的 管家历史记录表-管家快照 信息（更新全部信息）", httpMethod = "PUT", notes = "更新指定id的 管家历史记录表-管家快照 信息（更新全部信息）")
     public CommonResult<String> put(@ApiParam(name = "housekeeperHistory", value = "管家历史记录表-管家快照业务对象", required = true) @RequestBody HousekeeperHistory model) {
         String msg = "更新管家历史记录表-管家快照成功";
@@ -60,6 +63,7 @@ public class HousekeeperHistoryController extends BaseController {
     }
 
     @PatchMapping({"update"})
+    @NoRepeatSubmit
     @ApiOperation(value = "更新指定id的 管家历史记录表-管家快照 信息（更新部分信息）", httpMethod = "PATCH", notes = "更新指定id的 管家历史记录表-管家快照 信息（更新部分信息）")
     public CommonResult<String> patch(@ApiParam(name = "housekeeperHistory", value = "管家历史记录表-管家快照业务对象", required = true) @RequestBody HousekeeperHistory model) {
         String msg = "更新管家历史记录表-管家快照成功";

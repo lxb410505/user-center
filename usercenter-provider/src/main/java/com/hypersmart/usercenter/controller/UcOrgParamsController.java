@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.controller;
 
+import com.hypersmart.base.aop.norepeat.NoRepeatSubmit;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
@@ -45,6 +46,7 @@ public class UcOrgParamsController extends BaseController {
 
 
     @PostMapping({"add"})
+    @NoRepeatSubmit
     @ApiOperation(value = "新增组织参数信息", httpMethod = "POST", notes = "保存组织参数")
     public CommonResult<String> post(@ApiParam(name = "ucOrgParams", value = "组织参数业务对象", required = true) @RequestBody UcOrgParams model) {
         String msg = "添加组织参数成功";
@@ -53,6 +55,7 @@ public class UcOrgParamsController extends BaseController {
     }
 
     @PutMapping({"update"})
+    @NoRepeatSubmit
     @ApiOperation(value = "更新指定id的 组织参数 信息（更新全部信息）", httpMethod = "PUT", notes = "更新指定id的 组织参数 信息（更新全部信息）")
     public CommonResult<String> put(@ApiParam(name = "ucOrgParams", value = "组织参数业务对象", required = true) @RequestBody UcOrgParams model) {
         String msg = "更新组织参数成功";
@@ -61,6 +64,7 @@ public class UcOrgParamsController extends BaseController {
     }
 
     @PatchMapping({"update"})
+    @NoRepeatSubmit
     @ApiOperation(value = "更新指定id的 组织参数 信息（更新部分信息）", httpMethod = "PATCH", notes = "更新指定id的 组织参数 信息（更新部分信息）")
     public CommonResult<String> patch(@ApiParam(name = "ucOrgParams", value = "组织参数业务对象", required = true) @RequestBody UcOrgParams model) {
         String msg = "更新组织参数成功";

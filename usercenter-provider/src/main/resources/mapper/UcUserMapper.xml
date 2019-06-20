@@ -321,7 +321,7 @@
 
     <select id="getUserByDivideId" resultMap="baseMap">
         SELECT
-        u.ID_,u.FULLNAME_
+        u.ID_,u.FULLNAME_,u.PHOTO_
         FROM uc_user u
         JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
         JOIN uc_org org ON uou.ORG_ID_ = org.ID_

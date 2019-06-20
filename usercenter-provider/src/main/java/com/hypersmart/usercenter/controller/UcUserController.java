@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.controller;
 
+import com.hypersmart.base.aop.norepeat.NoRepeatSubmit;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.exception.RequiredException;
 import com.hypersmart.base.model.CommonResult;
