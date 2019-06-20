@@ -1047,4 +1047,21 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 		}
 		return 0;
 	}
+
+	@Override
+	public Integer getPublicGridNum(String id) {
+		Integer result=0;
+		QueryFilter qf = QueryFilter.build(GridBasicInfo.class);
+		qf.addFilter("gridType", GridTypeConstants.PUBLIC_AREA_GRID, QueryOP.EQUAL, FieldRelation.AND);
+		qf.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND);
+		qf.addFilter("enabledFlag", 1, QueryOP.EQUAL, FieldRelation.AND);
+		qf.addFilter("stagingId", id, QueryOP.EQUAL, FieldRelation.AND);
+		PageList<GridBasicInfo> query = gridBasicInfoService.query(qf);
+		if(query!=null && !CollectionUtils.isEmpty(query.getRows())){
+			if(query.getRows().size()>0){
+				result=1;
+			}
+		}
+		return result;
+	}
 }

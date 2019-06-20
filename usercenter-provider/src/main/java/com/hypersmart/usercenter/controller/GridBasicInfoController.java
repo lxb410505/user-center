@@ -318,4 +318,8 @@ public class GridBasicInfoController extends BaseController {
 		return houseByCondition;
 	}
 
+	@GetMapping({"/getPublicGrid/{id}"})
+	public Integer getHouseByCondition(@PathVariable String id) {
+		return gridBasicInfoService.getPublicGridNum(id);
+	}
 }
