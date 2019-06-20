@@ -8,6 +8,7 @@ import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.usercenter.bo.GridBasicInfoBO;
+import com.hypersmart.usercenter.constant.GridTypeConstants;
 import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridRangeInfo;
 import com.hypersmart.usercenter.mapper.GridApprovalRecordMapper;
@@ -220,7 +221,9 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 					grid.setUpdatedBy(record.getSubmitterId());
 					int i = gridBasicInfoService.updateSelective(grid);
 					if (i > 0) {
-						gridBasicInfoService.handChangeRange(gridId, dto.getGridRange(), 2);//2 修改
+						if(GridTypeConstants.BUILDING_GRID.equals(dto.getGridType())){
+							gridBasicInfoService.handChangeRange(gridId, dto.getGridRange(), 2);//2 修改
+						}
 					}
 					String[] ids = {gridId};
 					gridRangeService.deleteRangeByGridIds(ids);

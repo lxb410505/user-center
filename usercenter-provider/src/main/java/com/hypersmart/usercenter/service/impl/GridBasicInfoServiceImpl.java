@@ -343,7 +343,9 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 				gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfo.getId(), gridBasicInfoDTO);
 				if(num>0){
 					//增加gridRange 字段的缓存
-					handChangeRange(gridBasicInfo.getId(),gridBasicInfo.getGridRange(),1);//1 新增
+					if(GridTypeConstants.BUILDING_GRID.equals(gridBasicInfo.getGridType())){
+						handChangeRange(gridBasicInfo.getId(),gridBasicInfo.getGridRange(),1);//1 新增
+					}
 				}
 			}
 
@@ -410,7 +412,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 						qf.addFilter("enabledFlag",1,QueryOP.EQUAL,FieldRelation.AND);
 						qf.addFilter("serviceGridId",gridBasicInfoDTO.getServiceGridId(),QueryOP.EQUAL,FieldRelation.AND);
 						PageList<StageServiceGirdRef> stageServiceGirdRefPageList = stageServiceGirdRefService.query(qf);
-						if(!CollectionUtils.isEmpty(query.getRows()) && query.getRows().size()>0){
+						if(!CollectionUtils.isEmpty(stageServiceGirdRefPageList.getRows()) && stageServiceGirdRefPageList.getRows().size()>0){
 							List<StageServiceGirdRef> updateRef=new ArrayList<>();
 							List<String> updateStagingIds=new ArrayList<>();
 							List<StageServiceGirdRef> rows = stageServiceGirdRefPageList.getRows();
@@ -756,7 +758,10 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 					gridErrorCode = GridErrorCode.DELETE_EXCEPTION;
 				}else{
 					//增加gridRange 字段的缓存
-					handChangeRange(gridBasicInfoBO.getId(),null,3);//3 删除
+					if(GridTypeConstants.BUILDING_GRID.equals(gridBasicInfoBO.getGridType())){
+						handChangeRange(gridBasicInfoBO.getId(),null,3);//3 删除
+					}
+
 				}
 			}
 
@@ -1016,12 +1021,7 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 	}*/
 	@Override
 	public  void handChangeRange(String gridId,String gridRange,Integer action){
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				dashBoardFeignService.handChangeRange(gridId,gridRange,action);
-			}
-		});
+		dashBoardFeignService.handChangeRange(gridId,gridRange,action);
 	}
 
 	@Override
@@ -1046,5 +1046,22 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 			return Integer.valueOf(matcher.group());
 		}
 		return 0;
+	}
+
+	@Override
+	public Integer getPublicGridNum(String id) {
+		Integer result=0;
+		QueryFilter qf = QueryFilter.build(GridBasicInfo.class);
+		qf.addFilter("gridType", GridTypeConstants.PUBLIC_AREA_GRID, QueryOP.EQUAL, FieldRelation.AND);
+		qf.addFilter("isDeleted", 0, QueryOP.EQUAL, FieldRelation.AND);
+		qf.addFilter("enabledFlag", 1, QueryOP.EQUAL, FieldRelation.AND);
+		qf.addFilter("stagingId", id, QueryOP.EQUAL, FieldRelation.AND);
+		PageList<GridBasicInfo> query = gridBasicInfoService.query(qf);
+		if(query!=null && !CollectionUtils.isEmpty(query.getRows())){
+			if(query.getRows().size()>0){
+				result=1;
+			}
+		}
+		return result;
 	}
 }
