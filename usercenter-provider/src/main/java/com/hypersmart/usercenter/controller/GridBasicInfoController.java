@@ -271,19 +271,37 @@ public class GridBasicInfoController extends BaseController {
 	@PostMapping({"/associatedGrid"})
 	@NoRepeatSubmit
 	@ApiOperation(value = "关联网格", httpMethod = "POST", notes = "关联网格")
-	public List<GridBasicInfo> associatedGrid(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
-		// 调用service
-		gridBasicInfoService.associatedGrid(gridBasicInfoDTO);
-		return new ArrayList<>();
+	public CommonResult<String> associatedGrid(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
+        CommonResult commonResult=new CommonResult();
+	    // 调用service
+        GridErrorCode gridErrorCode = gridBasicInfoService.associatedGrid(gridBasicInfoDTO);
+
+        if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
+            commonResult.setState(true);
+            commonResult.setMessage("关联网格成功！");
+        } else {
+            commonResult.setState(false);
+            commonResult.setMessage("关联网格失败");
+        }
+        return commonResult;
 	}
 
 	@PostMapping({"/disassociatedGrid"})
 	@NoRepeatSubmit
 	@ApiOperation(value = "取消关联网格", httpMethod = "POST", notes = "取消关联网格")
-	public List<GridBasicInfo> disassociatedGrid(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
-		// 调用service
-		gridBasicInfoService.disassociatedGrid(gridBasicInfoDTO);
-		return new ArrayList<>();
+	public CommonResult<String> disassociatedGrid(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
+        CommonResult commonResult=new CommonResult();
+	    // 调用service
+        GridErrorCode gridErrorCode = gridBasicInfoService.disassociatedGrid(gridBasicInfoDTO);
+
+        if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
+            commonResult.setState(true);
+            commonResult.setMessage("取消关联网格成功！");
+        } else {
+            commonResult.setState(false);
+            commonResult.setMessage("取消关联网格失败");
+        }
+        return commonResult;
 	}
 
 	@GetMapping({"/getGridsBymassifId/{id}"})
