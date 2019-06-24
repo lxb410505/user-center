@@ -159,11 +159,12 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 * @param gridRange
 	 * @param action
 	 */
-	void handChangeRange(String gridId,String gridRange,Integer action);
+	void handChangeRange(String gridId, String gridRange, Integer action);
 
 	List<Map<String, Object>> getHouseByCondition(String divide, String id, Integer pageNum, Integer pageSize);
 
 	PageInfo<GridBasicInfo> getGridsBySmcloudmassifIdPage(String massifId, Integer page, Integer pageSize);
-	List<Map<String,Object>> getGridsHouseBymassifIdPage(String massifId,Integer page,Integer pageSize);
+	List<Map<String,Object>> getGridsHouseBymassifIdPage(String massifId, Integer page, Integer pageSize);
+	Integer getPublicGridNum(String id);
 }
 
