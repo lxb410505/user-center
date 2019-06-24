@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(name = "dashboard-provider-eureka", fallback = DashBoardFeignService.DashBoardFeignServiceImpl.class, configuration = {FeignConfig.class})
 public interface DashBoardFeignService {
     @PostMapping({"/dashboard/api/gridBasicInfo/handChangeRange"})
-    public void handChangeRange(@RequestParam("gridId")String gridId,@RequestParam("gridRange")String gridRange,@RequestParam("action")Integer action);
+    public void handChangeRange(@RequestParam("gridId") String gridId, @RequestParam("gridRange") String gridRange, @RequestParam("action") Integer action);
 
     @Component
     public class DashBoardFeignServiceImpl implements DashBoardFeignService {

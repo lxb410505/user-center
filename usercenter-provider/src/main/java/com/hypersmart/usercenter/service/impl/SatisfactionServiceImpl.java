@@ -656,6 +656,12 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                     satisfactions = satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
                 }
             }
+        }else{
+            //查询网格
+           QueryFilter queryFilter = QueryFilter.build();
+           queryFilter.addFilter("org_code",orgCode,QueryOP.EQUAL,FieldRelation.AND);
+           queryFilter.addFilter("effective_time",time+"-01",QueryOP.EQUAL,FieldRelation.AND);
+           satisfactions=this.query(queryFilter).getRows();
         }
         return satisfactions;
     }

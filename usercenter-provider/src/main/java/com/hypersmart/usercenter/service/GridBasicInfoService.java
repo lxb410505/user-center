@@ -164,7 +164,7 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	List<Map<String, Object>> getHouseByCondition(String divide, String id, Integer pageNum, Integer pageSize);
 
 	PageInfo<GridBasicInfo> getGridsBySmcloudmassifIdPage(String massifId, Integer page, Integer pageSize);
-	List<Map<String,Object>> getGridsHouseBymassifIdPage(String massifId,Integer page,Integer pageSize);
+	List<Map<String,Object>> getGridsHouseBymassifIdPage(String massifId, Integer page, Integer pageSize);
 	Integer getPublicGridNum(String id);
 }
 
