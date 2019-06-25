@@ -1,6 +1,7 @@
 package com.hypersmart.usercenter.controller;
 
 
+import com.hypersmart.base.aop.norepeat.NoRepeatSubmit;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageBean;
@@ -78,6 +79,7 @@ public class GridBasicInfoController extends BaseController {
 	 * @return
 	 */
 	@PostMapping({"/save"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "新增网格基础信息表信息", httpMethod = "POST", notes = "保存网格基础信息表")
 	public CommonResult<String> create(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
 		CommonResult commonResult = new CommonResult();
@@ -99,6 +101,7 @@ public class GridBasicInfoController extends BaseController {
 	 * @return
 	 */
 	@PostMapping({"/update"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "更新指定id的 网格基础信息表 信息（更新全部信息）", httpMethod = "POST", notes = "更新指定id的 网格基础信息表 信息（更新全部信息）")
 	public CommonResult<String> edit(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
 		CommonResult commonResult = new CommonResult();
@@ -132,6 +135,7 @@ public class GridBasicInfoController extends BaseController {
 	 * @return
 	 */
 	@PostMapping({"/changeHousekeeper"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "变更网格管家", httpMethod = "POST", notes = "变更网格管家")
 	public CommonResult<String> changeHousekeeper(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
 		CommonResult commonResult = new CommonResult();
@@ -153,6 +157,7 @@ public class GridBasicInfoController extends BaseController {
 	 * @return
 	 */
 	@PostMapping({"/changeRange"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "变更映射楼栋", httpMethod = "POST", notes = "变更映射楼栋")
 	public CommonResult<String> changeRange(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
 		CommonResult commonResult = new CommonResult();
@@ -175,6 +180,7 @@ public class GridBasicInfoController extends BaseController {
 	 * @return
 	 */
 	@PostMapping({"/disable"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "禁用网格基础信息表记录", httpMethod = "POST", notes = "禁用网格基础信息表记录")
 	public CommonResult<String> disable(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
 		CommonResult commonResult = new CommonResult();
@@ -217,6 +223,15 @@ public class GridBasicInfoController extends BaseController {
 		PageBean pageBean = queryFilter.getPageBean();
 		PageList<Map<String, Object>> pageList = ucOrgUserService.quertListFive(queryFilter);
 		if (pageList != null && pageList.getRows() != null && pageList.getRows().size() > 0) {
+			List<String> ids=new ArrayList<>();
+			List <Map<String,Object>>  temp= pageList.getRows().stream().filter(// 过滤去重
+					v -> {
+						boolean flag = !ids.contains(v.get("houseKeeperId").toString());
+						ids.add(v.get("houseKeeperId").toString());
+						return flag;
+					}
+			).collect(Collectors.toList());
+			pageList.setRows(temp);
 			List<HouseKeeperBO> houseKeeperBOList = new ArrayList<>();
 			for (Map<String, Object> objectMap : pageList.getRows()) {
 				HouseKeeperBO houseKeeperBO = new HouseKeeperBO();
@@ -254,19 +269,39 @@ public class GridBasicInfoController extends BaseController {
 
 
 	@PostMapping({"/associatedGrid"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "关联网格", httpMethod = "POST", notes = "关联网格")
-	public List<GridBasicInfo> associatedGrid(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
-		// 调用service
-		gridBasicInfoService.associatedGrid(gridBasicInfoDTO);
-		return new ArrayList<>();
+	public CommonResult<String> associatedGrid(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
+        CommonResult commonResult=new CommonResult();
+	    // 调用service
+        GridErrorCode gridErrorCode = gridBasicInfoService.associatedGrid(gridBasicInfoDTO);
+
+        if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
+            commonResult.setState(true);
+            commonResult.setMessage("关联网格成功！");
+        } else {
+            commonResult.setState(false);
+            commonResult.setMessage("关联网格失败");
+        }
+        return commonResult;
 	}
 
 	@PostMapping({"/disassociatedGrid"})
+	@NoRepeatSubmit
 	@ApiOperation(value = "取消关联网格", httpMethod = "POST", notes = "取消关联网格")
-	public List<GridBasicInfo> disassociatedGrid(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
-		// 调用service
-		gridBasicInfoService.disassociatedGrid(gridBasicInfoDTO);
-		return new ArrayList<>();
+	public CommonResult<String> disassociatedGrid(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
+        CommonResult commonResult=new CommonResult();
+	    // 调用service
+        GridErrorCode gridErrorCode = gridBasicInfoService.disassociatedGrid(gridBasicInfoDTO);
+
+        if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
+            commonResult.setState(true);
+            commonResult.setMessage("取消关联网格成功！");
+        } else {
+            commonResult.setState(false);
+            commonResult.setMessage("取消关联网格失败");
+        }
+        return commonResult;
 	}
 
 	@GetMapping({"/getGridsBymassifId/{id}"})
@@ -298,7 +333,7 @@ public class GridBasicInfoController extends BaseController {
 	@ApiOperation(value = "根据地块id，获取地块下的网格覆盖的房产信息", httpMethod = "GET", notes = "根据地块id，获取地块下的楼栋网格信息")
 	public List<Map<String,Object>> getHouseByCondition(@ApiParam(name = "divide", value = "地块id", required = true) @RequestParam(value = "divide",required = false,defaultValue = "") String divide, @RequestParam(value = "id",required = false,defaultValue = "0") String id, @RequestParam(value = "pageNum",required = false,defaultValue = "1") Integer pageNum,@RequestParam(value = "pageSize",required = false,defaultValue = "20") Integer pageSize) {
 		List<Map<String, Object>> houseByCondition = gridBasicInfoService.getHouseByCondition(divide, id,pageNum,pageSize);
-		Map<String,Object> checkMap = new HashMap<>(16);
+		/*Map<String,Object> checkMap = new HashMap<>(16);
 		List<Map<String, Object>> maps = new ArrayList<>();
 		for (Map<String, Object> map : houseByCondition) {
 			String key = map.get("parentId")+(String)map.get("name");
@@ -306,8 +341,12 @@ public class GridBasicInfoController extends BaseController {
                 checkMap.put(key,map);
                 maps.add(map);
             }
-		}
-		return maps;
+		}*/
+		return houseByCondition;
 	}
 
+	@GetMapping({"/getPublicGrid/{id}"})
+	public Integer getHouseByCondition(@PathVariable String id) {
+		return gridBasicInfoService.getPublicGridNum(id);
+	}
 }

@@ -114,7 +114,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                 QueryFilter queryFilter2 = QueryFilter.build();
                 queryFilter2.addFilter("org_code", orgNames, QueryOP.IN, FieldRelation.AND);
 
-                queryFilter2.addFilter("effective_time", params.get("effective_time"), QueryOP.EQUAL, FieldRelation.AND);
+                if(params.get("effective_time")!=null) queryFilter2.addFilter("effective_time", params.get("effective_time"), QueryOP.EQUAL, FieldRelation.AND);
 
                 queryFilter2.setSorter(sortList);
                 return this.query(queryFilter2);
@@ -656,6 +656,12 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                     satisfactions = satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
                 }
             }
+        }else{
+            //查询网格
+           QueryFilter queryFilter = QueryFilter.build();
+           queryFilter.addFilter("org_code",orgCode,QueryOP.EQUAL,FieldRelation.AND);
+           queryFilter.addFilter("effective_time",time+"-01",QueryOP.EQUAL,FieldRelation.AND);
+           satisfactions=this.query(queryFilter).getRows();
         }
         return satisfactions;
     }

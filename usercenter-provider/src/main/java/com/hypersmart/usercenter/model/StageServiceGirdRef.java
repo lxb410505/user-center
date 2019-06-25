@@ -93,6 +93,10 @@ public class StageServiceGirdRef implements Serializable {
     @Column(name = "is_deleted")
     @ApiModelProperty("是否删除（0：正常 1：删除）")
     private Integer isDeleted;
+    @Column(name="is_shared")
+
+    @ApiModelProperty("是否（0：不共享 1：共享）")
+    private Integer isShared;
 
     public String getId() {
         return id;
@@ -204,5 +208,13 @@ public class StageServiceGirdRef implements Serializable {
 
     public void setIsDeleted(Integer isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public Integer getIsShared() {
+        return isShared;
+    }
+
+    public void setIsShared(Integer isShared) {
+        this.isShared = isShared;
     }
 }
