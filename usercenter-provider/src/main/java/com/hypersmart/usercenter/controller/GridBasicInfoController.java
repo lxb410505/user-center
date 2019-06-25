@@ -333,16 +333,17 @@ public class GridBasicInfoController extends BaseController {
 	@ApiOperation(value = "根据地块id，获取地块下的网格覆盖的房产信息", httpMethod = "GET", notes = "根据地块id，获取地块下的楼栋网格信息")
 	public List<Map<String,Object>> getHouseByCondition(@ApiParam(name = "divide", value = "地块id", required = true) @RequestParam(value = "divide",required = false,defaultValue = "") String divide, @RequestParam(value = "id",required = false,defaultValue = "0") String id, @RequestParam(value = "pageNum",required = false,defaultValue = "1") Integer pageNum,@RequestParam(value = "pageSize",required = false,defaultValue = "20") Integer pageSize) {
 		List<Map<String, Object>> houseByCondition = gridBasicInfoService.getHouseByCondition(divide, id,pageNum,pageSize);
-		Map<String,Object> checkMap = new HashMap<>(16);
-		List<Map<String, Object>> maps = new ArrayList<>();
-		for (Map<String, Object> map : houseByCondition) {
-			String key = map.get("parentId")+(String)map.get("name");
-		    if(!checkMap.containsKey(key)){
-                checkMap.put(key,map);
-                maps.add(map);
-            }
-		}
-		return maps;
+//		Map<String,Object> checkMap = new HashMap<>(16);
+//		List<Map<String, Object>> maps = new ArrayList<>();
+//		for (Map<String, Object> map : houseByCondition) {
+//			String key = map.get("parentId")+(String)map.get("name");
+//		    if(!checkMap.containsKey(key)){
+//                checkMap.put(key,map);
+//                maps.add(map);
+//            }
+//		}
+//		return maps;
+		return houseByCondition;
 	}
 
 	@GetMapping({"/getPublicGrid/{id}"})
