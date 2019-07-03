@@ -74,7 +74,6 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     HttpServletResponse response;
     @Autowired
     SysProperties sysProperties;
-
     Map<String, String> orgMap = new HashMap<String, String>() {
         {
             put("ORG_QuYu", "区域");
@@ -87,6 +86,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     @Value("${xlsx.template}")
     String templatePath;
     String fileName = "客户满意度导入模板.xlsx";
+    boolean isError = false;
 
     @Override
     public PageList<Satisfaction> getListBySearch(QueryFilter queryFilter) {
@@ -97,6 +97,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         sortList.add(fieldSort);
         queryFilter.setSorter(sortList);
         Map<String, Object> params = queryFilter.getParams();
+
 
         if (params.get("quyu") == null || StringUtils.isEmpty(params.get("quyu").toString())) {
             return this.query(queryFilter);
@@ -184,11 +185,11 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                 //get all orgName
                 if (query != null && query.getRows() != null) {
                     List<UcOrg> rows = query.getRows();
-                    for (UcOrg u :rows) {
-                        if(null==u)continue;
+                    for (UcOrg u : rows) {
+                        if (null == u) continue;
                         orgNames.add(u.getCode());
 
-                        if (u.getGrade()!=null &&u.getGrade().equals("ORG_DiKuai")) {
+                        if (u.getGrade() != null && u.getGrade().equals("ORG_DiKuai")) {
                             String stangId = u.getId();
                             GridBasicInfo gridBasicInfo = new GridBasicInfo();
                             gridBasicInfo.setStagingId(stangId);
@@ -226,12 +227,13 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
     @Override
     public CommonResult<String> importData(MultipartFile file, String date) {
-        StringBuffer message = new StringBuffer();
+        StringBuilder message = new StringBuilder();
         boolean importState = true;
         List<Satisfaction> satisfactions = new ArrayList<>();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         try {
             if (file.isEmpty()) {
-                message.append("导入文件丢失，请重新选择文件");
+                message.append("导入文件丢失，请重新选择文件\r\n");
             }
 
 
@@ -243,36 +245,35 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             Integer hasRealCount = getRealCount(tempResourceImportList);
 
             if (hasRealCount > 3000) {
-                message.append("文件数据超过3000条！");
-                importState = false;
-                throw new Exception("文件数据超过3000条");
+                message.append("文件数据超过3000条！\r\n");
             }
             //从第二行开始是表头
             boolean hasError = isHasError(headArr, tempResourceImportList);
             if (hasError) {
-                message.append("标题栏数据顺序或格式不正确");
-                importState = false;
-                throw new Exception("标题栏数据顺序或格式不正确");
+                return new CommonResult<>(false, "模板不正确，请使用正确的模板");
 
             }
 
             //基础校验 看看有没有相等的序列；
             //1取所有序列
             String[] id = new String[tempResourceImportList.size() - 2];
+
             for (int i = 2; i < tempResourceImportList.size(); i++) {
+                isError = false;
                 List<Object> objects = tempResourceImportList.get(i);
                 if ((objects.get(0) == null || objects.get(0).toString().length() <= 0) &&
                         (objects.get(1) != null && objects.get(1).toString().length() == 0) &&
                         (objects.get(2) != null && objects.get(2).toString().length() == 0) &&
                         (objects.get(3) != null && objects.get(3).toString().length() == 0)) {
-                            break;
+                    break;
                 }
 
 
                 if ((objects.get(0) == null || objects.get(0).toString().length() <= 0) &&
                         (objects.get(1) != null && objects.get(1).toString().length() > 0) &&
                         (objects.get(2) != null && objects.get(2).toString().length() > 0)) {
-                    throw new Exception("第" + (i + 1) + "行组织ID为空");
+                    message.append("第" + (i + 1) + "行组织ID为空\r\n");
+                    isError = true;
                 } else {
                     //对小数点问题进行处理；
                     if (objects.get(0).toString().length() >= 4) {
@@ -288,32 +289,99 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                             tempResourceImportList.remove(i);
                             tempResourceImportList.add(i, objects);
                         }
-
                     }
-
                 }
-                if (id[i - 2] == null) {
-                    id[i - 2] = objects.get(0).toString();
+                List<Object> rowDataLevel3 = null;
+                int type = 0;
+                if (objects.get(1).toString() != null) {
+                    if (objects.get(1).toString().equals("区域")) {
+                        type = 1;
+                    }
+                    if (objects.get(1).toString().equals("项目")) {
+                        type = 2;
+                    }
+                    if (objects.get(1).toString().equals("地块")) {
+                        type = 3;
+                    }
+                    if (objects.get(1).toString().equals("网格")) {
+                        type = 4;
+                    }
+                    if (type == 0) {
+                        message.append("第" + (i + 1) + "行 分类内容错误或分类和序列层级不匹配！\r\n");
+                        isError = true;
+                    }
+                } else {
+                    message.append("第" + (i + 1) + "行 网格没有对应得分类\r\n");
+                    isError = true;
+                }
+
+                String orgCode = checkData(i + 1, message, objects, type);
+
+                //新增数据;
+                if (!isError) {
+                    Satisfaction satisfaction = new Satisfaction();
+                    //satisfaction.setCreateBy();
+                    satisfaction.setCreateTime(new Date());
+
+                    satisfaction.setOrder(objects.get(0).toString());
+                    satisfaction.setType(objects.get(1).toString());
+                    satisfaction.setOrgCode(objects.get(2).toString());
+                    satisfaction.setOrgName(objects.get(3).toString());
+                    if (objects.get(4) != null && StringUtil.isNotEmpty(objects.get(4).toString())) {
+                        satisfaction.setOverallSatisfaction(getBigDecimal(objects.get(4).toString()));
+                    }
+                    if (objects.get(5) != null && StringUtil.isNotEmpty(objects.get(5).toString())) {
+                        satisfaction.setStorming(getBigDecimal(objects.get(5).toString()));
+                    }
+                    if (objects.get(6) != null && StringUtil.isNotEmpty(objects.get(6).toString())) {
+                        satisfaction.setStationaryPhase(getBigDecimal(objects.get(6).toString()));
+                    }
+                    if (objects.get(7) != null && StringUtil.isNotEmpty(objects.get(7).toString())) {
+                        satisfaction.setOldProprietor(getBigDecimal(objects.get(7).toString()));
+                    }
+                    satisfaction.setEffectiveTime(formatter.parse(date));
+                    satisfaction.setOrgCode(orgCode);
+                    if (type < 4) {
+                        if (objects.get(8) != null && StringUtil.isNotEmpty(objects.get(8).toString())) {
+                            satisfaction.setOrderServiceUnit(getBigDecimal(objects.get(8).toString()));
+                        }
+                        if (objects.get(9) != null && StringUtil.isNotEmpty(objects.get(9).toString())) {
+                            satisfaction.setEsuCleaning(getBigDecimal(objects.get(9).toString()));
+                        }
+
+                        if (objects.get(10) != null && StringUtil.isNotEmpty(objects.get(10).toString())) {
+                            satisfaction.setEsuGreen(getBigDecimal(objects.get(10).toString()));
+                        }
+
+                        if (objects.get(11) != null && StringUtil.isNotEmpty(objects.get(11).toString())) {
+                            satisfaction.setEngineeringServiceUnit(getBigDecimal(objects.get(11).toString()));
+                        }
+                    }
+                    satisfactions.add(satisfaction);
                 }
             }
 
-//            this.checkHasEqualId(id);
 
             //处理导入的数据；
-            if (importState) {
 
-                doData(message, satisfactions, tempResourceImportList, date);
-
-                satisfactionMapper.deleteByDate(date);
-
-                insertBatch(satisfactions);
-
+            satisfactionMapper.deleteByDate(date);
+            int resultNum = 0;
+            if (org.apache.commons.collections.CollectionUtils.isNotEmpty(satisfactions)) {
+                if(message.length()==0) {
+                    if (insertBatch(satisfactions) > 0) {
+                        return new CommonResult(true, "导入成功。");
+                    }else{
+                        return new CommonResult<>(false, "导入失败，失败信息如下：没有一条正确的数据\r\n");
+                    }
+                }else{
+                    return new CommonResult<>(false, "导入失败，失败信息如下：\r\n" + message.toString());
+                }
             }
 
         } catch (Exception e) {
-            return new CommonResult(false, e.getMessage());
+            return new CommonResult<>(false, "导入失败,内部错误", message.toString(), 500);
         }
-        return new CommonResult(true, "成功导入");
+        return new CommonResult(true, "导入成功。");
     }
 
     private void fixId(List<List<Object>> tempResourceImportList, String[] id, int i, List<Object> objects) {
@@ -411,114 +479,15 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         return bdv;
     }
 
-    private void doData(StringBuffer message, List<Satisfaction> satisfactions, List<List<Object>> tempResourceImportList, String date) throws Exception {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        List<Object> rowDataLevel3 = null;
-        for (int i = 2; i < tempResourceImportList.size(); i++) {
-            List<Object> rowData = tempResourceImportList.get(i);
-            if ((rowData.get(0) == null || rowData.get(0).toString().length() <= 0) &&
-                    (rowData.get(1) != null && rowData.get(1).toString().length() == 0) &&
-                    (rowData.get(2) != null && rowData.get(2).toString().length() == 0) &&
-                    (rowData.get(3) != null && rowData.get(3).toString().length() == 0)) {
-                break;
-            }
-            int type = 0;
-            if (rowData.get(1).toString() != null) {
-                if (rowData.get(1).toString().equals("区域")) {
-                    type = 1;
-                }
-                if (rowData.get(1).toString().equals("项目")) {
-                    type = 2;
-                }
-                if (rowData.get(1).toString().equals("地块")) {
-                    type = 3;
-                }
-                if (rowData.get(1).toString().equals("网格")) {
-                    type = 4;
-                }
-                if (type == 0) {
-                    throw new Exception("第" + (i + 1) + "行 分类内容错误或分类和序列层级不匹配！");
-                }
-            } else {
-                throw new Exception("第" + (i + 1) + "行 网格没有对应得分类");
-            }
-            //获取上一级别得组织对象；
-            List<Object> lastOrgRow = null;
-            if (i > 2) {
-                for (int j = i; j > 2; j--) {
-                    List<Object> objects = tempResourceImportList.get(j);
-                    if (objects.get(0).toString().split("\\.").length + 1 == rowData.get(0).toString().split("\\.").length) {
-                        lastOrgRow = objects;
-                    }
-                }
-            }
-            if (type == 3) {
-                rowDataLevel3 = rowData;
-            }
-            if (type != 3 && type != 4) {
-                rowDataLevel3 = null;
-            }
-            if (type == 4 && rowDataLevel3 == null) {
-                throw new Exception("第" + (i + 1) + "行 网格没有对应得上级组织");
-            }
-            String orgCode = checkData(lastOrgRow, rowDataLevel3, i + 1, message, rowData, type);
-
-            //新增数据;
-            Satisfaction satisfaction = new Satisfaction();
-            //satisfaction.setCreateBy();
-            satisfaction.setCreateTime(new Date());
-
-            satisfaction.setOrder(rowData.get(0).toString());
-            satisfaction.setType(rowData.get(1).toString());
-            satisfaction.setOrgCode(rowData.get(2).toString());
-            satisfaction.setOrgName(rowData.get(3).toString());
-            if (rowData.get(4) != null && StringUtil.isNotEmpty(rowData.get(4).toString())) {
-                satisfaction.setOverallSatisfaction(getBigDecimal(rowData.get(4).toString()));
-            }
-            if (rowData.get(5) != null && StringUtil.isNotEmpty(rowData.get(5).toString())) {
-                satisfaction.setStorming(getBigDecimal(rowData.get(5).toString()));
-            }
-            if (rowData.get(6) != null && StringUtil.isNotEmpty(rowData.get(6).toString())) {
-                satisfaction.setStationaryPhase(getBigDecimal(rowData.get(6).toString()));
-            }
-            if (rowData.get(7) != null && StringUtil.isNotEmpty(rowData.get(7).toString())) {
-                satisfaction.setOldProprietor(getBigDecimal(rowData.get(7).toString()));
-            }
-            satisfaction.setEffectiveTime(formatter.parse(date));
-            satisfaction.setOrgCode(orgCode);
-            if (type < 4) {
-                if (rowData.get(8) != null && StringUtil.isNotEmpty(rowData.get(8).toString())) {
-                    satisfaction.setOrderServiceUnit(getBigDecimal(rowData.get(8).toString()));
-                }
-                if (rowData.get(9) != null && StringUtil.isNotEmpty(rowData.get(9).toString())) {
-                    satisfaction.setEsuCleaning(getBigDecimal(rowData.get(9).toString()));
-                }
-
-                if (rowData.get(10) != null && StringUtil.isNotEmpty(rowData.get(10).toString())) {
-                    satisfaction.setEsuGreen(getBigDecimal(rowData.get(10).toString()));
-                }
-
-                if (rowData.get(11) != null && StringUtil.isNotEmpty(rowData.get(11).toString())) {
-                    satisfaction.setEngineeringServiceUnit(getBigDecimal(rowData.get(11).toString()));
-                }
-
-            }
-            satisfactions.add(satisfaction);
-
-        }
-    }
 
 
-    private String checkData(List<Object> lastLevelRow, List<Object> parentRow, int rowNun, StringBuffer message, List<Object> rowData, int type) throws Exception {
+    private String checkData(int rowNun, StringBuilder message, List<Object> rowData, int type) throws Exception {
         //todo
         //校验与前面行得数据得归属关系;
-
-
         //校验是否有组织不匹配；根据层级和姓名，查询是否有组织匹配
         UcOrg ucOrg = new UcOrg();
 
         ucOrg.setId(rowData.get(0).toString());
-//        ucOrg.setName(rowData.get(3).toString());
         String orgCode = rowData.get(2).toString();
         boolean hasOrg = false;
 
@@ -529,41 +498,40 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             List<GridBasicInfo> gridBasicInfos = gridBasicInfoService.selectAll(gridBasicInfo);
 
             if (gridBasicInfos.size() <= 0) {
-                throw new Exception("第" + rowNun + "行：" + "没有该网格" + rowData.get(2).toString());//8
-
+                message.append("第" + rowNun + "行：" + "没有该网格" + rowData.get(2).toString() + "\r\n");//8
+                isError = true;
             }
             orgCode = gridBasicInfos.get(0).getGridCode();
             hasOrg = true;
         } else {
             if (type == 1) {
-                // ucOrg.setLevel(1);
                 ucOrg.setGrade("ORG_QuYu");
             }
             if (type == 2) {
-                //ucOrg.setLevel(3);
                 ucOrg.setGrade("ORG_XiangMu");
             }
             if (type == 3) {
-                //ucOrg.setLevel(4);
                 ucOrg.setGrade("ORG_DiKuai");
             }
             if (type == 5) {
-                //ucOrg.setLevel(4);
                 ucOrg.setGrade("ORG_ChengQu");
             }
             ucOrg.setIsDele("0");
             List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
             if (ucOrgs.size() <= 0) {
-                throw new Exception("第" + rowNun + "行：" + rowData.get(2).toString() + "组织名称不存在或组织名与对应得分类/层级不符");//8
+                message.append("第" + rowNun + "行：" + rowData.get(2).toString() + "组织名称不存在或组织名与对应得分类/层级不符\r\n");//8
+                isError = true;
             }
 
             if (org.apache.commons.collections.CollectionUtils.isNotEmpty(ucOrgs)) {
                 UcOrg uc = ucOrgs.get(0);
                 if (!uc.getName().equals(rowData.get(3).toString())) {
-                    throw new Exception("第" + rowNun + "行：" + rowData.get(3).toString() + "组织名称不存在");//8
+                    message.append("第" + rowNun + "行：" + rowData.get(3).toString() + "组织名称不存在\r\n");//8
+                    isError = true;
                 }
                 if (!uc.getCode().equals(rowData.get(2).toString())) {
-                    throw new Exception("第" + rowNun + "行：" + rowData.get(2).toString() + "组织编码不存在");//8
+                    message.append("第" + rowNun + "行：" + rowData.get(2).toString() + "组织编码不存在\r\n");//8
+                    isError = true;
                 }
 
             }
@@ -578,7 +546,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
 
         if (!hasOrg) {
-            throw new Exception("第" + rowNun + "行：" + rowData.get(2).toString() + "该组织名称与系统数据不匹配，请修改后重试。");
+            message.append("第" + rowNun + "行：" + rowData.get(2).toString() + "该组织名称与系统数据不匹配，请修改后重试。\r\n");
 
         }
 
@@ -586,10 +554,10 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         return orgCode;
     }
 
-    private void checkIsNullAndNum(int rowNun, StringBuffer message, List<Object> rowData, int type) throws Exception {
+    private void checkIsNullAndNum(int rowNun, StringBuilder message, List<Object> rowData, int type) throws Exception {
         switch (type) {
             case 0:
-                throw new Exception("请检查是否有空行");
+                message.append("请检查是否有空行\r\n");
 
             case 1:
             case 2:
@@ -597,23 +565,24 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
                 for (int i = 4; i < rowData.size(); i++) {
                     if (rowData.get(i) != null && rowData.get(i).toString() != null && rowData.get(i).toString().trim().length() > 0 && !isBigDecimal(rowData.get(i).toString())) {
-                        throw new Exception("第" + rowNun + "行,第" + i + "列数值格式错误（比如不是数字）");
+                        message.append("第" + rowNun + "行,第" + i + "列数值格式错误（比如不是数字）\r\n");
+                        isError=true;
                     }
                 }
                 break;
             case 4:
 
                 for (int j = 4; j < rowData.size(); j++) {
-//                    if (j < 7 && (rowData.get(j).toString() == null || rowData.get(j).toString().length() <= 0)) {
-//                        throw new Exception("第" + rowNun + "行：" + "请检查数据是否缺少");
-//                    }
-                    if (rowData.get(j) != null && rowData.get(j).toString() != null && rowData.get(j).toString().trim().length() > 0  && !isBigDecimal(rowData.get(j).toString())) {
-                        throw new Exception("第" + rowNun + "行,第" + j + "列数值格式错误（比如不是数字）");
+                    if (rowData.get(j) != null && rowData.get(j).toString() != null && rowData.get(j).toString().trim().length() > 0 && !isBigDecimal(rowData.get(j).toString())) {
+                        message.append("第" + rowNun + "行,第" + j + "列数值格式错误（比如不是数字）\r\n");
+                        isError=true;
+
                     }
                 }
                 break;
 
             default:
+
 
 
         }
