@@ -88,4 +88,11 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
     List<String> getServiceGridByStagingIds(Map<String, Object> params);
 
     Integer updateHousekeeperId(String id);
+
+    /**
+     * 根据房产id查询网格基础信息
+     * @param houseId
+     * @return
+     */
+    Map<String,Object> getByHouseId(String houseId);
 }
