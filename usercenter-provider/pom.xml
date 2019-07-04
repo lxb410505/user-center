@@ -102,6 +102,11 @@
 
     </dependencies>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
         <plugins>
             <!-- 用于生成jar文件 -->
             <plugin>
