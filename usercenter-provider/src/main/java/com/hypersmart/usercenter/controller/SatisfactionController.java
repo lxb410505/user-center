@@ -1,6 +1,7 @@
 package com.hypersmart.usercenter.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.hypersmart.base.annotation.cache.Cache;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
@@ -27,6 +28,7 @@ import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author magellan
@@ -220,6 +222,7 @@ public class SatisfactionController extends BaseController {
 
     @GetMapping({"/getAllSatisfactionNoAuth"})
     @ApiOperation(value = "总部满意度不过滤权限", httpMethod = "GET", notes = "总部满意度不过滤权限")
+    @Cache(key ="#bo.toString()" ,timeOut = 60,timeUnit = TimeUnit.MINUTES)
     public List<Satisfaction> getAllSatisfactionNoAuth(@ApiParam(name = "time", value = "时间") @RequestParam String time) {
         return this.satisfactionService.getAllSatisfactionNoAuth(time);
     }
