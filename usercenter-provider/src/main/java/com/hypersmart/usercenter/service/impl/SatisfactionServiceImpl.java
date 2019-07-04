@@ -12,26 +12,36 @@ import com.hypersmart.usercenter.mapper.UcOrgMapper;
 import com.hypersmart.usercenter.model.GridBasicInfo;
 import com.hypersmart.usercenter.model.Satisfaction;
 import com.hypersmart.usercenter.model.UcOrg;
+import com.hypersmart.usercenter.properties.SysProperties;
 import com.hypersmart.usercenter.service.GridBasicInfoService;
 import com.hypersmart.usercenter.service.SatisfactionService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.util.ImportExcelUtil;
+import org.apache.commons.io.IOUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.InputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.lang.reflect.MalformedParameterizedTypeException;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -42,11 +52,13 @@ import java.util.stream.Collectors;
  * @date 2019-05-14 13:37:39
  */
 @Service("satisfactionServiceImpl")
+
 public class SatisfactionServiceImpl extends GenericService<String, Satisfaction> implements SatisfactionService {
 
     public SatisfactionServiceImpl(SatisfactionMapper mapper) {
         super(mapper);
     }
+
     @Autowired
     GridBasicInfoService getGridBasicInfoService;
     @Autowired
@@ -58,15 +70,35 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     UcOrgFeignService ucOrgFeignService;
     @Resource
     SatisfactionMapper satisfactionMapper;
+
+    @Autowired
+    HttpServletResponse response;
+    @Autowired
+    SysProperties sysProperties;
+    Map<String, String> orgMap = new HashMap<String, String>() {
+        {
+            put("ORG_QuYu", "区域");
+            put("ORG_ChengQu", "城区");
+            put("ORG_XiangMu", "项目");
+            put("ORG_DiKuai", "地块");
+        }
+    };
+
+    @Value("${xlsx.template}")
+    String templatePath;
+    String fileName = "客户满意度导入模板.xlsx";
+    boolean isError = false;
+
     @Override
     public PageList<Satisfaction> getListBySearch(QueryFilter queryFilter) {
         List<FieldSort> sortList = new ArrayList<>();
         FieldSort fieldSort = new FieldSort();
         fieldSort.setDirection(Direction.ASC);
-        fieldSort.setProperty("order_");
+        fieldSort.setProperty("type");
         sortList.add(fieldSort);
         queryFilter.setSorter(sortList);
         Map<String, Object> params = queryFilter.getParams();
+
 
         if (params.get("quyu") == null || StringUtils.isEmpty(params.get("quyu").toString())) {
             return this.query(queryFilter);
@@ -75,7 +107,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                         && params.get("xiangmu") != null && !StringUtils.isEmpty(params.get("xiangmu").toString())
                         && params.get("dikuai") != null && !StringUtils.isEmpty(params.get("dikuai").toString())
                         && params.get("wangge") != null && !StringUtils.isEmpty(params.get("wangge").toString())
-                ) {
+        ) {
             QueryFilter queryFilter2 = QueryFilter.build();
             queryFilter2.addFilter("org_name", params.get("wangge"), QueryOP.EQUAL, FieldRelation.AND);
             if (params.get("effective_time") != null)
@@ -87,7 +119,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                         && params.get("xiangmu") != null
                         && params.get("dikuai") != null
                         && params.get("wangge") == null
-                ) {
+        ) {
             //dikuai
             String dikuai = params.get("dikuai").toString();
             UcOrg ucOrg = new UcOrg();
@@ -114,13 +146,14 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                 QueryFilter queryFilter2 = QueryFilter.build();
                 queryFilter2.addFilter("org_code", orgNames, QueryOP.IN, FieldRelation.AND);
 
-                if(params.get("effective_time")!=null) queryFilter2.addFilter("effective_time", params.get("effective_time"), QueryOP.EQUAL, FieldRelation.AND);
+                if (params.get("effective_time") != null)
+                    queryFilter2.addFilter("effective_time", params.get("effective_time"), QueryOP.EQUAL, FieldRelation.AND);
 
                 queryFilter2.setSorter(sortList);
                 return this.query(queryFilter2);
             }
         } else if ((params.get("quyu") != null)
-                ) {
+        ) {
             String dikuai = "";
             UcOrg ucOrg = new UcOrg();
             ucOrg.setIsDele("0");
@@ -153,10 +186,11 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                 //get all orgName
                 if (query != null && query.getRows() != null) {
                     List<UcOrg> rows = query.getRows();
-                    for (UcOrg u :
-                            rows) {
+                    for (UcOrg u : rows) {
+                        if (null == u) continue;
                         orgNames.add(u.getCode());
-                        if (u.getGrade().equals("ORG_DiKuai")) {
+
+                        if (u.getGrade() != null && u.getGrade().equals("ORG_DiKuai")) {
                             String stangId = u.getId();
                             GridBasicInfo gridBasicInfo = new GridBasicInfo();
                             gridBasicInfo.setStagingId(stangId);
@@ -192,17 +226,19 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     }
 
 
-
     @Override
     public CommonResult<String> importData(MultipartFile file, String date) {
-        StringBuffer message = new StringBuffer();
+        StringBuilder message = new StringBuilder();
         boolean importState = true;
         List<Satisfaction> satisfactions = new ArrayList<>();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         try {
             if (file.isEmpty()) {
-                message.append("导入文件丢失，请重新选择文件");
+                message.append("导入文件丢失，请重新选择文件\r\n");
             }
-            String[] headArr = {"序列", "分类", "组织名称", "综合满意度", "磨合期", "稳定期",
+
+
+            String[] headArr = {"组织ID", "分类", "组织编码", "组织名称", "综合满意度", "磨合期", "稳定期",
                     "老业主", "秩序服务单元", "环境服务单元-保洁", "环境服务单元-绿化", "工程服务单元"};
             InputStream in = file.getInputStream();
             List<List<Object>> tempResourceImportList = new ImportExcelUtil().getBankListByExcel4Statis(in, file.getOriginalFilename());
@@ -210,26 +246,35 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             Integer hasRealCount = getRealCount(tempResourceImportList);
 
             if (hasRealCount > 3000) {
-                message.append("文件数据超过3000条！");
-                importState = false;
-                throw new Exception("文件数据超过3000条");
+                message.append("文件数据超过3000条！\r\n");
             }
             //从第二行开始是表头
             boolean hasError = isHasError(headArr, tempResourceImportList);
             if (hasError) {
-                message.append("标题栏数据顺序或格式不正确");
-                importState = false;
-                throw new Exception("标题栏数据顺序或格式不正确");
+                return new CommonResult<>(false, "模板不正确，请使用正确的模板");
 
             }
 
             //基础校验 看看有没有相等的序列；
             //1取所有序列
             String[] id = new String[tempResourceImportList.size() - 2];
+
             for (int i = 2; i < tempResourceImportList.size(); i++) {
+                isError = false;
                 List<Object> objects = tempResourceImportList.get(i);
-                if (objects.get(0) == null || objects.get(0).toString().length() <= 0) {
-                    throw new Exception("第" + (i + 1) + "行序列为空");
+                if ((objects.get(0) == null || objects.get(0).toString().length() <= 0) &&
+                        (objects.get(1) != null && objects.get(1).toString().length() == 0) &&
+                        (objects.get(2) != null && objects.get(2).toString().length() == 0) &&
+                        (objects.get(3) != null && objects.get(3).toString().length() == 0)) {
+                    break;
+                }
+
+
+                if ((objects.get(0) == null || objects.get(0).toString().length() <= 0) &&
+                        (objects.get(1) != null && objects.get(1).toString().length() > 0) &&
+                        (objects.get(2) != null && objects.get(2).toString().length() > 0)) {
+                    message.append("第" + (i + 1) + "行组织ID为空\r\n");
+                    isError = true;
                 } else {
                     //对小数点问题进行处理；
                     if (objects.get(0).toString().length() >= 4) {
@@ -245,32 +290,99 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                             tempResourceImportList.remove(i);
                             tempResourceImportList.add(i, objects);
                         }
-
                     }
-
                 }
-                if (id[i - 2] == null) {
-                    id[i - 2] = objects.get(0).toString();
+                List<Object> rowDataLevel3 = null;
+                int type = 0;
+                if (objects.get(1).toString() != null) {
+                    if (objects.get(1).toString().equals("区域")) {
+                        type = 1;
+                    }
+                    if (objects.get(1).toString().equals("项目")) {
+                        type = 2;
+                    }
+                    if (objects.get(1).toString().equals("地块")) {
+                        type = 3;
+                    }
+                    if (objects.get(1).toString().equals("网格")) {
+                        type = 4;
+                    }
+                    if (type == 0) {
+                        message.append("第" + (i + 1) + "行 分类内容错误或分类和序列层级不匹配！\r\n");
+                        isError = true;
+                    }
+                } else {
+                    message.append("第" + (i + 1) + "行 网格没有对应得分类\r\n");
+                    isError = true;
+                }
+
+                String orgCode = checkData(i + 1, message, objects, type);
+
+                //新增数据;
+                if (!isError) {
+                    Satisfaction satisfaction = new Satisfaction();
+                    //satisfaction.setCreateBy();
+                    satisfaction.setCreateTime(new Date());
+
+                    satisfaction.setOrder(objects.get(0).toString());
+                    satisfaction.setType(objects.get(1).toString());
+                    satisfaction.setOrgCode(objects.get(2).toString());
+                    satisfaction.setOrgName(objects.get(3).toString());
+                    if (objects.get(4) != null && StringUtil.isNotEmpty(objects.get(4).toString())) {
+                        satisfaction.setOverallSatisfaction(getBigDecimal(objects.get(4).toString()));
+                    }
+                    if (objects.get(5) != null && StringUtil.isNotEmpty(objects.get(5).toString())) {
+                        satisfaction.setStorming(getBigDecimal(objects.get(5).toString()));
+                    }
+                    if (objects.get(6) != null && StringUtil.isNotEmpty(objects.get(6).toString())) {
+                        satisfaction.setStationaryPhase(getBigDecimal(objects.get(6).toString()));
+                    }
+                    if (objects.get(7) != null && StringUtil.isNotEmpty(objects.get(7).toString())) {
+                        satisfaction.setOldProprietor(getBigDecimal(objects.get(7).toString()));
+                    }
+                    satisfaction.setEffectiveTime(formatter.parse(date));
+                    satisfaction.setOrgCode(orgCode);
+                    if (type < 4) {
+                        if (objects.get(8) != null && StringUtil.isNotEmpty(objects.get(8).toString())) {
+                            satisfaction.setOrderServiceUnit(getBigDecimal(objects.get(8).toString()));
+                        }
+                        if (objects.get(9) != null && StringUtil.isNotEmpty(objects.get(9).toString())) {
+                            satisfaction.setEsuCleaning(getBigDecimal(objects.get(9).toString()));
+                        }
+
+                        if (objects.get(10) != null && StringUtil.isNotEmpty(objects.get(10).toString())) {
+                            satisfaction.setEsuGreen(getBigDecimal(objects.get(10).toString()));
+                        }
+
+                        if (objects.get(11) != null && StringUtil.isNotEmpty(objects.get(11).toString())) {
+                            satisfaction.setEngineeringServiceUnit(getBigDecimal(objects.get(11).toString()));
+                        }
+                    }
+                    satisfactions.add(satisfaction);
                 }
             }
 
-            this.checkHasEqualId(id);
 
             //处理导入的数据；
-            if (importState) {
 
-                doData(message, satisfactions, tempResourceImportList, date);
-
-                satisfactionMapper.deleteByDate(date);
-
-                insertBatch(satisfactions);
-
+            satisfactionMapper.deleteByDate(date);
+            int resultNum = 0;
+            if (org.apache.commons.collections.CollectionUtils.isNotEmpty(satisfactions)) {
+                if(message.length()==0) {
+                    if (insertBatch(satisfactions) > 0) {
+                        return new CommonResult(true, "导入成功。");
+                    }else{
+                        return new CommonResult<>(false, "导入失败，失败信息如下：没有一条正确的数据\r\n");
+                    }
+                }else{
+                    return new CommonResult<>(false, "导入失败，失败信息如下：\r\n" + message.toString());
+                }
             }
 
         } catch (Exception e) {
-            return new CommonResult(false, e.getMessage());
+            return new CommonResult<>(false, "导入失败,内部错误", message.toString(), 500);
         }
-        return new CommonResult(true, "成功导入");
+        return new CommonResult(true, "导入成功。");
     }
 
     private void fixId(List<List<Object>> tempResourceImportList, String[] id, int i, List<Object> objects) {
@@ -361,173 +473,68 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     public List<Satisfaction> getSatisfactionListByParam(JSONObject json) {
         return satisfactionMapper.getSatisfactionListByParam(JSONObject.toJavaObject(json, Map.class));
     }
+
     private BigDecimal getBigDecimal(String bdstr) {
         BigDecimal bdv = new BigDecimal(bdstr);//字符串转成bigdecimal
         bdv = bdv.setScale(4, BigDecimal.ROUND_HALF_UP);
         return bdv;
     }
-    private void doData(StringBuffer message, List<Satisfaction> satisfactions, List<List<Object>> tempResourceImportList, String date) throws Exception {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        List<Object> rowDataLevel3 = null;
-        for (int i = 2; i < tempResourceImportList.size(); i++) {
-            List<Object> rowData = tempResourceImportList.get(i);
 
-            boolean checkHasSpecialStr = checkHasSpecialStr(rowData.get(0).toString());
-            if (checkHasSpecialStr) {
-                throw new Exception("第" + (i + 1) + "行: 序列错误,包含除.以外特殊字符。");
-            }
 
-            String[] split = rowData.get(0).toString().split("\\.");
-            int length = split.length;
-            if (length < 1) {
-                throw new Exception("第" + (i + 1) + "行 序列错误。");
-            }
-            int type = 0;
-            if (rowData.get(1).toString() != null) {
-                if (rowData.get(1).toString().equals("区域") && length == 1) {
-                    type = 1;
-                }
-                if (rowData.get(1).toString().equals("项目") && length == 2) {
-                    type = 2;
-                }
-                if (rowData.get(1).toString().equals("地块") && length == 3) {
-                    type = 3;
-                }
-                if (rowData.get(1).toString().equals("网格") && length == 4) {
-                    type = 4;
-                }
-                if (type == 0) {
-                    throw new Exception("第" + (i + 1) + "行 分类内容错误或分类和序列层级不匹配！");
-                }
-            } else {
-                throw new Exception("第" + (i + 1) + "行 网格没有对应得分类");
-            }
-            //获取上一级别得组织对象；
-            List<Object> lastOrgRow = null;
-            if (i > 2) {
-                for (int j = i; j > 2; j--) {
-                    List<Object> objects = tempResourceImportList.get(j);
-                    if (objects.get(0).toString().split("\\.").length + 1 == rowData.get(0).toString().split("\\.").length) {
-                        lastOrgRow = objects;
-                    }
-                }
-            }
-            if (type == 3) {
-                rowDataLevel3 = rowData;
-            }
-            if (type != 3 && type != 4) {
-                rowDataLevel3 = null;
-            }
-            if (type == 4 && rowDataLevel3 == null) {
-                throw new Exception("第" + (i + 1) + "行 网格没有对应得上级组织");
-            }
-            String orgCode = checkData(lastOrgRow, rowDataLevel3, i + 1, message, rowData, type);
 
-            //新增数据;
-            Satisfaction satisfaction = new Satisfaction();
-            //satisfaction.setCreateBy();
-            satisfaction.setCreateTime(new Date());
-
-            satisfaction.setOrder(rowData.get(0).toString());
-            satisfaction.setType(rowData.get(1).toString());
-            satisfaction.setOrgName(rowData.get(2).toString());
-            if (rowData.get(3) != null && StringUtil.isNotEmpty(rowData.get(3).toString())) {
-                satisfaction.setOverallSatisfaction(getBigDecimal(rowData.get(3).toString()));
-            }
-            if (rowData.get(4) != null && StringUtil.isNotEmpty(rowData.get(4).toString())) {
-                satisfaction.setStorming(getBigDecimal(rowData.get(4).toString()));
-            }
-            if (rowData.get(5) != null && StringUtil.isNotEmpty(rowData.get(5).toString())) {
-                satisfaction.setStationaryPhase(getBigDecimal(rowData.get(5).toString()));
-            }
-            if (rowData.get(6) != null && StringUtil.isNotEmpty(rowData.get(6).toString())) {
-                satisfaction.setOldProprietor(getBigDecimal(rowData.get(6).toString()));
-            }
-            satisfaction.setEffectiveTime(formatter.parse(date));
-            satisfaction.setOrgCode(orgCode);
-            if (type < 4) {
-                if (rowData.get(7) != null && StringUtil.isNotEmpty(rowData.get(7).toString())) {
-                    satisfaction.setOrderServiceUnit(getBigDecimal(rowData.get(7).toString()));
-                }
-                if (rowData.get(8) != null && StringUtil.isNotEmpty(rowData.get(8).toString())) {
-                    satisfaction.setEsuCleaning(getBigDecimal(rowData.get(8).toString()));
-                }
-
-                if (rowData.get(9) != null && StringUtil.isNotEmpty(rowData.get(9).toString())) {
-                    satisfaction.setEsuGreen(getBigDecimal(rowData.get(9).toString()));
-                }
-
-                if (rowData.get(10) != null && StringUtil.isNotEmpty(rowData.get(10).toString())) {
-                    satisfaction.setEngineeringServiceUnit(getBigDecimal(rowData.get(10).toString()));
-                }
-
-            }
-            satisfactions.add(satisfaction);
-
-        }
-    }
-
-    /**
-     * 校验是否重复
-     *
-     * @return
-     */
-    private String checkRepeatId() {
-        return null;
-    }
-
-    private String checkData(List<Object> lastLevelRow, List<Object> parentRow, int rowNun, StringBuffer message, List<Object> rowData, int type) throws Exception {
+    private String checkData(int rowNun, StringBuilder message, List<Object> rowData, int type) throws Exception {
         //todo
         //校验与前面行得数据得归属关系;
-
-
         //校验是否有组织不匹配；根据层级和姓名，查询是否有组织匹配
         UcOrg ucOrg = new UcOrg();
-        ucOrg.setName(rowData.get(2).toString());
-        String orgCode = null;
+
+        ucOrg.setId(rowData.get(0).toString());
+        String orgCode = rowData.get(2).toString();
         boolean hasOrg = false;
 
         if (type == 4) {
-            //网格组织校验
-            //todo
-            ucOrg.setName(parentRow.get(2).toString());
-            //ucOrg.setLevel(4);
-            ucOrg.setGrade("ORG_DiKuai");
-            ucOrg.setIsDele("0");
-            List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
-            if (ucOrgs.size() <= 0) {
-                throw new Exception("第" + rowNun + "行：" + rowData.get(2).toString() + "该网格对应得上级组织错误或缺失，请检查格式");
-            }
-            String parentId = ucOrgs.get(0).getId();
             GridBasicInfo gridBasicInfo = new GridBasicInfo();
-            gridBasicInfo.setGridName(rowData.get(2).toString());
-            gridBasicInfo.setStagingId(parentId);
-            gridBasicInfo.setIsDeleted(0);
+            gridBasicInfo.setId(rowData.get(0).toString());
+
             List<GridBasicInfo> gridBasicInfos = gridBasicInfoService.selectAll(gridBasicInfo);
 
             if (gridBasicInfos.size() <= 0) {
-                throw new Exception("第" + rowNun + "行：" + "没有该网格" + rowData.get(2).toString());//8
-
+                message.append("第" + rowNun + "行：" + "没有该网格" + rowData.get(2).toString() + "\r\n");//8
+                isError = true;
             }
             orgCode = gridBasicInfos.get(0).getGridCode();
             hasOrg = true;
         } else {
             if (type == 1) {
-                // ucOrg.setLevel(1);
                 ucOrg.setGrade("ORG_QuYu");
             }
             if (type == 2) {
-                //ucOrg.setLevel(3);
                 ucOrg.setGrade("ORG_XiangMu");
             }
             if (type == 3) {
-                //ucOrg.setLevel(4);
                 ucOrg.setGrade("ORG_DiKuai");
+            }
+            if (type == 5) {
+                ucOrg.setGrade("ORG_ChengQu");
             }
             ucOrg.setIsDele("0");
             List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
             if (ucOrgs.size() <= 0) {
-                throw new Exception("第" + rowNun + "行：" + rowData.get(2).toString() + "组织名称不存在或组织名与对应得分类/层级不符");//8
+                message.append("第" + rowNun + "行：" + rowData.get(2).toString() + "组织名称不存在或组织名与对应得分类/层级不符\r\n");//8
+                isError = true;
+            }
+
+            if (org.apache.commons.collections.CollectionUtils.isNotEmpty(ucOrgs)) {
+                UcOrg uc = ucOrgs.get(0);
+                if (!uc.getName().equals(rowData.get(3).toString())) {
+                    message.append("第" + rowNun + "行：" + rowData.get(3).toString() + "组织名称不存在\r\n");//8
+                    isError = true;
+                }
+                if (!uc.getCode().equals(rowData.get(2).toString())) {
+                    message.append("第" + rowNun + "行：" + rowData.get(2).toString() + "组织编码不存在\r\n");//8
+                    isError = true;
+                }
+
             }
             //取最新版本
             if (ucOrgs.size() > 1) {
@@ -540,7 +547,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
 
         if (!hasOrg) {
-            throw new Exception("第" + rowNun + "行：" + rowData.get(2).toString() + "该组织名称与系统数据不匹配，请修改后重试。");
+            message.append("第" + rowNun + "行：" + rowData.get(2).toString() + "该组织名称与系统数据不匹配，请修改后重试。\r\n");
 
         }
 
@@ -548,44 +555,35 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         return orgCode;
     }
 
-    private void checkIsNullAndNum(int rowNun, StringBuffer message, List<Object> rowData, int type) throws Exception {
+    private void checkIsNullAndNum(int rowNun, StringBuilder message, List<Object> rowData, int type) throws Exception {
         switch (type) {
             case 0:
-                throw new Exception("请检查是否有空行");
+                message.append("请检查是否有空行\r\n");
 
             case 1:
             case 2:
             case 3:
 
-                //  6   第XX行 { 必填项的表头名称，如分类 }缺少
-                //  校验是否有不合法空值；
-//                for (Object v :
-//                        rowData) {
-//                    if (v.toString() == null || v.toString().length() <= 0) {
-//                        message.append("请检查数据是否为空");
-//                        throw new Exception("第" + rowNun + "行：" + "请检查数据是否缺少");
-//                    }
-//
-//                }
-                for (int i = 3; i < rowData.size(); i++) {
+                for (int i = 4; i < rowData.size(); i++) {
                     if (rowData.get(i) != null && rowData.get(i).toString() != null && rowData.get(i).toString().trim().length() > 0 && !isBigDecimal(rowData.get(i).toString())) {
-                        throw new Exception("第" + rowNun + "行：" + "数值格式错误（比如不是数字）");
+                        message.append("第" + rowNun + "行,第" + i + "列数值格式错误（比如不是数字）\r\n");
+                        isError=true;
                     }
                 }
                 break;
             case 4:
 
-                for (int j = 0; j < rowData.size(); j++) {
-//                    if (j < 7 && (rowData.get(j).toString() == null || rowData.get(j).toString().length() <= 0)) {
-//                        throw new Exception("第" + rowNun + "行：" + "请检查数据是否缺少");
-//                    }
-                    if (rowData.get(j) != null && rowData.get(j).toString() != null && rowData.get(j).toString().trim().length() > 0 && j > 2 && j < 7 && !isBigDecimal(rowData.get(j).toString())) {
-                        throw new Exception("第" + rowNun + "行：" + "数值格式错误（比如不是数字）");
+                for (int j = 4; j < rowData.size(); j++) {
+                    if (rowData.get(j) != null && rowData.get(j).toString() != null && rowData.get(j).toString().trim().length() > 0 && !isBigDecimal(rowData.get(j).toString())) {
+                        message.append("第" + rowNun + "行,第" + j + "列数值格式错误（比如不是数字）\r\n");
+                        isError=true;
+
                     }
                 }
                 break;
 
             default:
+
 
 
         }
@@ -656,12 +654,12 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                     satisfactions = satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
                 }
             }
-        }else{
+        } else {
             //查询网格
-           QueryFilter queryFilter = QueryFilter.build();
-           queryFilter.addFilter("org_code",orgCode,QueryOP.EQUAL,FieldRelation.AND);
-           queryFilter.addFilter("effective_time",time+"-01",QueryOP.EQUAL,FieldRelation.AND);
-           satisfactions=this.query(queryFilter).getRows();
+            QueryFilter queryFilter = QueryFilter.build();
+            queryFilter.addFilter("org_code", orgCode, QueryOP.EQUAL, FieldRelation.AND);
+            queryFilter.addFilter("effective_time", time + "-01", QueryOP.EQUAL, FieldRelation.AND);
+            satisfactions = this.query(queryFilter).getRows();
         }
         return satisfactions;
     }
@@ -698,6 +696,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         List<UcOrg> ucOrgList = ucOrgService.getDefaultOrgListByGrade("ORG_QuYu");
         return satisfactionMapper.getSatisfactionDetail(ucOrgList, time);
     }
+
 
     public static void main(String[] args) throws ParseException {
         String date = "2019-05-00";
@@ -738,6 +737,119 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             return true;
         } catch (NumberFormatException e) {
             return false;
+        }
+    }
+
+    public List<UcOrg> getOrgs() {
+        List<UcOrg> list = new ArrayList<>();
+        QueryFilter query = QueryFilter.build();
+        query.addFilter("GRADE_", "ORG_QuYu", QueryOP.EQUAL);
+        query.addFilter("IS_DELE_", "0", QueryOP.EQUAL);
+        PageList<UcOrg> areas = ucOrgService.query(query);
+        list.addAll(areas.getRows());
+        QueryFilter query3 = QueryFilter.build();
+        query3.addFilter("GRADE_", "ORG_XiangMu", QueryOP.EQUAL);
+        query3.addFilter("IS_DELE_", "0", QueryOP.EQUAL);
+        PageList<UcOrg> projects = ucOrgService.query(query3);
+        list.addAll(projects.getRows());
+
+        QueryFilter query4 = QueryFilter.build();
+        query4.addFilter("GRADE_", "ORG_DiKuai", QueryOP.EQUAL);
+        query4.addFilter("IS_DELE_", "0", QueryOP.EQUAL);
+        PageList<UcOrg> divides = ucOrgService.query(query4);
+        list.addAll(divides.getRows());
+
+        GridBasicInfo info = new GridBasicInfo();
+        info.setEnabledFlag(1);
+        info.setIsDeleted(0);
+        info.setGridType("building_grid");
+        List<GridBasicInfo> all = getGridBasicInfoService.selectAll(info);
+        UcOrg ucOrg;
+        for (GridBasicInfo gridBasicInfo : all) {
+            ucOrg = new UcOrg();
+            ucOrg.setId(gridBasicInfo.getId());
+            ucOrg.setCode(gridBasicInfo.getGridCode());
+            ucOrg.setName(gridBasicInfo.getGridName());
+            list.add(ucOrg);
+        }
+
+        return list;
+
+    }
+
+
+    @Override
+    public CommonResult downloadTemplate() throws Exception {
+        List<UcOrg> orgs = getOrgs();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        InputStream is = null;
+        try {
+            File areaFile = new File(templatePath + fileName);
+            FileInputStream areaFis = new FileInputStream(areaFile);
+            XSSFWorkbook wb = new XSSFWorkbook(areaFis);
+            SXSSFWorkbook workbook = new SXSSFWorkbook(wb, 1000);//缓存
+
+
+            Sheet sheet = workbook.getXSSFWorkbook().getSheetAt(0);
+
+
+            setCells(sheet, orgs, 2);
+            workbook.write(os);
+            workbook.dispose();
+            areaFis.close();
+
+            byte[] content = os.toByteArray();
+            is = new ByteArrayInputStream(content);
+            // 设置response参数，可以打开下载页面
+            response.reset();
+
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
+            response.setHeader("Content-Disposition", "attachment;filename=" + new String((fileName).getBytes(), "iso-8859-1"));
+            response.setContentLength(content.length);
+            ServletOutputStream outputStream = response.getOutputStream();
+            BufferedInputStream bis = new BufferedInputStream(is);
+            BufferedOutputStream bos = new BufferedOutputStream(outputStream);
+            byte[] buff = new byte[8192];
+            int bytesRead;
+            while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
+                bos.write(buff, 0, bytesRead);
+            }
+            bis.close();
+            bos.close();
+            outputStream.flush();
+            outputStream.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new CommonResult(false, ex.getMessage());
+        } finally {
+            IOUtils.closeQuietly(os);
+            IOUtils.closeQuietly(is);
+        }
+        return new CommonResult(true, "");
+    }
+
+
+    private void setCells(Sheet sheet, List<UcOrg> content, int startLine) {
+        if (content.size() > 0) {
+            sheet.setColumnHidden(0, true);
+            for (int i = 0; i < content.size(); i++) {
+                Row row = sheet.getRow(i + startLine);
+                if (row != null) {
+                    if (null != row.getCell(0)) {
+                        row.getCell(0).setCellValue(content.get(i).getId());
+                    }
+                    if (null != row.getCell(1)) {
+                        row.getCell(1).setCellValue(null == orgMap.get(content.get(i).getGrade()) ? "网格" : orgMap.get(content.get(i).getGrade()));
+                    }
+                    if (null != row.getCell(2)) {
+                        row.getCell(2).setCellValue(content.get(i).getCode());
+                    }
+                    if (null != row.getCell(3)) {
+                        row.getCell(3).setCellValue(content.get(i).getName());
+                    }
+                }
+            }
         }
     }
 }

@@ -19,11 +19,14 @@ import com.hypersmart.usercenter.service.UcOrgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -277,7 +280,7 @@ public class SatisfactionController extends BaseController {
      * @param file Excel文件
      * @return
      */
-    @RequestMapping(value = "/importData/{date}", method = RequestMethod.POST)
+        @RequestMapping(value = "/importData/{date}", method = RequestMethod.POST)
     public CommonResult<String> importData(MultipartFile file, @PathVariable("date") String date) throws Exception {
 
         CommonResult<String> result = this.satisfactionService.importData(file, date);
@@ -293,5 +296,16 @@ public class SatisfactionController extends BaseController {
     @RequestMapping(value = "/check/data/{date}", method = RequestMethod.GET)
     public CommonResult CheckHasExist(@PathVariable("date") String date) throws Exception {
         return satisfactionService.CheckHasExist(date);
+    }
+
+    /**
+     * 模板下载；
+     *
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/downloadTemplate")
+    public CommonResult downloadTemplate(HttpServletResponse response) throws Exception {
+        return satisfactionService.downloadTemplate();
     }
 }

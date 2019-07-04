@@ -28,5 +28,7 @@ public interface SatisfactionService extends IGenericService<String, Satisfactio
     List<Satisfaction> getAllSatisfaction(String time);
     PageList<Satisfaction> getListBySearch(QueryFilter queryFilter);
     List<Satisfaction> getAllSatisfactionNoAuth(String time);
+
+    CommonResult downloadTemplate() throws Exception;
 }
 
