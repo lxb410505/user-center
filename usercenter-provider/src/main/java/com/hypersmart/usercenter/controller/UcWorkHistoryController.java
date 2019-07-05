@@ -9,7 +9,6 @@ import com.hypersmart.base.query.FieldSort;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.util.UniqueIdUtil;
-import com.hypersmart.usercenter.mapper.UcUserWorkMapper;
 import com.hypersmart.usercenter.model.UcUserWork;
 import com.hypersmart.usercenter.model.UcUserWorkHistory;
 import com.hypersmart.usercenter.service.UcUserWorkHistoryService;
@@ -19,14 +18,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import tk.mybatis.mapper.entity.Example;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
-import java.util.UUID;
 
 
 /**
@@ -43,8 +38,6 @@ public class UcWorkHistoryController extends BaseController {
 	private UcUserWorkHistoryService ucUserWorkHistoryService;
 	@Autowired
 	UcUserWorkService ucUserWorkService;
-	@Autowired
-	UcUserWorkMapper ucUserWorkMapper;
 	/**
 	 * 分页查询
 	 *
@@ -85,9 +78,7 @@ public class UcWorkHistoryController extends BaseController {
 		ucUserWorkHistory.setId(UniqueIdUtil.getSuid());
 		int i = ucUserWorkHistoryService.save(ucUserWorkHistory);
 
-		Example example=new Example(UcUserWork.class);
-		example.createCriteria().andEqualTo("userId",userId);
-		int i1 = ucUserWorkMapper.deleteByExample(example);
+		ucUserWorkService.delByUserId(userId);
 		UcUserWork ucUserWork=new UcUserWork();
 		ucUserWork.setCreateBy(current());
 		ucUserWork.setCreateTime(new Date());
@@ -111,7 +102,7 @@ public class UcWorkHistoryController extends BaseController {
 
 	@GetMapping("getUserHisStatus")
 	public CommonResult<String> getUserHisStatus(@RequestParam("userId") String userId){
-		String s = ucUserWorkHistoryService.queryLatest(userId);
+		String s = ucUserWorkService.getStatus(userId);
 		if(null==s){
 			return new CommonResult<>(false,"该用户无上下班记录",null);
 		}

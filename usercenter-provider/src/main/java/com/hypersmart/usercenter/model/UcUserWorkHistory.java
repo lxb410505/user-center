@@ -26,7 +26,7 @@ public class UcUserWorkHistory implements Serializable {
     @ApiModelProperty("主键")
     private String id;
     @Column(name = "STATUS")
-    @ApiModelProperty("上下班状态 on_work:上班，off_work'")
+    @ApiModelProperty("上下班状态 0:上班，1:下班")
     private String status;
     @Column(name = "CREATE_BY")
     @ApiModelProperty("主键")
@@ -39,6 +39,7 @@ public class UcUserWorkHistory implements Serializable {
     @Column(name = "username")
     private String account;
     @ApiModelProperty("用户ID")
+    @Column(name = "user_id")
     private String userId;
 
     public String getId() {

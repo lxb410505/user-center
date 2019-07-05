@@ -15,4 +15,9 @@ import java.util.Map;
 @Mapper
 public interface UcUserWorkMapper extends GenericMapper<UcUserWork> {
 
+    void delByUserId(@Param("userId") String userId);
+
+    String getStatus(@Param("userId") String userId);
+
+    List<UcUserWork> queryUserWorkStatusList (@Param("userIds") List<String> userIds,@Param("status") String status);
 }

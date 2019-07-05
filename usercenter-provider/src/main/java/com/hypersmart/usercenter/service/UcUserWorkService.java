@@ -18,6 +18,8 @@ import java.util.Map;
  */
 @Service
 public interface UcUserWorkService extends IGenericService<String, UcUserWork> {
-
-
+    void delByUserId(String userId);
+    String getStatus(String userId);
+    //status:0上班，1下班
+    List<UcUserWork> queryUserWorkStatusList(List<String> userIds,String status);
 }
