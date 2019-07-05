@@ -202,5 +202,11 @@
         </where>
     </select>
 
-
+    <select id="getAllOrgs" resultMap="OrgFullMap">
+        select
+        *
+        from
+        <include refid="BaseTable"/>
+        where IS_DELE_ = '0'
+    </select>
 </mapper>
