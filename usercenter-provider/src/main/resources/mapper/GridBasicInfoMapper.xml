@@ -554,12 +554,16 @@
         grid_name AS gridName,
         grid_type as gridType,
         housekeeper_id as housekeeperId,
-        u.FULLNAME_ AS housekeeperName,
+        a.FULLNAME_ AS housekeeperName,
         enabled_flag as enabledFlag,
         is_deleted as isDeleted
         from
-        grid_basic_info info
-        join uc_user u on u.id_ =info.housekeeper_id
+        grid_basic_info info left join
+        (select
+        u.FULLNAME_ as  FULLNAME_,
+        u.id_ as id_
+        from
+         uc_user u
         JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
         JOIN uc_org org ON uou.ORG_ID_ = org.ID_
         JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
@@ -570,7 +574,8 @@
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
-        and grid_range LIKE CONCAT('%',#{houseId},'%')
+        ) a on a.id_ =info.housekeeper_id
+        where  grid_range LIKE CONCAT('%',#{houseId},'%')
         group by info.id limit 1
     </select>
 </mapper>
