@@ -43,12 +43,9 @@
         SELECT
             status
         FROM
-            uc_user_work_his
+            uc_user_work
         WHERE
             user_id = #{userId}
-        ORDER BY
-            create_time DESC
-        LIMIT 1
     </select>
 
     <select id="queryUserWorkStatusList" resultType="com.hypersmart.usercenter.model.UcUserWorkHistory">

@@ -351,4 +351,9 @@ public class GridBasicInfoController extends BaseController {
 	public Integer getPublicGrid(@PathVariable String id) {
 		return gridBasicInfoService.getPublicGridNum(id);
 	}
+
+	@GetMapping({"/getByHouseId/{houseId}"})
+	public Map<String,Object> getByHouseId(@PathVariable String houseId) {
+		return gridBasicInfoService.getByHouseId(houseId);
+	}
 }
