@@ -1064,4 +1064,9 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 		}
 		return result;
 	}
+
+	@Override
+	public Map<String, Object> getByHouseId(String houseId) {
+		return gridBasicInfoMapper.getByHouseId(houseId);
+	}
 }
