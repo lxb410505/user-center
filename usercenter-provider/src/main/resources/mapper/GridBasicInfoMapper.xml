@@ -192,14 +192,32 @@
         LEFT JOIN (
         SELECT
         u.ID_ AS houseKeeperId,
+        uou.ID_ AS id,
         u.FULLNAME_ AS fullName,
         u.MOBILE_ AS mobile,
-        u.ACCOUNT_ AS account
+        u.ACCOUNT_ AS account,
+        post.ID_ AS `postId`,
+        post.POS_NAME_ AS posName,
+        org.NAME_ AS divideName,
+        org.ID_ AS divideId
         FROM
         uc_user u
+        JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+        JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
+        JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
+        JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
         WHERE
-         u.IS_DELE_ = 0
-        ) AS k ON  g.housekeeperId = k.houseKeeperId
+        uoj.CODE_ = 'guanjia'
+        AND dem.CODE_ = 'smsf'
+        AND org.GRADE_ = 'ORG_DiKuai'
+        AND u.IS_DELE_ = 0
+        AND uou.IS_DELE_ = 0
+        AND org.IS_DELE_ = 0
+        AND post.IS_DELE_ = 0
+        AND uoj.IS_DELE_ = 0
+        AND dem.IS_DELE_ = 0
+        ) AS k ON  g.housekeeperId = k.houseKeeperId  and g.stagingId = k.divideId
         ) AS t
         LEFT JOIN (
         SELECT
@@ -332,14 +350,27 @@
         ) g LEFT JOIN (
         SELECT
         u.ID_ AS houseKeeperId,
+        uou.ID_ AS id,
         u.FULLNAME_ AS fullName,
         u.MOBILE_ AS mobile,
-        u.ACCOUNT_ AS account
+        u.ACCOUNT_ AS account,
+        post.ID_ AS `postId`,
+        post.POS_NAME_ AS posName,
+        org.NAME_ AS divideName,
+        org.ID_ AS divideId
         FROM
         uc_user u
+        JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+        JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
+        JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
+        JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
         WHERE
-        u.IS_DELE_ = 0 and u.STATUS_ = 1
-        ) as k on g.housekeeperId = k.houseKeeperId
+        uoj.CODE_ = 'guanjia'
+        AND dem.CODE_ = 'smsf'
+        AND org.GRADE_ = 'ORG_DiKuai'
+        and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
+        ) as k on g.housekeeperId = k.houseKeeperId  and g.stagingId = k.divideId
         ) as t
         LEFT JOIN (
         SELECT
@@ -516,4 +547,35 @@
     <update id="updateHousekeeperId">
         update uc.grid_basic_info set housekeeper_id=NULL ,grid_remark="" where id=#{id};
     </update>
+
+    <select id="getByHouseId" parameterType="java.lang.String" resultType="java.util.Map">
+        select 	info.id,
+        grid_code as gridCode,
+        grid_name AS gridName,
+        grid_type as gridType,
+        housekeeper_id as housekeeperId,
+        a.FULLNAME_ AS housekeeperName,
+        enabled_flag as enabledFlag,
+        is_deleted as isDeleted
+        from
+        grid_basic_info info left join
+        (select
+        u.FULLNAME_ as  FULLNAME_,
+        u.id_ as id_
+        from
+         uc_user u
+        JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+        JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
+        JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
+        JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
+        where
+         uoj.CODE_ = 'guanjia'
+        AND dem.CODE_ = 'smsf'
+        AND org.GRADE_ = 'ORG_DiKuai'
+        and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
+        ) a on a.id_ =info.housekeeper_id
+        where  grid_range LIKE CONCAT('%',#{houseId},'%')
+        group by info.id limit 1
+    </select>
 </mapper>
