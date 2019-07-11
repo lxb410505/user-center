@@ -9,6 +9,7 @@ import com.hypersmart.usercenter.model.UcOrgParams;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -26,8 +27,6 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
     List<UcOrg> getChildrenOrg(UcOrg ucOrg);
 
     List<UcOrg> getUserOrgList(String userId);
-
-    List<UcOrg> getUserOrgList2(String userId);
 
     List<UcOrgDTO> queryChildrenByUserId(String userId, String parentOrgId);
 
@@ -53,6 +52,6 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
     List<UcOrg> getDefaultOrgList();
     List<UcOrgParams> getOrgParams(String code, String value);
     List<UcOrg> getDefaultOrgListByGrade(String grade);
-
+    List<UcOrg> getAllOrgs() throws IOException;
 }
 

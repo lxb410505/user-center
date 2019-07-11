@@ -8,7 +8,6 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -17,9 +16,9 @@ import java.util.Date;
  * @CreateDate: 2019/4/25 17:13
  * @Version: 1.0
  */
-@Table(name = "uc_user_work_his")
-@ApiModel(value = "uc_user_work_his", description = "用户上下班历史")
-public class UcUserWorkHistory implements Serializable {
+@Table(name = "uc_user_work")
+@ApiModel(value = "uc_user_work", description = "用户上下班最新记录")
+public class UcUserWork implements Serializable {
     @Id
     @KeySql(genId = com.hypersmart.base.id.genId.Suid.class)
     @Column(name = "ID_")
@@ -35,9 +34,10 @@ public class UcUserWorkHistory implements Serializable {
     @ApiModelProperty("'创建时间'")
     private Date createTime;
 
-    @ApiModelProperty("'用户'")
+    @ApiModelProperty("用户")
     @Column(name = "username")
     private String account;
+
     @ApiModelProperty("用户ID")
     @Column(name = "user_id")
     private String userId;
