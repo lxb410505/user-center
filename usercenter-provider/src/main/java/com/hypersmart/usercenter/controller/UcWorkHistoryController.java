@@ -9,20 +9,19 @@ import com.hypersmart.base.query.FieldSort;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.util.UniqueIdUtil;
+import com.hypersmart.usercenter.model.UcUserWork;
 import com.hypersmart.usercenter.model.UcUserWorkHistory;
 import com.hypersmart.usercenter.service.UcUserWorkHistoryService;
+import com.hypersmart.usercenter.service.UcUserWorkService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
-import java.util.UUID;
 
 
 /**
@@ -37,7 +36,8 @@ public class UcWorkHistoryController extends BaseController {
 
 	@Autowired
 	private UcUserWorkHistoryService ucUserWorkHistoryService;
-
+	@Autowired
+	UcUserWorkService ucUserWorkService;
 	/**
 	 * 分页查询
 	 *
@@ -75,9 +75,20 @@ public class UcWorkHistoryController extends BaseController {
 		ucUserWorkHistory.setStatus(status);
 		ucUserWorkHistory.setAccount(account);
 		ucUserWorkHistory.setUserId(userId);
-		ucUserWorkHistory.setId(UniqueIdUtil.getSuid().replaceAll("-",""));
+		ucUserWorkHistory.setId(UniqueIdUtil.getSuid());
 		int i = ucUserWorkHistoryService.save(ucUserWorkHistory);
-		if (i>0) {
+
+		ucUserWorkService.delByUserId(userId);
+		UcUserWork ucUserWork=new UcUserWork();
+		ucUserWork.setCreateBy(current());
+		ucUserWork.setCreateTime(new Date());
+		ucUserWork.setStatus(status);
+		ucUserWork.setAccount(account);
+		ucUserWork.setUserId(userId);
+		ucUserWork.setId(UniqueIdUtil.getSuid());
+		int j = ucUserWorkService.insert(ucUserWork);
+
+		if (i>0&&j>0) {
 			commonResult.setState(true);
 			commonResult.setMessage(msg);
 			commonResult.setValue(status);
@@ -91,7 +102,7 @@ public class UcWorkHistoryController extends BaseController {
 
 	@GetMapping("getUserHisStatus")
 	public CommonResult<String> getUserHisStatus(@RequestParam("userId") String userId){
-		String s = ucUserWorkHistoryService.queryLatest(userId);
+		String s = ucUserWorkService.getStatus(userId);
 		if(null==s){
 			return new CommonResult<>(false,"该用户无上下班记录",null);
 		}
