@@ -15,10 +15,7 @@ import com.hypersmart.uc.api.impl.model.Org;
 import com.hypersmart.usercenter.dto.*;
 import com.hypersmart.usercenter.mapper.*;
 import com.hypersmart.usercenter.model.*;
-import com.hypersmart.usercenter.service.UcDemensionService;
-import com.hypersmart.usercenter.service.UcOrgService;
-import com.hypersmart.usercenter.service.UcUserService;
-import com.hypersmart.usercenter.service.UcUserWorkHistoryService;
+import com.hypersmart.usercenter.service.*;
 import com.hypersmart.usercenter.util.ImportExcelUtil;
 import com.hypersmart.usercenter.util.ResourceErrorCode;
 import net.sourceforge.pinyin4j.PinyinHelper;
@@ -62,7 +59,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
     @Resource
     private UCFeignService ucFeignService;
     @Resource
-    private UcUserWorkHistoryService ucUserWorkHistoryService;
+    private UcUserWorkService ucUserWorkService;
     @Resource
     private UcRoleMapper ucRoleMapper;
     @Resource
@@ -625,20 +622,15 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
                         e.printStackTrace();
                     }
                 });
-        List<UcUserWorkHistory > statusList = ucUserWorkHistoryService.queryUserWorkStatusList(gList);
+        List<UcUserWork > statusList = ucUserWorkService.queryUserWorkStatusList(gList,"0");
         groupIdentities.forEach(groupIdentity->{
             try{
                 GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(),GroupIdentity.class);
-                for (UcUserWorkHistory ucUserWorkHistory:statusList
-                     ) {
-                    if(ucUserWorkHistory.getUserId()!=null && ucUserWorkHistory.getUserId().equals(groupIdentity1.getId()))
-                    {
-                        if(com.hypersmart.framework.utils.StringUtils.isNotRealEmpty(ucUserWorkHistory.getStatus()) && "0".equals(ucUserWorkHistory.getStatus())){
-                            groupIdentitySet.add(groupIdentity1);
-                        }
+                for (UcUserWork ucUserWork:statusList) {
+                    if(ucUserWork.getUserId().equals(groupIdentity1.getId())) {
+                        groupIdentitySet.add(groupIdentity1);
                     }
                 }
-
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -648,26 +640,48 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
 
     @Override
     public Set<GroupIdentityDTO> getByJobCodeAndOrgIdAndDimCodeDeeplyWithPost(String jobCode, String orgId, String dimCode, String fullName) {
+
+        //1、找人
         List<ObjectNode> groupIdentities = ucFeignService.getByJobCodeAndOrgIdAndDimCodeDeeply(jobCode,orgId,dimCode,fullName);
-        //Set<GroupIdentity> groupIdentitySet = new HashSet<>();
-        Set<String> userIdSet = new HashSet<>();
+        if(groupIdentities==null||groupIdentities.size()<=0){
+            return null;
+        }
+
+        List<String> gList=new ArrayList<>();
+        groupIdentities.forEach(groupIdentity-> {
+            try {
+                GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(), GroupIdentity.class);
+                gList.add(groupIdentity1.getId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        //2、批量找人的工作状态
         Set<GroupIdentityDTO> groupIdentityDTOSet = new HashSet<>();
+        Set<String> userIdSet = new HashSet<>();
+        List<UcUserWork > statusList = ucUserWorkService.queryUserWorkStatusList(gList,"0");
         groupIdentities.forEach(groupIdentity->{
             try{
                 GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(),GroupIdentity.class);
-                //根据上下班状态获取上班人员
-                String status = ucUserWorkHistoryService.queryLatest(groupIdentity1.getId());
-                if(com.hypersmart.framework.utils.StringUtils.isNotRealEmpty(status) && "0".equals(status)){
-                    GroupIdentityDTO groupIdentityDTO = new GroupIdentityDTO();
-                    org.springframework.beans.BeanUtils.copyProperties(groupIdentity1, groupIdentityDTO);
-                    //groupIdentitySet.add(groupIdentity1);
-                    groupIdentityDTOSet.add(groupIdentityDTO);
-                    userIdSet.add(groupIdentity1.getId());
+                for (UcUserWork ucUserWork : statusList) {
+                    if(ucUserWork.getUserId().equals(groupIdentity1.getId())) {
+                        //符合要求的加入
+                        userIdSet.add(ucUserWork.getUserId());
+                        GroupIdentityDTO groupIdentityDTO = new GroupIdentityDTO();
+                        org.springframework.beans.BeanUtils.copyProperties(groupIdentity1, groupIdentityDTO);
+                        groupIdentityDTOSet.add(groupIdentityDTO);
+                    }
                 }
+
             }catch (Exception e){
                 e.printStackTrace();
             }
         });
+
+
+        //3、获取人员岗位
+
         if (userIdSet != null && userIdSet.size() > 0){
             List<UserPostDTO> list = ucOrgPostMapper.getPostNameByUserIds(userIdSet);
             Map<String,List<String>> map = new HashMap<>();
