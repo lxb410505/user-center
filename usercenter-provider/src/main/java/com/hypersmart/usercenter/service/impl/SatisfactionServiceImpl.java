@@ -84,7 +84,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
         }
     };
 
-    @Value("${xlsx.template}")
+    @Value("${xlsx.template:}")
     String templatePath;
     String fileName = "客户满意度导入模板.xlsx";
     boolean isError = false;
@@ -139,7 +139,6 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                     for (GridBasicInfo u :
                             gridBasicInfos) {
                         orgNames.add(u.getGridCode());
-
                     }
                 }
                 orgNames.add(ucOrgs.get(0).getCode());
