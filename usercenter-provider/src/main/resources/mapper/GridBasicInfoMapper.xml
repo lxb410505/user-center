@@ -578,4 +578,29 @@
         where  grid_range LIKE CONCAT('%',#{houseId},'%')
         group by info.id limit 1
     </select>
+    <select id="getByStagingId" parameterType="java.lang.String" resultType="com.hypersmart.usercenter.dto.GridBasicInfoDTO">
+        SELECT
+        g.id AS gridId,
+        g.grid_name AS gridName,
+        g.housekeeper_id AS housekeeperId,
+        u.FULLNAME_ AS housekeeperName
+        FROM
+	    grid_basic_info g
+	    LEFT JOIN uc_user u ON g.housekeeper_id = u.ID_
+	    WHERE g.is_deleted = 0 AND u.IS_DELE_ = 0
+	    and g.staging_id = #{stagingId}
+    </select>
+
+    <select id="getByGridId" parameterType="java.lang.String" resultType="com.hypersmart.usercenter.dto.GridBasicInfoDTO">
+        SELECT
+        g.id AS gridId,
+        g.grid_name AS gridName,
+        g.housekeeper_id AS housekeeperId,
+        u.FULLNAME_ AS housekeeperName
+        FROM
+        grid_basic_info g
+        LEFT JOIN uc_user u ON g.housekeeper_id = u.ID_
+        WHERE g.is_deleted = 0 AND u.IS_DELE_ = 0
+        and g.id = #{id}
+    </select>
 </mapper>

@@ -356,4 +356,16 @@ public class GridBasicInfoController extends BaseController {
 	public Map<String,Object> getByHouseId(@PathVariable String houseId) {
 		return gridBasicInfoService.getByHouseId(houseId);
 	}
+
+	/**
+	 * 根据地块id或者网格Id查询网格id，name,管家id，name
+	 * @param stagingId
+	 * @param gridId
+	 * @return
+	 */
+	@PostMapping({"/getByStagingId"})
+	public List<GridBasicInfoDTO> getByStagingId(@ApiParam(name = "stagingId", value = "查询对象") @RequestParam String stagingId ,
+												 @ApiParam(name = "gridId", value = "查询对象") @RequestParam String gridId) {
+		return gridBasicInfoService.getByStagingId(stagingId,gridId);
+	}
 }

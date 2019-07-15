@@ -167,5 +167,12 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	List<Map<String,Object>> getGridsHouseBymassifIdPage(String massifId, Integer page, Integer pageSize);
 	Integer getPublicGridNum(String id);
 	Map<String,Object> getByHouseId(String houseId);
+
+	/**
+	 * 根据地块Id查询下面的网格及网格管家姓名
+	 * @param stagingId
+	 * @return
+	 */
+	List<GridBasicInfoDTO> getByStagingId(String stagingId,String gridId);
 }
 
