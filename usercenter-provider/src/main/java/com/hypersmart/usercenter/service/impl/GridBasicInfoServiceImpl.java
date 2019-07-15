@@ -1069,4 +1069,12 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 	public Map<String, Object> getByHouseId(String houseId) {
 		return gridBasicInfoMapper.getByHouseId(houseId);
 	}
+
+	@Override
+	public List<GridBasicInfoDTO> getByStagingId(String stagingId,String gridId) {
+		if(StringUtil.isNotEmpty(gridId)){
+			return gridBasicInfoMapper.getByGridId(gridId);
+		}
+		return gridBasicInfoMapper.getByStagingId(stagingId);
+	}
 }
