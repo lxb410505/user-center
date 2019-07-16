@@ -142,6 +142,17 @@ public class GridBasicInfoDTO extends GenericDTO<String> implements Serializable
 	// 管家解除网格关联  和  管家关联网格 使用
 	List<GridBasicInfoBO> gridBasicInfoBOList;
 
+	//网格Id
+	private String gridId;
+
+	public String getGridId() {
+		return gridId;
+	}
+
+	public void setGridId(String gridId) {
+		this.gridId = gridId;
+	}
+
 	public String getGridCode() {
 		return gridCode;
 	}

@@ -364,21 +364,23 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
             //处理导入的数据；
 
-            satisfactionMapper.deleteByDate(date);
+
             int resultNum = 0;
             if (org.apache.commons.collections.CollectionUtils.isNotEmpty(satisfactions)) {
-                if(message.length()==0) {
+                satisfactionMapper.deleteByDate(date);
+                if (message.length() == 0) {
                     if (insertBatch(satisfactions) > 0) {
                         return new CommonResult(true, "导入成功。");
-                    }else{
-                        return new CommonResult<>(false, "导入失败，失败信息如下：没有一条正确的数据\r\n");
                     }
-                }else{
-                    return new CommonResult<>(false, "导入失败，失败信息如下：\r\n" + message.toString());
+                } else {
+                    return new CommonResult<>(false, "导入失败，失败信息如下：&nbsp;&nbsp;&nbsp;&nbsp;\r\n" + message.toString());
                 }
             }
-
+            else {
+                return new CommonResult<>(false, "导入失败，失败信息如下：&nbsp;&nbsp;&nbsp;&nbsp;\r\n没有一条正确的数据\r\n");
+            }
         } catch (Exception e) {
+            e.printStackTrace();
             return new CommonResult<>(false, "导入失败,内部错误", message.toString(), 500);
         }
         return new CommonResult(true, "导入成功。");
@@ -480,7 +482,6 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     }
 
 
-
     private String checkData(int rowNun, StringBuilder message, List<Object> rowData, int type) throws Exception {
         //todo
         //校验与前面行得数据得归属关系;
@@ -496,13 +497,15 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
             gridBasicInfo.setId(rowData.get(0).toString());
 
             List<GridBasicInfo> gridBasicInfos = gridBasicInfoService.selectAll(gridBasicInfo);
-
+            if (org.apache.commons.collections.CollectionUtils.isNotEmpty(gridBasicInfos)) {
+                orgCode = gridBasicInfos.get(0).getGridCode();
+                hasOrg = true;
+            }
             if (gridBasicInfos.size() <= 0) {
                 message.append("第" + rowNun + "行：" + "没有该网格" + rowData.get(2).toString() + "\r\n");//8
                 isError = true;
             }
-            orgCode = gridBasicInfos.get(0).getGridCode();
-            hasOrg = true;
+
         } else {
             if (type == 1) {
                 ucOrg.setGrade("ORG_QuYu");
@@ -533,15 +536,16 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                     message.append("第" + rowNun + "行：" + rowData.get(2).toString() + "组织编码不存在\r\n");//8
                     isError = true;
                 }
-
+                orgCode = ucOrgs.get(ucOrgs.size() - 1).getCode();
+                hasOrg = true;
             }
             //取最新版本
-            if (ucOrgs.size() > 1) {
+        /*    if (ucOrgs.size() > 1) {
                 ucOrgs.sort((UcOrg o1, UcOrg o2) -> o1.getVersion() - o2.getVersion());
 
-            }
-            orgCode = ucOrgs.get(ucOrgs.size() - 1).getCode();
-            hasOrg = true;
+            }*/
+
+
         }
 
 
@@ -566,7 +570,7 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                 for (int i = 4; i < rowData.size(); i++) {
                     if (rowData.get(i) != null && rowData.get(i).toString() != null && rowData.get(i).toString().trim().length() > 0 && !isBigDecimal(rowData.get(i).toString())) {
                         message.append("第" + rowNun + "行,第" + i + "列数值格式错误（比如不是数字）\r\n");
-                        isError=true;
+                        isError = true;
                     }
                 }
                 break;
@@ -575,14 +579,13 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                 for (int j = 4; j < rowData.size(); j++) {
                     if (rowData.get(j) != null && rowData.get(j).toString() != null && rowData.get(j).toString().trim().length() > 0 && !isBigDecimal(rowData.get(j).toString())) {
                         message.append("第" + rowNun + "行,第" + j + "列数值格式错误（比如不是数字）\r\n");
-                        isError=true;
+                        isError = true;
 
                     }
                 }
                 break;
 
             default:
-
 
 
         }
