@@ -371,12 +371,13 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                 if (message.length() == 0) {
                     if (insertBatch(satisfactions) > 0) {
                         return new CommonResult(true, "导入成功。");
-                    } else {
-                        return new CommonResult<>(false, "导入失败，失败信息如下：没有一条正确的数据\r\n");
                     }
                 } else {
                     return new CommonResult<>(false, "导入失败，失败信息如下：\r\n" + message.toString());
                 }
+            }
+            else {
+                return new CommonResult<>(false, "导入失败，失败信息如下：没有一条正确的数据\r\n");
             }
 
         } catch (Exception e) {
