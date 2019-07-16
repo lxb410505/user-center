@@ -373,13 +373,12 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
                         return new CommonResult(true, "导入成功。");
                     }
                 } else {
-                    return new CommonResult<>(false, "导入失败，失败信息如下：\r\n" + message.toString());
+                    return new CommonResult<>(false, "导入失败，失败信息如下：&nbsp;&nbsp;&nbsp;&nbsp;\r\n" + message.toString());
                 }
             }
             else {
-                return new CommonResult<>(false, "导入失败，失败信息如下：没有一条正确的数据\r\n");
+                return new CommonResult<>(false, "导入失败，失败信息如下：&nbsp;&nbsp;&nbsp;&nbsp;\r\n没有一条正确的数据\r\n");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             return new CommonResult<>(false, "导入失败,内部错误", message.toString(), 500);
