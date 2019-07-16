@@ -225,7 +225,7 @@ public class SatisfactionController extends BaseController {
 
     @GetMapping({"/getAllSatisfactionNoAuth"})
     @ApiOperation(value = "总部满意度不过滤权限", httpMethod = "GET", notes = "总部满意度不过滤权限")
-    @Cache(key ="#bo.toString()" ,timeOut = 60,timeUnit = TimeUnit.MINUTES)
+    @Cache(timeOut = 60,timeUnit = TimeUnit.MINUTES)
     public List<Satisfaction> getAllSatisfactionNoAuth(@ApiParam(name = "time", value = "时间") @RequestParam String time) {
         return this.satisfactionService.getAllSatisfactionNoAuth(time);
     }
