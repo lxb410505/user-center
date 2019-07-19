@@ -108,22 +108,24 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 		 */
 		// 地块id从前台传入，无须在后台过滤数据权限
 		boolean flag = false;
-		Object orgId=null;
+		Object orgId = null;
 		Iterator<QueryField> iterator = queryFilter.getQuerys().iterator();
-		while (iterator.hasNext() ) {
+		while (iterator.hasNext()) {
 			QueryField next = iterator.next();
-			if("massifId".equals(next.getProperty()) && null!= next.getValue()){
-				flag=true;
-				orgId= next.getValue();
-				iterator.remove();
+			if ("massifId".equals(next.getProperty()) && null != next.getValue()) {
+				flag = true;
 				break;
 			}
 		}
-		if(!flag){
-			orgId= ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
+
+		if (queryFilter.getParams().containsKey("massifId")&&!StringUtils.isEmpty(String.valueOf(queryFilter.getParams().get("massifId")))) {
+			queryFilter.getParams().put("massifId", new ArrayList<>(Arrays.asList(queryFilter.getParams().get("massifId").toString().split(","))));
+			flag = true;
 		}
-		if (orgId != null) {
-			queryFilter.getParams().put("massifId", orgId.toString());
+
+		orgId = ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
+		if (orgId != null && !flag) {
+			queryFilter.getParams().put("massifId", Arrays.asList(orgId.toString()));
 		}
 		/*else {
 			PageList<Map<String, Object>> pageList = new PageList();
