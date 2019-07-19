@@ -960,7 +960,7 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 		List<RangeDTO> returnList = new ArrayList<>();
         List<GridBasicInfo> gridBasicInfos = this.getGridsBySmcloudmassifId(massifId);
         for(int i=0;i<gridBasicInfos.size();i++){
-        	List<RangeDTO> listObjectFir = (List<RangeDTO>) JSONArray.parse(gridBasicInfos.get(i).getGridRange());
+        	List<RangeDTO> listObjectFir = (List<RangeDTO>) JSONArray.parseArray(gridBasicInfos.get(i).getGridRange(),RangeDTO.class);
         	if(!CollectionUtils.isEmpty(listObjectFir)) {
                 returnList.addAll(listObjectFir);
             }
@@ -971,7 +971,10 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 			*//*returnList.addAll(JsonUtil.to)*//*
 		});*/
 		Set<RangeDTO> set = new HashSet<>(returnList);
-		return new ArrayList<>(set);
+		List<RangeDTO> returnList2 = new ArrayList<>(set);
+		returnList2.sort(Comparator.comparing(RangeDTO::getName));
+		
+		return new ArrayList<>(returnList2);
 	}
 
 	@Override
