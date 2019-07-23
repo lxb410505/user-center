@@ -48,7 +48,7 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
      * @param id
      * @return
      */
-    Map<String, Object> getGridById(String id);
+    Map<String, Object> getGridById(@Param("id") String id,@Param("stagingId") String stagingId);
 
     /**
      * 禁用网格

@@ -5,6 +5,8 @@ public class GridBasicInfoSimpleDTO {
     private String gridName;
     private String stagingId;
     private String housekeeperId;
+    private String gridType;
+    private String gridId;
 
     public String getId() {
         return id;
@@ -36,5 +38,21 @@ public class GridBasicInfoSimpleDTO {
 
     public void setHousekeeperId(String housekeeperId) {
         this.housekeeperId = housekeeperId;
+    }
+
+    public String getGridType() {
+        return gridType;
+    }
+
+    public void setGridType(String gridType) {
+        this.gridType = gridType;
+    }
+
+    public String getGridId() {
+        return gridId;
+    }
+
+    public void setGridId(String gridId) {
+        this.gridId = gridId;
     }
 }

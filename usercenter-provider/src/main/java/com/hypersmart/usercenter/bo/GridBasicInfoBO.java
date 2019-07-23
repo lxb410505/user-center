@@ -48,6 +48,8 @@ public class GridBasicInfoBO extends GenericBO{
 
     private String updatedBy;
 
+    private String gridId;
+
     public String getGridCode() {
         return gridCode;
     }
@@ -142,5 +144,13 @@ public class GridBasicInfoBO extends GenericBO{
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    public String getGridId() {
+        return gridId;
+    }
+
+    public void setGridId(String gridId) {
+        this.gridId = gridId;
     }
 }

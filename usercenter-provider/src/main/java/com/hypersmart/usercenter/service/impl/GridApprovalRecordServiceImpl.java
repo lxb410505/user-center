@@ -3,6 +3,10 @@ package com.hypersmart.usercenter.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hypersmart.base.model.CommonResult;
+import com.hypersmart.base.query.FieldRelation;
+import com.hypersmart.base.query.PageList;
+import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.base.util.JsonUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.framework.utils.StringUtils;
@@ -13,6 +17,7 @@ import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridRangeInfo;
 import com.hypersmart.usercenter.mapper.GridApprovalRecordMapper;
 import com.hypersmart.usercenter.mapper.GridBasicInfoMapper;
+import com.hypersmart.usercenter.mapper.StageServiceGirdRefMapper;
 import com.hypersmart.usercenter.model.GridApprovalRecord;
 import com.hypersmart.usercenter.model.GridBasicInfo;
 import com.hypersmart.usercenter.model.K2Result;
@@ -21,6 +26,7 @@ import com.hypersmart.usercenter.service.GridBasicInfoHistoryService;
 import com.hypersmart.usercenter.service.GridBasicInfoService;
 import com.hypersmart.usercenter.service.GridRangeService;
 import com.hypersmart.usercenter.util.GridOperateEnum;
+import com.hypersmart.usercenter.util.GridTypeEnum;
 import com.hypersmart.usercenter.util.HttpClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +50,9 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 
 	@Resource
 	private GridBasicInfoMapper gridBasicInfoMapper;
+
+	@Resource
+	private StageServiceGirdRefMapper stageServiceGirdRefMapper;
 
 	@Autowired
 	private GridBasicInfoService gridBasicInfoService;
@@ -137,7 +146,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			record.setCallFlowContent(flowContent);
 
 			// TODO 调用K2流程
-			/*HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
+			HttpClientUtils httpClientUtils = HttpClientUtils.getInstance();
 			String resultContent = httpClientUtils.httpPost(flowUrl, flowContent, null);
 			JsonNode resultNode = JsonUtil.toJsonNode(resultContent);
 			if (null != resultNode) {
@@ -170,25 +179,25 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 			} else {
 				record.setCallStatus(2);
 				record.setCallErrorMessage("调用K2审批流程失败：未能收到K2任何反馈信息");
-			}*/
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			record.setCallStatus(2);
 			record.setCallErrorMessage(e.getMessage());
 		} finally {
-//			gridApprovalRecordMapper.insert(record);
-
-			// TODO 待调整（删除此段代码，使用上面代码）
-			record.setCallStatus(1);
-			String procInstId = UUID.randomUUID().toString();
-			record.setProcInstId(procInstId);
 			gridApprovalRecordMapper.insert(record);
 
-			K2Result k2Result = new K2Result();
-			k2Result.setMessage("审批通过");
-			k2Result.setProcInstId(procInstId);
-			k2Result.setResultCode("1");
-			processFlowResult(k2Result);
+			// TODO 待调整（删除此段代码，使用上面代码）
+//			record.setCallStatus(1);
+//			String procInstId = UUID.randomUUID().toString();
+//			record.setProcInstId(procInstId);
+//			gridApprovalRecordMapper.insert(record);
+//
+//			K2Result k2Result = new K2Result();
+//			k2Result.setMessage("审批通过");
+//			k2Result.setProcInstId(procInstId);
+//			k2Result.setResultCode("1");
+//			processFlowResult(k2Result);
 		}
 	}
 
@@ -202,12 +211,12 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		boolean importState = true;
 		String message = "0";
 		GridApprovalRecord record = gridApprovalRecordMapper.getGridApprovalRecordByProcInstId(k2Result.getProcInstId());
+		GridBasicInfoDTO dto = JsonUtil.toBean(record.getApprovalContent(), GridBasicInfoDTO.class);
 		try {
 			if ("1".equals(k2Result.getResultCode())) {
 				// 审批通过
 				record.setApprovalStatus(2);
 				record.setApprovalDate(new Date());
-				GridBasicInfoDTO dto = JsonUtil.toBean(record.getApprovalContent(), GridBasicInfoDTO.class);
 				String gridId = record.getGridId();
 
 				// 针对不同的审核数据，做后续处理操作
@@ -232,44 +241,57 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 				// TODO
 				if ((GridOperateEnum.CHANGE_HOUSEKEEPER.getOperateType()).equals(record.getApprovalType()) || (GridOperateEnum.LINK_HOUSEKEEPER.getOperateType()).equals(record.getApprovalType())) {
 					// 变更管家>>>记录历史>>>更新数据
-					GridBasicInfo grid = gridBasicInfoService.get(gridId);
-					gridBasicInfoHistoryService.saveGridBasicInfoHistory(grid, 0);
-					if ("".equals(dto.getHousekeeperId())) {
-						grid.setHousekeeperId(null);
-					} else {
-						grid.setHousekeeperId(dto.getHousekeeperId());
+					if(GridTypeEnum.SERVICE_CENTER_GRID.getGridType().equals(dto.getGridType())){
+						List<GridBasicInfo> gridBasicInfoLists = getGridBasicInfoByServiceGridId(gridId);
+						if(!CollectionUtils.isEmpty(gridBasicInfoLists)){
+							boolean saveHistory=true;
+							for(GridBasicInfo info:gridBasicInfoLists){
+								updateHouseKeeperId(info,record.getSubmitterId(),dto,saveHistory);
+								saveHistory=false;
+							}
+						}
+					}else{
+						GridBasicInfo grid = gridBasicInfoService.get(gridId);
+						updateHouseKeeperId(grid,record.getSubmitterId(),dto,true);
 					}
-					grid.setUpdateTimes(grid.getUpdateTimes() + 1);
-					grid.setUpdationDate(new Date());
-					grid.setUpdatedBy(record.getSubmitterId());
-					gridBasicInfoService.updateSelective(grid);
+
 				}
 
 				if ((GridOperateEnum.DISABLE_GRID.getOperateType()).equals(record.getApprovalType())) {
 					// 网格禁用
-					GridBasicInfoBO bo = new GridBasicInfoBO();
-					String[] ids = {dto.getId()};
-					bo.setIds(ids);
-					bo.setUpdatedBy(record.getSubmitterId());
-					gridBasicInfoMapper.disableGridInfo(bo);
-					gridRangeService.deleteRangeByGridIds(ids);
+					disableGrid(record,dto);
 				}
 
 				if ((GridOperateEnum.HOUSEKEEPER_DISASSOCIATED.getOperateType()).equals(record.getApprovalType())) {
 					// 管家解除关联网格>>>记录历史>>>更新数据
-					String[] ids = dto.getIds();
-					List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getByIds(ids);
-					if (gridBasicInfoList != null && gridBasicInfoList.size() > 0) {
-						for (GridBasicInfo grid : gridBasicInfoList) {
-							grid.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
-							grid.setHousekeeperId(null);
-							gridBasicInfoHistoryService.saveGridBasicInfoHistory(grid, 0);
+					dto.setHousekeeperId(null);
+					if(GridTypeEnum.SERVICE_CENTER_GRID.getGridType().equals(dto.getGridType())){
+						List<GridBasicInfo> gridBasicInfoLists = getGridBasicInfoByServiceGridId(gridId);
+						if(!CollectionUtils.isEmpty(gridBasicInfoLists)){
+							boolean saveHistory=true;
+							for (GridBasicInfo info : gridBasicInfoLists) {
+								updateHouseKeeperId(info,record.getSubmitterId(),dto,saveHistory);
+								saveHistory=false;
+							}
+						}
+					}else{
+						String[] ids = dto.getIds();
+						List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getByIds(ids);
+						if (gridBasicInfoList != null && gridBasicInfoList.size() > 0) {
+							for (GridBasicInfo grid : gridBasicInfoList) {
+								updateHouseKeeperId(grid,record.getSubmitterId(),dto,true);
+							}
 						}
 					}
-					gridBasicInfoService.updateBatch(gridBasicInfoList);
+
+
 				}
 			} else {
 				// 审批不通过
+				//新增网格审批驳回
+				if ((GridOperateEnum.NEW_GRID.getOperateType()).equals(record.getApprovalType())) {
+					disableGrid(record,dto);
+				}
 				record.setApprovalStatus(3);
 				record.setApprovalOpinion(k2Result.getMessage());
 				importState = false;
@@ -283,7 +305,69 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 		}
 		return new CommonResult(importState, message);
 	}
+	//禁用网格
+	private void disableGrid(GridApprovalRecord record,GridBasicInfoDTO dto){
+		// 禁用网格
+		GridBasicInfoBO bo = new GridBasicInfoBO();
+		String[] ids = {dto.getId()};
+		bo.setIds(ids);
+		bo.setUpdatedBy(record.getSubmitterId());
+		//服务中心网格
+		if(GridTypeEnum.SERVICE_CENTER_GRID.getGridType().equals(dto.getGridType())){
+			stageServiceGirdRefMapper.disableServiceCenterGrid(bo);
+			List<GridBasicInfo> gridBasicInfoLists = getGridBasicInfoByServiceGridId(dto.getId());
+			if(!CollectionUtils.isEmpty(gridBasicInfoLists)){
+				for (GridBasicInfo grid : gridBasicInfoLists) {
+					grid.setUpdatedBy(record.getSubmitterId());
+					grid.setHousekeeperId(null);
+					grid.setGridRemark(null);
+				}
+				gridBasicInfoService.updateBatch(gridBasicInfoLists);
 
+			}
+		}else{
+			//楼栋、公区网格
+			gridBasicInfoMapper.disableGridInfo(bo);
+			gridRangeService.deleteRangeByGridIds(ids);
+		}
+	}
+	//根据服务中心网格id 获取覆盖地块的网格
+	private List<GridBasicInfo> getGridBasicInfoByServiceGridId(String gridId){
+		List<Map<String, Object>> serviceGridByGridId = stageServiceGirdRefMapper.getServiceGridByGridId(gridId);
+		List<GridBasicInfo> gridBasicInfos=new ArrayList<>();
+		if(!CollectionUtils.isEmpty(serviceGridByGridId)){
+			List<String> stagingIds=new ArrayList<>();
+			for(Map<String, Object> serviceGrid:serviceGridByGridId){
+				String stagingId = serviceGrid.get("stagingId") == null ? null : String.valueOf(serviceGrid.get("stagingId"));
+				stagingIds.add(stagingId);
+			}
+			QueryFilter queryFilter=QueryFilter.build(GridBasicInfo.class);
+			queryFilter.addFilter("grid_type",GridTypeEnum.SERVICE_CENTER_GRID.getGridType(), QueryOP.IN, FieldRelation.AND);
+			queryFilter.addFilter("is_deleted",0, QueryOP.EQUAL, FieldRelation.AND);
+			queryFilter.addFilter("enabled_flag",1, QueryOP.EQUAL, FieldRelation.AND);
+			queryFilter.addFilter("staging_id",stagingIds, QueryOP.IN, FieldRelation.AND);
+			PageList<GridBasicInfo> query = gridBasicInfoService.query(queryFilter);
+			if(query!=null){
+				gridBasicInfos=query.getRows();
+			}
+		}
+		return gridBasicInfos;
+	}
+	//更新网格管家信息
+	private void updateHouseKeeperId(GridBasicInfo grid,String submitterId,GridBasicInfoDTO dto,boolean saveHistory){
+		if(saveHistory){
+			gridBasicInfoHistoryService.saveGridBasicInfoHistory(grid, 0);
+		}
+		if ("".equals(dto.getHousekeeperId())) {
+			grid.setHousekeeperId(null);
+		} else {
+			grid.setHousekeeperId(dto.getHousekeeperId());
+		}
+		grid.setUpdateTimes(grid.getUpdateTimes() + 1);
+		grid.setUpdationDate(new Date());
+		grid.setUpdatedBy(submitterId);
+		gridBasicInfoService.update(grid);
+	}
 	/**
 	 * 构建 K2流程消息体（新建网格）
 	 *

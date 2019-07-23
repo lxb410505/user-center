@@ -41,7 +41,7 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 * @param id
 	 * @return
 	 */
-	Map<String, Object> getGridById(String id);
+	Map<String, Object> getGridById(String id,String stagingId);
 
 	/**
 	 * 新增网格
