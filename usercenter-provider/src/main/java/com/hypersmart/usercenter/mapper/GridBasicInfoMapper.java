@@ -98,10 +98,10 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
 
     /**
      * 根据地块id查询网格及网格管家
-     * @param stagingId
+     * @param
      * @return
      */
-    List<GridBasicInfoDTO> getByStagingId(@Param("stagingId") String stagingId);
+    List<GridBasicInfoDTO> getByStagingId(@Param("list") List<String> list);
 
     /**
      * 根据网格id查询网格和网格管家姓名
@@ -109,4 +109,6 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
      * @return
      */
     List<GridBasicInfoDTO> getByGridId(@Param("id") String id);
+
+    List<Map<String,Object>> getListByOrgs(@Param("list") List<String> list);
 }
