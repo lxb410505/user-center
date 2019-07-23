@@ -1080,6 +1080,24 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 		if(StringUtil.isNotEmpty(gridId)){
 			return gridBasicInfoMapper.getByGridId(gridId);
 		}
-		return gridBasicInfoMapper.getByStagingId(stagingId);
+		List<String> list = this.stringToList(stagingId);
+		return gridBasicInfoMapper.getByStagingId(list);
 	}
+
+	@Override
+	public List<Map<String,Object>> getListByOrgs(String stagingId) {
+		if (StringUtil.isEmpty(stagingId)){
+			return null;
+		}
+	    List<String> list = this.stringToList(stagingId);
+		return gridBasicInfoMapper.getListByOrgs(list);
+	}
+
+	private List<String> stringToList(String str){
+	    str = str.replace("(","");
+	    str = str.replace(")","");
+	    str = str.replace("'","");
+	    List<String> list = Arrays.asList(str.split(","));
+	    return list;
+    }
 }

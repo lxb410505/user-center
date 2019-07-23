@@ -364,8 +364,13 @@ public class GridBasicInfoController extends BaseController {
 	 * @return
 	 */
 	@PostMapping({"/getByStagingId"})
-	public List<GridBasicInfoDTO> getByStagingId(@ApiParam(name = "stagingId", value = "查询对象") @RequestParam String stagingId ,
+	public List<GridBasicInfoDTO> getByStagingId(@ApiParam(name = "stagingId", value = "查询对象") @RequestBody String stagingId ,
 												 @ApiParam(name = "gridId", value = "查询对象") @RequestParam String gridId) {
 		return gridBasicInfoService.getByStagingId(stagingId,gridId);
+	}
+
+	@PostMapping({"/getListByOrgs"})
+	public List<Map<String,Object>> getListByOrgs(@ApiParam(name = "stagingId", value = "查询对象") @RequestBody(required = false) String stagingId) {
+		return gridBasicInfoService.getListByOrgs(stagingId);
 	}
 }

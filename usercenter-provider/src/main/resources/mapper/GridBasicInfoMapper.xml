@@ -595,7 +595,10 @@
 	    grid_basic_info g
 	    LEFT JOIN uc_user u ON g.housekeeper_id = u.ID_
 	    WHERE g.is_deleted = 0 AND u.IS_DELE_ = 0
-	    and g.staging_id = #{stagingId}
+        and g.staging_id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </select>
 
     <select id="getByGridId" parameterType="java.lang.String" resultType="com.hypersmart.usercenter.dto.GridBasicInfoDTO">
@@ -609,5 +612,21 @@
         LEFT JOIN uc_user u ON g.housekeeper_id = u.ID_
         WHERE g.is_deleted = 0 AND u.IS_DELE_ = 0
         and g.id = #{id}
+    </select>
+
+    <select id="getListByOrgs" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT
+        g.id AS id,
+        g.grid_name AS gridName,
+        g.housekeeper_id AS housekeeperId,
+        u.FULLNAME_ AS housekeeperName
+        FROM
+        grid_basic_info g
+        LEFT JOIN uc_user u ON g.housekeeper_id = u.ID_
+        WHERE g.is_deleted = 0 AND u.IS_DELE_ = 0
+        and g.staging_id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </select>
 </mapper>
