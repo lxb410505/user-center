@@ -136,7 +136,7 @@
         when 1 then t.grid_remark
         else NULL
         end
-         AS gridRemark,
+        AS gridRemark,
         t.area_id AS areaId,
         t.project_id AS projectId,
         t.city_id AS cityId,
@@ -158,7 +158,10 @@
         stage_servicegird_ref s LEFT JOIN grid_basic_info t
         ON t.staging_id = s.staging_id and t.grid_type='service_center_grid'
         where
-        s.staging_id =#{massifId}
+        s.staging_id in
+        <foreach collection="massifId"  item="dkId"  open="(" separator="," close=")">
+            #{dkId}
+        </foreach>
         and s.is_deleted = 0
         and
         t.is_deleted = 0
@@ -184,7 +187,11 @@
         t.creation_date AS creationDate,
         null AS serviceGridId
         from grid_basic_info t
-        where t.staging_id=#{massifId}
+        where
+        t.staging_id in
+        <foreach collection="massifId" item="dkId" open="(" separator=","  close=")" >
+            #{dkId}
+        </foreach>
         AND t.grid_type!='service_center_grid'
         AND t.is_deleted = 0
         ) as a
