@@ -27,8 +27,7 @@ public interface UcOrgFegin {
 
     @GetMapping({"/api/skeleton/v1/ucOrg/get/{id}"})
     @ApiOperation(value = "组织架构数据列表", httpMethod = "GET", notes = "获取单个组织架构记录")
-    public UcOrg get(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id);
-
+    public UcOrg get(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable("id") String id);
 
     /**
      * 查询地块列表
