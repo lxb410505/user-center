@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.TgeQualityCheckMapper">
+    <select id="initSelect" resultType="com.hypersmart.usercenter.model.TgeQualityCheck">
+        SELECT id id,area_ area ,area_code areaCode ,project_  project,project_code projectCode ,massif_ massif ,
+        massif_code massifCode,storied_grid  storiedGrid,public_area_grid publicAreaGrid ,service_center_grid serviceCenterGrid ,
+        order_service_unit orderServiceUnit ,esu_comprehensive_score esuComprehensiveScore,esu_cleaning esuCleaning,
+        esu_green esuGreen ,psu_operation_and_maintenance psuOperationAndMaintenance, psu_facilities psuFacilities,
+        first_grade_red_line firstGradeRedLine,two_level_strong_control twoLevelStrongControl ,create_date createDate,effective_time effectiveTime
+
+        FROM tge_quality_check
+        where 1=1
+        <if test="value.area !=null">
+            and area_ = #{value.area}
+        </if>
+        <if test="value.project !=null">
+            and project_  = #{value.project}
+        </if>
+        <if test="value.massif !=null">
+            and massif_  = #{value.massif}
+        </if>
+        <if test="value.effectiveTime !=null">
+            and effective_time  = #{value.effectiveTime}
+        </if>
+    </select>
+    <select id="deleteByDate" parameterType="java.lang.String">
+        delete from  tge_quality_check where
+        effective_time = #{date}
+    </select>
+</mapper>
