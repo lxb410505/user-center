@@ -170,6 +170,7 @@
         t.project_id AS projectId,
         t.city_id AS cityId,
         s.staging_id AS stagingId,
+        s.staging_id AS massifId,
         t.staging_id AS divideId,
         case s.enabled_flag
         when 1 then t.housekeeper_id
@@ -207,6 +208,7 @@
         t.project_id AS projectId,
         t.city_id AS cityId,
         t.staging_id AS stagingId,
+        t.staging_id AS massifId,
         t.staging_id AS divideId,
         t.housekeeper_id AS housekeeperId,
         t.format_attribute AS formatAttribute,
@@ -267,18 +269,33 @@
         grid_approval_record gr
         WHERE
         gr.create_date = (
-        SELECT
-        max(create_date)
-        FROM
-        grid_approval_record
-        WHERE
-        grid_id = gr.grid_id
-        limit 1
+        <choose>
+            <when test="enabledFlag!=null">
+                SELECT max(create_date)
+                FROM
+                grid_approval_record
+                WHERE
+                grid_id = gr.grid_id
+                and approval_type='newGrid'
+                limit 1
+            </when>
+            <otherwise>
+                SELECT max(create_date)
+                FROM
+                grid_approval_record
+                WHERE
+                grid_id = gr.grid_id
+                limit 1
+            </otherwise>
+        </choose>
         )
         ) r ON r.grid_id = t.gridId
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
+                <if test="enabledFlag!=null">
+                    and (approvalStatus is null or approvalStatus =2)
+                </if>
             </if>
         </where>
         GROUP BY t.gridId
