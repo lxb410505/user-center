@@ -13,6 +13,7 @@ import com.hypersmart.usercenter.fegin.UcOrgFegin;
 import com.hypersmart.usercenter.mapper.TgeSignificantQualityMapper;
 import com.hypersmart.usercenter.model.TgeSignificantQuality;
 import com.hypersmart.usercenter.service.TgeSignificantQualityService;
+import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.util.ImportExcelUtil;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
@@ -47,6 +48,8 @@ public class TgeSignificantQualityServiceImpl extends GenericService<String, Tge
     TgeSignificantQualityMapper tgeSignificantQualityMapper;
     @Autowired
     UcOrgFegin ucOrgService;
+    @Autowired
+    UcOrgService orgService;
 
     public TgeSignificantQualityServiceImpl(TgeSignificantQualityMapper mapper) {
         super(mapper);
@@ -237,9 +240,10 @@ public class TgeSignificantQualityServiceImpl extends GenericService<String, Tge
                                 build.addFilter("NAME_", o, QueryOP.EQUAL);
 
                                 build.addFilter("GRADE_", "ORG_DiKuai", QueryOP.EQUAL);
-                                PageList<UcOrg> orgList = ucOrgService.getOrgList(build);
+                                PageList<com.hypersmart.usercenter.model.UcOrg> orgList = orgService.query(build);
+//                                PageList<UcOrg> orgList = orgService.query(build);
                                 if (orgList.getRows() != null) {
-                                    List<UcOrg> rows = orgList.getRows();
+                                    List<com.hypersmart.usercenter.model.UcOrg> rows = orgList.getRows();
                                     String path = rows.get(0).getId();
                                     List<UcOrg> orgIdsByOrgs = ucOrgService.getAllParentByOrgId(path);
                                     // 该项目有城区，为填写
