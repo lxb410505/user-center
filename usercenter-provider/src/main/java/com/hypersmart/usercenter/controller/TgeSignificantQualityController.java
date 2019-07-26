@@ -62,7 +62,7 @@ public class TgeSignificantQualityController extends BaseController {
 
     @GetMapping({"/get/{id}"})
     @ApiOperation(value = "重大事件质量数据列表", httpMethod = "GET", notes = "获取单个重大事件质量记录")
-    public TgeSignificantQuality get(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable String id) {
+    public TgeSignificantQuality get(@ApiParam(name = "id", value = "业务对象主键", required = true) @PathVariable("id") String id) {
         return this.tgeSignificantQualityService.get(id);
     }
 
