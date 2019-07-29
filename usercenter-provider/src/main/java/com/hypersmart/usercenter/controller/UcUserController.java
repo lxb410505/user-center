@@ -1,8 +1,10 @@
 package com.hypersmart.usercenter.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.hypersmart.base.aop.norepeat.NoRepeatSubmit;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.exception.RequiredException;
+import com.hypersmart.base.feign.UCFeignService;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
@@ -16,9 +18,8 @@ import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.dto.GroupIdentityDTO;
 import com.hypersmart.usercenter.dto.UserDetailRb;
 import com.hypersmart.usercenter.dto.UserDetailValue;
-import com.hypersmart.usercenter.model.GradeDemCode;
-import com.hypersmart.usercenter.model.GroupIdentity;
-import com.hypersmart.usercenter.model.UcOrg;
+import com.hypersmart.usercenter.mapper.UcUserSkillMapper;
+import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.util.ResourceErrorCode;
 import io.swagger.annotations.Api;
@@ -28,14 +29,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
-import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.usercenter.service.UcUserService;
 import org.springframework.web.multipart.MultipartFile;
+import tk.mybatis.mapper.entity.Example;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 用户管理
@@ -53,6 +51,12 @@ public class UcUserController extends BaseController {
 
     @Resource
     UcOrgService ucOrgService;
+
+    @Resource
+    private UCFeignService ucFeignService;
+
+    @Resource
+    private UcUserSkillMapper ucUserSkillMapper;
 
     @PostMapping({"/list"})
     @ApiOperation(value = "用户管理数据列表}", httpMethod = "POST", notes = "获取用户管理列表")
@@ -231,6 +235,69 @@ public class UcUserController extends BaseController {
         }
         return ucUserService.getByJobCodeAndOrgIdAndDimCodeDeeplyWithPost(jobCode, orgId, dimCode, fullName);
     }
+
+    @RequestMapping(value = {"users/getUserByRepairCategory"}, method = {
+            org.springframework.web.bind.annotation.RequestMethod.GET}, produces = {
+            "application/json; charset=utf-8"})
+    @ApiOperation(value = "根据报修类别等条件获取人员列表", httpMethod = "GET", notes = "根据报修类别等条件获取人员列表")
+    public List<JsonNode> getUserByRepairCategory(
+            @ApiParam(name = "orgId", value = "组织id") @RequestParam(required = true) String orgId,
+            @ApiParam(name = "jobCode", value = "职务Code（多个逗号分隔）", required = true) @RequestParam String jobCode,
+            @ApiParam(name = "includeAncestors", value = "查找范围是否包括上级组织") @RequestParam(required = false) String includeAncestors,
+            @ApiParam(name = "dimCode", value = "维度Code") @RequestParam(required = false) String dimCode,
+            @ApiParam(name = "repairCategory", value = "三级报修类别") @RequestParam(required = false) String repairCategory
+    )
+            throws Exception {
+
+
+        if (StringUtil.isEmpty(orgId) || StringUtil.isEmpty(jobCode) || StringUtil.isEmpty(repairCategory)) {
+            throw new RequiredException("组织id、职务Code、报修类别不能为空！");
+        }
+        List<JsonNode> result = ucFeignService.getUserByCondition(orgId, jobCode, includeAncestors, dimCode);
+
+        if (result != null && result.size() > 0) {
+            /**
+             * 1、根据报修类别获取 工程技能code
+             * 2、根据工程技能code 和人员 过滤人员
+             */
+            List<String> userIds = new LinkedList<>();
+            result.forEach(u -> {
+                userIds.add(u.get("id").asText());
+            });
+
+            if (userIds.size() > 0) {
+                List<String> skillCodes = ucUserService.getSkillCodebyCategory(repairCategory);
+                if (skillCodes != null && skillCodes.size() > 0) {
+                    Example example = new Example(UcUserSkill.class);
+                    example.createCriteria().andIn("engineeringSkillCode", skillCodes).andIn("userId", userIds);
+                    List<UcUserSkill> userSkills = ucUserSkillMapper.selectByExample(example);
+
+                    List<String> newUserIds = new LinkedList<>();
+                    userSkills.forEach(s -> {
+                        newUserIds.add(s.getUserId());
+                    });
+                    if (newUserIds.size() > 0) {
+                        Iterator<JsonNode> iteratorResult = result.iterator();
+                        while (iteratorResult.hasNext()) {
+                            JsonNode item = iteratorResult.next();
+                            if (!newUserIds.contains(item.get("id").asText())) {
+                                iteratorResult.remove();
+                            }
+                        }
+                        return result;
+                    } else {
+                        return null;
+                    }
+                } else {
+                    throw new RequiredException("报修类别未设置对应工程技能，类别id：" + repairCategory);
+                }
+            }
+        }
+        return result;
+    }
+
+
+
 
 //    @PostMapping({"add"})
 //    @ApiOperation(value = "新增用户管理信息", httpMethod = "POST", notes = "保存用户管理")

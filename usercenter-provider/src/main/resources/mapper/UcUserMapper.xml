@@ -348,4 +348,10 @@
         limit 1
     </select>
 
+    <select id="getSkillCodebyCategory" resultType="java.lang.String">
+        SELECT DISTINCT brhs.engineering_skill_code FROM bpm.biz_repair_hour_settings brhs
+        WHERE brhs.bx_cate_lv3_id = #{category}
+        AND brhs.enabled_flag = 1
+    </select>
+
 </mapper>
