@@ -181,6 +181,7 @@
         t.second_format_attribute AS secondFormatAttribute,
         t.third_format_attribute AS thirdFormatAttribute,
         concat('', s.enabled_flag, '') AS enabledFlag,
+        concat('', t.enabled_flag, '') AS enabled_flag,
         t.is_deleted AS isDeleted,
         t.creation_date AS creationDate,
         s.id AS serviceGridId,
@@ -215,6 +216,7 @@
         t.second_format_attribute AS secondFormatAttribute,
         t.third_format_attribute AS thirdFormatAttribute,
         concat('', t.enabled_flag, '') AS enabledFlag,
+        concat('', t.enabled_flag, '') AS enabled_flag,
         t.is_deleted AS isDeleted,
         t.creation_date AS creationDate,
         null AS serviceGridId,
@@ -446,7 +448,8 @@
         FROM
         grid_approval_record gr
         WHERE
-        gr.create_date = ( SELECT max( create_date ) FROM grid_approval_record WHERE grid_id = gr.grid_id limit 1)
+        gr.create_date = ( SELECT max( create_date ) FROM grid_approval_record WHERE grid_id = gr.grid_id and approval_type='newGrid'
+        limit 1)
         ) r ON r.grid_id = t.gridId
         <where>
             <if test="whereSql!=null">
