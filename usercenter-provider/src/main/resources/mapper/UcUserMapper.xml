@@ -243,6 +243,9 @@
         <if test="(roleIdList!=null and roleIdList.size > 0)">
             inner join uc_user_role ur on u.ID_ = ur.USER_ID_ and ur.IS_DELE_ = 0
         </if>
+        <if test="(skillCodeList!=null and skillCodeList.size > 0)">
+            inner join uc_user_skill us on u.ID_ = us.user_id and us.is_dele = 0
+        </if>
         where u.IS_DELE_ = 0 and uorg.ORG_ID_ in
         <foreach collection="orgIdList" item="iOrgId" open="(" separator="," close=")">
             #{iOrgId}
@@ -266,6 +269,12 @@
             and ur.ROLE_ID_ in
             <foreach collection="roleIdList" item="iRoleId" open="(" separator="," close=")">
                 #{iRoleId}
+            </foreach>
+        </if>
+        <if test="(skillCodeList!=null and skillCodeList.size > 0)">
+            and us.engineering_skill_code in
+            <foreach collection="skillCodeList" item="iSkillCode" open="(" separator="," close=")">
+                #{iSkillCode}
             </foreach>
         </if>
         order by u.id_ asc
