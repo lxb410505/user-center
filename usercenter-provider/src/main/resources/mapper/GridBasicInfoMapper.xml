@@ -181,7 +181,7 @@
         t.second_format_attribute AS secondFormatAttribute,
         t.third_format_attribute AS thirdFormatAttribute,
         concat('', s.enabled_flag, '') AS enabledFlag,
-        concat('', t.enabled_flag, '') AS enabled_flag,
+        concat('', s.enabled_flag, '') AS enabled_flag,
         t.is_deleted AS isDeleted,
         t.creation_date AS creationDate,
         s.id AS serviceGridId,
