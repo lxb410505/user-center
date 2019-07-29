@@ -444,18 +444,25 @@
         SELECT
         gr.grid_id,
         gr.approval_status AS approvalStatus,
-        gr.proc_inst_Id AS procInstId
+        gr.proc_inst_Id AS procInstId,
+        gr.approval_type AS approvalType
         FROM
         grid_approval_record gr
         WHERE
-        gr.create_date = ( SELECT max( create_date ) FROM grid_approval_record WHERE grid_id = gr.grid_id and approval_type='newGrid'
+        gr.create_date = ( SELECT max( create_date ) FROM grid_approval_record WHERE grid_id = gr.grid_id
         limit 1)
         ) r ON r.grid_id = t.gridId
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
             </if>
-            and (approvalStatus is null or approvalStatus =2)
+            and (
+              (approvalType='newGrid' and (approvalStatus is null or approvalStatus =2 ))
+              or
+              (approvalType!='newGrid'and (approvalStatus is null or approvalStatus =2 or approvalStatus =3))
+              or
+              ( approvalType is null)
+            )
         </where>
         GROUP BY t.id
         <if test="orderBySql!=null">
