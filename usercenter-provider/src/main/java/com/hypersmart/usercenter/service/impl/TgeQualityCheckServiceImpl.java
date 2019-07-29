@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -151,52 +152,37 @@ public class TgeQualityCheckServiceImpl extends GenericService<String, TgeQualit
     }
 
     List<String> getOrg(int i,String val1,String val2 ,String val3) throws Exception {
-        //area code
+        //dikuai code
         UcOrg ucOrg = new UcOrg();
-        ucOrg.setName(val1);
+        ucOrg.setName(val3);
         ucOrg.setIsDele("0");
         List<UcOrg> ucOrgs = ucOrgService.selectAll(ucOrg);
         if(!checkHasOrg(ucOrgs)){
             throw new Exception("第"+i+"行组织名称错误请检查");
         }
-        String code1 = ucOrgs.get(0).getCode();
+        UcOrg diOrg = ucOrgs.get(0);
         List<String> orgids= new ArrayList<>();
+        orgids.add(diOrg.getCode());
 
-        orgids.add(code1);
+        String pathName = ucOrgs.get(0).getPathName();
+        String pathId = ucOrgs.get(0).getPath();
 
-        //project code
-        ucOrg.setName(val2);
-        ucOrg.setParentId(ucOrgs.get(0).getId());
-        ucOrg.setIsDele("0");
-        ucOrgs=ucOrgService.selectAll(ucOrg);
-        if(!checkHasOrg(ucOrgs)){
+        String[] nameArr = pathName.split("\\/");
+        String[] idArr = pathId.split("\\.");
+        if (nameArr[2].equals(val1)) {
+            UcOrg area = ucOrgService.get(idArr[2]);
+            orgids.add(area.getCode());
+        }else {
             throw new Exception("第"+i+"行组织名称错误请检查");
         }
 
-        if(ucOrgs.get(0).getGrade().equals("ORG_XiangMu")){
-            orgids.add(ucOrgs.get(0).getCode());
-        }else if(ucOrgs.get(0).getGrade().equals("ORG_ChengQu")){
-            ucOrg.setName(ucOrgs.get(0).getName());
-            ucOrg.setParentId(ucOrgs.get(0).getId());
-            ucOrgs=ucOrgService.selectAll(ucOrg);
-            if(!checkHasOrg(ucOrgs)){
-                throw new Exception("第"+i+"行组织名称错误请检查");
-            }
-            orgids.add(ucOrgs.get(0).getCode());
-
-        }else{
-            throw new Exception("第"+i+"行组织名称错误请检查");
-
-        }
-
-        //di kuai  code
-        ucOrg.setName(val3);
-        ucOrg.setParentId(ucOrgs.get(0).getId());
-        ucOrgs = ucOrgService.selectAll(ucOrg);
-        if(!checkHasOrg(ucOrgs)){
+        String parentId = diOrg.getParentId();
+        UcOrg project = ucOrgService.get(parentId);
+        if (project.getName().equals(val2)) {
+            orgids.add(project.getCode());
+        }else {
             throw new Exception("第"+i+"行组织名称错误请检查");
         }
-        orgids.add(ucOrgs.get(0).getCode());
         return orgids;
     }
     private boolean checkHasOrg( List<UcOrg> ucOrgs){
