@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.TgeSignificantQualityMapper">
+    <resultMap id="querys" type="com.hypersmart.usercenter.model.TgeSignificantQuality">
+        <id property="id" column="id"/>
+        <result column="region_id" property="regionId"/>
+        <result column="region_name" property="regionName"/>
+        <result column="area_id" property="areaId"/>
+        <result column="area_name" property="areaName"/>
+        <result column="project_id" property="projectId"/>
+        <result column="project_name" property="projectName"/>
+        <result column="divide_id" property="divideId"/>
+        <result column="divide_name" property="divideName"/>
+        <result column="order_service_unit_score" property="regionId"/>
+        <result column="environmental_service_unit_score" property="environmentalServiceUnitScore"/>
+        <result column="order_service_unit_score" property="orderServiceUnitScore"/>
+        <result column="engineering_service_unit_score" property="engineeringServiceUnitScore"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="operation_org_id" property="operationOrgId"/>
+        <result column="month" property="month"/>
+
+    </resultMap>
+    <select id="queryList" resultMap="querys">
+        select * from tge_significant_quality
+        <where>
+            <if test="whereSql">
+                ${whereSql}
+            </if>
+        </where>
+        <if test="orderSql">
+            order by ${orderSql}
+        </if>
+    </select>
+
+    <select id="checkExists" resultType="java.lang.Long">
+        select count(1) from tge_significant_quality where month in
+        <foreach collection="strings" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

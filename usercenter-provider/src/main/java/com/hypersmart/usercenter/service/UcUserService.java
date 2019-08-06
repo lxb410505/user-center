@@ -63,6 +63,8 @@ public interface UcUserService extends IGenericService<String, UcUser> {
 
     Set<GroupIdentityDTO> getByJobCodeAndOrgIdAndDimCodeDeeplyWithPost(String jobCode, String orgId, String dimCode, String fullName);
 
+    List<String> getSkillCodebyCategory(String category);
+
     UcUser getUserByDivideId(String divideId, String gridType);
 }
 

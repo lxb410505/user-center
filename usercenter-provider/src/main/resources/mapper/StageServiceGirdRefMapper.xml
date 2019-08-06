@@ -34,11 +34,12 @@
     <select id="getServiceGridIdByStagingIdNotEnableFlag" resultType="java.util.Map">
         select
         staging_id,
-        service_grid_id,
+        service_grid_id,getServiceGridIdByStagingId
         service_grid_name,
         service_grid_code
         from stage_servicegird_ref
         where staging_id=#{stagingId}
+        and enabled_flag=#{enabled}
         and is_deleted = 0
 		limit 1;
     </select>
@@ -50,4 +51,12 @@
         and is_deleted = 0
         limit 1;
     </select>
+    <update id="disableServiceCenterGrid" parameterType="com.hypersmart.usercenter.bo.GridBasicInfoBO">
+        update stage_servicegird_ref set enabled_flag=0 ,updation_date=now(),updated_by = #{updatedBy}
+        where service_grid_id in
+        <foreach collection="ids" index="index" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and enabled_flag=1 and is_deleted=0;
+    </update>
 </mapper>

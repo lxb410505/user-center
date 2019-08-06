@@ -2,8 +2,11 @@ package com.hypersmart.usercenter.mapper;
 
 import com.hypersmart.framework.mapper.GenericMapper;
 import com.hypersmart.framework.service.IGenericService;
+import com.hypersmart.usercenter.bo.GridBasicInfoBO;
+import com.hypersmart.usercenter.model.GridBasicInfo;
 import com.hypersmart.usercenter.model.StageServiceGirdRef;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +27,8 @@ public interface StageServiceGirdRefMapper extends GenericMapper<StageServiceGir
 
     String getServiceIdByStagingId(String stagingId);
 
-    Map<String,Object>  getServiceGridIdByStagingIdNotEnableFlag(String id);
+    Map<String,Object>  getServiceGridIdByStagingIdNotEnableFlag(String id,Integer enabled);
+
+    int disableServiceCenterGrid(GridBasicInfoBO bo);
 
 }

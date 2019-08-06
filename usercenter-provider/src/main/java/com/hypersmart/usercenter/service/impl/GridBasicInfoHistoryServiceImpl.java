@@ -13,11 +13,14 @@ import com.hypersmart.usercenter.constant.GridErrorCode;
 import com.hypersmart.usercenter.dto.GridBasicInfoDTO;
 import com.hypersmart.usercenter.dto.GridBasicInfoHistoryDTO;
 import com.hypersmart.usercenter.mapper.GridBasicInfoHistoryMapper;
+import com.hypersmart.usercenter.mapper.StageServiceGirdRefMapper;
 import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.*;
+import com.hypersmart.usercenter.util.GridTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +62,9 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
     @Autowired
     private GridBasicInfoHistoryMapper gridBasicInfoHistoryMapper;
 
+    @Resource
+    private StageServiceGirdRefMapper stageServiceGirdRefMapper;
+
     public GridBasicInfoHistoryServiceImpl(GridBasicInfoHistoryMapper mapper) {
         super(mapper);
     }
@@ -75,6 +81,17 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
 
             if (beforeGrid == null) {
                 return GridErrorCode.RESOURCE_NOT_FOUND;
+            }
+            if(GridTypeEnum.SERVICE_CENTER_GRID.getGridType().equals(beforeGrid.getGridType())){
+                Map<String, Object> serviceGridIdByStagingId = stageServiceGirdRefMapper.getServiceGridIdByStagingId(beforeGrid.getStagingId());
+                if(serviceGridIdByStagingId!=null){
+                    if(serviceGridIdByStagingId.get("service_grid_id")!=null){
+                        beforeGrid.setId(String.valueOf(serviceGridIdByStagingId.get("service_grid_id")));
+                        beforeGrid.setGridName(String.valueOf(serviceGridIdByStagingId.get("service_grid_name")));
+                        beforeGrid.setGridCode(String.valueOf(serviceGridIdByStagingId.get("service_grid_code")));
+                    }
+
+                }
             }
             String before_housekeeper_history_id = null;
             String after_housekeeper_history_id = null;
@@ -123,7 +140,7 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
             //除了再次更新，别的情况区划信息调接口获取或前台返回
             //记录grid_basic_info_history
             GridBasicInfoHistory gridBasicInfoHistory = new GridBasicInfoHistory();
-            gridBasicInfoHistory.setGridId(gridBasicInfoDTO.getId());
+            gridBasicInfoHistory.setGridId(beforeGrid.getId());
             gridBasicInfoHistory.setGridCode(beforeGrid.getGridCode());
             gridBasicInfoHistory.setGridName(beforeGrid.getGridName());
             gridBasicInfoHistory.setGridRange(beforeGrid.getGridRange());
@@ -265,9 +282,9 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                 //新增 grid_basic_info_history_after
                 GridBasicInfoHistoryAfter gridBasicInfoHistoryAfter = new GridBasicInfoHistoryAfter();
                 gridBasicInfoHistoryAfter.setGridHistoryId(gridBasicInfoHistory.getId());
-                gridBasicInfoHistoryAfter.setGridId(gridBasicInfoDTO.getId());
-                gridBasicInfoHistoryAfter.setGridCode(gridBasicInfoDTO.getGridCode());
-                gridBasicInfoHistoryAfter.setGridName(gridBasicInfoDTO.getGridName());
+                gridBasicInfoHistoryAfter.setGridId(beforeGrid.getId());
+                gridBasicInfoHistoryAfter.setGridCode(beforeGrid.getGridCode());
+                gridBasicInfoHistoryAfter.setGridName(beforeGrid.getGridName());
                 gridBasicInfoHistoryAfter.setGridRange(gridBasicInfoDTO.getGridRange());
                 gridBasicInfoHistoryAfter.setGridType(gridBasicInfoDTO.getGridType());
                 gridBasicInfoHistoryAfter.setGridRemark(gridBasicInfoDTO.getGridRemark());

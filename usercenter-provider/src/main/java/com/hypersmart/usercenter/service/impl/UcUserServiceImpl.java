@@ -723,4 +723,8 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
     public UcUser getUserByDivideId(String divideId, String gridType) {
         return ucUserMapper.getUserByDivideId(divideId, gridType);
     }
+
+    public List<String> getSkillCodebyCategory(String category){
+        return ucUserMapper.getSkillCodebyCategory(category);
+    }
 }

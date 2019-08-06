@@ -27,6 +27,9 @@
         <result column="grid_name" jdbcType="VARCHAR" property="gridName" />
         <result column="staging_id" jdbcType="VARCHAR" property="stagingId" />
         <result column="housekeeper_id" jdbcType="VARCHAR" property="housekeeperId" />
+        <result column="grid_type" jdbcType="VARCHAR" property="gridType" />
+        <result column="grid_id" jdbcType="VARCHAR" property="gridId" />
+
     </resultMap>
     <sql id="BaseTable">
     grid_basic_info
@@ -37,7 +40,9 @@
         a.id,
         a.grid_name,
         a.staging_id,
-        a.housekeeper_id
+        a.housekeeper_id,
+        a.grid_type,
+        a.grid_id
         FROM
         (
         SELECT * from
@@ -47,7 +52,9 @@
         s.service_grid_name AS grid_name,
         t.housekeeper_id AS housekeeper_id,
         s.staging_id AS staging_id,
-        s.creation_date AS creation_date
+        s.creation_date AS creation_date,
+        t.grid_type AS grid_type,
+        s.service_grid_id AS grid_id
         FROM
         stage_servicegird_ref s LEFT JOIN grid_basic_info t
         ON t.staging_id = s.staging_id and t.grid_type='service_center_grid'
@@ -66,7 +73,9 @@
         t.grid_name AS grid_name,
         t.housekeeper_id AS housekeeper_id,
         t.staging_id AS staging_id,
-        t.creation_date AS creation_date
+        t.creation_date AS creation_date,
+        t.grid_type AS grid_type,
+        t.id AS grid_id
         from grid_basic_info t
         where
         <foreach collection="houseKeeperBO" index="index" item="houseKeeper" open="(" separator="or" close=")">
@@ -78,13 +87,33 @@
         AND t.grid_type!='service_center_grid'
         ) as g
         ) a
+        LEFT JOIN (
+        SELECT
+        gr.grid_id,
+        gr.approval_status AS approvalStatus,
+        gr.proc_inst_Id AS procInstId
+        FROM
+        grid_approval_record gr
+        WHERE
+        gr.create_date = (
+        SELECT
+        max(create_date)
+        FROM
+        grid_approval_record
+        WHERE
+         grid_id = gr.grid_id
+        limit 1
+        )
+        ) r ON r.grid_id = a.grid_id
+        where (r.approvalStatus=2 or r.approvalStatus is null)
         order by a.creation_date desc
     </select>
 
     <select id="quertList" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT
         t.*, r.procInstId,
-        r.approvalStatus
+        r.approvalStatus,
+        r.approvalType
         FROM
         (
         SELECT
@@ -136,11 +165,12 @@
         when 1 then t.grid_remark
         else NULL
         end
-         AS gridRemark,
+        AS gridRemark,
         t.area_id AS areaId,
         t.project_id AS projectId,
         t.city_id AS cityId,
         s.staging_id AS stagingId,
+        s.staging_id AS massifId,
         t.staging_id AS divideId,
         case s.enabled_flag
         when 1 then t.housekeeper_id
@@ -151,14 +181,19 @@
         t.second_format_attribute AS secondFormatAttribute,
         t.third_format_attribute AS thirdFormatAttribute,
         concat('', s.enabled_flag, '') AS enabledFlag,
+        concat('', s.enabled_flag, '') AS enabled_flag,
         t.is_deleted AS isDeleted,
         t.creation_date AS creationDate,
-        s.id AS serviceGridId
+        s.id AS serviceGridId,
+        s.service_grid_id AS gridId
         FROM
         stage_servicegird_ref s LEFT JOIN grid_basic_info t
         ON t.staging_id = s.staging_id and t.grid_type='service_center_grid'
         where
-        s.staging_id =#{massifId}
+        s.staging_id in
+        <foreach collection="massifId"  item="dkId"  open="(" separator="," close=")">
+            #{dkId}
+        </foreach>
         and s.is_deleted = 0
         and
         t.is_deleted = 0
@@ -174,17 +209,24 @@
         t.project_id AS projectId,
         t.city_id AS cityId,
         t.staging_id AS stagingId,
+        t.staging_id AS massifId,
         t.staging_id AS divideId,
         t.housekeeper_id AS housekeeperId,
         t.format_attribute AS formatAttribute,
         t.second_format_attribute AS secondFormatAttribute,
         t.third_format_attribute AS thirdFormatAttribute,
         concat('', t.enabled_flag, '') AS enabledFlag,
+        concat('', t.enabled_flag, '') AS enabled_flag,
         t.is_deleted AS isDeleted,
         t.creation_date AS creationDate,
-        null AS serviceGridId
+        null AS serviceGridId,
+        t.id AS gridId
         from grid_basic_info t
-        where t.staging_id=#{massifId}
+        where
+        t.staging_id in
+        <foreach collection="massifId" item="dkId" open="(" separator=","  close=")" >
+            #{dkId}
+        </foreach>
         AND t.grid_type!='service_center_grid'
         AND t.is_deleted = 0
         ) as a
@@ -223,25 +265,42 @@
         SELECT
         gr.grid_id,
         gr.approval_status AS approvalStatus,
-        gr.proc_inst_Id AS procInstId
+        gr.proc_inst_Id AS procInstId,
+        gr.approval_type AS approvalType
         FROM
         grid_approval_record gr
         WHERE
         gr.create_date = (
-        SELECT
-        max(create_date)
-        FROM
-        grid_approval_record
-        WHERE
-        grid_id = gr.grid_id
+        <choose>
+            <when test="enabledFlag!=null">
+                SELECT max(create_date)
+                FROM
+                grid_approval_record
+                WHERE
+                grid_id = gr.grid_id
+                and approval_type='newGrid'
+                limit 1
+            </when>
+            <otherwise>
+                SELECT max(create_date)
+                FROM
+                grid_approval_record
+                WHERE
+                grid_id = gr.grid_id
+                limit 1
+            </otherwise>
+        </choose>
         )
-        ) r ON r.grid_id = t.id
+        ) r ON r.grid_id = t.gridId
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
+                <if test="enabledFlag!=null">
+                    and (approvalStatus is null or approvalStatus =2)
+                </if>
             </if>
         </where>
-        GROUP BY t.id
+        GROUP BY t.gridId
         <if test="orderBySql!=null">
             ORDER BY ${orderBySql}
         </if>
@@ -310,13 +369,17 @@
         t.third_format_attribute AS thirdFormatAttribute,
         concat('', s.enabled_flag, '') AS enabledFlag,
         t.is_deleted AS isDeleted,
-        t.creation_date AS creationDate
+        t.creation_date AS creationDate,
+        s.service_grid_id AS gridId
         FROM
         stage_servicegird_ref s LEFT JOIN grid_basic_info t
         ON t.staging_id = s.staging_id and t.grid_type='service_center_grid'
         where
-        s.staging_id =#{massifId}
-        and s.is_deleted = 0
+        t.staging_id in
+        <foreach collection="massifId" item="dkId" open="(" separator=","  close=")" >
+            #{dkId}
+        </foreach>
+        AND  s.is_deleted = 0
         AND s.enabled_flag = 1
         and
         t.is_deleted = 0
@@ -340,10 +403,15 @@
         t.third_format_attribute AS thirdFormatAttribute,
         concat('', t.enabled_flag, '') AS enabledFlag,
         t.is_deleted AS isDeleted,
-        t.creation_date AS creationDate
+        t.creation_date AS creationDate,
+        t.id AS gridId
         from grid_basic_info t
-        where t.staging_id=#{massifId}
-        AND t.grid_type !='service_center_grid'
+        where
+        t.staging_id in
+        <foreach collection="massifId" item="dkId" open="(" separator=","  close=")" >
+            #{dkId}
+        </foreach>
+        AND  t.grid_type !='service_center_grid'
         AND t.is_deleted = 0
         AND t.enabled_flag = 1
         ) as a
@@ -376,17 +444,25 @@
         SELECT
         gr.grid_id,
         gr.approval_status AS approvalStatus,
-        gr.proc_inst_Id AS procInstId
+        gr.proc_inst_Id AS procInstId,
+        gr.approval_type AS approvalType
         FROM
         grid_approval_record gr
         WHERE
-        gr.create_date = ( SELECT max( create_date ) FROM grid_approval_record WHERE grid_id = gr.grid_id )
-        ) r ON r.grid_id = t.id
+        gr.create_date = ( SELECT max( create_date ) FROM grid_approval_record WHERE grid_id = gr.grid_id
+        limit 1)
+        ) r ON r.grid_id = t.gridId
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
             </if>
-            and (approvalStatus is null or approvalStatus =2)
+            and (
+              (approvalType='newGrid' and (approvalStatus is null or approvalStatus =2 ))
+              or
+              (approvalType!='newGrid'and (approvalStatus is null or approvalStatus =2 or approvalStatus =3))
+              or
+              ( approvalType is null)
+            )
         </where>
         GROUP BY t.id
         <if test="orderBySql!=null">
@@ -395,7 +471,41 @@
     </select>
 
     <select id="getGridById" parameterType="java.lang.String" resultType="java.util.Map">
-        select DISTINCT g.id as id,
+        select DISTINCT g.*,
+        k.fullName as housekeeperName
+        from
+         (
+        select
+        g.id as id,
+        g.grid_range as gridRange,
+        s.service_grid_name as gridName,
+        g.grid_type as gridType,
+        s.service_grid_code as gridCode,
+        g.grid_remark as gridRemark,
+        g.area_id as areaId,
+        g.project_id as projectId,
+        g.city_id as cityId,
+        g.staging_id as stagingId,
+        g.staging_id as divideId,
+        g.housekeeper_id as housekeeperId,
+        g.format_attribute as formatAttribute,
+        g.second_format_attribute as secondFormatAttribute,
+        g.third_format_attribute as thirdFormatAttribute,
+        concat('',g.enabled_flag,'') as enabledFlag,
+        (select org.NAME_ from uc_org org where ID_ = g.area_id) as areaName,
+        (select org.NAME_ from uc_org org where ID_ = g.project_id) as projectName,
+        (select org.NAME_ from uc_org org where ID_ = g.city_id) as cityName,
+        (select org.NAME_ from uc_org org where ID_ = g.staging_id) as stagingName,
+        s.service_grid_id AS serviceGridId
+        FROM
+        stage_servicegird_ref s LEFT JOIN grid_basic_info g
+        ON g.staging_id = s.staging_id and g.grid_type='service_center_grid'
+        where
+        s.service_grid_id =#{id}
+        and s.staging_id=#{stagingId}
+        UNION
+        select
+        g.id as id,
         g.grid_range as gridRange,
         g.grid_name as gridName,
         g.grid_type as gridType,
@@ -415,8 +525,11 @@
         (select org.NAME_ from uc_org org where ID_ = g.project_id) as projectName,
         (select org.NAME_ from uc_org org where ID_ = g.city_id) as cityName,
         (select org.NAME_ from uc_org org where ID_ = g.staging_id) as stagingName,
-        k.fullName as housekeeperName
-        from grid_basic_info g LEFT JOIN (SELECT
+        g.id AS serviceGridId
+        from grid_basic_info g
+        where g.id =#{id}
+        AND g.grid_type !='service_center_grid'
+        ) as g LEFT JOIN (SELECT
         u.ID_ AS houseKeeperId,
         uou.ID_ AS id,
         u.FULLNAME_ AS fullName,
@@ -438,8 +551,7 @@
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
-        ) as k on g.staging_id = k.divideId and g.housekeeper_id = k.houseKeeperId
-        where g.id = #{id}
+        ) as k on g.stagingId = k.divideId and g.housekeeperId = k.houseKeeperId
     </select>
 
     <update id="disableGridInfo" parameterType="com.hypersmart.usercenter.bo.GridBasicInfoBO">
@@ -588,7 +700,10 @@
 	    grid_basic_info g
 	    LEFT JOIN uc_user u ON g.housekeeper_id = u.ID_
 	    WHERE g.is_deleted = 0 AND u.IS_DELE_ = 0
-	    and g.staging_id = #{stagingId}
+        and g.staging_id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </select>
 
     <select id="getByGridId" parameterType="java.lang.String" resultType="com.hypersmart.usercenter.dto.GridBasicInfoDTO">
@@ -602,5 +717,21 @@
         LEFT JOIN uc_user u ON g.housekeeper_id = u.ID_
         WHERE g.is_deleted = 0 AND u.IS_DELE_ = 0
         and g.id = #{id}
+    </select>
+
+    <select id="getListByOrgs" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT
+        g.id AS id,
+        g.grid_name AS gridName,
+        g.housekeeper_id AS housekeeperId,
+        u.FULLNAME_ AS housekeeperName
+        FROM
+        grid_basic_info g
+        LEFT JOIN uc_user u ON g.housekeeper_id = u.ID_
+        WHERE g.is_deleted = 0 AND u.IS_DELE_ = 0
+        and g.staging_id IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </select>
 </mapper>
