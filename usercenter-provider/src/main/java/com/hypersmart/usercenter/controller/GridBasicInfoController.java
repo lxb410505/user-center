@@ -82,16 +82,7 @@ public class GridBasicInfoController extends BaseController {
 	@NoRepeatSubmit
 	@ApiOperation(value = "新增网格基础信息表信息", httpMethod = "POST", notes = "保存网格基础信息表")
 	public CommonResult<String> create(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
-		CommonResult commonResult = new CommonResult();
-		GridErrorCode gridErrorCode = gridBasicInfoService.create(gridBasicInfoDTO);
-		if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
-			commonResult.setState(true);
-			commonResult.setMessage("新增成功！");
-		} else {
-			commonResult.setState(false);
-			commonResult.setMessage(gridErrorCode.getMessage());
-		}
-		return commonResult;
+		return gridBasicInfoService.create(gridBasicInfoDTO);
 	}
 
 	/**
@@ -160,16 +151,7 @@ public class GridBasicInfoController extends BaseController {
 	@NoRepeatSubmit
 	@ApiOperation(value = "变更映射楼栋", httpMethod = "POST", notes = "变更映射楼栋")
 	public CommonResult<String> changeRange(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
-		CommonResult commonResult = new CommonResult();
-		GridErrorCode gridErrorCode = gridBasicInfoService.changeRange(gridBasicInfoDTO);
-		if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
-			commonResult.setState(true);
-			commonResult.setMessage("变更映射楼栋成功！");
-		} else {
-			commonResult.setState(false);
-			commonResult.setMessage("变更映射楼栋失败");
-		}
-		return commonResult;
+		return gridBasicInfoService.changeRange(gridBasicInfoDTO);
 	}
 
 
@@ -183,16 +165,7 @@ public class GridBasicInfoController extends BaseController {
 	@NoRepeatSubmit
 	@ApiOperation(value = "禁用网格基础信息表记录", httpMethod = "POST", notes = "禁用网格基础信息表记录")
 	public CommonResult<String> disable(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
-		CommonResult commonResult = new CommonResult();
-		GridErrorCode gridErrorCode = gridBasicInfoService.disableGridList(gridBasicInfoDTO);
-		if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
-			commonResult.setState(true);
-			commonResult.setMessage("停用成功！");
-		} else {
-			commonResult.setState(false);
-			commonResult.setMessage("停用失败");
-		}
-		return commonResult;
+		return gridBasicInfoService.disableGridList(gridBasicInfoDTO);
 	}
 
 	/**
@@ -272,36 +245,14 @@ public class GridBasicInfoController extends BaseController {
 	@NoRepeatSubmit
 	@ApiOperation(value = "关联网格", httpMethod = "POST", notes = "关联网格")
 	public CommonResult<String> associatedGrid(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
-        CommonResult commonResult=new CommonResult();
-	    // 调用service
-        GridErrorCode gridErrorCode = gridBasicInfoService.associatedGrid(gridBasicInfoDTO);
-
-        if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
-            commonResult.setState(true);
-            commonResult.setMessage("关联网格成功！");
-        } else {
-            commonResult.setState(false);
-            commonResult.setMessage("关联网格失败");
-        }
-        return commonResult;
+        return gridBasicInfoService.associatedGrid(gridBasicInfoDTO);
 	}
 
 	@PostMapping({"/disassociatedGrid"})
 	@NoRepeatSubmit
 	@ApiOperation(value = "取消关联网格", httpMethod = "POST", notes = "取消关联网格")
 	public CommonResult<String> disassociatedGrid(@ApiParam(name = "gridBasicInfo", value = "网格基础信息表业务对象", required = true) @RequestBody GridBasicInfoDTO gridBasicInfoDTO) {
-        CommonResult commonResult=new CommonResult();
-	    // 调用service
-        GridErrorCode gridErrorCode = gridBasicInfoService.disassociatedGrid(gridBasicInfoDTO);
-
-        if (GridErrorCode.SUCCESS.getCode() == gridErrorCode.getCode()) {
-            commonResult.setState(true);
-            commonResult.setMessage("取消关联网格成功！");
-        } else {
-            commonResult.setState(false);
-            commonResult.setMessage("取消关联网格失败");
-        }
-        return commonResult;
+        return gridBasicInfoService.disassociatedGrid(gridBasicInfoDTO);
 	}
 
 	@GetMapping({"/getGridsBymassifId/{id}"})

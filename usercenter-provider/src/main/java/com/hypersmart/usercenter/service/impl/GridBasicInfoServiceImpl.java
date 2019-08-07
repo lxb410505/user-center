@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.ContextUtils;
@@ -275,17 +276,17 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	 * @return
 	 */
 	@Override
-	public GridErrorCode create(GridBasicInfoDTO gridBasicInfoDTO) {
-		GridErrorCode gridErrorCode = GridErrorCode.SUCCESS;
+	public CommonResult<String> create(GridBasicInfoDTO gridBasicInfoDTO) {
+		CommonResult<String> commonResult =new CommonResult<>();
 		Integer num = 0;
 		if (gridBasicInfoDTO != null) {
 			//判断房产是否已经被覆盖
 			if (StringUtil.isNotEmpty(gridBasicInfoDTO.getGridRange())) {
 				boolean flag = gridRangeService.judgeExistHouse(gridBasicInfoDTO.getGridRange(), null, gridBasicInfoDTO.getStagingId());
 				if (flag) {
-					gridErrorCode = GridErrorCode.INSERT_EXCEPTION;
-					gridErrorCode.setMessage("存在已被覆盖的房产信息！");
-					return gridErrorCode;
+					commonResult.setMessage("存在已被覆盖的房产信息！");
+					commonResult.setState(false);
+					return commonResult;
 				}
 			}
 			GridBasicInfo gridBasicInfo = new GridBasicInfo();
@@ -340,7 +341,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 				}
 			}
 			// 调用K2
-			gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
+			commonResult=gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
 
 			if(num>0){
                 if(GridTypeConstants.PUBLIC_AREA_GRID.equals(gridBasicInfoDTO.getGridType())){//公区网格
@@ -351,11 +352,13 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 
 		}
 		if (num < 1) {
-			gridErrorCode = GridErrorCode.INSERT_EXCEPTION;
+			commonResult.setMessage("存在已被覆盖的房产信息！");
+			commonResult.setState(false);
+			return commonResult;
 		}
 
 
-		return gridErrorCode;
+		return commonResult;
 	}
 	private void addPublicGirdPercent(String gridCode,String gridId,String gridName,String stagingId){
         PublicGirdPercent publicGirdPercent=new PublicGirdPercent();
@@ -608,23 +611,23 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	 * @return
 	 */
 	@Override
-	public GridErrorCode changeRange(GridBasicInfoDTO gridBasicInfoDTO) {
-		GridErrorCode gridErrorCode = GridErrorCode.SUCCESS;
+	public CommonResult<String> changeRange(GridBasicInfoDTO gridBasicInfoDTO) {
+		CommonResult<String> commonResult =new CommonResult<>();
 		//获取对应id旧的的网格数据
 		GridBasicInfo gridBasicInfoOld = this.get(gridBasicInfoDTO.getId());
 		//判断房产是否已经被覆盖
 		if (StringUtil.isNotEmpty(gridBasicInfoDTO.getGridRange())) {
 			boolean flag = gridRangeService.judgeExistHouse(gridBasicInfoDTO.getGridRange(), gridBasicInfoDTO.getId(), gridBasicInfoOld.getStagingId());
 			if (flag) {
-				gridErrorCode = GridErrorCode.INSERT_EXCEPTION;
-				gridErrorCode.setMessage("存在已被覆盖的房产信息！");
-				return gridErrorCode;
+				commonResult.setState(false);
+				commonResult.setMessage("存在已被覆盖的房产信息！");
+				return commonResult;
 			}
 		}
 
 		// 调用K2
-		gridApprovalRecordService.callApproval(GridOperateEnum.CHANGE_SCOPE.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
-		return gridErrorCode;
+		commonResult=gridApprovalRecordService.callApproval(GridOperateEnum.CHANGE_SCOPE.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
+		return commonResult;
 	}
 
 	/**
@@ -634,8 +637,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	 * @return
 	 */
 	@Override
-	public GridErrorCode disableGridList(GridBasicInfoDTO gridBasicInfoDTO) {
-		GridErrorCode gridErrorCode = GridErrorCode.SUCCESS;
+	public CommonResult<String> disableGridList(GridBasicInfoDTO gridBasicInfoDTO) {
+		CommonResult<String> commonResult=new CommonResult<>();
 		// 调用K2
 		String[] ids = gridBasicInfoDTO.getIds();
 		List<GridBasicInfo> gridBasicInfos = gridApprovalRecordMapper.getGridInfoByIds(ids);
@@ -659,10 +662,13 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 				dto.setProjectName(gridBasicInfoDTO.getProjectName());
 				dto.setStagingName(gridBasicInfoDTO.getStagingName());
 				dto.setAccount(gridBasicInfoDTO.getAccount());
-				gridApprovalRecordService.callApproval(GridOperateEnum.DISABLE_GRID.getOperateType(), gridInfo.getId(), dto);
+				commonResult=gridApprovalRecordService.callApproval(GridOperateEnum.DISABLE_GRID.getOperateType(), gridInfo.getId(), dto);
+				if(!commonResult.getState()){
+					return commonResult;
+				}
 			}
 		}
-		return gridErrorCode;
+		return commonResult;
 	}
 
 	/**
@@ -774,7 +780,8 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 	 * @return
 	 */
 	@Override
-	public GridErrorCode associatedGrid(GridBasicInfoDTO gridBasicInfoDTO) {
+	public CommonResult<String> associatedGrid(GridBasicInfoDTO gridBasicInfoDTO) {
+		CommonResult<String> commonResult=new CommonResult<>();
 		List<GridBasicInfoBO> gridBasicInfoBOList = gridBasicInfoDTO.getGridBasicInfoBOList();
 
 		// 调用K2
@@ -794,10 +801,13 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 dto.setStagingName(gridBasicInfoDTO.getStagingName());
                 dto.setStagingId(gridBasicInfoDTO.getStagingId());
                 dto.setAccount(gridBasicInfoDTO.getAccount());
-                gridApprovalRecordService.callApproval(GridOperateEnum.LINK_HOUSEKEEPER.getOperateType(), bo.getId(), dto);
+				commonResult=gridApprovalRecordService.callApproval(GridOperateEnum.LINK_HOUSEKEEPER.getOperateType(), bo.getId(), dto);
+				if(!commonResult.getState()){
+					return commonResult;
+				}
 			}
 		}
-		return GridErrorCode.SUCCESS;
+		return commonResult;
 	}
 	private List<GridBasicInfo> getGridBasicInfo(String id){
 		List<GridBasicInfo> gridBasicInfos= new ArrayList<>();
@@ -875,7 +885,8 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 	 * @return
 	 */
 	@Override
-	public GridErrorCode disassociatedGrid(GridBasicInfoDTO gridBasicInfoDTO) {
+	public CommonResult<String> disassociatedGrid(GridBasicInfoDTO gridBasicInfoDTO) {
+		CommonResult<String> commonResult =new CommonResult<>();
 		List<GridBasicInfoBO> gridBasicInfoBOList = gridBasicInfoDTO.getGridBasicInfoBOList();
 		if (!CollectionUtils.isEmpty(gridBasicInfoBOList)) {
 			String housekeeperId = gridBasicInfoBOList.get(0).getHousekeeperId();
@@ -884,10 +895,13 @@ public  PageInfo<GridBasicInfo> doPage(int pageNum,int pageSize,Example example)
 				gridBasicInfoDTO.setIds(arr);
 				gridBasicInfoDTO.setGridType(bo.getGridType());
 				// 调用K2
-				gridApprovalRecordService.callApproval(GridOperateEnum.HOUSEKEEPER_DISASSOCIATED.getOperateType(), bo.getId(), gridBasicInfoDTO);
+				commonResult=gridApprovalRecordService.callApproval(GridOperateEnum.HOUSEKEEPER_DISASSOCIATED.getOperateType(), bo.getId(), gridBasicInfoDTO);
+				if(!commonResult.getState()){
+					return commonResult;
+				}
 			}
 		}
-		return GridErrorCode.SUCCESS;
+		return commonResult;
 	}
 
 	@Override
