@@ -58,4 +58,6 @@ public interface UcUserMapper extends GenericMapper<UcUser> {
 
     UcUser getUserByDivideId(@Param("divideId") String unitId,@Param("gridType")String unitType);
 
+    List<String> getSkillCodebyCategory(@Param("category")String category);
+
 }

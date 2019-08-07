@@ -181,6 +181,7 @@
         t.second_format_attribute AS secondFormatAttribute,
         t.third_format_attribute AS thirdFormatAttribute,
         concat('', s.enabled_flag, '') AS enabledFlag,
+        concat('', s.enabled_flag, '') AS enabled_flag,
         t.is_deleted AS isDeleted,
         t.creation_date AS creationDate,
         s.id AS serviceGridId,
@@ -215,6 +216,7 @@
         t.second_format_attribute AS secondFormatAttribute,
         t.third_format_attribute AS thirdFormatAttribute,
         concat('', t.enabled_flag, '') AS enabledFlag,
+        concat('', t.enabled_flag, '') AS enabled_flag,
         t.is_deleted AS isDeleted,
         t.creation_date AS creationDate,
         null AS serviceGridId,
@@ -373,8 +375,11 @@
         stage_servicegird_ref s LEFT JOIN grid_basic_info t
         ON t.staging_id = s.staging_id and t.grid_type='service_center_grid'
         where
-        s.staging_id =#{massifId}
-        and s.is_deleted = 0
+        t.staging_id in
+        <foreach collection="massifId" item="dkId" open="(" separator=","  close=")" >
+            #{dkId}
+        </foreach>
+        AND  s.is_deleted = 0
         AND s.enabled_flag = 1
         and
         t.is_deleted = 0
@@ -401,8 +406,12 @@
         t.creation_date AS creationDate,
         t.id AS gridId
         from grid_basic_info t
-        where t.staging_id=#{massifId}
-        AND t.grid_type !='service_center_grid'
+        where
+        t.staging_id in
+        <foreach collection="massifId" item="dkId" open="(" separator=","  close=")" >
+            #{dkId}
+        </foreach>
+        AND  t.grid_type !='service_center_grid'
         AND t.is_deleted = 0
         AND t.enabled_flag = 1
         ) as a
@@ -435,17 +444,25 @@
         SELECT
         gr.grid_id,
         gr.approval_status AS approvalStatus,
-        gr.proc_inst_Id AS procInstId
+        gr.proc_inst_Id AS procInstId,
+        gr.approval_type AS approvalType
         FROM
         grid_approval_record gr
         WHERE
-        gr.create_date = ( SELECT max( create_date ) FROM grid_approval_record WHERE grid_id = gr.grid_id limit 1)
+        gr.create_date = ( SELECT max( create_date ) FROM grid_approval_record WHERE grid_id = gr.grid_id
+        limit 1)
         ) r ON r.grid_id = t.gridId
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
             </if>
-            and (approvalStatus is null or approvalStatus =2)
+            and (
+              (approvalType='newGrid' and (approvalStatus is null or approvalStatus =2 ))
+              or
+              (approvalType!='newGrid'and (approvalStatus is null or approvalStatus =2 or approvalStatus =3))
+              or
+              ( approvalType is null)
+            )
         </where>
         GROUP BY t.id
         <if test="orderBySql!=null">
