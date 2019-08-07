@@ -18,7 +18,7 @@ public interface GridApprovalRecordService extends IGenericService<String, GridA
 	 * @param gridId          网格id
 	 * @param approvalContent 审批内容
 	 */
-	void callApproval(String approvalType, String gridId, Object approvalContent);
+	CommonResult<String> callApproval(String approvalType, String gridId, Object approvalContent);
 
 	/**
 	 * 流程结果处理

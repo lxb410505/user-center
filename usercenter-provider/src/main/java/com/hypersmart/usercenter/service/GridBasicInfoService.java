@@ -1,6 +1,7 @@
 package com.hypersmart.usercenter.service;
 
 import com.github.pagehelper.PageInfo;
+import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.framework.service.IGenericService;
@@ -49,7 +50,7 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 * @param gridBasicInfoDTO
 	 * @return
 	 */
-	GridErrorCode create(GridBasicInfoDTO gridBasicInfoDTO);
+	CommonResult<String> create(GridBasicInfoDTO gridBasicInfoDTO);
 
 	/**
 	 * 修改网格
@@ -73,7 +74,7 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 * @param gridBasicInfoDTO
 	 * @return
 	 */
-	GridErrorCode changeRange(GridBasicInfoDTO gridBasicInfoDTO);
+	CommonResult<String> changeRange(GridBasicInfoDTO gridBasicInfoDTO);
 
 	/**
 	 * 禁用网格
@@ -81,7 +82,7 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 * @param gridBasicInfoDTO
 	 * @return
 	 */
-	GridErrorCode disableGridList(GridBasicInfoDTO gridBasicInfoDTO);
+	CommonResult<String> disableGridList(GridBasicInfoDTO gridBasicInfoDTO);
 
 	/**
 	 * 删除网格
@@ -128,7 +129,7 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 * @param gridBasicInfoDTO
 	 * @return
 	 */
-	GridErrorCode associatedGrid(GridBasicInfoDTO gridBasicInfoDTO);
+	CommonResult<String> associatedGrid(GridBasicInfoDTO gridBasicInfoDTO);
 
 	/**
 	 * 管家解除关联网格
@@ -136,7 +137,7 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 * @param gridBasicInfoDTO
 	 * @return
 	 */
-	GridErrorCode disassociatedGrid(GridBasicInfoDTO gridBasicInfoDTO);
+	CommonResult<String> disassociatedGrid(GridBasicInfoDTO gridBasicInfoDTO);
 
 	/**
 	 * 根据地块id，获取地块下的楼栋网格覆盖的房产
