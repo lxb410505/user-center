@@ -5,6 +5,7 @@ import com.hypersmart.base.query.FieldRelation;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.base.util.BeanUtils;
+import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.usercenter.mapper.TgeQualityCheckMapper;
 import com.hypersmart.usercenter.model.TgeQualityCheck;
@@ -95,18 +96,18 @@ public class TgeQualityCheckServiceImpl extends GenericService<String, TgeQualit
                     qualityCheck.setProjectCode(orgCodes.get(1));
                     qualityCheck.setMassif(!BeanUtils.isEmpty(obj=row.get(2))?obj.toString():"");
                     qualityCheck.setMassifCode(orgCodes.get(2));
-                    BigDecimal demoBd = new BigDecimal(0);
-                    qualityCheck.setStoriedGrid(!BeanUtils.isEmpty(obj=row.get(3))?new BigDecimal(obj.toString()):demoBd);
-                    qualityCheck.setPublicAreaGrid(!BeanUtils.isEmpty(obj=row.get(4))?new BigDecimal(obj.toString()):demoBd);
-                    qualityCheck.setServiceCenterGrid(!BeanUtils.isEmpty(obj=row.get(5))?new BigDecimal(obj.toString()):demoBd);
-                    qualityCheck.setOrderServiceUnit(!BeanUtils.isEmpty(obj=row.get(6))?new BigDecimal(obj.toString()):demoBd);
-                    qualityCheck.setEsuComprehensiveScore(!BeanUtils.isEmpty(obj=row.get(7))?new BigDecimal(obj.toString()):demoBd);
-                    qualityCheck.setEsuCleaning(!BeanUtils.isEmpty(obj=row.get(8))?new BigDecimal(obj.toString()):demoBd);
-                    qualityCheck.setEsuGreen(!BeanUtils.isEmpty(obj=row.get(9))?new BigDecimal(obj.toString()):demoBd);
-                    qualityCheck.setPsuOperationAndMaintenance(!BeanUtils.isEmpty(obj=row.get(10))?new BigDecimal(obj.toString()):demoBd);
-                    qualityCheck.setPsuFacilities(!BeanUtils.isEmpty(obj=row.get(11))?new BigDecimal(obj.toString()):demoBd);
-                    qualityCheck.setFirstGradeRedLine(!BeanUtils.isEmpty(obj=row.get(12))?new BigDecimal(obj.toString()):demoBd);
-                    qualityCheck.setTwoLevelStrongControl(!BeanUtils.isEmpty(obj=row.get(13))?new BigDecimal(obj.toString()):demoBd);
+                    BigDecimal demoBd = null;
+                    qualityCheck.setStoriedGrid(isValid(row.get(3).toString())?new BigDecimal(row.get(3).toString()):demoBd);
+                    qualityCheck.setPublicAreaGrid(isValid(row.get(4).toString())?new BigDecimal(row.get(4).toString()):demoBd);
+                    qualityCheck.setServiceCenterGrid(isValid(row.get(5).toString())?new BigDecimal(row.get(5).toString()):demoBd);
+                    qualityCheck.setOrderServiceUnit(isValid(row.get(6).toString())?new BigDecimal(row.get(6).toString()):demoBd);
+                    qualityCheck.setEsuComprehensiveScore(isValid(row.get(7).toString())?new BigDecimal(row.get(7).toString()):demoBd);
+                    qualityCheck.setEsuCleaning(isValid(row.get(8).toString())?new BigDecimal(row.get(8).toString()):demoBd);
+                    qualityCheck.setEsuGreen(isValid(row.get(9).toString())?new BigDecimal(row.get(9).toString()):demoBd);
+                    qualityCheck.setPsuOperationAndMaintenance(isValid(row.get(10).toString())?new BigDecimal(row.get(10).toString()):demoBd);
+                    qualityCheck.setPsuFacilities(isValid(row.get(11).toString())?new BigDecimal(row.get(11).toString()):demoBd);
+                    qualityCheck.setFirstGradeRedLine(isValid(row.get(12).toString())?new BigDecimal(row.get(12).toString()):demoBd);
+                    qualityCheck.setTwoLevelStrongControl(isValid(row.get(13).toString())?new BigDecimal(row.get(13).toString()):demoBd);
                     qualityCheck.setCreateDate(new Date());
                     qualityCheck.setEffectiveTime(formatter.parse(date));
                     qualityChecks.add(qualityCheck);
@@ -129,6 +130,22 @@ public class TgeQualityCheckServiceImpl extends GenericService<String, TgeQualit
 
     }
 
+    public static boolean isValid(String value) {
+        boolean isValid = true;
+        if (StringUtil.isNotEmpty(value)) {
+            if (value.endsWith("%")) {
+                value = value.substring(0, value.length() - 1);
+            }
+            try {
+                new BigDecimal(value);
+            } catch(Exception ex) {
+                isValid = false;
+            }
+        }else{
+            isValid = false;
+        }
+        return isValid;
+    }
 
     private boolean isHasError(String[] headArr, List<List<Object>> tempResourceImportList) {
         List<Object> rowDataHeader = tempResourceImportList.get(1);
@@ -188,7 +205,6 @@ public class TgeQualityCheckServiceImpl extends GenericService<String, TgeQualit
     private boolean checkHasOrg( List<UcOrg> ucOrgs){
         if(ucOrgs==null||ucOrgs.size()<=0||ucOrgs.get(0)==null||ucOrgs.get(0).getCode()==null){
             return Boolean.FALSE;
-
         }else{
             return Boolean.TRUE;
         }
