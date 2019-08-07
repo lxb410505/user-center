@@ -95,8 +95,9 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 	 * @param approvalContent 审批内容
 	 */
 	@Override
-	public void callApproval(String approvalType, String gridId, Object approvalContent) {
+	public CommonResult<String> callApproval(String approvalType, String gridId, Object approvalContent) {
 		GridApprovalRecord record = new GridApprovalRecord();
+		CommonResult<String> commonResult=new CommonResult<>();
 		try {
 			String recordId = UUID.randomUUID().toString();
 			record.setGridId(gridId);
@@ -166,6 +167,8 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 						message = resultNode.get("RESULT").asText();
 					}
 					record.setCallErrorMessage(message);
+					commonResult.setMessage(message);
+					commonResult.setState(false);
 				} else {
 					String procinstid = "";
 					if (resultNode.get("procinstid") != null) {
@@ -175,15 +178,21 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 					}
 					record.setCallStatus(1);
 					record.setProcInstId(procinstid);
+					commonResult.setMessage("成功！");
+					commonResult.setState(true);
 				}
 			} else {
 				record.setCallStatus(2);
 				record.setCallErrorMessage("调用K2审批流程失败：未能收到K2任何反馈信息");
+				commonResult.setMessage("调用K2审批流程失败：未能收到K2任何反馈信息");
+				commonResult.setState(false);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			record.setCallStatus(2);
 			record.setCallErrorMessage(e.getMessage());
+			commonResult.setMessage(e.getMessage());
+			commonResult.setState(false);
 		} finally {
 			gridApprovalRecordMapper.insert(record);
 
@@ -199,6 +208,7 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 //			k2Result.setResultCode("1");
 //			processFlowResult(k2Result);
 		}
+		return commonResult;
 	}
 
 	/**
