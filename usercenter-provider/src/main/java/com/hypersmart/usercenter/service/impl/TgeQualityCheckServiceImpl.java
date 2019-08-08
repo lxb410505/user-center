@@ -187,15 +187,15 @@ public class TgeQualityCheckServiceImpl extends GenericService<String, TgeQualit
                 }
                 //check org and get org info
             }
-            //todo delete
-            tgeQualityCheckMapper.deleteByDate(date);
-
-            int i = insertBatch(qualityChecks);
 
             if (count == 0) {
+                //todo delete
+                tgeQualityCheckMapper.deleteByDate(date);
+    
+                insertBatch(qualityChecks);
                 return new CommonResult<>(true,"导入成功");
             }else {
-                return new CommonResult<>(false,"导入成功" + i + "条，失败" + (tempResourceImportList.size() - 3 - i) + "条，失败信息如下：\r\n" + errorMessege);
+                return new CommonResult<>(false,"导入失败，失败信息如下：\r\n" + errorMessege);
             }
 
 
