@@ -82,7 +82,11 @@ public class TgeQualityCheckServiceImpl extends GenericService<String, TgeQualit
 
             List<TgeQualityCheck> qualityChecks = new ArrayList<>();
 
+            StringBuffer errorMessege = new StringBuffer("失败信息如下：");
+            int count = 0;
+
             for (int i = 3; i < tempResourceImportList.size(); i++) {
+                Boolean temp = true;
                 List<Object> row = tempResourceImportList.get(i);
                 if (row.get(0) == null || row.get(0).toString().length() <= 0) {
                     throw new Exception("第" + (i + 1) + "行区域为空");
@@ -96,35 +100,108 @@ public class TgeQualityCheckServiceImpl extends GenericService<String, TgeQualit
                     qualityCheck.setProjectCode(orgCodes.get(1));
                     qualityCheck.setMassif(!BeanUtils.isEmpty(obj=row.get(2))?obj.toString():"");
                     qualityCheck.setMassifCode(orgCodes.get(2));
-                    BigDecimal demoBd = null;
-                    qualityCheck.setStoriedGrid(isValid(row.get(3).toString())?new BigDecimal(row.get(3).toString()):demoBd);
-                    qualityCheck.setPublicAreaGrid(isValid(row.get(4).toString())?new BigDecimal(row.get(4).toString()):demoBd);
-                    qualityCheck.setServiceCenterGrid(isValid(row.get(5).toString())?new BigDecimal(row.get(5).toString()):demoBd);
-                    qualityCheck.setOrderServiceUnit(isValid(row.get(6).toString())?new BigDecimal(row.get(6).toString()):demoBd);
-                    qualityCheck.setEsuComprehensiveScore(isValid(row.get(7).toString())?new BigDecimal(row.get(7).toString()):demoBd);
-                    qualityCheck.setEsuCleaning(isValid(row.get(8).toString())?new BigDecimal(row.get(8).toString()):demoBd);
-                    qualityCheck.setEsuGreen(isValid(row.get(9).toString())?new BigDecimal(row.get(9).toString()):demoBd);
-                    qualityCheck.setPsuOperationAndMaintenance(isValid(row.get(10).toString())?new BigDecimal(row.get(10).toString()):demoBd);
-                    qualityCheck.setPsuFacilities(isValid(row.get(11).toString())?new BigDecimal(row.get(11).toString()):demoBd);
-                    qualityCheck.setFirstGradeRedLine(isValid(row.get(12).toString())?new BigDecimal(row.get(12).toString()):demoBd);
-                    qualityCheck.setTwoLevelStrongControl(isValid(row.get(13).toString())?new BigDecimal(row.get(13).toString()):demoBd);
+                    if (isValid(row.get(3).toString())) {
+                        qualityCheck.setStoriedGrid(new BigDecimal(row.get(3).toString()));
+                    }else {
+                        temp = false;
+                        errorMessege.append("第" + (i + 1) + "行，第" + 4 + "列数据格式不对。\r\n");
+                    }
+
+                    if (isValid(row.get(4).toString())) {
+                        qualityCheck.setPublicAreaGrid(new BigDecimal(row.get(4).toString()));
+                    }else {
+                        temp = false;
+                        errorMessege.append("第" + (i + 1) + "行，第" + 5 + "列数据格式不对。\r\n");
+                    }
+
+                    if (isValid(row.get(5).toString())) {
+                        qualityCheck.setServiceCenterGrid(new BigDecimal(row.get(5).toString()));
+                    }else {
+                        temp = false;
+                        errorMessege.append("第" + (i + 1) + "行，第" + 6 + "列数据格式不对。\r\n");
+                    }
+
+                    if (isValid(row.get(6).toString())) {
+                        qualityCheck.setOrderServiceUnit(new BigDecimal(row.get(6).toString()));
+                    }else {
+                        temp = false;
+                        errorMessege.append("第" + (i + 1) + "行，第" + 7 + "列数据格式不对。\r\n");
+                    }
+
+                    if (isValid(row.get(7).toString())) {
+                        qualityCheck.setEsuComprehensiveScore(new BigDecimal(row.get(7).toString()));
+                    }else {
+                        temp = false;
+                        errorMessege.append("第" + (i + 1) + "行，第" + 8 + "列数据格式不对。\r\n");
+                    }
+
+                    if (isValid(row.get(8).toString())) {
+                        qualityCheck.setEsuCleaning(new BigDecimal(row.get(8).toString()));
+                    }else {
+                        temp = false;
+                        errorMessege.append("第" + (i + 1) + "行，第" + 9 + "列数据格式不对。\r\n");
+                    }
+
+                    if (isValid(row.get(9).toString())) {
+                        qualityCheck.setEsuGreen(new BigDecimal(row.get(9).toString()));
+                    }else {
+                        temp = false;
+                        errorMessege.append("第" + (i + 1) + "行，第" + 10 + "列数据格式不对。\r\n");
+                    }
+
+                    if (isValid(row.get(10).toString())) {
+                        qualityCheck.setPsuOperationAndMaintenance(new BigDecimal(row.get(10).toString()));
+                    }else {
+                        temp = false;
+                        errorMessege.append("第" + (i + 1) + "行，第" + 11 + "列数据格式不对。\r\n");
+                    }
+
+                    if (isValid(row.get(11).toString())) {
+                        qualityCheck.setPsuFacilities(new BigDecimal(row.get(11).toString()));
+                    }else {
+                        temp = false;
+                        errorMessege.append("第" + (i + 1) + "行，第" + 12 + "列数据格式不对。\r\n");
+                    }
+
+                    if (isValid(row.get(12).toString())) {
+                        qualityCheck.setFirstGradeRedLine(new BigDecimal(row.get(12).toString()));
+                    }else {
+                        temp = false;
+                        errorMessege.append("第" + (i + 1) + "行，第" + 13 + "列数据格式不对。\r\n");
+                    }
+
+                    if (isValid(row.get(13).toString())) {
+                        qualityCheck.setTwoLevelStrongControl(new BigDecimal(row.get(13).toString()));
+                    }else {
+                        temp = false;
+                        errorMessege.append("第" + (i + 1) + "行，第" + 14 + "列数据格式不对。\r\n");
+                    }
+
                     qualityCheck.setCreateDate(new Date());
                     qualityCheck.setEffectiveTime(formatter.parse(date));
-                    qualityChecks.add(qualityCheck);
+                    if (temp) {
+                        qualityChecks.add(qualityCheck);
+                    }else {
+                        count++;
+                    }
                 }
                 //check org and get org info
             }
-            //todo delete
-            tgeQualityCheckMapper.deleteByDate(date);
 
-            insertBatch(qualityChecks);
-
-            return new CommonResult<>(Boolean.TRUE,"导入成功");
+            if (count == 0) {
+                //todo delete
+                tgeQualityCheckMapper.deleteByDate(date);
+    
+                insertBatch(qualityChecks);
+                return new CommonResult<>(true,"导入成功");
+            }else {
+                return new CommonResult<>(false,"导入失败，失败信息如下：\r\n" + errorMessege);
+            }
 
 
         } catch (Exception e) {
             //todo
-            return new CommonResult<>(Boolean.FALSE,e.getMessage());
+            return new CommonResult<>(false,"导入失败，请联系管理员");
 
         }
 
