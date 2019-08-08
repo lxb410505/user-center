@@ -74,6 +74,10 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
     public GridErrorCode saveGridBasicInfoHistory(GridBasicInfo gridBasicInfoDTO,Integer changeType) {
         GridErrorCode gridErrorCode = GridErrorCode.UNKOWN_EXCEPTION;
         IUser user = ContextUtil.getCurrentUser();
+        String userId="";
+        if(user!=null){
+            userId=user.getUserId();
+        }
         Integer num = 0;
         if (gridBasicInfoDTO != null) {
             //之前网格记录
@@ -129,9 +133,9 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                         }
                     }
                     housekeeperHistory.setCreationDate(new Date());
-                    housekeeperHistory.setCreatedBy(user.getUserId());
+                    housekeeperHistory.setCreatedBy(userId);
                     housekeeperHistory.setUpdationDate(new Date());
-                    housekeeperHistory.setUpdatedBy(user.getUserId());
+                    housekeeperHistory.setUpdatedBy(userId);
                     housekeeperHistoryService.insert(housekeeperHistory);
                     before_housekeeper_history_id = housekeeperHistory.getId();
                 }
@@ -199,8 +203,8 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
             gridBasicInfoHistory.setIsDeleted(0);
             gridBasicInfoHistory.setCreationDate(new Date());
             gridBasicInfoHistory.setUpdationDate(new Date());
-            gridBasicInfoHistory.setCreatedBy(user.getUserId());
-            gridBasicInfoHistory.setUpdatedBy(user.getUserId());
+            gridBasicInfoHistory.setCreatedBy(userId);
+            gridBasicInfoHistory.setUpdatedBy(userId);
             //新增
             num = this.insertSelective(gridBasicInfoHistory);
 
@@ -220,8 +224,8 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                         gridHistoryChangeTypeRef.setGridChangeType("housekeeper_change");
                         gridHistoryChangeTypeRef.setCreationDate(new Date());
                         gridHistoryChangeTypeRef.setUpdationDate(new Date());
-                        gridHistoryChangeTypeRef.setCreatedBy(user.getUserId());
-                        gridHistoryChangeTypeRef.setUpdatedBy(user.getUserId());
+                        gridHistoryChangeTypeRef.setCreatedBy(userId);
+                        gridHistoryChangeTypeRef.setUpdatedBy(userId);
                         gridHistoryChangeTypeRefService.insert(gridHistoryChangeTypeRef);
                     } else {
                         //网格覆盖范围变更
@@ -233,8 +237,8 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                         gridHistoryChangeTypeRef.setGridChangeType("grid_range_change");
                         gridHistoryChangeTypeRef.setCreationDate(new Date());
                         gridHistoryChangeTypeRef.setUpdationDate(new Date());
-                        gridHistoryChangeTypeRef.setUpdatedBy(user.getUserId());
-                        gridHistoryChangeTypeRef.setCreatedBy(user.getUserId());
+                        gridHistoryChangeTypeRef.setUpdatedBy(userId);
+                        gridHistoryChangeTypeRef.setCreatedBy(userId);
                         gridHistoryChangeTypeRefService.insert(gridHistoryChangeTypeRef);
                     }
 
@@ -270,8 +274,8 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                             }
                             housekeeperHistory.setCreationDate(new Date());
                             housekeeperHistory.setUpdationDate(new Date());
-                            housekeeperHistory.setCreatedBy(user.getUserId());
-                            housekeeperHistory.setUpdatedBy(user.getUserId());
+                            housekeeperHistory.setCreatedBy(userId);
+                            housekeeperHistory.setUpdatedBy(userId);
                             housekeeperHistoryService.insert(housekeeperHistory);
                             after_housekeeper_history_id = housekeeperHistory.getId();
                         }
@@ -341,8 +345,8 @@ public class GridBasicInfoHistoryServiceImpl extends GenericService<String, Grid
                 gridBasicInfoHistoryAfter.setIsDeleted(0);
                 gridBasicInfoHistoryAfter.setCreationDate(new Date());
                 gridBasicInfoHistoryAfter.setUpdationDate(new Date());
-                gridBasicInfoHistoryAfter.setCreatedBy(user.getUserId());
-                gridBasicInfoHistoryAfter.setUpdatedBy(user.getUserId());
+                gridBasicInfoHistoryAfter.setCreatedBy(userId);
+                gridBasicInfoHistoryAfter.setUpdatedBy(userId);
                 gridBasicInfoHistoryAfterService.insert(gridBasicInfoHistoryAfter);
             }
         }
