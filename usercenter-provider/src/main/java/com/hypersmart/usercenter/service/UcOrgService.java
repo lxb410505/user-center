@@ -53,5 +53,8 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
     List<UcOrgParams> getOrgParams(String code, String value);
     List<UcOrg> getDefaultOrgListByGrade(String grade);
     List<UcOrg> getAllOrgs() throws IOException;
+
+    List<UcOrg> getOrgByCondition(UcOrg ucOrg);
+
 }
 
