@@ -85,6 +85,8 @@
         post.POS_NAME_ AS posName,
         org_lv4.NAME_ AS corpName,
         org_lv3.NAME_ AS areaName,
+        '' AS postKey,
+        '' AS cityName,
         org_lv2.NAME_ AS projectName,
         org.NAME_ AS divideName,
         org_lv4.ID_ AS corpId,
