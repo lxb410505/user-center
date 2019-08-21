@@ -1,7 +1,9 @@
 package com.hypersmart.usercenter.service.impl;
 
-import com.hypersmart.base.query.PageList;
-import com.hypersmart.base.query.QueryFilter;
+import com.github.pagehelper.PageHelper;
+import com.hypersmart.base.query.*;
+import com.hypersmart.base.util.BeanUtils;
+import com.hypersmart.base.util.ContextUtils;
 import com.hypersmart.framework.service.GenericService;
 
 import com.hypersmart.usercenter.mapper.HouseMapper;
@@ -10,6 +12,8 @@ import com.hypersmart.usercenter.service.HouseService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,9 +35,33 @@ public class HouseServiceImpl extends GenericService<String, House> implements H
     HouseMapper houseMapper ;
 
     @Override
-    public PageList<House> list(QueryFilter queryFilter) {
+    public  PageList<Map<String, Object>> list(QueryFilter queryFilter) {
         //todo
-        return null;
+        //带查询条件的待完善
+        PageBean pageBean = queryFilter.getPageBean();
+        Map<String, Object> params = queryFilter.getParams();
+        QueryFilter queryFilter2 = QueryFilter.build();
+
+        if(params.get("massifId")!=null){
+            queryFilter2.addFilter("gbi.staging_id", params.get("massifId"), QueryOP.EQUAL, FieldRelation.AND);
+
+        }
+
+        if(params.get("gridId")!=null){
+            queryFilter2.addFilter("gr.id", params.get("gridId"), QueryOP.EQUAL, FieldRelation.AND);
+
+
+        }
+        //分页
+        if (BeanUtils.isEmpty(pageBean)) {
+            PageHelper.startPage(1, Integer.MAX_VALUE, false);
+        } else {
+            PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
+                    pageBean.showTotal());
+        }
+
+        List<Map<String, Object>> query=houseMapper.list(queryFilter2.getParams());
+        return new PageList<>(query);
     }
 
     @Override

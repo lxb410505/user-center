@@ -16,7 +16,7 @@ import java.util.Map;
  * @date 2019-08-15 17:33:45
  */
 public interface HouseService extends IGenericService<String, House> {
-    PageList<House> list (QueryFilter queryFilter);
+    PageList<Map<String, Object>> list (QueryFilter queryFilter);
     Map selectGridBuilding (String  id);
     Map selectBuildingUnit (String  id);
 }

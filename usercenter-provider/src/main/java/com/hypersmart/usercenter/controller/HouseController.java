@@ -32,7 +32,7 @@ public class HouseController extends BaseController {
 
     @PostMapping({"/list"})
     @ApiOperation(value = "【基础信息】房产数据列表}", httpMethod = "POST", notes = "获取【基础信息】房产列表")
-    public PageList<House> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+    public PageList<Map<String,Object>> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
         return this.houseService.list(queryFilter);
     }
 
@@ -86,7 +86,7 @@ public class HouseController extends BaseController {
 
     @GetMapping({"/selectGridBuilding/{id}"})
     @ApiOperation(value = "根据地块查询楼栋", httpMethod = "PATCH", notes = "根据地块查询楼栋")
-    public Map<String,String> selectGridBuilding(@ApiParam(name = "house", value = "【基础信息】房产业务对象", required = true) @RequestBody String id) {
+    public Map<String,String> selectGridBuilding(@ApiParam(name = "house", value = "【基础信息】房产业务对象", required = true) @PathVariable String id) {
         String msg = "查询成功";
         Map map = this.houseService.selectGridBuilding(id);
        return map;
@@ -94,7 +94,7 @@ public class HouseController extends BaseController {
 
     @GetMapping({"/selectBuildingUnit/{id}"})
     @ApiOperation(value = "根据楼栋查询单元", httpMethod = "PATCH", notes = "根据地块查询楼栋")
-    public Map<String,String> selectBuildingUnit(@ApiParam(name = "house", value = "【基础信息】房产业务对象", required = true) @RequestBody String id) {
+    public Map<String,String> selectBuildingUnit(@ApiParam(name = "house", value = "【基础信息】房产业务对象", required = true) @PathVariable String id) {
         String msg = "查询成功";
         Map map = this.houseService.selectBuildingUnit(id);
         return map;
