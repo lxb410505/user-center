@@ -33,7 +33,7 @@ public class HouseController extends BaseController {
     @PostMapping({"/list"})
     @ApiOperation(value = "【基础信息】房产数据列表}", httpMethod = "POST", notes = "获取【基础信息】房产列表")
     public PageList<House> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
-        return this.houseService.query(queryFilter);
+        return this.houseService.list(queryFilter);
     }
 
     @GetMapping({"/get/{id}"})

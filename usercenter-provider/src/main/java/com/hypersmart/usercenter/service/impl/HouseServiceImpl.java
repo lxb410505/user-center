@@ -32,7 +32,7 @@ public class HouseServiceImpl extends GenericService<String, House> implements H
 
     @Override
     public PageList<House> list(QueryFilter queryFilter) {
-
+        //todo
         return null;
     }
 
@@ -40,5 +40,10 @@ public class HouseServiceImpl extends GenericService<String, House> implements H
     public Map selectGridBuilding(String id) {
 
         return houseMapper.selectGridBuilding(id);
+    }
+
+    @Override
+    public Map selectBuildingUnit(String id) {
+        return houseMapper.selectBuildingUnit(id);
     }
 }
