@@ -603,4 +603,9 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         }
         return ucOrgList2;
     }
+
+    @Override
+    public List<UcOrg> getOrgByCondition(UcOrg ucOrg) {
+        return ucOrgMapper.getOrgByCondition(ucOrg);
+    }
 }

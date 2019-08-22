@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.HouseMapper">
+    <select id="list" resultType="java.util.Map" parameterType="java.util.Map">
+
+
+            select hs.id id,hs.sf_guid suGuid ,hs.sap_id sapId ,hs.wbs_code wbsCode,hs.house_code houseCode,
+            hs.house_inner_name houseInnerName,hs.is_invented isInvented ,hs.floor ,hs.house_state houseState,
+            property_type propertyType, actual_address actualAddress,measured_area measuredArea,
+            predicted_area predictedArea,building_area buildingArea ,fee_area feeArea,used_area usedArea,
+            public_booth_area publicBoothArea ,total_arrearage totalArrearage,start_date startDate,restore_original_date restoreOriginalDate,
+            remark ,reason,unit_id unitId,unit_code unitCode ,building_id buildingId,divide_id divideId,area_code areaCode ,hs.area_id areaId,
+            hs.city_id cityId,city_name cityName,city_code cityCode ,hs.project_id projectId ,building_name buildingName,divide_code divideCode,
+            divide_name divideName ,project_code procectCode ,project_name projectName,contract_id contractId,contract_flag contractFlag,
+            debit_enabled_flag debitEnabledFlag ,corp_id corpId,batch_id batchId ,property_fee propertyFee,other_fee otherFee,
+            delivery_date deliveryDate,real_delivery_date realDeliveryDate,access_card_number accessCardNumber,purpose ,
+            renovation_type renovationType ,source_from sourceFrom ,emergency_contact_1 emergencyContact1,
+            emergency_contact_phone_1 emergencyContactPhone1,
+            emergency_contact_2 emergencyContact2,
+            emergency_contact_phone_2 emergencyContactPhone2,
+            emergency_contact_3 emergencyContact3,
+            emergency_contact_phone_3 emergencyContactPhone3,
+            hs.creation_date creationDate,hs.created_by createdBy,hs.updation_date updationDate,house_use houseUse,
+            connect_address connectAddress,hs.updated_by updatedBy,hs.row_version rowVersion,hs.is_deleted isDeleted ,
+            hs.enabled_flag enabledFlag,org.name_ massifName
+            from   uc.house  hs
+            left join uc.grid_range  gr on gr.resource_id = hs.id
+            left join uc.grid_basic_info gbi on gr.id = gbi.id
+            left join uc.uc_org org on gbi.staging_id = org.id_
+        <where>
+            <if test="whereSql">
+                ${whereSql}
+            </if>
+        </where>
+        <if test="orderSql">
+            order by ${orderSql}
+        </if>
+    </select>
+
+
+
+    <select id="selectGridBuilding" resultType="java.util.Map" >
+        select hs.building_id, hs.building_name
+        from   uc.house  hs
+        left join uc.grid_range  gr on gr.resource_id = hs.id
+        left join uc.grid_basic_info gbi on gr.id = gbi.id
+        left join uc.uc_org org on gbi.staging_id = org.id_
+        where gr.id = #{id}
+        group by  hs.building_id
+    </select>
+
+
+    <select id="selectBuildingUnit" resultType="java.util.Map" >
+        select hs.unit_id, hs.unit_code
+        from   uc.house  hs
+        left join uc.grid_range  gr on gr.resource_id = hs.id
+        left join uc.grid_basic_info gbi on gr.id = gbi.id
+        left join uc.uc_org org on gbi.staging_id = org.id_
+        where hs.building_id = #{id}
+        group by  hs.unit_id
+    </select>
+
+</mapper>
