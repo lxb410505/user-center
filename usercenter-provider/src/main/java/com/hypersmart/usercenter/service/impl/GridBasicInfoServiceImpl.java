@@ -1056,4 +1056,19 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         List<String> list = Arrays.asList(str.split(","));
         return list;
     }
+
+	@Override
+	public void realDeleteGridList(String id,String gridType) {
+		if(GridTypeConstants.SERVICE_CENTER_GRID.equals(gridType)){
+			StageServiceGirdRef stageServiceGirdRef=new StageServiceGirdRef();
+			stageServiceGirdRef.setServiceGridId(id);
+			stageServiceGirdRefMapper.delete(stageServiceGirdRef);
+		}else{
+			if(GridTypeConstants.BUILDING_GRID.equals(gridType)){
+				String [] ids={id};
+				gridRangeService.deleteRangeByGridIds(ids);
+			}
+			gridBasicInfoService.delete(id);
+		}
+	}
 }
