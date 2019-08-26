@@ -1,6 +1,8 @@
 package com.hypersmart.usercenter.mapper;
 
 import com.hypersmart.framework.mapper.GenericMapper;
+import com.hypersmart.usercenter.dto.ClientRelationDTO;
+import com.hypersmart.usercenter.dto.HouseExcelInfoDTO;
 import com.hypersmart.usercenter.model.House;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,6 +18,8 @@ import java.util.Map;
  */
 public interface HouseMapper extends GenericMapper<House> {
     List<Map<String,Object>> list(Map<String,Object> map);
-    Map selectGridBuilding(@Param("id")String id);
-    Map selectBuildingUnit(@Param("id")String id);
+    List<Map<String,Object>> selectGridBuilding(@Param("id")String id);
+    List<Map<String,Object>> selectBuildingUnit(@Param("id")String id);
+    List<HouseExcelInfoDTO> selectHouseExcelInfo(Map<String,Object> map);
+    List<ClientRelationDTO> selectUcMemberRelatio(Map<String,Object> map);
 }

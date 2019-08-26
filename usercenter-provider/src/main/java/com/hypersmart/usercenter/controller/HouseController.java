@@ -5,6 +5,7 @@ import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.util.StringUtil;
+import com.hypersmart.usercenter.dto.ClientRelationDTO;
 import com.hypersmart.usercenter.model.House;
 import com.hypersmart.usercenter.service.HouseService;
 import io.swagger.annotations.Api;
@@ -14,6 +15,8 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -85,18 +88,23 @@ public class HouseController extends BaseController {
 
 
     @GetMapping({"/selectGridBuilding/{id}"})
-    @ApiOperation(value = "根据地块查询楼栋", httpMethod = "PATCH", notes = "根据地块查询楼栋")
-    public Map<String,String> selectGridBuilding(@ApiParam(name = "house", value = "【基础信息】房产业务对象", required = true) @PathVariable String id) {
-        String msg = "查询成功";
-        Map map = this.houseService.selectGridBuilding(id);
-       return map;
+    @ApiOperation(value = "根据网格查询楼栋", httpMethod = "GET", notes = "根据网格查询楼栋")
+    public List<Map<String,Object>> selectGridBuilding(@ApiParam(name = "id", value = "网格id", required = true) @PathVariable String id) {
+       return this.houseService.selectGridBuilding(id);
     }
 
-    @GetMapping({"/selectBuildingUnit/{id}"})
+    @GetMapping({"/getUnitByBuildingId/{id}"})
+    @ApiOperation(value = "根据楼栋查询单元", httpMethod = "GET", notes = "根据楼栋查询单元")
+    public List<Map<String,Object>> getUnitByBuildingId(@ApiParam(name = "id", value = "楼栋id", required = true) @PathVariable String id) {
+        return this.houseService.selectBuildingUnit(id);
+    }
+    @PostMapping({"/exportExcel"})
     @ApiOperation(value = "根据楼栋查询单元", httpMethod = "PATCH", notes = "根据地块查询楼栋")
-    public Map<String,String> selectBuildingUnit(@ApiParam(name = "house", value = "【基础信息】房产业务对象", required = true) @PathVariable String id) {
-        String msg = "查询成功";
-        Map map = this.houseService.selectBuildingUnit(id);
-        return map;
+    public void exportExcel(@RequestBody QueryFilter queryFilter, HttpServletResponse response) throws Exception {
+        this.houseService.exportExcel(queryFilter,response);
+    }
+    @PostMapping({"/ucMemberRelationList"})
+    public PageList<ClientRelationDTO> ucMemberRelationList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+        return this.houseService.ucMemberRelationList(queryFilter);
     }
 }
