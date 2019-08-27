@@ -40,6 +40,7 @@ public class ParkingServiceImpl extends GenericService<String, Parking> implemen
     public CommonResult<String> addParking(Parking model) {
         int insert = 0;
         if (model != null) {
+            model.setHouseId(model.getHouseId());
             model.setParkingNum(model.getParkingNum());
             model.setRentalPropertyNum(model.getRentalPropertyNum());
             model.setPlateNumber(model.getPlateNumber());
@@ -58,6 +59,9 @@ public class ParkingServiceImpl extends GenericService<String, Parking> implemen
             model.setUpdatedBy(ContextUtil.getCurrentUser().getUserId());
             model.setRowVersion(0);
             insert = parkingMapper.insert(model);
+
+
+
         }
         if (insert < 1) {
             return new CommonResult<>(Boolean.FALSE, "新增失敗");
@@ -88,4 +92,5 @@ public class ParkingServiceImpl extends GenericService<String, Parking> implemen
         }
         return new CommonResult<>(Boolean.TRUE, "修改成功");
     }
+
 }

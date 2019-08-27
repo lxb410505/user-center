@@ -46,7 +46,6 @@ public class ParkingController extends BaseController {
     @PostMapping({"add"})
     @ApiOperation(value = "新增【基础信息】停车位信息", httpMethod = "POST", notes = "保存【基础信息】停车位")
     public CommonResult<String> post(@ApiParam(name = "parking", value = "【基础信息】停车位业务对象", required = true) @RequestBody Parking model) {
-
         CommonResult<String> result = parkingService.addParking(model);
         return result;
     }
@@ -70,6 +69,7 @@ public class ParkingController extends BaseController {
     @ApiOperation(value = "删除【基础信息】停车位记录", httpMethod = "DELETE", notes = "删除【基础信息】停车位记录")
     public CommonResult<String> remove(@ApiParam(name = "id", value = "业务主键", required = true) @PathVariable String id) {
         this.parkingService.delete(id);
+        System.out.println("调用的是{\"remove/{id}\"}方法==============================================");
         return new CommonResult(true, "删除成功");
     }
 
@@ -79,6 +79,7 @@ public class ParkingController extends BaseController {
             @ApiParam(name = "ids", value = "业务主键数组,多个业务主键之间用逗号分隔", required = true) @RequestParam String ids) {
         String[] aryIds = ids.split(",");
         this.parkingService.delete(aryIds);
+        System.out.println("调用的是{\"/remove\"}方法==============================================");
         return new CommonResult(true, "批量删除成功");
     }
 }

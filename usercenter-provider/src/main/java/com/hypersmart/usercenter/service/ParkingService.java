@@ -12,6 +12,7 @@ import com.hypersmart.framework.service.IGenericService;
  * @date 2019-08-21 16:19:42
  */
 public interface ParkingService extends IGenericService<String, Parking> {
+
     CommonResult<String> addParking(Parking model);
 
     /**
@@ -19,5 +20,6 @@ public interface ParkingService extends IGenericService<String, Parking> {
      * @param model
      */
     CommonResult<String> updateParking(Parking model);
+
 }
 
