@@ -74,13 +74,13 @@
         gbi.grid_name gridName,
         case
         when delivery_date <![CDATA[ <= ]]> CURDATE() and  delivery_date > date_add(CURDATE(), interval -6 month)
-        then 'storming1'
+        then 'ownerStage_storming1'
         when delivery_date <![CDATA[ <= ]]> date_add(CURDATE(), interval -6 month) and  delivery_date > date_add(CURDATE(), interval -1 year)
-        then 'storming2'
+        then 'ownerStage_storming2'
         when delivery_date <![CDATA[ <= ]]> date_add(CURDATE(), interval -1 year) and  delivery_date > date_add(CURDATE(), interval -2 year)
-        then 'stable'
+        then 'ownerStage_stable'
         when delivery_date <![CDATA[ <= ]]> date_add(CURDATE(), interval -2 year)
-        then 'oldProprietor'
+        then 'ownerStage_oldProprietor'
         else '其他'
         end as ownerStage
         FROM
@@ -123,40 +123,33 @@
     </select>
     <select id="selectHouseExcelInfo" resultType="com.hypersmart.usercenter.dto.HouseExcelInfoDTO">
         SELECT
-	hs.id houseId,
-	hs.house_inner_name houseInnerName,
-	property_type houseType,
-	remark remarks,
-	area_name areaName,
-	city_name cityName,
-	project_name projectName,
-	delivery_date deliveryDate,
-	real_delivery_date realDeliveryDate,
-	renovation_type renovationType,
-	house_use houseUse,
-	org.name_ massifName,
-	gbi.grid_name gridName,
-	um.FULLNAME_ ucMemberName,
-  IF( um.GRADE_ = 'internal_staff', '是', '否' ) isOwnStaff,
-	um.MOBILE_ phone1
-FROM
-	uc.house hs
-	LEFT JOIN uc.grid_range gr ON gr.resource_id = hs.id
-	LEFT JOIN uc.grid_basic_info gbi ON gr.grid_id = gbi.id
-	LEFT JOIN uc.uc_org org ON gbi.staging_id = org.id_
-	LEFT JOIN member.user_house_ref uhf ON hs.id = uhf.HOUSE_ID_
-
-	LEFT JOIN member.uc_member um ON uhf.MEMBER_ID_ = um.ID_
-	where
-	uhf.RELATION_ = 0
-	and uhf.IS_DELE_='0'
-	and gr.is_deleted=0
-	and gr.enabled_flag=1
-	and gbi.is_deleted=0
-	and gbi.enabled_flag=1
-    and org.IS_DELE_='0'
-	and hs.is_deleted=0
-	and hs.enabled_flag=1
+        hs.id houseId,
+        hs.house_inner_name houseInnerName,
+        property_type houseType,
+        remark remarks,
+        area_name areaName,
+        city_name cityName,
+        project_name projectName,
+        delivery_date deliveryDate,
+        real_delivery_date realDeliveryDate,
+        renovation_type renovationType,
+        house_use houseUse,
+        org.name_ massifName,
+        gbi.grid_name gridName,
+        hs.uc_member_name ucMemberName,
+        hs.uc_member_mobile phone1,
+        hs.is_own_staff isOwnStaff,
+        hs.uc_member_telphone phone2
+        FROM
+        uc.house hs
+        LEFT JOIN uc.grid_range gr ON gr.resource_id = hs.id
+        LEFT JOIN uc.grid_basic_info gbi ON gr.grid_id = gbi.id
+        LEFT JOIN uc.uc_org org ON gbi.staging_id = org.id_
+        where
+        gbi.is_deleted=0
+        and org.IS_DELE_='0'
+        and  hs.is_deleted=0
+        and hs.enabled_flag=1
 	<if test="whereSql">
       and  ${whereSql}
     </if>
@@ -166,24 +159,71 @@ FROM
     </if>
 
     </select>
-    <select id="selectUcMemberRelatio" resultType="com.hypersmart.usercenter.dto.ClientRelationDTO">
+    <select id="selectUcMemberRelation" resultType="com.hypersmart.usercenter.dto.ClientRelationDTO">
         select
         uhf.id_ as id,
         uhf.MEMBER_ID_ as clientId,
         uhf.HOUSE_ID_ as houseId,
-        um.FULLNAME_ as fullname,
+        um.FULLNAME_ as clientName,
         um.ID_CARD_ as idCard,
         um.MOBILE_ as mobile,
         um.SEX_ as sex,
         um.GRADE_ as grade
         from
         member.user_house_ref uhf
-        LEFT JOIN member.uc_member um ON uhf.MEMBER_ID_ = um.ID_
+        JOIN member.uc_member um ON uhf.MEMBER_ID_ = um.ID_
         where
         uhf.IS_DELE_='0'
         <if test="whereSql">
             and  ${whereSql}
         </if>
     </select>
+
+    <insert id="insertUserHouseRefList" parameterType="java.util.List">
+        insert into member.user_house_ref (ID_, HOUSE_ID_,
+        MEMBER_ID_,RELATION_,FROM_,IS_DELE_,CREATE_TIME_,UPDATE_TIME_,VERSION_,CREATED_BY_,UPDATED_BY_) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id,jdbcType=VARCHAR},
+            #{item.houseId,jdbcType=VARCHAR},
+            #{item.memberId,jdbcType=VARCHAR},
+            #{item.relation,jdbcType=VARCHAR},
+            #{item.from,jdbcType=VARCHAR},
+            #{item.isDele,jdbcType=CHAR},
+            #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.updateTime,jdbcType=TIMESTAMP},
+            #{item.version,jdbcType=INTEGER},
+            #{item.createdBy,jdbcType=CHAR},
+            #{item.updatedBy,jdbcType=CHAR})
+        </foreach>
+    </insert>
+    <select id="selectMemberInfos" resultType="java.util.Map">
+        select
+GROUP_CONCAT(b.id_) as id,
+GROUP_CONCAT(b.FULLNAME_) as name,
+GROUP_CONCAT(b.MOBILE_) as mobile,
+GROUP_CONCAT(b.telPhone_) as telPhone,
+GROUP_CONCAT(IF( b.GRADE_ = 'internal_staff', '是', '否' )) as isOwnStaff
+from member.user_house_ref a join member.uc_member b  on a.member_id_=b.id_
+where
+a.RELATION_=0
+and a.IS_DELE_='0'
+and a.HOUSE_ID_ =#{houseId}
+    </select>
+    <select id="selectUserHouseRef" resultType="com.hypersmart.usercenter.model.UserHouseRef">
+        select
+         ID_ as id,
+          HOUSE_ID_ as houseId,
+          RELATION_ as relation,
+        VERSION_ as version
+         from member.user_house_ref where id_=#{id}
+    </select>
+    <update id="updateUserHouseRef" parameterType="com.hypersmart.usercenter.model.UserHouseRef">
+        update member.user_house_ref
+        set IS_DELE_=#{isDele,jdbcType=CHAR},
+        VERSION_=#{version,jdbcType=INTEGER},
+        UPDATE_TIME_=#{updateTime,jdbcType=TIMESTAMP},
+        UPDATED_BY_=#{updatedBy,jdbcType=CHAR}
+        where id_=#{id}
+    </update>
 
 </mapper>

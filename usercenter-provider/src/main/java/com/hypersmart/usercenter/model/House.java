@@ -188,6 +188,22 @@ public class House implements Serializable {
     @ApiModelProperty("【冗余】项目名称")
     private String projectName;
 
+    @Column(name = "uc_member_id")
+    @ApiModelProperty("【冗余】产权人id，逗号隔开")
+    private String ucMemberId;
+    @Column(name = "uc_member_name")
+    @ApiModelProperty("【冗余】产权人名称，逗号隔开")
+    private String ucMemberName;
+    @Column(name = "uc_member_mobile")
+    @ApiModelProperty("【冗余】产权人手机号，逗号隔开")
+    private String ucMemberMobile;
+    @Column(name = "uc_member_telphone")
+    @ApiModelProperty("【冗余】产权人固话，逗号隔开")
+    private String ucMemberTelPhone;
+    @Column(name = "is_own_staff")
+    @ApiModelProperty("【冗余】是否是内部员工，逗号隔开")
+    private String isOwnStaff;
+
     @Column(name = "contract_id")
     @ApiModelProperty("合同Id")
     private String contractId;
@@ -218,14 +234,14 @@ public class House implements Serializable {
 
     @Column(name = "delivery_date")
     @ApiModelProperty("集中交付日期")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date deliveryDate;
 
     @Column(name = "real_delivery_date")
     @ApiModelProperty("实际交付日期")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date realDeliveryDate;
 
     @Column(name = "access_card_number")
@@ -613,6 +629,46 @@ public class House implements Serializable {
         return this.projectName;
     }
 
+    public String getUcMemberId() {
+        return ucMemberId;
+    }
+
+    public void setUcMemberId(String ucMemberId) {
+        this.ucMemberId = ucMemberId;
+    }
+
+    public String getUcMemberName() {
+        return ucMemberName;
+    }
+
+    public void setUcMemberName(String ucMemberName) {
+        this.ucMemberName = ucMemberName;
+    }
+
+    public String getUcMemberMobile() {
+        return ucMemberMobile;
+    }
+
+    public void setUcMemberMobile(String ucMemberMobile) {
+        this.ucMemberMobile = ucMemberMobile;
+    }
+
+    public String getUcMemberTelPhone() {
+        return ucMemberTelPhone;
+    }
+
+    public void setUcMemberTelPhone(String ucMemberTelPhone) {
+        this.ucMemberTelPhone = ucMemberTelPhone;
+    }
+
+    public String getIsOwnStaff() {
+        return isOwnStaff;
+    }
+
+    public void setIsOwnStaff(String isOwnStaff) {
+        this.isOwnStaff = isOwnStaff;
+    }
+
     public void setContractId(String contractId) {
         this.contractId = contractId;
     }
@@ -837,75 +893,79 @@ public class House implements Serializable {
         return this.enabledFlag;
     }
 
+    @Override
     public String toString() {
-        return
-                new ToStringBuilder(this)
-                        .append("id", this.id)
-                        .append("sfGuid", this.sfGuid)
-                        .append("sapId", this.sapId)
-                        .append("wbsCode", this.wbsCode)
-                        .append("houseCode", this.houseCode)
-                        .append("houseInnerName", this.houseInnerName)
-                        .append("isInvented", this.isInvented)
-                        .append("floor", this.floor)
-                        .append("houseState", this.houseState)
-                        .append("propertyType", this.propertyType)
-                        .append("actualAddress", this.actualAddress)
-                        .append("measuredArea", this.measuredArea)
-                        .append("predictedArea", this.predictedArea)
-                        .append("buildingArea", this.buildingArea)
-                        .append("feeArea", this.feeArea)
-                        .append("usedArea", this.usedArea)
-                        .append("publicBoothArea", this.publicBoothArea)
-                        .append("totalArrearage", this.totalArrearage)
-                        .append("startDate", this.startDate)
-                        .append("restoreOriginalDate", this.restoreOriginalDate)
-                        .append("remark", this.remark)
-                        .append("reason", this.reason)
-                        .append("unitId", this.unitId)
-                        .append("unitCode", this.unitCode)
-                        .append("buildingId", this.buildingId)
-                        .append("divideId", this.divideId)
-                        .append("areaName", this.areaName)
-                        .append("areaCode", this.areaCode)
-                        .append("areaId", this.areaId)
-                        .append("cityId", this.cityId)
-                        .append("cityName", this.cityName)
-                        .append("cityCode", this.cityCode)
-                        .append("projectId", this.projectId)
-                        .append("buildingName", this.buildingName)
-                        .append("divideCode", this.divideCode)
-                        .append("divideName", this.divideName)
-                        .append("projectCode", this.projectCode)
-                        .append("projectName", this.projectName)
-                        .append("contractId", this.contractId)
-                        .append("contractFlag", this.contractFlag)
-                        .append("debitEnabledFlag", this.debitEnabledFlag)
-                        .append("corpId", this.corpId)
-                        .append("batchId", this.batchId)
-                        .append("propertyFee", this.propertyFee)
-                        .append("otherFee", this.otherFee)
-                        .append("deliveryDate", this.deliveryDate)
-                        .append("realDeliveryDate", this.realDeliveryDate)
-                        .append("accessCardNumber", this.accessCardNumber)
-                        .append("purpose", this.purpose)
-                        .append("renovationType", this.renovationType)
-                        .append("sourceFrom", this.sourceFrom)
-                        .append("emergencyContact1", this.emergencyContact1)
-                        .append("emergencyContactPhone1", this.emergencyContactPhone1)
-                        .append("emergencyContact2", this.emergencyContact2)
-                        .append("emergencyContactPhone2", this.emergencyContactPhone2)
-                        .append("emergencyContact3", this.emergencyContact3)
-                        .append("emergencyContactPhone3", this.emergencyContactPhone3)
-                        .append("creationDate", this.creationDate)
-                        .append("createdBy", this.createdBy)
-                        .append("updationDate", this.updationDate)
-                        .append("houseUse", this.houseUse)
-                        .append("connectAddress", this.connectAddress)
-                        .append("updatedBy", this.updatedBy)
-                        .append("rowVersion", this.rowVersion)
-                        .append("isDeleted", this.isDeleted)
-                        .append("enabledFlag", this.enabledFlag)
-                        .toString();
+        return "House{" +
+                "id='" + id + '\'' +
+                ", sfGuid='" + sfGuid + '\'' +
+                ", sapId='" + sapId + '\'' +
+                ", wbsCode='" + wbsCode + '\'' +
+                ", houseCode='" + houseCode + '\'' +
+                ", houseInnerName='" + houseInnerName + '\'' +
+                ", isInvented=" + isInvented +
+                ", floor=" + floor +
+                ", houseState='" + houseState + '\'' +
+                ", propertyType='" + propertyType + '\'' +
+                ", actualAddress='" + actualAddress + '\'' +
+                ", measuredArea=" + measuredArea +
+                ", predictedArea=" + predictedArea +
+                ", buildingArea=" + buildingArea +
+                ", feeArea=" + feeArea +
+                ", usedArea=" + usedArea +
+                ", publicBoothArea=" + publicBoothArea +
+                ", totalArrearage=" + totalArrearage +
+                ", startDate=" + startDate +
+                ", restoreOriginalDate=" + restoreOriginalDate +
+                ", remark='" + remark + '\'' +
+                ", reason='" + reason + '\'' +
+                ", unitId='" + unitId + '\'' +
+                ", unitCode='" + unitCode + '\'' +
+                ", buildingId='" + buildingId + '\'' +
+                ", divideId='" + divideId + '\'' +
+                ", areaName='" + areaName + '\'' +
+                ", areaCode='" + areaCode + '\'' +
+                ", areaId='" + areaId + '\'' +
+                ", cityId='" + cityId + '\'' +
+                ", cityName='" + cityName + '\'' +
+                ", cityCode='" + cityCode + '\'' +
+                ", projectId='" + projectId + '\'' +
+                ", buildingName='" + buildingName + '\'' +
+                ", divideCode='" + divideCode + '\'' +
+                ", divideName='" + divideName + '\'' +
+                ", projectCode='" + projectCode + '\'' +
+                ", projectName='" + projectName + '\'' +
+                ", ucMemberId='" + ucMemberId + '\'' +
+                ", ucMemberName='" + ucMemberName + '\'' +
+                ", ucMemberMobile='" + ucMemberMobile + '\'' +
+                ", ucMemberTelPhone='" + ucMemberTelPhone + '\'' +
+                ", contractId='" + contractId + '\'' +
+                ", contractFlag=" + contractFlag +
+                ", debitEnabledFlag=" + debitEnabledFlag +
+                ", corpId='" + corpId + '\'' +
+                ", batchId='" + batchId + '\'' +
+                ", propertyFee=" + propertyFee +
+                ", otherFee=" + otherFee +
+                ", deliveryDate=" + deliveryDate +
+                ", realDeliveryDate=" + realDeliveryDate +
+                ", accessCardNumber='" + accessCardNumber + '\'' +
+                ", purpose='" + purpose + '\'' +
+                ", renovationType='" + renovationType + '\'' +
+                ", sourceFrom='" + sourceFrom + '\'' +
+                ", emergencyContact1='" + emergencyContact1 + '\'' +
+                ", emergencyContactPhone1='" + emergencyContactPhone1 + '\'' +
+                ", emergencyContact2='" + emergencyContact2 + '\'' +
+                ", emergencyContactPhone2='" + emergencyContactPhone2 + '\'' +
+                ", emergencyContact3='" + emergencyContact3 + '\'' +
+                ", emergencyContactPhone3='" + emergencyContactPhone3 + '\'' +
+                ", creationDate=" + creationDate +
+                ", createdBy='" + createdBy + '\'' +
+                ", updationDate=" + updationDate +
+                ", houseUse='" + houseUse + '\'' +
+                ", connectAddress='" + connectAddress + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", rowVersion=" + rowVersion +
+                ", isDeleted=" + isDeleted +
+                ", enabledFlag=" + enabledFlag +
+                '}';
     }
 }

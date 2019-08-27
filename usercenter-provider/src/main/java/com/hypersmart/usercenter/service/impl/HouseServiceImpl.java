@@ -3,24 +3,30 @@ package com.hypersmart.usercenter.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.feign.PortalFeignService;
+import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.ContextUtils;
+import com.hypersmart.base.util.UniqueIdUtil;
 import com.hypersmart.framework.service.GenericService;
 
 import com.hypersmart.framework.utils.DateUtils;
 import com.hypersmart.mdm.feign.PortalFeginClient;
+import com.hypersmart.uc.api.impl.util.ContextUtil;
+import com.hypersmart.usercenter.bo.UserHouseRefBO;
 import com.hypersmart.usercenter.constant.OwnerStageEnum;
 import com.hypersmart.usercenter.dto.ClientRelationDTO;
 import com.hypersmart.usercenter.dto.HouseExcelInfoDTO;
 import com.hypersmart.usercenter.mapper.HouseMapper;
 import com.hypersmart.usercenter.model.House;
+import com.hypersmart.usercenter.model.UserHouseRef;
 import com.hypersmart.usercenter.service.HouseService;
 import com.hypersmart.usercenter.util.ExportExcelUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -187,7 +193,85 @@ public class HouseServiceImpl extends GenericService<String, House> implements H
             PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
                     pageBean.showTotal());
         }
-        List<ClientRelationDTO> clientRelationDTOS = houseMapper.selectUcMemberRelatio(queryFilter.getParams());
+        List<ClientRelationDTO> clientRelationDTOS = houseMapper.selectUcMemberRelation(queryFilter.getParams());
         return new PageList<>(clientRelationDTOS);
+    }
+
+    @Override
+    public CommonResult<String> addUserHouseRef(UserHouseRefBO model) {
+        List<UserHouseRef> addData = getAddData(model);
+        if(CollectionUtils.isEmpty(addData)){
+            return new CommonResult<>(false,"没有数据");
+        }
+        int i = houseMapper.insertUserHouseRefList(addData);
+        if(i>0){
+            if("0".equals(model.getRelation())){
+                updateHouse(model.getHouseId());
+            }
+            return new CommonResult<>("成功");
+        }
+        return new CommonResult<>(false,"没有数据");
+    }
+    private List<UserHouseRef> getAddData(UserHouseRefBO model){
+        List<UserHouseRef> userHouseRefs=new ArrayList<>();
+        List<String> memberIds = model.getMemberIds();
+        String houseId = model.getHouseId();
+        String relation = model.getRelation();
+        String userId = ContextUtil.getCurrentUser().getUserId();
+        if(!CollectionUtils.isEmpty(memberIds)){
+            for (String memberId : memberIds) {
+                UserHouseRef userHouseRef=new UserHouseRef();
+                userHouseRefs.add(userHouseRef);
+                userHouseRef.setId(UniqueIdUtil.getSuid());
+                userHouseRef.setHouseId(houseId);
+                userHouseRef.setMemberId(memberId);
+                userHouseRef.setRelation(relation);
+                userHouseRef.setIsDele("0");
+                userHouseRef.setFrom("platform");
+                userHouseRef.setCreatedBy(userId);
+                userHouseRef.setCreateTime(new Date());
+                userHouseRef.setUpdatedBy(userId);
+                userHouseRef.setUpdateTime(new Date());
+                userHouseRef.setVersion(0);
+            }
+        }
+        return userHouseRefs;
+    }
+    private void updateHouse(String houseId){
+        //产权人 维护house表的冗余字段
+        Map<String, String> stringStringMap = houseMapper.selectMemberInfos(houseId);
+        House house = houseMapper.get(houseId);
+        if(house!=null){
+            house.setUcMemberId(stringStringMap.get("id"));
+            house.setUcMemberName(stringStringMap.get("name"));
+            house.setUcMemberMobile(stringStringMap.get("mobile"));
+            house.setUcMemberTelPhone(stringStringMap.get("telPhone"));
+            house.setIsOwnStaff(stringStringMap.get("isOwnStaff"));
+            houseMapper.updateByPrimaryKeySelective(house);
+        }
+    }
+    @Override
+    public CommonResult<String> updateUserHouseRef(String id) {
+        UserHouseRef userHouseRef = houseMapper.selectUserHouseRef(id);
+        if(userHouseRef!=null){
+            String userId = ContextUtil.getCurrentUser().getUserId();
+            Integer version = userHouseRef.getVersion();
+            if(version!=null){
+                userHouseRef.setVersion(version++);
+            }else{
+                userHouseRef.setVersion(0);
+            }
+            userHouseRef.setUpdateTime(new Date());
+            userHouseRef.setUpdatedBy(userId);
+            userHouseRef.setIsDele("1");
+            int i = houseMapper.updateUserHouseRef(userHouseRef);
+            if(i>0){
+                if("0".equals(userHouseRef.getRelation())){
+                    updateHouse(userHouseRef.getHouseId());
+                }
+                return new CommonResult<>("成功");
+            }
+        }
+        return new CommonResult<>(false,"没有对应关系");
     }
 }

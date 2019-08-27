@@ -1,9 +1,11 @@
 package com.hypersmart.usercenter.service;
 
 
+import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.framework.service.IGenericService;
+import com.hypersmart.usercenter.bo.UserHouseRefBO;
 import com.hypersmart.usercenter.dto.ClientRelationDTO;
 import com.hypersmart.usercenter.model.House;
 
@@ -26,5 +28,9 @@ public interface HouseService extends IGenericService<String, House> {
     void exportExcel(QueryFilter queryFilter, HttpServletResponse response) throws Exception;
 
     PageList<ClientRelationDTO> ucMemberRelationList(QueryFilter queryFilter);
+
+    CommonResult<String> addUserHouseRef(UserHouseRefBO model);
+
+    CommonResult<String> updateUserHouseRef(String id);
 }
 

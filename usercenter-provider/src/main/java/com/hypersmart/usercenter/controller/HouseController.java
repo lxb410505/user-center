@@ -5,6 +5,8 @@ import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.util.StringUtil;
+import com.hypersmart.framework.utils.StringUtils;
+import com.hypersmart.usercenter.bo.UserHouseRefBO;
 import com.hypersmart.usercenter.dto.ClientRelationDTO;
 import com.hypersmart.usercenter.model.House;
 import com.hypersmart.usercenter.service.HouseService;
@@ -12,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import com.hypersmart.framework.model.ResponseData;
 import io.swagger.annotations.ApiParam;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -106,5 +109,19 @@ public class HouseController extends BaseController {
     @PostMapping({"/ucMemberRelationList"})
     public PageList<ClientRelationDTO> ucMemberRelationList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
         return this.houseService.ucMemberRelationList(queryFilter);
+    }
+
+    @PostMapping({"/addUserHouseRef"})
+    public CommonResult<String> addUserHouseRef( @RequestBody UserHouseRefBO model) {
+        if(StringUtils.isEmpty(model.getHouseId()) || StringUtils.isEmpty(model.getRelation()) ||
+                CollectionUtils.isEmpty(model.getMemberIds())){
+
+            return new CommonResult<>(false,"入参有误，请检查!");
+        }
+        return this.houseService.addUserHouseRef(model);
+    }
+    @PostMapping({"/removeUserHouseRef"})
+    public CommonResult<String> removeUserHouseRef(@RequestBody String id) {
+        return this.houseService.updateUserHouseRef(id);
     }
 }
