@@ -93,7 +93,6 @@
                 ${whereSql}
             </if>
         </where>
-        group by hs.id
         <if test="orderSql">
             order by ${orderSql}
         </if>

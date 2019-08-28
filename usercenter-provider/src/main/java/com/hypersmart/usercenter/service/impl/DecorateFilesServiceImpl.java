@@ -51,7 +51,7 @@ public class DecorateFilesServiceImpl extends GenericService<String, DecorateFil
 
         List<JsonNode> listFile = null;
         try {
-            listFile = portalFeginClient.getByTypeKey("customer_files_type");
+            listFile = portalFeginClient.getByTypeKey("house_decorate_file_type");
         } catch (Exception e) {
             e.printStackTrace();
         }
