@@ -1,6 +1,7 @@
 package com.hypersmart.usercenter.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.Maps;
 import com.hypersmart.base.annotation.cache.Cache;
 import com.hypersmart.base.cache.ICache;
 import com.hypersmart.base.query.FieldRelation;
@@ -33,6 +34,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * 组织架构
@@ -358,6 +360,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         List<UcOrg> set = new ArrayList<>();
         List<String> ids = new ArrayList<>();
         for (UcOrg ucOrg : returnList) {
+            // 获取指定用户ID下的组织
             QueryFilter childQuery = QueryFilter.build();
             childQuery.addFilter("path", ucOrg.getPath(), QueryOP.RIGHT_LIKE, FieldRelation.AND);
             childQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
@@ -607,5 +610,52 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     @Override
     public List<UcOrg> getOrgByCondition(UcOrg ucOrg) {
         return ucOrgMapper.getOrgByCondition(ucOrg);
+    }
+
+    @Override
+    public List<UcOrg> queryOrgByDemensionCode(String userId, String demensionCode) {
+
+        //根据用户查询人与组织关系
+        Map<String,Object> map= Maps.newHashMap();
+        map.put("userId",userId);
+        map.put("demCode",demensionCode);
+        List<UcOrgUser> list = ucOrgUserService.getUserWithDemByCondition(map);
+
+        if (null == list || list.size() <= 0) {
+            return new ArrayList<>();
+        }
+        String orgIds = "";
+        for (int i = 0; i < list.size(); i++) {
+            if (i == 0) {
+                orgIds = list.get(i).getOrgId();
+            } else {
+                orgIds = orgIds + "," + list.get(i).getOrgId();
+            }
+        }
+        //根据组织id获取组织信息
+        QueryFilter orgQuery = QueryFilter.build();
+        orgQuery.addFilter("id", orgIds, QueryOP.IN, FieldRelation.AND);
+        orgQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+        List<UcOrg> returnList = this.query(orgQuery).getRows();
+
+
+        //根据组织获取子级
+        List<UcOrg> set = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
+        for (UcOrg ucOrg : returnList) {
+            // 获取指定用户ID下的组织
+            QueryFilter childQuery = QueryFilter.build();
+            childQuery.addFilter("path", ucOrg.getPath(), QueryOP.RIGHT_LIKE, FieldRelation.AND);
+            childQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+            List<UcOrg> orgs = this.query(childQuery).getRows();
+            for (UcOrg org : orgs) {
+                if (!ids.contains(org.getId())) {
+                    set.add(org);
+                    ids.add(org.getId());
+                }
+            }
+        }
+
+        return set;
     }
 }

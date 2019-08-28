@@ -200,4 +200,18 @@
         </where>
     </select>
 
+    <select id="getUserWithDemByCondition" resultType="com.hypersmart.usercenter.model.UcOrgUser">
+
+ SELECT u.ID_ id,u.ID_ userId, org.ID_ orgId, org.NAME_ orgName ,org.CODE_ orgCode
+ FROM UC_USER u
+ LEFT JOIN UC_ORG_USER orguser
+ ON u.ID_=orguser.USER_ID_
+ LEFT JOIN UC_ORG org
+ ON org.ID_=orguser.ORG_ID_
+
+ WHERE u.IS_DELE_!=1 AND orguser.IS_DELE_!=1 AND org.IS_DELE_!=1 and org.DEM_ID_=(select ID_ from uc_demension where CODE_=#{demCode})
+ and u.ID_=#{userId}
+
+    </select>
+
 </mapper>

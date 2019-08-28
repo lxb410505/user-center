@@ -62,7 +62,7 @@
         select ID_,NAME_,PARENT_ID_,PATH_,REF_ID_
         from
         <include refid="BaseTable"/>
-        where DEM_ID_ = #{demId}
+        where DEM_ID_ = #{demId} and IS_DELE_='0'
     </select>
 
     <select id="getAllDimOrgListByOrg" parameterType="com.hypersmart.usercenter.bo.UcOrgBO" resultMap="OrgExtMap">
