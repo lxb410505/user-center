@@ -241,14 +241,26 @@ public class HouseServiceImpl extends GenericService<String, House> implements H
         //产权人 维护house表的冗余字段
         Map<String, String> stringStringMap = houseMapper.selectMemberInfos(houseId);
         House house = houseMapper.get(houseId);
-        if(house!=null){
-            house.setUcMemberId(stringStringMap.get("id"));
-            house.setUcMemberName(stringStringMap.get("name"));
-            house.setUcMemberMobile(stringStringMap.get("mobile"));
-            house.setUcMemberTelPhone(stringStringMap.get("telPhone"));
-            house.setIsOwnStaff(stringStringMap.get("isOwnStaff"));
-            houseMapper.updateByPrimaryKeySelective(house);
+        if(stringStringMap==null){
+            if(house!=null){
+                house.setUcMemberId("");
+                house.setUcMemberName("");
+                house.setUcMemberMobile("");
+                house.setUcMemberTelPhone("");
+                house.setIsOwnStaff("");
+                houseMapper.updateByPrimaryKeySelective(house);
+            }
+        }else{
+            if(house!=null){
+                house.setUcMemberId(stringStringMap.get("id"));
+                house.setUcMemberName(stringStringMap.get("name"));
+                house.setUcMemberMobile(stringStringMap.get("mobile"));
+                house.setUcMemberTelPhone(stringStringMap.get("telPhone"));
+                house.setIsOwnStaff(stringStringMap.get("isOwnStaff"));
+                houseMapper.updateByPrimaryKeySelective(house);
+            }
         }
+
     }
     @Override
     public CommonResult<String> updateUserHouseRef(String id) {
