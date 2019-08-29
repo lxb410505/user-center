@@ -35,4 +35,6 @@ public interface HouseMapper extends GenericMapper<House> {
     List<Map<String,Object>> selectByClientId(@Param("memberId")String id);
 
     List<Map<String, Object>> selectHouseAndClient(Map<String, Object> params);
+
+    List<UserHouseRef> selectHouseIdByMemberId(@Param("memberId")String memberId);
 }
