@@ -111,4 +111,11 @@ public interface GridBasicInfoMapper extends GenericMapper<GridBasicInfo> {
     List<GridBasicInfoDTO> getByGridId(@Param("id") String id);
 
     List<Map<String,Object>> getListByOrgs(@Param("list") List<String> list);
+
+    /**
+     * 根据地块查询网格
+     * @param stagingId
+     * @return
+     */
+    List<GridBasicInfo> getGridByStagingId(@Param("stagingId") String stagingId);
 }
