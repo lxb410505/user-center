@@ -32,5 +32,8 @@ public interface HouseService extends IGenericService<String, House> {
     CommonResult<String> addUserHouseRef(UserHouseRefBO model);
 
     CommonResult<String> updateUserHouseRef(String id);
+
+
+    PageList<List<Map<String, Object>>> selectHouseAndClient(QueryFilter queryFilter);
 }
 
