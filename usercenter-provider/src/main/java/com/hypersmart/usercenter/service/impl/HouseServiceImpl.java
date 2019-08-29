@@ -288,7 +288,7 @@ public class HouseServiceImpl extends GenericService<String, House> implements H
     }
 
     @Override
-    public PageList<List<Map<String, Object>>> selectHouseAndClient(QueryFilter queryFilter) {
+    public PageList<Map<String, Object>> selectHouseAndClient(QueryFilter queryFilter) {
         //分页
         PageBean pageBean = queryFilter.getPageBean();
         if (BeanUtils.isEmpty(pageBean)) {
@@ -299,5 +299,10 @@ public class HouseServiceImpl extends GenericService<String, House> implements H
         }
         List<Map<String, Object>> list=houseMapper.selectHouseAndClient(queryFilter.getParams());
         return new PageList(list);
+    }
+
+    @Override
+    public void syncRedundancyInfo(String memberId) {
+
     }
 }
