@@ -230,7 +230,6 @@ and a.HOUSE_ID_ =#{houseId}
     <select id="selectHouseAndClient" resultType="java.util.Map">
         SELECT distinct
         hs.id houseId,
-        house_use houseUse,
         remark remarks,
         area_name areaName,
         city_name cityName,
