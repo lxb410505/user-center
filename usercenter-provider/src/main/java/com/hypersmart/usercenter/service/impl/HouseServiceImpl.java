@@ -303,6 +303,13 @@ public class HouseServiceImpl extends GenericService<String, House> implements H
 
     @Override
     public void syncRedundancyInfo(String memberId) {
-
+        List<UserHouseRef> userHouseRefs = houseMapper.selectHouseIdByMemberId(memberId);
+        if(!CollectionUtils.isEmpty(userHouseRefs)){
+            userHouseRefs.forEach(a->{
+                if(!StringUtils.isEmpty(a.getHouseId())){
+                    updateHouse(a.getHouseId());
+                }
+            });
+        }
     }
 }
