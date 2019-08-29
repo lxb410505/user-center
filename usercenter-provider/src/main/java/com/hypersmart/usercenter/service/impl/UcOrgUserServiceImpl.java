@@ -382,6 +382,11 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
         return collect;
 
     }
+
+    @Override
+    public List<UcOrgUser> getUserWithDemByCondition(Map<String, Object> map) {
+        return ucOrgUserMapper.getUserWithDemByCondition(map);
+    }
 }
 
 

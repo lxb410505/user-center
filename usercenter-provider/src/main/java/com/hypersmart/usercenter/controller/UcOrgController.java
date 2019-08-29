@@ -289,6 +289,14 @@ public class UcOrgController extends BaseController {
         String demensionCode=userIdDemensionCode.getDemensionCode();
         return ucOrgService.queryByDemensionCode(userId,demensionCode);
     }
+    //查询用户有权查看条线的列表接口
+    @PostMapping({"/queryOrgByDemensionCode"})
+    public List<UcOrg> queryOrgByDemensionCode(@RequestBody UserIdDemensionCode userIdDemensionCode) {
+        String userId=userIdDemensionCode.getUserId();
+        String demensionCode=userIdDemensionCode.getDemensionCode();
+        return ucOrgService.queryOrgByDemensionCode(userId,demensionCode);
+    }
+
 
     /**
      * 根据组织id集合获取组织信息

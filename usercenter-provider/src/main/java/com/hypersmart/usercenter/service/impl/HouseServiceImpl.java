@@ -154,7 +154,7 @@ public class HouseServiceImpl extends GenericService<String, House> implements H
         }
     }
     private ExportExcelUtils addSheet(List<HouseExcelInfoDTO> houseExcelInfoDTOS, String sheetName, ExportExcelUtils exportExcel, List<String> hearList){
-        exportExcel.addSheet(hearList , StringUtils.isEmpty(sheetName)?"未知区域":sheetName);
+        exportExcel.addSheet(hearList , StringUtils.isEmpty(sheetName)?"sheet1":sheetName);
         for (HouseExcelInfoDTO dto : houseExcelInfoDTOS) {
             Row row = exportExcel.addRow();
             exportExcel.addCell(row, 0, dto.getAreaName() == null ? "" :  dto.getAreaName());
@@ -285,5 +285,19 @@ public class HouseServiceImpl extends GenericService<String, House> implements H
             }
         }
         return new CommonResult<>(false,"没有对应关系");
+    }
+
+    @Override
+    public PageList<List<Map<String, Object>>> selectHouseAndClient(QueryFilter queryFilter) {
+        //分页
+        PageBean pageBean = queryFilter.getPageBean();
+        if (BeanUtils.isEmpty(pageBean)) {
+            PageHelper.startPage(1, Integer.MAX_VALUE, false);
+        } else {
+            PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
+                    pageBean.showTotal());
+        }
+        List<Map<String, Object>> list=houseMapper.selectHouseAndClient(queryFilter.getParams());
+        return new PageList(list);
     }
 }
