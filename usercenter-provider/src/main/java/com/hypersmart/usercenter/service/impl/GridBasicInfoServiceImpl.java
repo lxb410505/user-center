@@ -1071,4 +1071,9 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
 			gridBasicInfoService.delete(id);
 		}
 	}
+
+    @Override
+    public List<GridBasicInfo> getGridByStagingId(String stagingId) {
+        return this.gridBasicInfoMapper.getGridByStagingId(stagingId);
+    }
 }

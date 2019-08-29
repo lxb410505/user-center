@@ -747,4 +747,19 @@
             #{item}
         </foreach>
     </select>
+
+    <select id="getGridByStagingId" parameterType="java.lang.String" resultType="com.hypersmart.usercenter.model.GridBasicInfo">
+        SELECT
+        id AS id,
+        grid_code as gridCode,
+        grid_name AS gridName,
+        grid_type AS gridType,
+        grid_range AS gridRange,
+        grid_remark AS gridRemark,
+        is_deleted AS isDeleted,
+        staging_id AS stagingId
+        FROM
+        grid_basic_info g
+        WHERE g.is_deleted = 0 and g.staging_id = #{stagingId}
+    </select>
 </mapper>
