@@ -245,7 +245,8 @@ and a.HOUSE_ID_ =#{houseId}
         hs.uc_member_mobile phone,
         uhr.CREATE_TIME_ createTime,
         house_use houseUse,
-        RELATION_ relation
+        RELATION_ relation,
+        uhr.MEMBER_ID_ memberId
         FROM
         member.user_house_ref uhr
         LEFT JOIN uc.house hs ON hs.id=uhr.HOUSE_ID_
