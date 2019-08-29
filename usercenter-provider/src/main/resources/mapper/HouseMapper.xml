@@ -3,7 +3,7 @@
 
 <mapper namespace="com.hypersmart.usercenter.mapper.HouseMapper">
     <select id="list" resultType="java.util.Map" parameterType="java.util.Map">
-        SELECT
+        SELECT distinct
         hs.id id,
         hs.sf_guid suGuid,
         hs.sap_id sapId,
@@ -90,7 +90,7 @@
         LEFT JOIN uc.uc_org org ON gbi.staging_id = org.id_
         where
         hs.is_deleted=0
-        and hs.is_deleted=1
+        and hs.enabled_flag=1
             <if test="whereSql">
                and ${whereSql}
             </if>
@@ -228,7 +228,7 @@ and a.HOUSE_ID_ =#{houseId}
     </update>
 
     <select id="selectHouseAndClient" resultType="java.util.Map">
-        SELECT
+        SELECT distinct
         hs.id houseId,
         house_use houseUse,
         remark remarks,
