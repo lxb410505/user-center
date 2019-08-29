@@ -88,11 +88,13 @@
         LEFT JOIN uc.grid_range gr ON gr.resource_id = hs.id
         LEFT JOIN uc.grid_basic_info gbi ON gr.grid_id = gbi.id
         LEFT JOIN uc.uc_org org ON gbi.staging_id = org.id_
-        <where>
+        where
+        hs.is_deleted=0
+        and hs.is_deleted=1
             <if test="whereSql">
-                ${whereSql}
+               and ${whereSql}
             </if>
-        </where>
+
         <if test="orderSql">
             order by ${orderSql}
         </if>
@@ -224,5 +226,43 @@ and a.HOUSE_ID_ =#{houseId}
         UPDATED_BY_=#{updatedBy,jdbcType=CHAR}
         where id_=#{id}
     </update>
+
+    <select id="selectHouseAndClient" resultType="java.util.Map">
+        SELECT
+        hs.id houseId,
+        house_use houseUse,
+        remark remarks,
+        area_name areaName,
+        city_name cityName,
+        project_name projectName,
+        org.name_ massifName,
+        gbi.grid_name gridName,
+        building_name buildingName,
+        unit_code unitName,
+        house_inner_name houseInnerName,
+        building_area buildingArea,
+        public_booth_area publicBoothArea,
+        hs.uc_member_name ucMemberName,
+        hs.uc_member_mobile phone,
+        uhr.CREATE_TIME_ createTime,
+        house_use houseUse,
+        RELATION_ relation
+        FROM
+        member.user_house_ref uhr
+        LEFT JOIN uc.house hs ON hs.id=uhr.HOUSE_ID_
+        LEFT JOIN uc.grid_range gr ON gr.resource_id = hs.id
+        LEFT JOIN uc.grid_basic_info gbi ON gr.grid_id = gbi.id
+        LEFT JOIN uc.uc_org org ON gbi.staging_id = org.id_
+        where
+        gbi.is_deleted=0
+        and org.IS_DELE_='0'
+        and  hs.is_deleted=0
+        and hs.enabled_flag=1
+        and uhr.IS_DELE_='0'
+        <if test="whereSql">
+            and ${whereSql}
+        </if>
+
+    </select>
 
 </mapper>

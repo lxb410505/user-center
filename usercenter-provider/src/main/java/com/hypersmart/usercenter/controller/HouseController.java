@@ -124,4 +124,8 @@ public class HouseController extends BaseController {
     public CommonResult<String> removeUserHouseRef(@RequestBody String id) {
         return this.houseService.updateUserHouseRef(id);
     }
+    @PostMapping({"/selectHouseAndClient"})
+    public PageList<List<Map<String, Object>>> selectHouseAndClient(@RequestBody QueryFilter queryFilter) {
+        return this.houseService.selectHouseAndClient(queryFilter);
+    }
 }
