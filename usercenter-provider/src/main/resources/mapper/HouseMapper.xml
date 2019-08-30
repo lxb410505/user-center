@@ -144,12 +144,10 @@
         FROM
         uc.house hs
         LEFT JOIN uc.grid_range gr ON gr.resource_id = hs.id
-        LEFT JOIN uc.grid_basic_info gbi ON gr.grid_id = gbi.id
-        LEFT JOIN uc.uc_org org ON gbi.staging_id = org.id_
+        LEFT JOIN uc.grid_basic_info gbi ON gr.grid_id = gbi.id and gbi.is_deleted=0
+        LEFT JOIN uc.uc_org org ON gbi.staging_id = org.id_ and org.IS_DELE_='0'
         where
-        gbi.is_deleted=0
-        and org.IS_DELE_='0'
-        and  hs.is_deleted=0
+         hs.is_deleted=0
         and hs.enabled_flag=1
 	<if test="whereSql">
       and  ${whereSql}
@@ -251,12 +249,10 @@ and a.HOUSE_ID_ =#{houseId}
         member.user_house_ref uhr
         LEFT JOIN uc.house hs ON hs.id=uhr.HOUSE_ID_
         LEFT JOIN uc.grid_range gr ON gr.resource_id = hs.id
-        LEFT JOIN uc.grid_basic_info gbi ON gr.grid_id = gbi.id
-        LEFT JOIN uc.uc_org org ON gbi.staging_id = org.id_
+        LEFT JOIN uc.grid_basic_info gbi ON gr.grid_id = gbi.id and gbi.is_deleted=0
+        LEFT JOIN uc.uc_org org ON gbi.staging_id = org.id_ and org.IS_DELE_='0'
         where
-        gbi.is_deleted=0
-        and org.IS_DELE_='0'
-        and  hs.is_deleted=0
+        hs.is_deleted=0
         and hs.enabled_flag=1
         and uhr.IS_DELE_='0'
         <if test="whereSql">
