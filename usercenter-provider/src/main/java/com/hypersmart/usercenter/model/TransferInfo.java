@@ -47,6 +47,12 @@ private static final long serialVersionUID=1L;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
         private Date transactionDate;
 
+    @Column(name = "rev_date")
+    @ApiModelProperty("变更日期")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    private Date revDate;
+
         @Column(name = "house_id")
     @ApiModelProperty("房产ID")
         private String houseId;
@@ -146,19 +152,30 @@ private static final long serialVersionUID=1L;
         public Date getUpdateTime() {
             return this.updateTime;
         }
-    public String toString(){
-        return
-        new ToStringBuilder(this)
-                .append("id",this.id)
-                .append("newCustomerName",this.newCustomerName)
-                .append("oldCustomerName",this.oldCustomerName)
-                .append("transactionDate",this.transactionDate)
-                .append("houseId",this.houseId)
-                .append("isDelete",this.isDelete)
-                .append("createBy",this.createBy)
-                .append("createTime",this.createTime)
-                .append("updateBy",this.updateBy)
-                .append("updateTime",this.updateTime)
-            .toString();
+
+
+    public Date getRevDate() {
+        return revDate;
+    }
+
+    public void setRevDate(Date revDate) {
+        this.revDate = revDate;
+    }
+
+    @Override
+    public String toString() {
+        return "TransferInfo{" +
+                "id='" + id + '\'' +
+                ", newCustomerName='" + newCustomerName + '\'' +
+                ", oldCustomerName='" + oldCustomerName + '\'' +
+                ", transactionDate=" + transactionDate +
+                ", revDate=" + revDate +
+                ", houseId='" + houseId + '\'' +
+                ", isDelete=" + isDelete +
+                ", createBy='" + createBy + '\'' +
+                ", createTime=" + createTime +
+                ", updateBy='" + updateBy + '\'' +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }
