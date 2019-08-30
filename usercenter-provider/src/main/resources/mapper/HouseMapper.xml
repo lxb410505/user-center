@@ -264,5 +264,16 @@ and a.HOUSE_ID_ =#{houseId}
         </if>
 
     </select>
+    <select id="selectHouseIdByMemberId" resultType="com.hypersmart.usercenter.model.UserHouseRef">
+        select
+         ID_ as id,
+          HOUSE_ID_ as houseId,
+          RELATION_ as relation,
+        VERSION_ as version
+         from member.user_house_ref
+         where MEMBER_ID_=#{memberId}
+         and VERSION_='0'
+         and IS_DELE_='0'
+    </select>
 
 </mapper>

@@ -125,7 +125,11 @@ public class HouseController extends BaseController {
         return this.houseService.updateUserHouseRef(id);
     }
     @PostMapping({"/selectHouseAndClient"})
-    public PageList<List<Map<String, Object>>> selectHouseAndClient(@RequestBody QueryFilter queryFilter) {
+    public PageList<Map<String, Object>> selectHouseAndClient(@RequestBody QueryFilter queryFilter) {
         return this.houseService.selectHouseAndClient(queryFilter);
+    }
+    @PostMapping({"/syncRedundancyInfo"})
+    public void syncRedundancyInfo(@RequestBody String memberId) {
+        this.houseService.syncRedundancyInfo(memberId);
     }
 }
