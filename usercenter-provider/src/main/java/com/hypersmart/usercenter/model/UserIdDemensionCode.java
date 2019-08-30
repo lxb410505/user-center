@@ -2,14 +2,14 @@ package com.hypersmart.usercenter.model;
 
 public class UserIdDemensionCode {
     private String userId;
-    private String DemensionCode;
-
+//    private String DemensionCode;
+private String demensionCode;
     public UserIdDemensionCode() {
     }
 
     public UserIdDemensionCode(String userId, String demensionCode) {
         this.userId = userId;
-        DemensionCode = demensionCode;
+        this.demensionCode = demensionCode;
     }
 
     public String getUserId() {
@@ -21,10 +21,10 @@ public class UserIdDemensionCode {
     }
 
     public String getDemensionCode() {
-        return DemensionCode;
+        return demensionCode;
     }
 
     public void setDemensionCode(String demensionCode) {
-        DemensionCode = demensionCode;
+        this.demensionCode = demensionCode;
     }
 }

@@ -169,6 +169,12 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 					record.setCallErrorMessage(message);
 					commonResult.setMessage(message);
 					commonResult.setState(false);
+					if ((GridOperateEnum.NEW_GRID.getOperateType()).equals(record.getApprovalType())) {
+						GridBasicInfoDTO gridBasicInfoDTO=(GridBasicInfoDTO)approvalContent;
+						if(gridBasicInfoDTO!=null){
+							gridBasicInfoService.realDeleteGridList(gridBasicInfoDTO.getId(),gridBasicInfoDTO.getGridType());
+						}
+					}
 				} else {
 					String procinstid = "";
 					if (resultNode.get("procinstid") != null) {
@@ -186,6 +192,12 @@ public class GridApprovalRecordServiceImpl extends GenericService<String, GridAp
 				record.setCallErrorMessage("调用K2审批流程失败：未能收到K2任何反馈信息");
 				commonResult.setMessage("调用K2审批流程失败：未能收到K2任何反馈信息");
 				commonResult.setState(false);
+				if ((GridOperateEnum.NEW_GRID.getOperateType()).equals(record.getApprovalType())) {
+					GridBasicInfoDTO gridBasicInfoDTO=(GridBasicInfoDTO)approvalContent;
+					if(gridBasicInfoDTO!=null){
+						gridBasicInfoService.realDeleteGridList(gridBasicInfoDTO.getId(),gridBasicInfoDTO.getGridType());
+					}
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

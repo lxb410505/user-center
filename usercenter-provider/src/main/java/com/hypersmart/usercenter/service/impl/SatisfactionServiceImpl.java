@@ -7,6 +7,7 @@ import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.mdm.feign.UcOrgFeignService;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
+import com.hypersmart.usercenter.mapper.GridBasicInfoMapper;
 import com.hypersmart.usercenter.mapper.SatisfactionMapper;
 import com.hypersmart.usercenter.mapper.UcOrgMapper;
 import com.hypersmart.usercenter.model.GridBasicInfo;
@@ -31,6 +32,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
@@ -65,6 +67,8 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
     UcOrgService ucOrgService;
     @Autowired
     GridBasicInfoService gridBasicInfoService;
+    @Autowired
+    GridBasicInfoMapper gridBasicInfoMapper;
     //查询组织机构;
     @Autowired
     UcOrgFeignService ucOrgFeignService;
@@ -744,28 +748,30 @@ public class SatisfactionServiceImpl extends GenericService<String, Satisfaction
 
     public List<UcOrg> getOrgs() {
         List<UcOrg> list = new ArrayList<>();
-        QueryFilter query = QueryFilter.build();
-        query.addFilter("GRADE_", "ORG_QuYu", QueryOP.EQUAL);
-        query.addFilter("IS_DELE_", "0", QueryOP.EQUAL);
-        PageList<UcOrg> areas = ucOrgService.query(query);
-        list.addAll(areas.getRows());
-        QueryFilter query3 = QueryFilter.build();
-        query3.addFilter("GRADE_", "ORG_XiangMu", QueryOP.EQUAL);
-        query3.addFilter("IS_DELE_", "0", QueryOP.EQUAL);
-        PageList<UcOrg> projects = ucOrgService.query(query3);
-        list.addAll(projects.getRows());
+        UcOrg ucOrg1 = new UcOrg();
+        ucOrg1.setGrade("ORG_QuYu");
+        List<UcOrg> areas = ucOrgService.getOrgByCondition(ucOrg1);
+        list.addAll(areas);
 
-        QueryFilter query4 = QueryFilter.build();
-        query4.addFilter("GRADE_", "ORG_DiKuai", QueryOP.EQUAL);
-        query4.addFilter("IS_DELE_", "0", QueryOP.EQUAL);
-        PageList<UcOrg> divides = ucOrgService.query(query4);
-        list.addAll(divides.getRows());
+        UcOrg ucOrg2 = new UcOrg();
+        ucOrg2.setGrade("ORG_XiangMu");
+        List<UcOrg> projects = ucOrgService.getOrgByCondition(ucOrg2);
+        list.addAll(projects);
 
-        GridBasicInfo info = new GridBasicInfo();
-        info.setEnabledFlag(1);
-        info.setIsDeleted(0);
-        info.setGridType("building_grid");
-        List<GridBasicInfo> all = getGridBasicInfoService.selectAll(info);
+
+        UcOrg ucOrg3 = new UcOrg();
+        ucOrg3.setGrade("ORG_DiKuai");
+        List<UcOrg> divides = ucOrgService.getOrgByCondition(ucOrg3);
+        list.addAll(divides);
+
+
+        Example  example=new Example(GridBasicInfo.class);
+        example.createCriteria()
+                .andEqualTo("enabledFlag",1)
+                .andEqualTo("isDeleted",0)
+                .andEqualTo("gridType","building_grid")
+                .andNotLike("gridName","测试");
+        List<GridBasicInfo> all = gridBasicInfoMapper.selectByExample(example);
         UcOrg ucOrg;
         for (GridBasicInfo gridBasicInfo : all) {
             ucOrg = new UcOrg();

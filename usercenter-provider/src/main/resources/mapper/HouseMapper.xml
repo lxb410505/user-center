@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.HouseMapper">
+    <select id="list" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT distinct
+        hs.id id,
+        hs.sf_guid suGuid,
+        hs.sap_id sapId,
+        hs.wbs_code wbsCode,
+        hs.house_code houseCode,
+        hs.house_inner_name houseInnerName,
+        hs.is_invented isInvented,
+        hs.floor,
+        hs.house_state houseState,
+        property_type propertyType,
+        actual_address actualAddress,
+        measured_area measuredArea,
+        predicted_area predictedArea,
+        building_area buildingArea,
+        fee_area feeArea,
+        used_area usedArea,
+        public_booth_area publicBoothArea,
+        total_arrearage totalArrearage,
+        start_date startDate,
+        restore_original_date restoreOriginalDate,
+        remark,
+        reason,
+        unit_id unitId,
+        unit_code unitCode,
+        building_id buildingId,
+        divide_id divideId,
+        area_code areaCode,
+        hs.area_id areaId,
+        area_name areaName,
+        hs.city_id cityId,
+        city_name cityName,
+        city_code cityCode,
+        hs.project_id projectId,
+        building_name buildingName,
+        divide_code divideCode,
+        divide_name divideName,
+        project_code procectCode,
+        project_name projectName,
+        contract_id contractId,
+        contract_flag contractFlag,
+        debit_enabled_flag debitEnabledFlag,
+        corp_id corpId,
+        batch_id batchId,
+        property_fee propertyFee,
+        other_fee otherFee,
+        delivery_date deliveryDate,
+        real_delivery_date realDeliveryDate,
+        access_card_number accessCardNumber,
+        purpose,
+        renovation_type renovationType,
+        source_from sourceFrom,
+        emergency_contact_1 emergencyContact1,
+        emergency_contact_phone_1 emergencyContactPhone1,
+        emergency_contact_2 emergencyContact2,
+        emergency_contact_phone_2 emergencyContactPhone2,
+        emergency_contact_3 emergencyContact3,
+        emergency_contact_phone_3 emergencyContactPhone3,
+        hs.creation_date creationDate,
+        hs.created_by createdBy,
+        hs.updation_date updationDate,
+        house_use houseUse,
+        connect_address connectAddress,
+        hs.updated_by updatedBy,
+        hs.row_version rowVersion,
+        hs.is_deleted isDeleted,
+        hs.enabled_flag enabledFlag,
+        org.name_ massifName,
+        gbi.grid_name gridName,
+        case
+        when delivery_date <![CDATA[ <= ]]> CURDATE() and  delivery_date > date_add(CURDATE(), interval -6 month)
+        then 'ownerStage_storming1'
+        when delivery_date <![CDATA[ <= ]]> date_add(CURDATE(), interval -6 month) and  delivery_date > date_add(CURDATE(), interval -1 year)
+        then 'ownerStage_storming2'
+        when delivery_date <![CDATA[ <= ]]> date_add(CURDATE(), interval -1 year) and  delivery_date > date_add(CURDATE(), interval -2 year)
+        then 'ownerStage_stable'
+        when delivery_date <![CDATA[ <= ]]> date_add(CURDATE(), interval -2 year)
+        then 'ownerStage_oldProprietor'
+        else '其他'
+        end as ownerStage
+        FROM
+        uc.house hs
+        LEFT JOIN uc.grid_range gr ON gr.resource_id = hs.id
+        LEFT JOIN uc.grid_basic_info gbi ON gr.grid_id = gbi.id
+        LEFT JOIN uc.uc_org org ON gbi.staging_id = org.id_
+        where
+        hs.is_deleted=0
+        and hs.enabled_flag=1
+            <if test="whereSql">
+               and ${whereSql}
+            </if>
+
+        <if test="orderSql">
+            order by ${orderSql}
+        </if>
+    </select>
+
+
+
+    <select id="selectGridBuilding" resultType="java.util.Map" >
+        select
+        hs.building_id as buildingId,
+        hs.building_name as buildingName
+        from   uc.house  hs
+        left join uc.grid_range  gr on gr.resource_id = hs.id
+        left join uc.grid_basic_info gbi on gr.grid_id = gbi.id
+        where gbi.id = #{id}
+        group by  hs.building_id
+    </select>
+
+
+    <select id="selectBuildingUnit" resultType="java.util.Map" >
+        select
+        hs.unit_id as unitId,
+        hs.unit_code as unitName
+        from   uc.house  hs
+        where hs.building_id = #{id}
+        group by  hs.unit_id
+    </select>
+    <select id="selectHouseExcelInfo" resultType="com.hypersmart.usercenter.dto.HouseExcelInfoDTO">
+        SELECT
+        hs.id houseId,
+        hs.house_inner_name houseInnerName,
+        property_type houseType,
+        remark remarks,
+        area_name areaName,
+        city_name cityName,
+        project_name projectName,
+        delivery_date deliveryDate,
+        real_delivery_date realDeliveryDate,
+        renovation_type renovationType,
+        house_use houseUse,
+        org.name_ massifName,
+        gbi.grid_name gridName,
+        hs.uc_member_name ucMemberName,
+        hs.uc_member_mobile phone1,
+        hs.is_own_staff isOwnStaff,
+        hs.uc_member_telphone phone2
+        FROM
+        uc.house hs
+        LEFT JOIN uc.grid_range gr ON gr.resource_id = hs.id
+        LEFT JOIN uc.grid_basic_info gbi ON gr.grid_id = gbi.id
+        LEFT JOIN uc.uc_org org ON gbi.staging_id = org.id_
+        where
+        gbi.is_deleted=0
+        and org.IS_DELE_='0'
+        and  hs.is_deleted=0
+        and hs.enabled_flag=1
+	<if test="whereSql">
+      and  ${whereSql}
+    </if>
+    group by hs.id
+    <if test="orderSql">
+        order by ${orderSql}
+    </if>
+
+    </select>
+    <select id="selectUcMemberRelation" resultType="com.hypersmart.usercenter.dto.ClientRelationDTO">
+        select
+        uhf.id_ as id,
+        uhf.MEMBER_ID_ as clientId,
+        uhf.HOUSE_ID_ as houseId,
+        um.FULLNAME_ as clientName,
+        um.ID_CARD_ as idCard,
+        um.MOBILE_ as mobile,
+        um.SEX_ as sex,
+        um.GRADE_ as grade
+        from
+        member.user_house_ref uhf
+        JOIN member.uc_member um ON uhf.MEMBER_ID_ = um.ID_
+        where
+        uhf.IS_DELE_='0'
+        <if test="whereSql">
+            and  ${whereSql}
+        </if>
+    </select>
+
+    <insert id="insertUserHouseRefList" parameterType="java.util.List">
+        insert into member.user_house_ref (ID_, HOUSE_ID_,
+        MEMBER_ID_,RELATION_,FROM_,IS_DELE_,CREATE_TIME_,UPDATE_TIME_,VERSION_,CREATED_BY_,UPDATED_BY_) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id,jdbcType=VARCHAR},
+            #{item.houseId,jdbcType=VARCHAR},
+            #{item.memberId,jdbcType=VARCHAR},
+            #{item.relation,jdbcType=VARCHAR},
+            #{item.from,jdbcType=VARCHAR},
+            #{item.isDele,jdbcType=CHAR},
+            #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.updateTime,jdbcType=TIMESTAMP},
+            #{item.version,jdbcType=INTEGER},
+            #{item.createdBy,jdbcType=CHAR},
+            #{item.updatedBy,jdbcType=CHAR})
+        </foreach>
+    </insert>
+    <select id="selectMemberInfos" resultType="java.util.Map">
+        select
+GROUP_CONCAT(b.id_) as id,
+GROUP_CONCAT(b.FULLNAME_) as name,
+GROUP_CONCAT(b.MOBILE_) as mobile,
+GROUP_CONCAT(b.telPhone_) as telPhone,
+GROUP_CONCAT(IF( b.GRADE_ = 'internal_staff', '是', '否' )) as isOwnStaff
+from member.user_house_ref a join member.uc_member b  on a.member_id_=b.id_
+where
+a.RELATION_=0
+and a.IS_DELE_='0'
+and a.HOUSE_ID_ =#{houseId}
+    </select>
+    <select id="selectUserHouseRef" resultType="com.hypersmart.usercenter.model.UserHouseRef">
+        select
+         ID_ as id,
+          HOUSE_ID_ as houseId,
+          RELATION_ as relation,
+        VERSION_ as version
+         from member.user_house_ref where id_=#{id}
+    </select>
+    <update id="updateUserHouseRef" parameterType="com.hypersmart.usercenter.model.UserHouseRef">
+        update member.user_house_ref
+        set IS_DELE_=#{isDele,jdbcType=CHAR},
+        VERSION_=#{version,jdbcType=INTEGER},
+        UPDATE_TIME_=#{updateTime,jdbcType=TIMESTAMP},
+        UPDATED_BY_=#{updatedBy,jdbcType=CHAR}
+        where id_=#{id}
+    </update>
+
+    <select id="selectHouseAndClient" resultType="java.util.Map">
+        SELECT distinct
+        hs.id houseId,
+        remark remarks,
+        area_name areaName,
+        city_name cityName,
+        project_name projectName,
+        org.name_ massifName,
+        gbi.grid_name gridName,
+        building_name buildingName,
+        unit_code unitName,
+        house_inner_name houseInnerName,
+        building_area buildingArea,
+        public_booth_area publicBoothArea,
+        hs.uc_member_name ucMemberName,
+        hs.uc_member_mobile phone,
+        uhr.CREATE_TIME_ createTime,
+        house_use houseUse,
+        RELATION_ relation,
+        uhr.MEMBER_ID_ memberId
+        FROM
+        member.user_house_ref uhr
+        LEFT JOIN uc.house hs ON hs.id=uhr.HOUSE_ID_
+        LEFT JOIN uc.grid_range gr ON gr.resource_id = hs.id
+        LEFT JOIN uc.grid_basic_info gbi ON gr.grid_id = gbi.id
+        LEFT JOIN uc.uc_org org ON gbi.staging_id = org.id_
+        where
+        gbi.is_deleted=0
+        and org.IS_DELE_='0'
+        and  hs.is_deleted=0
+        and hs.enabled_flag=1
+        and uhr.IS_DELE_='0'
+        <if test="whereSql">
+            and ${whereSql}
+        </if>
+
+    </select>
+    <select id="selectHouseIdByMemberId" resultType="com.hypersmart.usercenter.model.UserHouseRef">
+        select
+         ID_ as id,
+          HOUSE_ID_ as houseId,
+          RELATION_ as relation,
+        VERSION_ as version
+         from member.user_house_ref
+         where MEMBER_ID_=#{memberId}
+         and VERSION_='0'
+         and IS_DELE_='0'
+    </select>
+
+</mapper>

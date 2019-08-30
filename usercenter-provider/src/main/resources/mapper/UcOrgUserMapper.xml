@@ -92,7 +92,7 @@
         from
         <include refid="BaseTable"/>
         where USER_ID_ = #{userId}
-        and  IS_DELE_ = 0
+        and IS_DELE_ = 0
     </select>
 
     <select id="getUserRegionOrg" resultMap="UcOrgUser">
@@ -100,19 +100,19 @@
         <include refid="BaseAttribute"/>
         from
         uc_org_user,uc_org
-        where USER_ID_ = #{userId} and  uc_org_user.
-        and  IS_DELE_ = 0
+        where USER_ID_ = #{userId} and uc_org_user.
+        and IS_DELE_ = 0
     </select>
 
     <!--<select id="getUserIdOrgByOrgIds" resultMap="java.lang.String">-->
-        <!--select-->
-        <!--ID_-->
-        <!--from-->
-        <!--<include refid="BaseTable"/>-->
-        <!--where IS_DELE_ = 0 AND ORG_ID_  in  #{userId}-->
-        <!--<foreach collection="list" index="index" item="item" open="(" separator="," close=")">-->
-                <!--#{item}-->
-        <!--</foreach>-->
+    <!--select-->
+    <!--ID_-->
+    <!--from-->
+    <!--<include refid="BaseTable"/>-->
+    <!--where IS_DELE_ = 0 AND ORG_ID_  in  #{userId}-->
+    <!--<foreach collection="list" index="index" item="item" open="(" separator="," close=")">-->
+    <!--#{item}-->
+    <!--</foreach>-->
     <!--</select>-->
 
     <select id="getPostIdByjobCode" resultType="java.lang.String">
@@ -159,7 +159,7 @@
     </select>
 
     <select id="getListByOrgIdUserId" resultType="com.hypersmart.usercenter.model.UcOrgUser">
-        select 	ID_ as id, ORG_ID_ as orgId, USER_ID_ as userId, IS_MASTER_ as isMaster, POS_ID_ as posId,
+        select ID_ as id, ORG_ID_ as orgId, USER_ID_ as userId, IS_MASTER_ as isMaster, POS_ID_ as posId,
         IS_CHARGE_ as isCharge, START_DATE_ as startDate, END_DATE_ as endDate,
         IS_REL_ACTIVE_ as isRelActive, UPDATE_TIME_ as updateTime, IS_DELE_, VERSION_ as version
         from uc_org_user
@@ -176,7 +176,7 @@
 
 
     <select id="findDivide" resultMap="DivideId">
-        select  a.* from uc_org a  where a.PARENT_ID_ in (
+        select a.* from uc_org a where a.PARENT_ID_ in (
         SELECT
         b.id_
         FROM
@@ -192,12 +192,32 @@
     </select>
 
     <select id="findHous" resultMap="hours">
-         select * from  <![CDATA[ `resource-center`.house_bak ]]>
+        select * from  <![CDATA[ `resource-center`.house_bak ]]>
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
             </if>
         </where>
+    </select>
+
+    <select id="getUserWithDemByCondition" resultType="com.hypersmart.usercenter.model.UcOrgUser">
+
+        <if test="userId!=null and userId='1'">
+            SELECT u.ID_ orgId, u.NAME_ orgName ,u.CODE_ orgCode
+            FROM UC_ORG u
+            where u.DEM_ID_=(select ID_ from uc_demension where CODE_=#{demCode})
+        </if>
+        <if test="userId!=null and userId!='1'">
+            SELECT u.ID_ id,u.ID_ userId, org.ID_ orgId, org.NAME_ orgName ,org.CODE_ orgCode
+            FROM UC_USER u
+            LEFT JOIN UC_ORG_USER orguser
+            ON u.ID_=orguser.USER_ID_
+            LEFT JOIN UC_ORG org
+            ON org.ID_=orguser.ORG_ID_
+            WHERE u.IS_DELE_!=1 AND orguser.IS_DELE_!=1 AND org.IS_DELE_!=1 and org.DEM_ID_=(select ID_ from
+            uc_demension where CODE_=#{demCode})
+            and u.ID_=#{userId}
+        </if>
     </select>
 
 </mapper>

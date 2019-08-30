@@ -62,7 +62,7 @@
         select ID_,NAME_,PARENT_ID_,PATH_,REF_ID_
         from
         <include refid="BaseTable"/>
-        where DEM_ID_ = #{demId}
+        where DEM_ID_ = #{demId} and IS_DELE_='0'
     </select>
 
     <select id="getAllDimOrgListByOrg" parameterType="com.hypersmart.usercenter.bo.UcOrgBO" resultMap="OrgExtMap">
@@ -208,5 +208,31 @@
         from
         <include refid="BaseTable"/>
         where IS_DELE_ = '0'
+    </select>
+
+
+    <select id="getOrgByCondition" resultType="com.hypersmart.usercenter.model.UcOrg">
+        select
+        ID_ as id,
+        NAME_ as name,
+        PARENT_ID_ as parentId,
+        ORDER_NO_ as orderNo,
+        CODE_ as code,
+        GRADE_ as grade,
+        DEM_ID_ as demId,
+        PATH_ as path,
+        PATH_NAME_ as pathName,
+        UPDATE_TIME_ as updateTime,
+        IS_DELE_ as isDele,
+        VERSION_ as version,
+        LEVEL_ as level,
+        REF_ID_ as refId
+        from uc_org
+        <where>
+            IS_DELE_ = '0' and  locate('测试',NAME_)=0
+            <if test="grade!=null and grade!=''">
+                AND GRADE_=#{grade}
+            </if>
+        </where>
     </select>
 </mapper>

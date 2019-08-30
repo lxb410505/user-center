@@ -182,5 +182,9 @@ public interface GridBasicInfoService extends IGenericService<String, GridBasicI
 	 * @return
 	 */
 	List<Map<String,Object>> getListByOrgs(String stagingId);
+
+	void realDeleteGridList(String id,String gridType);
+
+	List<GridBasicInfo> getGridByStagingId(String stagingId);
 }
 

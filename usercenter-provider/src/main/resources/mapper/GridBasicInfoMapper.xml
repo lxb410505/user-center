@@ -102,6 +102,7 @@
         grid_approval_record
         WHERE
          grid_id = gr.grid_id
+         and  call_status=1
         limit 1
         )
         ) r ON r.grid_id = a.grid_id
@@ -189,11 +190,16 @@
         FROM
         stage_servicegird_ref s LEFT JOIN grid_basic_info t
         ON t.staging_id = s.staging_id and t.grid_type='service_center_grid'
-        where
-        s.staging_id in
-        <foreach collection="massifId"  item="dkId"  open="(" separator="," close=")">
-            #{dkId}
-        </foreach>
+        where 1=1
+        <if test="!isIn">
+          and   t.staging_id =#{massifId}
+        </if>
+        <if test="isIn">
+         and   t.staging_id in
+            <foreach collection="massifId" item="dkId" open="(" separator=","  close=")" >
+                #{dkId}
+            </foreach>
+        </if>
         and s.is_deleted = 0
         and
         t.is_deleted = 0
@@ -222,11 +228,16 @@
         null AS serviceGridId,
         t.id AS gridId
         from grid_basic_info t
-        where
-        t.staging_id in
-        <foreach collection="massifId" item="dkId" open="(" separator=","  close=")" >
-            #{dkId}
-        </foreach>
+        where 1=1
+        <if test="!isIn">
+            and   t.staging_id =#{massifId}
+        </if>
+        <if test="isIn">
+            and  t.staging_id in
+            <foreach collection="massifId" item="dkId" open="(" separator=","  close=")" >
+                #{dkId}
+            </foreach>
+        </if>
         AND t.grid_type!='service_center_grid'
         AND t.is_deleted = 0
         ) as a
@@ -279,6 +290,7 @@
                 WHERE
                 grid_id = gr.grid_id
                 and approval_type='newGrid'
+                and  call_status=1
                 limit 1
             </when>
             <otherwise>
@@ -287,6 +299,7 @@
                 grid_approval_record
                 WHERE
                 grid_id = gr.grid_id
+                and  call_status=1
                 limit 1
             </otherwise>
         </choose>
@@ -733,5 +746,20 @@
         <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
             #{item}
         </foreach>
+    </select>
+
+    <select id="getGridByStagingId" parameterType="java.lang.String" resultType="com.hypersmart.usercenter.model.GridBasicInfo">
+        SELECT
+        id AS id,
+        grid_code as gridCode,
+        grid_name AS gridName,
+        grid_type AS gridType,
+        grid_range AS gridRange,
+        grid_remark AS gridRemark,
+        is_deleted AS isDeleted,
+        staging_id AS stagingId
+        FROM
+        grid_basic_info g
+        WHERE g.is_deleted = 0 and g.staging_id = #{stagingId}
     </select>
 </mapper>

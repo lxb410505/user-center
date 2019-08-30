@@ -41,4 +41,7 @@ public interface UcOrgUserMapper extends GenericMapper<UcOrgUser> {
 
     List<UcOrg> findDivide(Map<String,Object> param);
     List<House> findHous(Map<String,Object> param);
+
+
+    List<UcOrgUser> getUserWithDemByCondition(Map<String, Object> map);
 }

@@ -185,6 +185,9 @@ public class ImportExcelUtil {
                 row = sheet.getRow(j);
                 //遍历所有的列
                 List<Object> li = new ArrayList<Object>();
+                if(row==null){
+                  continue;
+                }
                 for (int y = 0; y < row.getLastCellNum(); y++) {
                     cell = row.getCell(y);
                     li.add(cell == null ? "" : this.getCellValue4Statis(cell));

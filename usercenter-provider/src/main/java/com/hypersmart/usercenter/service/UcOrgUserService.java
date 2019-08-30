@@ -48,5 +48,6 @@ public interface UcOrgUserService extends IGenericService<String, UcOrgUser> {
 
     List<String> findHous(QueryFilter queryFilter);
 
+    List<UcOrgUser> getUserWithDemByCondition(Map<String, Object> map);
 }
 

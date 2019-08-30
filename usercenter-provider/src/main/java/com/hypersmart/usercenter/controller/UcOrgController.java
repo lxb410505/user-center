@@ -289,6 +289,14 @@ public class UcOrgController extends BaseController {
         String demensionCode=userIdDemensionCode.getDemensionCode();
         return ucOrgService.queryByDemensionCode(userId,demensionCode);
     }
+    //查询用户有权查看条线的列表接口
+    @PostMapping({"/queryOrgByDemensionCode"})
+    public List<UcOrg> queryOrgByDemensionCode(@RequestBody UserIdDemensionCode userIdDemensionCode) {
+        String userId=userIdDemensionCode.getUserId();
+        String demensionCode=userIdDemensionCode.getDemensionCode();
+        return ucOrgService.queryOrgByDemensionCode(userId,demensionCode);
+    }
+
 
     /**
      * 根据组织id集合获取组织信息
@@ -461,5 +469,19 @@ public class UcOrgController extends BaseController {
     public List<UcOrg> getDefaultListByGrade(@ApiParam(name = "grade", value = "参数值", required = true) @RequestParam("grade") String grade
     ) {
         return  this.ucOrgService.getDefaultOrgListByGrade(grade);
+    }
+
+    @GetMapping({"/getLandMassList"})
+    @ApiOperation(value = "闸机对接-获取地块组织信息", httpMethod = "GET", notes = "闸机对接-获取地块组织信息")
+    public List<Map<String, String>> getDiKuaiList() {
+        List<Map<String, String>> retList = new LinkedList<>();
+        List<UcOrg> list = this.ucOrgService.getDefaultOrgListByGrade("ORG_DiKuai");
+        list.forEach(p -> {
+            Map<String, String> item = new HashMap<>();
+            item.put("id", p.getId());
+            item.put("name", p.getName());
+            retList.add(item);
+        });
+        return retList;
     }
 }
