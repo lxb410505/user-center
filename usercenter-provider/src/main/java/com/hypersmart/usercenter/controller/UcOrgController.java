@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.controller;
 
+import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.query.*;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
@@ -473,15 +474,24 @@ public class UcOrgController extends BaseController {
 
     @GetMapping({"/getLandMassList"})
     @ApiOperation(value = "闸机对接-获取地块组织信息", httpMethod = "GET", notes = "闸机对接-获取地块组织信息")
-    public List<Map<String, String>> getDiKuaiList() {
-        List<Map<String, String>> retList = new LinkedList<>();
-        List<UcOrg> list = this.ucOrgService.getDefaultOrgListByGrade("ORG_DiKuai");
-        list.forEach(p -> {
-            Map<String, String> item = new HashMap<>();
-            item.put("id", p.getId());
-            item.put("name", p.getName());
-            retList.add(item);
-        });
+    public List<Map<String, Object>> getDiKuaiList() throws Exception {
+        List<Map<String, Object>> retList = new LinkedList<>();
+        QueryFilter queryFilter = QueryFilter.build();
+        queryFilter.addFilter("isDele", 0, QueryOP.EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("demId", "1", QueryOP.EQUAL, FieldRelation.AND);
+        PageHelper.startPage(1, Integer.MAX_VALUE, false);
+        PageList<UcOrg> list = this.ucOrgService.query(queryFilter);
+        if (list != null && list.getRows() != null && list.getRows().size() > 0) {
+            list.getRows().forEach(p -> {
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", p.getId());
+                item.put("name", p.getName());
+                item.put("parentId", p.getParentId());
+                item.put("path", p.getPath());
+                item.put("level", p.getLevel());
+                retList.add(item);
+            });
+        }
         return retList;
     }
 

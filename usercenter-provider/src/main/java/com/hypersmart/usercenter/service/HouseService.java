@@ -34,6 +34,8 @@ public interface HouseService extends IGenericService<String, House> {
     CommonResult<String> updateUserHouseRef(String id);
 
 
-    PageList<List<Map<String, Object>>> selectHouseAndClient(QueryFilter queryFilter);
+    PageList<Map<String, Object>> selectHouseAndClient(QueryFilter queryFilter);
+
+    void syncRedundancyInfo(String memberId);
 }
 
