@@ -235,4 +235,24 @@
             </if>
         </where>
     </select>
+    <select id="getAllOrgsByUserId" resultType="com.hypersmart.usercenter.model.UcOrg">
+        SELECT
+        o.ID_ as id,
+        o.NAME_ AS name,
+        o.PARENT_ID_ AS parentId,
+        o.ORDER_NO_  AS orderNo,
+        o.CODE_ AS code,
+        o.GRADE_ AS grade,
+        o.PATH_ AS path,
+        o.PATH_NAME_ AS pathName,
+        o.DEM_ID_ AS demId,
+        o.UPDATE_TIME_ AS updateTime,
+        o.IS_DELE_ AS isDele,
+        o.VERSION_ AS version
+        from uc_org_user u
+        LEFT JOIN uc_org o on o.ID_ = u.ORG_ID_
+        where u.IS_DELE_ = 0  and o.IS_DELE_=0
+        and (o.GRADE_ = 'ORG_ZongBu' or o.GRADE_ = 'ORG_QuYu' or o.GRADE_ = 'ORG_ChengQu' or o.GRADE_ = 'ORG_XiangMu' or o.GRADE_ = 'ORG_DiKuai')
+        and u.USER_ID_ = #{userId}
+    </select>
 </mapper>

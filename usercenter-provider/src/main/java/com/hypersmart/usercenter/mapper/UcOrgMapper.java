@@ -48,4 +48,6 @@ public interface UcOrgMapper extends GenericMapper<UcOrg> {
 
     List<UcOrg> getAllOrgs();
     List<UcOrg> getOrgByCondition(UcOrg ucOrg);
+
+    List<UcOrg> getAllOrgsByUserId(@Param("userId") String userId);
 }

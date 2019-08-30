@@ -494,4 +494,15 @@ public class UcOrgController extends BaseController {
         }
         return retList;
     }
+
+    /**
+     * 根据userID查询他下面的所有org组织
+     * @param userId
+     * @return
+     */
+    @PostMapping({"/queryAllOrgsByUserId"})
+    @ApiOperation(value = "根据组织id集合获取组织信息}", httpMethod = "POST", notes = "根据组织id集合获取组织信息")
+    public List<UcOrg> queryAllOrgsByUserId( @RequestBody String userId) {
+        return this.ucOrgService.queryAllOrgsByUserId(userId);
+    }
 }

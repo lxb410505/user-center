@@ -525,6 +525,72 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
 
     }
 
+    /**
+     * 根据userID查询他下面的所有org组织
+     * @param userId
+     * @return
+     */
+    public List<UcOrg> queryAllOrgsByUserId(String userId){
+        List<UcOrg> returnOrgs = new ArrayList<>();
+        if(StringUtil.isEmpty(userId)){
+            return new ArrayList<>();
+        }
+        returnOrgs = this.ucOrgMapper.getAllOrgsByUserId(userId);
+        if(com.hypersmart.base.util.BeanUtils.isEmpty(returnOrgs)){
+            return new ArrayList<>();
+        }
+        List<UcOrg> ZBList = new ArrayList<>();
+        List<UcOrg> areaList = new ArrayList<>();
+        List<UcOrg> cityList = new ArrayList<>();
+        List<UcOrg> projectList = new ArrayList<>();
+        List<UcOrg> stagingList = new ArrayList<>();
+        for (int i= 0;i<returnOrgs.size();i++){
+            if(returnOrgs.get(i).getGrade().equals("ORG_ZongBu")){
+                ZBList.add(returnOrgs.get(i));
+            }else if(returnOrgs.get(i).getGrade().equals("ORG_QuYu")){
+                areaList.add(returnOrgs.get(i));
+            }else if(returnOrgs.get(i).getGrade().equals("ORG_ChengQu")){
+                cityList.add(returnOrgs.get(i));
+            }else if(returnOrgs.get(i).getGrade().equals("ORG_XiangMu")){
+                projectList.add(returnOrgs.get(i));
+            }else if(returnOrgs.get(i).getGrade().equals("ORG_DiKuai")){
+                stagingList.add(returnOrgs.get(i));
+            }
+        }
+        returnOrgs.clear();
+        if(ZBList!=null && ZBList.size()>0){
+            returnOrgs.addAll(ZBList);
+            returnOrgs.addAll(this.queryChildrenByOrgId(ZBList.get(0).getId(),"ORG_QuYU"));
+            returnOrgs.addAll(this.queryChildrenByOrgId(ZBList.get(0).getId(),"ORG_ChengQu"));
+            returnOrgs.addAll(this.queryChildrenByOrgId(ZBList.get(0).getId(),"ORG_XiangMu"));
+            returnOrgs.addAll(this.queryChildrenByOrgId(ZBList.get(0).getId(),"ORG_DiKuai"));
+        }else if (areaList!=null && areaList.size()>0){
+            returnOrgs.addAll(areaList);
+            for (int i=0;i<areaList.size();i++){
+                returnOrgs.addAll(this.queryChildrenByOrgId(areaList.get(i).getId(),"ORG_ChengQu"));
+                returnOrgs.addAll(this.queryChildrenByOrgId(areaList.get(i).getId(),"ORG_XiangMu"));
+                returnOrgs.addAll(this.queryChildrenByOrgId(areaList.get(i).getId(),"ORG_DiKuai"));
+            }
+        }else if (cityList!=null && cityList.size()>0){
+            returnOrgs.addAll(cityList);
+            for (int i=0;i<cityList.size();i++){
+                returnOrgs.addAll(this.queryChildrenByOrgId(cityList.get(i).getId(),"ORG_XiangMu"));
+                returnOrgs.addAll(this.queryChildrenByOrgId(cityList.get(i).getId(),"ORG_DiKuai"));
+            }
+        }else if (projectList!=null && projectList.size()>0){
+            returnOrgs.addAll(projectList);
+            for (int i=0;i<projectList.size();i++){
+                returnOrgs.addAll(this.queryChildrenByOrgId(projectList.get(i).getId(),"ORG_DiKuai"));
+            }
+        }else {
+            returnOrgs.addAll(stagingList);
+        }
+        for (int i=0;i<returnOrgs.size();i++){
+            if (returnOrgs.get(i).getGrade().equals("ORG_ZhongBu"));
+        }
+        return returnOrgs;
+    }
+
     public List<UcOrg> getDefaultOrgList() {
 
         QueryFilter queryFilter = QueryFilter.build();

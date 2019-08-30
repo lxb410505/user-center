@@ -57,5 +57,7 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
     List<UcOrg> getOrgByCondition(UcOrg ucOrg);
 
     List<UcOrg> queryOrgByDemensionCode(String userId,String demensionCode);
+
+    List<UcOrg> queryAllOrgsByUserId(String userId);
 }
 
