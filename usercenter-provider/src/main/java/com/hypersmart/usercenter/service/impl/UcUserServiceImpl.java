@@ -285,9 +285,9 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
         Integer errorCount = 0;//错误数量
         //总部，或者根据地区code获取区域,改！！
         if (stat != true) {
-            UcOrg orgZb = ucOrgMapper.getByOrgName("世茂天成物业集团","0").get(0);
+            UcOrg orgZb = ucOrgMapper.getByOrgName("弘阳物业集团","0").get(0);
             if(BeanUtils.isEmpty(orgZb)){
-                message.append("世茂天成物业集团组织为查询到");
+                message.append("弘阳物业集团组织未查询到");
             }
             for (int i = 1; i < listob.size(); i++) {
                 long beforeLength = message.length();//用于判断本条信息是否有误
