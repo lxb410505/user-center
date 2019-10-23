@@ -492,7 +492,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
                 resultSet.add(item);
             }
         }
-        //（排除行政-edit by lily 0515）
+        resultSet=resultSet.stream().sorted(Comparator.comparing(a -> null ==a.getOrderNo()?1000:a.getOrderNo())).collect(Collectors.toList());
         return resultSet;
     }
 
