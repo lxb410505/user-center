@@ -1,18 +1,21 @@
 package com.hypersmart.usercenter.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.hypersmart.base.query.PageBean;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.usercenter.dto.GroupIdentityDTO;
 import com.hypersmart.usercenter.dto.UserDetailRb;
 import com.hypersmart.usercenter.dto.UserDetailValue;
-import com.hypersmart.usercenter.model.GroupIdentity;
-import com.hypersmart.usercenter.model.UcUser;
+import com.hypersmart.usercenter.dto.rsunJbDTO;
+import com.hypersmart.usercenter.model.*;
 import com.hypersmart.framework.service.IGenericService;
 import com.hypersmart.usercenter.util.ResourceErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,5 +69,27 @@ public interface UcUserService extends IGenericService<String, UcUser> {
     List<String> getSkillCodebyCategory(String category);
 
     UcUser getUserByDivideId(String divideId, String gridType);
+
+    String getdikuai(String id);
+
+    RsunUserStarLevel getkuozhan(String account);
+
+    void insertt(UcUser ucUser);
+
+    ArrayList<RsunUserStarLevel> getlist(PageBean pagebean);
+
+    RsunUserStarLevel getxzjb(String userCode);
+
+    List<rsunJbHiReward> getmoney(String userCode);
+
+    List<JinBiJiLv> getUserCoinHisRecordByUserCode(String userCode);
+
+    List<UcUser> getaa();
+
+    Boolean insertadd(rsunJbDTO reward);
+
+    void updatemoney(rsunJbHiReward reward);
+
+    String getname(String ucUserId);
 }
 
