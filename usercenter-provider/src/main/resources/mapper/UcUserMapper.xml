@@ -373,7 +373,7 @@
     </select>
 
     <select id="getxzjb" resultType="com.hypersmart.usercenter.model.RsunUserStarLevel" parameterType="java.lang.String">
-        SELECT uc_user_id ucUserId , pj_star_id pjStarId , level_sy_time levelSyTime , total_coin totalCoin , xz_num xzNum FROM uc.rsun_user_star_level WHERE uc_user_id = #{userCode}
+        SELECT uc_user_id ucUserId , pj_star_id pjStarId , level_sy_time levelSyTime , total_coin totalCoin , xz_num xzNum FROM uc.rsun_user_star_level WHERE uc_user_id = #{UserCode}
     </select>
 
     <select id="getmoney" parameterType="java.util.HashMap" resultType="com.hypersmart.usercenter.model.rsunJbHiReward">
