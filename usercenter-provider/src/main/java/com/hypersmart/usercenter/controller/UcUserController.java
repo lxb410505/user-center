@@ -125,12 +125,21 @@ public class  UcUserController extends BaseController {
     @PostMapping({"/getUserCoinHisRecordByUserCode"})
     @ApiOperation(value = "金币记录}", httpMethod = "POST", notes = "金币记录")
     public PageList<JinBiJiLv> getUserCoinHisRecordByUserCode(@RequestBody Map<String,String> reqMap) {
-        String page=reqMap.get("page");
-        String pageSize=reqMap.get("pageSize");
+        String page="1";
+        if(reqMap.get("page")!=null){
+            page=reqMap.get("page");
+        }
+        String pageSize="20";
+        if(reqMap.get("pageSize")!=null){
+            pageSize=reqMap.get("pageSize");
+        }
         String UserCode=reqMap.get("UserCode");
         PageHelper.startPage(Integer.valueOf(page), Integer.valueOf(pageSize), true);
         List<JinBiJiLv> list = ucUserService.getUserCoinHisRecordByUserCode(UserCode);
         PageList<JinBiJiLv> jinBiJiLvPageList = new PageList<>();
+        jinBiJiLvPageList.setPageSize(Integer.valueOf(pageSize));
+        jinBiJiLvPageList.setPage(Integer.valueOf(page));
+        jinBiJiLvPageList.setTotal(list.size());
         jinBiJiLvPageList.setRows(list);
         return jinBiJiLvPageList;
     }
