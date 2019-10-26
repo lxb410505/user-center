@@ -28,7 +28,7 @@ import java.util.Set;
  * @date 2019-01-10 15:55:44
  */
 @Service
-public interface UcUserService extends IGenericService<String, UcUser> {
+public interface  UcUserService extends IGenericService<String, UcUser> {
 
     UcUser getUserByUnitId(String unitId, String unitType);
 

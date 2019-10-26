@@ -21,7 +21,7 @@ import java.util.Map;
  * @date 2019-01-10 15:55:44
  */
 @Mapper
-public interface UcUserMapper extends GenericMapper<UcUser> {
+public interface  UcUserMapper extends GenericMapper<UcUser> {
 
     List<Map<String, Object>> quertListFive(Map<String, Object> map);
 

@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * @date 2019-01-10 15:55:44
  */
 @Service("ucUserServiceImpl")
-public class UcUserServiceImpl extends GenericService<String, UcUser> implements UcUserService {
+public class  UcUserServiceImpl extends GenericService<String, UcUser> implements UcUserService {
 
     @Autowired
     private UcUserMapper ucUserMapper;
@@ -616,13 +616,13 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
         Set<GroupIdentity> groupIdentitySet = new HashSet<>();
         List<String> gList=new ArrayList<>();
         groupIdentities.forEach(groupIdentity-> {
-                    try {
-                        GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(), GroupIdentity.class);
-                        gList.add(groupIdentity1.getId());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+            try {
+                GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(), GroupIdentity.class);
+                gList.add(groupIdentity1.getId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         List<UcUserWork > statusList = ucUserWorkService.queryUserWorkStatusList(gList,"0");
         groupIdentities.forEach(groupIdentity->{
             try{
@@ -771,7 +771,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
 
     @Override
     public List<JinBiJiLv> getUserCoinHisRecordByUserCode(String userCode) {
-       return ucUserMapper.getUserCoinHisRecordByUserCode(userCode);
+        return ucUserMapper.getUserCoinHisRecordByUserCode(userCode);
     }
 
     @Override
@@ -782,7 +782,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
     @Override
     public Boolean insertadd(rsunJbDTO reward) {
         reward.setJbJlTime(new Date());
-       return ucUserMapper.insertadd(reward);
+        return ucUserMapper.insertadd(reward);
     }
 
     @Override
@@ -792,7 +792,7 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
 
     @Override
     public String getname(String ucUserId) {
-         return ucUserMapper.getname(ucUserId);
+        return ucUserMapper.getname(ucUserId);
     }
 
     public List<String> getSkillCodebyCategory(String category){

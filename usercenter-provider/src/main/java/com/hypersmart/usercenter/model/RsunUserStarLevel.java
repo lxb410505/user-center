@@ -10,26 +10,26 @@ import java.util.Date;
 
 /*@Table(name = "rsun_user_star_level")
 @ApiModel(value = "RsunUserStarLevel", description = "用户金币等级管理")*/
-public class RsunUserStarLevel {
+public class  RsunUserStarLevel {
 
     /*@Column(name = "uc_user_id")
     @ApiModelProperty("账号")*/
     private String ucUserId;
 
-   /* @Column(name = "pj_star_id")
-    @ApiModelProperty("等级")*/
+    /* @Column(name = "pj_star_id")
+     @ApiModelProperty("等级")*/
     private Integer pjStarId;
 
     /*@Column(name = "level_sy_time")
     @ApiModelProperty("等级授权时间")*/
     private Date levelSyTime;
 
-   /* @Column(name = "total_coin")
-    @ApiModelProperty("个人金币总额")*/
+    /* @Column(name = "total_coin")
+     @ApiModelProperty("个人金币总额")*/
     private Double totalCoin;
 
-   /* @Column(name = "xz_num")
-    @ApiModelProperty("个人勋章数")*/
+    /* @Column(name = "xz_num")
+     @ApiModelProperty("个人勋章数")*/
     private Double xzNum;
 
     private String name; //姓名

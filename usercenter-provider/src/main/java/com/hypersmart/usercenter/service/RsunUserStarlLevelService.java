@@ -6,6 +6,6 @@ import com.hypersmart.usercenter.model.Satisfaction;
 import org.springframework.stereotype.Service;
 
 @Service
-public interface RsunUserStarlLevelService extends IGenericService<String, RsunUserStarLevell> {
+public interface  RsunUserStarlLevelService extends IGenericService<String, RsunUserStarLevell> {
 
 }

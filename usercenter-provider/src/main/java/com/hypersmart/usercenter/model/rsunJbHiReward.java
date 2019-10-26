@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Table(name = "rsun_jb_hi_reward")
 @ApiModel(value = "rsunJbHiReward", description = "用户金币等级管理")
-public class rsunJbHiReward implements Serializable {
+public class  rsunJbHiReward implements Serializable {
     @Column(name = "uc_user_id")
     @ApiModelProperty("用户id")
     private String ucUserId;

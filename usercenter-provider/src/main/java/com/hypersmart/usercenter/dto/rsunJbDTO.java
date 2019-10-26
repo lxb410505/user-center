@@ -2,7 +2,7 @@ package com.hypersmart.usercenter.dto;
 
 import java.util.Date;
 
-public class rsunJbDTO {
+public class  rsunJbDTO {
     private String ucUserId;
 
     private String jbJlReason;;

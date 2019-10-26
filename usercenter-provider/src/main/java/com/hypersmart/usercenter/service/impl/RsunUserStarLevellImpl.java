@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("rsunUserStarLevellImpl")
-public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarLevell> implements RsunUserStarlLevelService {
+public class  RsunUserStarLevellImpl extends GenericService<String, RsunUserStarLevell> implements RsunUserStarlLevelService {
 
     public RsunUserStarLevellImpl(RsunUserStarLevellMapper rsunUserStarLevellMapper) {
         super(rsunUserStarLevellMapper);

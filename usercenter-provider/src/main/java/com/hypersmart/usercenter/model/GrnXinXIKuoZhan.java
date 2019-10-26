@@ -1,6 +1,6 @@
 package com.hypersmart.usercenter.model;
 
-public class GrnXinXIKuoZhan {
+public class  GrnXinXIKuoZhan {
 
     private Double userTotalCoin; //个人金币总额
 

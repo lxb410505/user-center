@@ -4,7 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
 
-public class JinBiJiLv {
+public class  JinBiJiLv {
 
     private Double workOrderCode; //工单id
 

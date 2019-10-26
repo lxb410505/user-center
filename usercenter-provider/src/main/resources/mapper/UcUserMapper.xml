@@ -204,10 +204,10 @@
             #{item.id}
         </foreach>
         <if test="fullname != null and fullname !=''" >
-        and u.FULLNAME_ like CONCAT('%',#{fullname},'%')
+            and u.FULLNAME_ like CONCAT('%',#{fullname},'%')
         </if>
         <if test="mobile != null and mobile !=''" >
-        and u.MOBILE_ like CONCAT('%',#{mobile},'%')
+            and u.MOBILE_ like CONCAT('%',#{mobile},'%')
         </if>
     </select>
 
@@ -300,20 +300,20 @@
         ID_,FULLNAME_,ACCOUNT_,PASSWORD_,EMAIL_,MOBILE_,CREATE_TIME_,ADDRESS_,PHOTO_,SEX_,FROM_,STATUS_,HAS_SYNC_TO_WX_,NOTIFY_TYPE_,USER_NUMBER_,ID_CARD_,PHONE_,
         BIRTHDAY_,ENTRY_DATE_,LEAVE_DATE_,EDUCATION_,UPDATE_TIME_,IS_DELE_,VERSION_
         from uc_user where ID_ in (
-            select DISTINCT USER_ID_ from uc_org_user where POS_ID_ in(
-            select a.ID_ from uc_org_post a left join uc_org_job b on a.JOB_ID_= b.ID_
-            LEFT JOIN uc_org c on a.ORG_ID_ = c.ID_
-            where c.IS_DELE_!=1 AND b.IS_DELE_!=1 AND a.IS_DELE_!=1
-            <if test="jobCodes!=null">
-                and b.CODE_ in
-                <foreach collection="jobCodes" index="index" item="item" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
+        select DISTINCT USER_ID_ from uc_org_user where POS_ID_ in(
+        select a.ID_ from uc_org_post a left join uc_org_job b on a.JOB_ID_= b.ID_
+        LEFT JOIN uc_org c on a.ORG_ID_ = c.ID_
+        where c.IS_DELE_!=1 AND b.IS_DELE_!=1 AND a.IS_DELE_!=1
+        <if test="jobCodes!=null">
+            and b.CODE_ in
+            <foreach collection="jobCodes" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
         ) AND IS_DELE_!=1) AND IS_DELE_!=1
-            <if test="whereSql!=null">
-                and ${whereSql}
-            </if>
+        <if test="whereSql!=null">
+            and ${whereSql}
+        </if>
         <if test="orderBySql!=null">
             ORDER BY ${orderBySql}
         </if>

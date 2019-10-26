@@ -31,6 +31,6 @@ public class RsunJbHiRewardController  extends BaseController {
     public PageList<rsunJbHiReward> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
         return this.rsunJbHiRewardService.query(queryFilter);
-    }
+     }
 
 }
