@@ -6,5 +6,5 @@ import com.hypersmart.usercenter.model.rsunJbHiReward;
 import org.springframework.stereotype.Service;
 
 @Service
-public interface RsunUserExceptionHiLogService extends IGenericService<String, RsunUserExceptionHiLog> {
+public interface  RsunUserExceptionHiLogService extends IGenericService<String, RsunUserExceptionHiLog> {
 }

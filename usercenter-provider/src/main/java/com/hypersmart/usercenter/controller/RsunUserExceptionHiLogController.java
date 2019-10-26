@@ -35,7 +35,7 @@ public class RsunUserExceptionHiLogController extends BaseController {
             return true;
         }catch (Exception e){
             return false;
-        }
+         }
 
     }
 }

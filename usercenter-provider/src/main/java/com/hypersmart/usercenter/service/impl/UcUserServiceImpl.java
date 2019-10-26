@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * @date 2019-01-10 15:55:44
  */
 @Service("ucUserServiceImpl")
-public class UcUserServiceImpl extends GenericService<String, UcUser> implements UcUserService {
+public class  UcUserServiceImpl extends GenericService<String, UcUser> implements UcUserService {
 
     @Autowired
     private UcUserMapper ucUserMapper;

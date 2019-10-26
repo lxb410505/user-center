@@ -6,5 +6,5 @@ import com.hypersmart.usercenter.model.UcUser;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface RsunUserStarLevellMapper extends GenericMapper<RsunUserStarLevell> {
+public interface  RsunUserStarLevellMapper extends GenericMapper<RsunUserStarLevell> {
 }

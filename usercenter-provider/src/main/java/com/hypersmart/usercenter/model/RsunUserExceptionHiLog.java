@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Table(name = "rsun_user_exception_hi_log")
 @ApiModel(value = "rsunUserExceptionHiLog", description = "用户异常信息记录")
-public class RsunUserExceptionHiLog implements Serializable {
+public class  RsunUserExceptionHiLog implements Serializable {
     @Column(name = "uc_user_id")
     @ApiModelProperty("用户id")
     private String ucUserId;

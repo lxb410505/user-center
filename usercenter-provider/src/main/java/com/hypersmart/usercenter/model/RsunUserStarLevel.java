@@ -10,7 +10,7 @@ import java.util.Date;
 
 /*@Table(name = "rsun_user_star_level")
 @ApiModel(value = "RsunUserStarLevel", description = "用户金币等级管理")*/
-public class RsunUserStarLevel {
+public class  RsunUserStarLevel {
 
     /*@Column(name = "uc_user_id")
     @ApiModelProperty("账号")*/

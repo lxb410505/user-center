@@ -49,7 +49,7 @@ import java.util.*;
 @RestController
 @RequestMapping(value = {"/api/usercenter/v1/ucUser"}, produces = {"application/json;charset=UTF-8"})
 @Api(tags = {"ucUserController"})
-public class UcUserController extends BaseController {
+public class  UcUserController extends BaseController {
     @Resource
     UcUserService ucUserService;
 

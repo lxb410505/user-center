@@ -6,5 +6,5 @@ import com.hypersmart.usercenter.model.rsunJbHiReward;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface RsunUserExceptionHiLogMapper extends GenericMapper<RsunUserExceptionHiLog> {
+public interface  RsunUserExceptionHiLogMapper extends GenericMapper<RsunUserExceptionHiLog> {
 }

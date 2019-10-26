@@ -23,7 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = {"/api/usercenter/v1/rsunUserStarLevel"}, produces = {"application/json;charset=UTF-8"})
 @Api(tags = {"rsunUserStarLevelController"})
-public class RsunUserStarLevelController extends BaseController {
+public class  RsunUserStarLevelController extends BaseController {
 
     @Resource
     UcUserService ucUserService;

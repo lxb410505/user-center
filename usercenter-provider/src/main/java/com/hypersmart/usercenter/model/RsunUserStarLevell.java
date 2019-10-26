@@ -11,7 +11,7 @@ import java.util.Date;
 
 @Table(name = "rsun_user_star_level")
 @ApiModel(value = "RsunUserStarLevel", description = "用户金币等级管理")
-public class RsunUserStarLevell implements Serializable {
+public class  RsunUserStarLevell implements Serializable {
     @Id
     @Column(name = "uc_user_id")
     @ApiModelProperty("账号")

@@ -9,7 +9,7 @@ import com.hypersmart.usercenter.service.RsunUserExceptionHiLogService;
 import org.springframework.stereotype.Service;
 
 @Service("rsunUserExceptionHiLogServiceImpl")
-public class RsunUserExceptionHiLogServiceImpl extends GenericService<String, RsunUserExceptionHiLog> implements RsunUserExceptionHiLogService {
+public class  RsunUserExceptionHiLogServiceImpl extends GenericService<String, RsunUserExceptionHiLog> implements RsunUserExceptionHiLogService {
     public RsunUserExceptionHiLogServiceImpl(RsunUserExceptionHiLogMapper genericMapper) {
         super(genericMapper);
     }

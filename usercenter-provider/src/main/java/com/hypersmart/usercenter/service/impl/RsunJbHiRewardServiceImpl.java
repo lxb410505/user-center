@@ -10,7 +10,7 @@ import com.hypersmart.usercenter.service.RsunUserStarlLevelService;
 import org.springframework.stereotype.Service;
 
 @Service("rsunJbHiRewardServiceImpl")
-public class RsunJbHiRewardServiceImpl extends GenericService<String, rsunJbHiReward> implements RsunJbHiRewardService {
+public class  RsunJbHiRewardServiceImpl extends GenericService<String, rsunJbHiReward> implements RsunJbHiRewardService {
     public RsunJbHiRewardServiceImpl(RsunJbHiRewardMapper genericMapper) {
         super(genericMapper);
     }
