@@ -8,6 +8,7 @@ import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.usercenter.model.RsunUserStarLevel;
 import com.hypersmart.usercenter.model.RsunUserStarLevell;
 import com.hypersmart.usercenter.model.TgeSignificantQuality;
+import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.usercenter.service.RsunUserStarlLevelService;
 import com.hypersmart.usercenter.service.UcUserService;
 import io.swagger.annotations.Api;
@@ -38,41 +39,62 @@ public class RsunUserStarLevelController extends BaseController {
     @PostMapping({"/moneylist"})
     @ApiOperation(value = "用户金币等级列表}", httpMethod = "POST", notes = "获取用户管理列表")
     public PageList<RsunUserStarLevel> moneylistt(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
-        PageList<RsunUserStarLevell> query = rsunUserStarlLevelService.query(queryFilter);
-        List<RsunUserStarLevell> rows = query.getRows();
+        //遍历用户表
+        PageList<UcUser> query = ucUserService.query(queryFilter);
+        List<UcUser> rows1 = query.getRows();
+        //创建List集合
+        List<RsunUserStarLevel> list = new ArrayList<>();
+        //遍历用户表
+        for(UcUser ucUser: rows1){
+            if(ucUser.getAccount()!=null){
+                //创建RsunUserStarLevel对象
+                RsunUserStarLevel rsunUserStarLevel = new RsunUserStarLevel();
+                //给rsunUserStarLevel存值
+                rsunUserStarLevel.setName(ucUser.getFullname());//姓名
+                //根据用户姓名去查询金币表中是否有数据,如果有数据就获取等级金币账号
+                RsunUserStarLevell rsunUserStarLevell = rsunUserStarlLevelService.get(ucUser.getAccount());
 
-        List<RsunUserStarLevel> list = new ArrayList<RsunUserStarLevel>();
-        for(RsunUserStarLevell rsunUserStarLevell : rows){
-            String getname = ucUserService.getname(rsunUserStarLevell.getUcUserId());
+                rsunUserStarLevel.setUcUserId(ucUser.getAccount());//账号
+                if(rsunUserStarLevell==null){
+                    rsunUserStarLevel.setPjStarId(0);//默认等级为0
+                    rsunUserStarLevel.setTotalCoin(0.0);//默认为0
+                    rsunUserStarLevel.setXzNum(0.0);//默认为0
+                }else {
+                    rsunUserStarLevel.setPjStarId(rsunUserStarLevell.getPjStarId());
+                    rsunUserStarLevel.setTotalCoin(rsunUserStarLevell.getTotalCoin());
+                    rsunUserStarLevel.setXzNum(rsunUserStarLevell.getXzNum());
+                }
 
-            RsunUserStarLevel rsunUserStarLevel = new RsunUserStarLevel();
-            rsunUserStarLevel.setName(getname);//姓名
-            rsunUserStarLevel.setUcUserId(rsunUserStarLevell.getUcUserId());//账号
-            rsunUserStarLevel.setPjStarId(rsunUserStarLevell.getPjStarId());//等级
-            rsunUserStarLevel.setLevelSyTime(rsunUserStarLevell.getLevelSyTime());//时间
-            rsunUserStarLevel.setTotalCoin(rsunUserStarLevell.getTotalCoin());//金币数
-            rsunUserStarLevel.setXzNum(rsunUserStarLevell.getXzNum());//勋章数
+                list.add(rsunUserStarLevel);
+            }
 
-            list.add(rsunUserStarLevel);
         }
+        PageList<RsunUserStarLevel> objectPageList = new PageList<>();
+        objectPageList.setTotal(query.getTotal());
+        objectPageList.setPage(query.getPage());
+        objectPageList.setPageSize(query.getPageSize());
+        objectPageList.setRows(list);
+        return objectPageList;
 
-        PageList<RsunUserStarLevel> rsunUserStarLevellPageList = new PageList<>();
-        rsunUserStarLevellPageList.setRows(list);
-        rsunUserStarLevellPageList.setTotal(query.getTotal());
-        rsunUserStarLevellPageList.setPageSize(query.getPageSize());
-        rsunUserStarLevellPageList.setPage(query.getPage());
-        return rsunUserStarLevellPageList;
-//        return query;
     }
 
 
     @PutMapping({"/update"})
     @ApiOperation(value = "修改员工等级", httpMethod = "PUT", notes = "修改员工等级")
     public CommonResult<String> put(@ApiParam(name = "tgeSignificantQuality", value = "重大事件质量业务对象", required = true) @RequestBody RsunUserStarLevell model) {
-        String msg = "更新重大事件质量成功";
-        model.setLevelSyTime(new Date());
-        this.rsunUserStarlLevelService.update(model);
-        return new CommonResult(msg);
+        String msg = "";
+        //判断用户金币表里有没有数据如果有数据就执行修改如果没有数据就添加
+        RsunUserStarLevell rsunUserStarLevell = rsunUserStarlLevelService.get(model.getUcUserId());
+        if(rsunUserStarLevell==null){
+            rsunUserStarLevell.setLevelSyTime(new Date());
+            rsunUserStarlLevelService.insert(model);
+            return new CommonResult(msg);
+        }else {
+            model.setLevelSyTime(new Date());
+            this.rsunUserStarlLevelService.update(model);
+            return new CommonResult(msg);
+        }
+
     }
 
 }
