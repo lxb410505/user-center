@@ -79,7 +79,7 @@ public class  UcUserController extends BaseController {
      */
     @PostMapping({"/getUserInfoByUserCode"})
     @ApiOperation(value = "个人信息扩展}", httpMethod = "POST", notes = "个人信息扩展")
-    public GrnXinXIKuoZhan gerenxinxikuozhan(@ApiParam(name = "UserCode", value = "查询对象") @RequestBody String UserCode) {
+    public GrnXinXIKuoZhan gerenxinxikuozhan(@ApiParam(name = "UserCode", value = "查询对象") @RequestParam("UserCode") String UserCode) {
         RsunUserStarLevel rsunUserStarLevel = ucUserService.getxzjb(UserCode);
         //获取当月金币
         List<rsunJbHiReward> list = ucUserService.getmoney(UserCode);
