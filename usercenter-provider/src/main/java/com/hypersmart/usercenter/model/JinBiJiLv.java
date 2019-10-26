@@ -10,7 +10,7 @@ public class  JinBiJiLv {
 
     private Double coinNum; //金币数量
 
-    private Double coinObtainReason; //金币获取原因
+    private String coinObtainReason; //金币获取原因
 
     private String  coinObtainTime; //金币获取时间
 
@@ -30,11 +30,11 @@ public class  JinBiJiLv {
         this.coinNum = coinNum;
     }
 
-    public Double getCoinObtainReason() {
+    public String getCoinObtainReason() {
         return coinObtainReason;
     }
 
-    public void setCoinObtainReason(Double coinObtainReason) {
+    public void setCoinObtainReason(String coinObtainReason) {
         this.coinObtainReason = coinObtainReason;
     }
 

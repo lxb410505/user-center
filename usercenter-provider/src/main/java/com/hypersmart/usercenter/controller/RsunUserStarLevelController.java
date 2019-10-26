@@ -48,8 +48,11 @@ public class  RsunUserStarLevelController extends BaseController {
                 String value = (String) querys.get(i).getValue();
                 String getname = ucUserService.getname(value);
                 RsunUserStarLevel rsunUserStarLevel = new RsunUserStarLevel();
-                rsunUserStarLevel.setName(getname);//姓名
+                rsunUserStarLevel.setName(value);//姓名
+
+                //通过姓名去查询账号
                 rsunUserStarLevel.setUcUserId(value);//账号
+
                 RsunUserStarLevell rsunUserStarLevell = rsunUserStarlLevelService.get(value);
                 if(rsunUserStarLevell==null){
                     rsunUserStarLevel.setPjStarId(0);
