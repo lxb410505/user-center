@@ -4,6 +4,7 @@ import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageBean;
 import com.hypersmart.base.query.PageList;
+import com.hypersmart.base.query.QueryField;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.usercenter.model.RsunUserStarLevel;
 import com.hypersmart.usercenter.model.RsunUserStarLevell;
@@ -39,6 +40,35 @@ public class  RsunUserStarLevelController extends BaseController {
     @PostMapping({"/moneylist"})
     @ApiOperation(value = "用户金币等级列表}", httpMethod = "POST", notes = "获取用户管理列表")
     public PageList<RsunUserStarLevel> moneylistt(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+
+        if(queryFilter.getQuerys().size()>0){
+            List<RsunUserStarLevel> list = new ArrayList<>();
+            List<QueryField> querys = queryFilter.getQuerys();
+            for(int i = 0 ; i<querys.size() ; i++){
+                String value = (String) querys.get(i).getValue();
+                String getname = ucUserService.getname(value);
+                RsunUserStarLevel rsunUserStarLevel = new RsunUserStarLevel();
+                rsunUserStarLevel.setName(getname);//姓名
+                rsunUserStarLevel.setUcUserId(value);//账号
+                RsunUserStarLevell rsunUserStarLevell = rsunUserStarlLevelService.get(value);
+                if(rsunUserStarLevell==null){
+                    rsunUserStarLevel.setPjStarId(0);
+                    rsunUserStarLevel.setTotalCoin(0.0);
+                    rsunUserStarLevel.setXzNum(0.0);
+                }else {
+                    rsunUserStarLevel.setPjStarId(rsunUserStarLevell.getPjStarId());
+                    rsunUserStarLevel.setTotalCoin(rsunUserStarLevell.getTotalCoin());
+                    rsunUserStarLevel.setXzNum(rsunUserStarLevell.getXzNum());
+                }
+                list.add(rsunUserStarLevel);
+            }
+            PageList<RsunUserStarLevel> pageList = new PageList<>();
+            pageList.setTotal(queryFilter.getQuerys().size());
+            pageList.setPage(1);
+            pageList.setPageSize(20);
+            pageList.setRows(list);
+            return pageList;
+        }
 
         //遍历用户表
         PageList<UcUser> query = ucUserService.query(queryFilter);
