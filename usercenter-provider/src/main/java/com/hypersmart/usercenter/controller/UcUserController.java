@@ -81,36 +81,60 @@ public class  UcUserController extends BaseController {
     @ApiOperation(value = "个人信息扩展}", httpMethod = "POST", notes = "个人信息扩展")
     public GrnXinXIKuoZhan gerenxinxikuozhan(@ApiParam(name = "UserCode", value = "查询对象") @RequestParam("UserCode") String UserCode) {
         RsunUserStarLevel rsunUserStarLevel = ucUserService.getxzjb(UserCode);
-        //获取当月金币
-        List<rsunJbHiReward> list = ucUserService.getmoney(UserCode);
+        if(rsunUserStarLevel!=null){
+            //获取当月金币
+            List<rsunJbHiReward> list = ucUserService.getmoney(UserCode);
 
-        Double money = 0.0;
-        for (rsunJbHiReward r : list) {
-            money += r.getGcoinVal();
+            Double money = 0.0;
+            for (rsunJbHiReward r : list) {
+                if(r.getGcoinVal()!=null){
+                    money += r.getGcoinVal();
+                }
+            }
+            GrnXinXIKuoZhan grnXinXIKuoZhan = new GrnXinXIKuoZhan();
+            if(rsunUserStarLevel.getTotalCoin()==null){
+                grnXinXIKuoZhan.setUserTotalCoin(0.0);
+            }else {
+                grnXinXIKuoZhan.setUserTotalCoin(rsunUserStarLevel.getTotalCoin());//个人金币总额
+            }
+            if(rsunUserStarLevel.getXzNum()==null){
+                grnXinXIKuoZhan.setUserMedalLeve(0.0);
+            }else {
+                grnXinXIKuoZhan.setUserMedalLeve(rsunUserStarLevel.getXzNum());//用户勋章数
+            }
+            if((rsunUserStarLevel.getPjStarId())==null){
+                grnXinXIKuoZhan.setUserStarLeve(0.0);
+            }else {
+                grnXinXIKuoZhan.setUserStarLeve((rsunUserStarLevel.getPjStarId()) * 1.0);//用户星级
+            }
+            grnXinXIKuoZhan.setCurMonthCoin(money);//本月金币
+            return grnXinXIKuoZhan;
+        }else {
+            GrnXinXIKuoZhan rsunUserStarLevel1 = new GrnXinXIKuoZhan();
+            return rsunUserStarLevel1;
         }
-        GrnXinXIKuoZhan grnXinXIKuoZhan = new GrnXinXIKuoZhan();
-        grnXinXIKuoZhan.setUserTotalCoin(rsunUserStarLevel.getTotalCoin());//个人金币总额
-        grnXinXIKuoZhan.setUserMedalLeve(rsunUserStarLevel.getXzNum());//用户勋章数
-        grnXinXIKuoZhan.setUserStarLeve((rsunUserStarLevel.getPjStarId()) * 1.0);//用户星级
-        grnXinXIKuoZhan.setCurMonthCoin(money);//本月金币
-        return grnXinXIKuoZhan;
+
     }
 
     /**
      * 金币记录
      *
-     * @param UserCode
+     * @param reqMap
      * @return
      */
     @PostMapping({"/getUserCoinHisRecordByUserCode"})
     @ApiOperation(value = "金币记录}", httpMethod = "POST", notes = "金币记录")
-    public PageList<JinBiJiLv> getUserCoinHisRecordByUserCode(String UserCode, String page, String pageSize) {
+    public PageList<JinBiJiLv> getUserCoinHisRecordByUserCode(@RequestBody Map<String,String> reqMap) {
+        String page=reqMap.get("page");
+        String pageSize=reqMap.get("pageSize");
+        String UserCode=reqMap.get("UserCode");
         PageHelper.startPage(Integer.valueOf(page), Integer.valueOf(pageSize), true);
         List<JinBiJiLv> list = ucUserService.getUserCoinHisRecordByUserCode(UserCode);
         PageList<JinBiJiLv> jinBiJiLvPageList = new PageList<>();
         jinBiJiLvPageList.setRows(list);
         return jinBiJiLvPageList;
     }
+
 
     /**
      * 记录

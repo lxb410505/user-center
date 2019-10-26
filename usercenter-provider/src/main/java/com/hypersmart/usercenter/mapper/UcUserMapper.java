@@ -72,7 +72,7 @@ public interface  UcUserMapper extends GenericMapper<UcUser> {
 
     ArrayList<RsunUserStarLevel> getlist(@Param("pagebean") PageBean pagebean);
 
-    RsunUserStarLevel getxzjb( @Param("userCode") String userCode);
+    RsunUserStarLevel getxzjb( @Param("UserCode") String UserCode);
 
     List<rsunJbHiReward> getmoney( HashMap<String, String> map);
 
