@@ -89,8 +89,7 @@ public class  RsunUserStarLevelController extends BaseController {
         //判断用户金币表里有没有数据如果有数据就执行修改如果没有数据就添加
         RsunUserStarLevell rsunUserStarLevell = rsunUserStarlLevelService.get(model.getUcUserId());
         if(rsunUserStarLevell==null){
-            rsunUserStarLevell=new RsunUserStarLevell();
-            rsunUserStarLevell.setLevelSyTime(new Date());
+            model.setLevelSyTime(new Date());
             rsunUserStarlLevelService.insert(model);
             return new CommonResult(msg);
         }else {
