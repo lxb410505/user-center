@@ -21,6 +21,7 @@ import com.hypersmart.usercenter.dto.*;
 import com.hypersmart.usercenter.mapper.UcUserSkillMapper;
 import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.RsunJbHiRewardService;
+import com.hypersmart.usercenter.service.RsunUserStarlLevelService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.util.ImportExcelUtil;
 import com.hypersmart.usercenter.util.ResourceErrorCode;
@@ -64,6 +65,10 @@ public class  UcUserController extends BaseController {
 
     @Resource
     RsunJbHiRewardService rsunJbHiRewardService;
+
+    @Resource
+    RsunUserStarlLevelService rsunUserStarlLevelService;
+
 
     @PostMapping({"/list"})
     @ApiOperation(value = "用户管理数据列表}", httpMethod = "POST", notes = "获取用户管理列表")
@@ -110,8 +115,21 @@ public class  UcUserController extends BaseController {
             grnXinXIKuoZhan.setCurMonthCoin(money);//本月金币
             return grnXinXIKuoZhan;
         }else {
-            GrnXinXIKuoZhan rsunUserStarLevel1 = new GrnXinXIKuoZhan();
-            return rsunUserStarLevel1;
+            RsunUserStarLevell rsunUserStarLevell = new RsunUserStarLevell();
+            rsunUserStarLevell.setUcUserId(UserCode);
+            rsunUserStarLevell.setPjStarId(0);
+            rsunUserStarLevell.setTotalCoin(0.0);
+            rsunUserStarLevell.setXzNum(0.0);
+            rsunUserStarLevell.setLevelSyTime(new Date());
+            rsunUserStarlLevelService.insert(rsunUserStarLevell);
+
+            //根据账号查询用户表
+            GrnXinXIKuoZhan grnXinXIKuoZhan = new GrnXinXIKuoZhan();
+            grnXinXIKuoZhan.setUserTotalCoin(0.0);
+            grnXinXIKuoZhan.setCurMonthCoin(0.0);
+            grnXinXIKuoZhan.setUserStarLeve(1.0);
+            grnXinXIKuoZhan.setUserMedalLeve(0.0);
+            return grnXinXIKuoZhan;
         }
 
     }
