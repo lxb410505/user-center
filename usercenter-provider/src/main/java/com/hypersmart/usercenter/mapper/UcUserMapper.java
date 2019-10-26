@@ -1,11 +1,15 @@
 package com.hypersmart.usercenter.mapper;
 
-import com.hypersmart.usercenter.model.UcOrg;
-import com.hypersmart.usercenter.model.UcUser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.hypersmart.base.query.PageBean;
+import com.hypersmart.usercenter.dto.rsunJbDTO;
+import com.hypersmart.usercenter.model.*;
 import com.hypersmart.framework.mapper.GenericMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,4 +64,25 @@ public interface UcUserMapper extends GenericMapper<UcUser> {
 
     List<String> getSkillCodebyCategory(@Param("category")String category);
 
+    String getdikuai(@Param("id") String id);
+
+    RsunUserStarLevel getkuozhan(@Param("account") String account);
+
+    void insertt(@Param("ucUser") UcUser ucUser);
+
+    ArrayList<RsunUserStarLevel> getlist(@Param("pagebean") PageBean pagebean);
+
+    RsunUserStarLevel getxzjb( @Param("userCode") String userCode);
+
+    List<rsunJbHiReward> getmoney( HashMap<String, String> map);
+
+    List<JinBiJiLv> getUserCoinHisRecordByUserCode(@Param("userCode") String userCode);
+
+    List<UcUser> getaa();
+
+    Boolean insertadd(rsunJbDTO reward);
+
+    void updatemoney(@Param("reward") rsunJbHiReward reward);
+
+    String getname(@Param("reward") String ucUserId);
 }

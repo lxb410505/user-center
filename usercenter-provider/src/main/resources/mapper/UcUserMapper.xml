@@ -204,10 +204,10 @@
             #{item.id}
         </foreach>
         <if test="fullname != null and fullname !=''" >
-        and u.FULLNAME_ like CONCAT('%',#{fullname},'%')
+            and u.FULLNAME_ like CONCAT('%',#{fullname},'%')
         </if>
         <if test="mobile != null and mobile !=''" >
-        and u.MOBILE_ like CONCAT('%',#{mobile},'%')
+            and u.MOBILE_ like CONCAT('%',#{mobile},'%')
         </if>
     </select>
 
@@ -300,20 +300,20 @@
         ID_,FULLNAME_,ACCOUNT_,PASSWORD_,EMAIL_,MOBILE_,CREATE_TIME_,ADDRESS_,PHOTO_,SEX_,FROM_,STATUS_,HAS_SYNC_TO_WX_,NOTIFY_TYPE_,USER_NUMBER_,ID_CARD_,PHONE_,
         BIRTHDAY_,ENTRY_DATE_,LEAVE_DATE_,EDUCATION_,UPDATE_TIME_,IS_DELE_,VERSION_
         from uc_user where ID_ in (
-            select DISTINCT USER_ID_ from uc_org_user where POS_ID_ in(
-            select a.ID_ from uc_org_post a left join uc_org_job b on a.JOB_ID_= b.ID_
-            LEFT JOIN uc_org c on a.ORG_ID_ = c.ID_
-            where c.IS_DELE_!=1 AND b.IS_DELE_!=1 AND a.IS_DELE_!=1
-            <if test="jobCodes!=null">
-                and b.CODE_ in
-                <foreach collection="jobCodes" index="index" item="item" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
+        select DISTINCT USER_ID_ from uc_org_user where POS_ID_ in(
+        select a.ID_ from uc_org_post a left join uc_org_job b on a.JOB_ID_= b.ID_
+        LEFT JOIN uc_org c on a.ORG_ID_ = c.ID_
+        where c.IS_DELE_!=1 AND b.IS_DELE_!=1 AND a.IS_DELE_!=1
+        <if test="jobCodes!=null">
+            and b.CODE_ in
+            <foreach collection="jobCodes" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
         ) AND IS_DELE_!=1) AND IS_DELE_!=1
-            <if test="whereSql!=null">
-                and ${whereSql}
-            </if>
+        <if test="whereSql!=null">
+            and ${whereSql}
+        </if>
         <if test="orderBySql!=null">
             ORDER BY ${orderBySql}
         </if>
@@ -356,4 +356,47 @@
         AND brhs.enabled_flag = 1
     </select>
 
+    <select id="getdikuai" resultType="java.lang.String" parameterType="java.lang.String">
+        SELECT NAME_ FROM uc.uc_org a JOIN (SELECT ORG_ID_ FROM uc.uc_org_user WHERE USER_ID_ =#{id})b ON b.ORG_ID_ = a.ID_ LIMIT 1
+    </select>
+
+    <select id="getkuozhan" resultType="com.hypersmart.usercenter.model.RsunUserStarLevel" parameterType="java.lang.String">
+        SELECT pj_star_id pjStarId , xz_num xzNum , total_coin totalCoin FROM uc.rsun_user_star_level WHERE uc_user_id=#{account}
+    </select>
+
+    <insert id="insertt" parameterType="com.hypersmart.usercenter.model.UcUser">
+        INSERT INTO uc.rsun_user_star_level(uc_user_id,pj_star_id,total_coin,xz_num)VALUES(#{ucUser.account} , 1  , 0 ,1)
+    </insert>
+
+    <select id="getlist" resultType="com.hypersmart.usercenter.model.RsunUserStarLevel">
+        SELECT uc_user_id ucUserId , pj_star_id pjStarId , level_sy_time levelSyTime , total_coin totalCoin , xz_num xzNum FROM uc.rsun_user_star_level limit #{pagebean.page} ,#{pagebean.pageSize}
+    </select>
+
+    <select id="getxzjb" resultType="com.hypersmart.usercenter.model.RsunUserStarLevel" parameterType="java.lang.String">
+        SELECT uc_user_id ucUserId , pj_star_id pjStarId , level_sy_time levelSyTime , total_coin totalCoin , xz_num xzNum FROM uc.rsun_user_star_level WHERE uc_user_id = #{userCode}
+    </select>
+
+    <select id="getmoney" parameterType="java.util.HashMap" resultType="com.hypersmart.usercenter.model.rsunJbHiReward">
+        SELECT uc_user_id ucUserId,jb_jl_reason jbJlReason , jb_jl_time jbJlTime , gd_code gdCode , gcoin_val   gcoinVal FROM uc.rsun_jb_hi_reward WHERE uc_user_id =#{userCode} AND jb_jl_time BETWEEN #{kaishi} AND #{jieshu}
+    </select>
+
+    <select id="getUserCoinHisRecordByUserCode" resultType="com.hypersmart.usercenter.model.JinBiJiLv" parameterType="java.lang.String">
+        select gd_code workOrderCode ,gcoin_val coinNum ,jb_jl_reason coinObtainReason, jb_jl_time coinObtainTime from uc.rsun_jb_hi_reward where uc_user_id='${userCode}'
+    </select>
+
+    <select id="getaa" resultType="com.hypersmart.usercenter.model.UcUser">
+        SELECT FULLNAME_ fullname ,ACCOUNT_ account FROM uc.uc_user WHERE ACCOUNT_ IS NOT NULL
+    </select>
+
+    <insert id="insertadd" parameterType="com.hypersmart.usercenter.dto.rsunJbDTO">
+        INSERT INTO uc.rsun_jb_hi_reward (uc_user_id,gd_code,gcoin_val,jb_jl_time)VALUES(#{ucUserId},#{gdCode},#{gcoinVal},#{jbJlTime})
+    </insert>
+
+    <update id="updatemoney" parameterType="com.hypersmart.usercenter.model.rsunJbHiReward">
+        UPDATE uc.rsun_user_star_level SET total_coin=(total_coin+#{reward.gcoinVal}) WHERE uc_user_id=#{reward.ucUserId}
+    </update>
+
+    <select id="getname" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT FULLNAME_ FROM uc.uc_user WHERE ACCOUNT_=#{reward}
+    </select>
 </mapper>

@@ -29,6 +29,7 @@ import com.hypersmart.base.feign.UCFeignService;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -615,13 +616,13 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
         Set<GroupIdentity> groupIdentitySet = new HashSet<>();
         List<String> gList=new ArrayList<>();
         groupIdentities.forEach(groupIdentity-> {
-                    try {
-                        GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(), GroupIdentity.class);
-                        gList.add(groupIdentity1.getId());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+            try {
+                GroupIdentity groupIdentity1 = JsonUtil.toBean(groupIdentity.toString(), GroupIdentity.class);
+                gList.add(groupIdentity1.getId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         List<UcUserWork > statusList = ucUserWorkService.queryUserWorkStatusList(gList,"0");
         groupIdentities.forEach(groupIdentity->{
             try{
@@ -722,6 +723,76 @@ public class UcUserServiceImpl extends GenericService<String, UcUser> implements
     @Override
     public UcUser getUserByDivideId(String divideId, String gridType) {
         return ucUserMapper.getUserByDivideId(divideId, gridType);
+    }
+
+    /**
+     * 获取地块信息
+     * @param id
+     * @return
+     */
+    @Override
+    public String getdikuai(String id) {
+        return ucUserMapper.getdikuai(id);
+    }
+
+    @Override
+    public RsunUserStarLevel getkuozhan(String account) {
+        return ucUserMapper.getkuozhan(account);
+    }
+
+    @Override
+    public void insertt(UcUser ucUser) {
+        ucUserMapper.insertt(ucUser);
+    }
+
+    @Override
+    public ArrayList<RsunUserStarLevel> getlist(PageBean pagebean) {
+        return ucUserMapper.getlist(pagebean);
+    }
+
+    @Override
+    public RsunUserStarLevel getxzjb(String userCode) {
+        return ucUserMapper.getxzjb(userCode);
+    }
+
+    @Override
+    public List<rsunJbHiReward> getmoney(String userCode) {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("userCode",userCode);
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
+        String format = simpleDateFormat.format(date);
+        String kaishi = format+"-01";
+        String jieshu = format+"-31";
+        map.put("kaishi",kaishi);
+        map.put("jieshu",jieshu);
+        return ucUserMapper.getmoney(map);
+    }
+
+    @Override
+    public List<JinBiJiLv> getUserCoinHisRecordByUserCode(String userCode) {
+        return ucUserMapper.getUserCoinHisRecordByUserCode(userCode);
+    }
+
+    @Override
+    public List<UcUser> getaa() {
+        return ucUserMapper.getaa();
+    }
+
+    @Override
+    public Boolean insertadd(rsunJbDTO reward) {
+        reward.setJbJlTime(new Date());
+        return ucUserMapper.insertadd(reward);
+    }
+
+    @Override
+    public void updatemoney(rsunJbHiReward reward) {
+        ucUserMapper.updatemoney(reward);
+    }
+
+    @Override
+    public String getname(String ucUserId) {
+        return ucUserMapper.getname(ucUserId);
     }
 
     public List<String> getSkillCodebyCategory(String category){

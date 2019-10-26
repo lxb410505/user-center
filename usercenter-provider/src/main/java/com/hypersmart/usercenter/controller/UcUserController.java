@@ -1,11 +1,13 @@
 package com.hypersmart.usercenter.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.aop.norepeat.NoRepeatSubmit;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.exception.RequiredException;
 import com.hypersmart.base.feign.UCFeignService;
 import com.hypersmart.base.model.CommonResult;
+import com.hypersmart.base.query.PageBean;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
@@ -15,12 +17,12 @@ import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
-import com.hypersmart.usercenter.dto.GroupIdentityDTO;
-import com.hypersmart.usercenter.dto.UserDetailRb;
-import com.hypersmart.usercenter.dto.UserDetailValue;
+import com.hypersmart.usercenter.dto.*;
 import com.hypersmart.usercenter.mapper.UcUserSkillMapper;
 import com.hypersmart.usercenter.model.*;
+import com.hypersmart.usercenter.service.RsunJbHiRewardService;
 import com.hypersmart.usercenter.service.UcOrgService;
+import com.hypersmart.usercenter.util.ImportExcelUtil;
 import com.hypersmart.usercenter.util.ResourceErrorCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +35,8 @@ import com.hypersmart.usercenter.service.UcUserService;
 import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
 
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -58,10 +62,75 @@ public class UcUserController extends BaseController {
     @Resource
     private UcUserSkillMapper ucUserSkillMapper;
 
+    @Resource
+    RsunJbHiRewardService rsunJbHiRewardService;
+
     @PostMapping({"/list"})
     @ApiOperation(value = "用户管理数据列表}", httpMethod = "POST", notes = "获取用户管理列表")
     public PageList<UcUser> list(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
         return this.ucUserService.query(queryFilter);
+    }
+
+    /**
+     * 个人信息扩展
+     *
+     * @param UserCode
+     * @return
+     */
+    @PostMapping({"/getUserInfoByUserCode"})
+    @ApiOperation(value = "个人信息扩展}", httpMethod = "POST", notes = "个人信息扩展")
+    public GrnXinXIKuoZhan gerenxinxikuozhan(@ApiParam(name = "UserCode", value = "查询对象") @RequestBody String UserCode) {
+        RsunUserStarLevel rsunUserStarLevel = ucUserService.getxzjb(UserCode);
+        //获取当月金币
+        List<rsunJbHiReward> list = ucUserService.getmoney(UserCode);
+
+        Double money = 0.0;
+        for (rsunJbHiReward r : list) {
+            money += r.getGcoinVal();
+        }
+        GrnXinXIKuoZhan grnXinXIKuoZhan = new GrnXinXIKuoZhan();
+        grnXinXIKuoZhan.setUserTotalCoin(rsunUserStarLevel.getTotalCoin());//个人金币总额
+        grnXinXIKuoZhan.setUserMedalLeve(rsunUserStarLevel.getXzNum());//用户勋章数
+        grnXinXIKuoZhan.setUserStarLeve((rsunUserStarLevel.getPjStarId()) * 1.0);//用户星级
+        grnXinXIKuoZhan.setCurMonthCoin(money);//本月金币
+        return grnXinXIKuoZhan;
+    }
+
+    /**
+     * 金币记录
+     *
+     * @param UserCode
+     * @return
+     */
+    @PostMapping({"/getUserCoinHisRecordByUserCode"})
+    @ApiOperation(value = "金币记录}", httpMethod = "POST", notes = "金币记录")
+    public PageList<JinBiJiLv> getUserCoinHisRecordByUserCode(String UserCode, String page, String pageSize) {
+        PageHelper.startPage(Integer.valueOf(page), Integer.valueOf(pageSize), true);
+        List<JinBiJiLv> list = ucUserService.getUserCoinHisRecordByUserCode(UserCode);
+        PageList<JinBiJiLv> jinBiJiLvPageList = new PageList<>();
+        jinBiJiLvPageList.setRows(list);
+        return jinBiJiLvPageList;
+    }
+
+    /**
+     * 记录
+     *
+     * @param reward
+     * @return
+     */
+    @PostMapping({"/addUserCoinHisRecordByUserCode"})
+    public boolean addUserCoinHisRecordByUserCode(@RequestBody rsunJbHiReward reward) {
+        try {
+            //保存金币记录
+            reward.setJbJlTime(new Date());
+            rsunJbHiRewardService.insert(reward);
+            //修改员工总金额
+            ucUserService.updatemoney(reward);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+
     }
 
     /**
@@ -174,44 +243,22 @@ public class UcUserController extends BaseController {
         return new CommonResult<UserDetailValue>(true, "处理成功", ucUserService.searchUserDetailByCondition(userDetailRb), 200);
     }
 
-    /**
-     * sunwenjie
-     * 工单系统总部角色导入
-     *
-     * @param file
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping(value = "/importOrgUserData", method = RequestMethod.POST)
-    public CommonResult<String> importOrgUserData(@RequestParam("file") MultipartFile file) throws Exception {
-        CommonResult commonResult = new CommonResult();
-        ResourceErrorCode resourceErrorCode = ucUserService.importOrgUser(file);
-        if (ResourceErrorCode.SUCCESS.getCode() == resourceErrorCode.getCode()) {
-            commonResult.setState(true);
-            commonResult.setMessage(resourceErrorCode.getMessage());
-        } else {
-            commonResult.setState(false);
-            commonResult.setMessage(resourceErrorCode.getMessage());
-        }
-        return commonResult;
-    }
-
     @RequestMapping(value = {"/users/getByJobCodeAndOrgIdAndDimCodeDeeply"}, method = {
             org.springframework.web.bind.annotation.RequestMethod.GET}, produces = {
             "application/json; charset=utf-8"})
     @ApiOperation(value = "根据组织Id、条线编码和职务编码获取对应条线上的对应人员", httpMethod = "GET", notes = "根据组织Id、条线编码和职务编码获取对应条线上的对应人员")
     public Set<GroupIdentity> getByJobCodeAndOrgIdAndDimCodeDeeply(
             @ApiParam(name = "jobCode", value = "职务编码") @RequestParam(required = false) String jobCode,
-            @ApiParam(name = "orgId", value = "组织Id", required = true) @RequestParam(value = "orgId",required = false,defaultValue = "") String orgId,
+            @ApiParam(name = "orgId", value = "组织Id", required = true) @RequestParam(value = "orgId", required = false, defaultValue = "") String orgId,
             @ApiParam(name = "dimCode", value = "维度编码") @RequestParam(required = false) String dimCode,
             @ApiParam(name = "fullName", value = "姓名") @RequestParam(required = false) String fullName
     )
             throws Exception {
         if (StringUtil.isEmpty(orgId)) {
-            if(null==  ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY)){
-            throw new RequiredException("职务编码、组织Id为空！");
+            if (null == ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY)) {
+                throw new RequiredException("职务编码、组织Id为空！");
             }
-            orgId= (String)ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
+            orgId = (String) ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
         }
         return ucUserService.getByJobCodeAndOrgIdAndDimCodeDeeply(jobCode, orgId, dimCode, fullName);
     }
@@ -222,16 +269,16 @@ public class UcUserController extends BaseController {
     @ApiOperation(value = "根据组织Id、条线编码和职务编码获取对应条线上的对应人员", httpMethod = "GET", notes = "根据组织Id、条线编码和职务编码获取对应条线上的对应人员")
     public Set<GroupIdentityDTO> getByJobCodeAndOrgIdAndDimCodeDeeplyWithPost(
             @ApiParam(name = "jobCode", value = "职务编码") @RequestParam(required = false) String jobCode,
-            @ApiParam(name = "orgId", value = "组织Id", required = true) @RequestParam(value = "orgId",required = false,defaultValue = "") String orgId,
+            @ApiParam(name = "orgId", value = "组织Id", required = true) @RequestParam(value = "orgId", required = false, defaultValue = "") String orgId,
             @ApiParam(name = "dimCode", value = "维度编码") @RequestParam(required = false) String dimCode,
             @ApiParam(name = "fullName", value = "姓名") @RequestParam(required = false) String fullName
     )
             throws Exception {
         if (StringUtil.isEmpty(orgId)) {
-            if(null==  ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY)){
+            if (null == ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY)) {
                 throw new RequiredException("职务编码、组织Id为空！");
             }
-            orgId= (String)ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
+            orgId = (String) ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
         }
         return ucUserService.getByJobCodeAndOrgIdAndDimCodeDeeplyWithPost(jobCode, orgId, dimCode, fullName);
     }
@@ -295,8 +342,6 @@ public class UcUserController extends BaseController {
         }
         return result;
     }
-
-
 
 
 //    @PostMapping({"add"})
