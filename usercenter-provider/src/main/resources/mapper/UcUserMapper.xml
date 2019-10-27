@@ -397,6 +397,10 @@
     </update>
 
     <select id="getname" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT FULLNAME_ FROM uc.uc_user WHERE ACCOUNT_=#{reward}
+        SELECT FULLNAME_ FROM uc.uc_user WHERE ACCOUNT_ = #{reward}
+    </select>
+
+    <select id="getzh" parameterType="java.lang.String" resultType="com.hypersmart.usercenter.model.UcUser">
+        SELECT ID_ id , FULLNAME_ fullname ,PASSWORD_ password , ACCOUNT_ account FROM uc.uc_user WHERE FULLNAME_ = #{getname}
     </select>
 </mapper>

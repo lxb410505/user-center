@@ -46,27 +46,53 @@ public class  RsunUserStarLevelController extends BaseController {
             List<QueryField> querys = queryFilter.getQuerys();
             for(int i = 0 ; i<querys.size() ; i++){
                 String value = (String) querys.get(i).getValue();
+                //通过账号去查询姓名
+//                String getzh = ucUserService.getzh(value);
                 String getname = ucUserService.getname(value);
-                RsunUserStarLevel rsunUserStarLevel = new RsunUserStarLevel();
-                rsunUserStarLevel.setName(value);//姓名
-
-                //通过姓名去查询账号
-                rsunUserStarLevel.setUcUserId(value);//账号
-
-                RsunUserStarLevell rsunUserStarLevell = rsunUserStarlLevelService.get(value);
-                if(rsunUserStarLevell==null){
-                    rsunUserStarLevel.setPjStarId(0);
-                    rsunUserStarLevel.setTotalCoin(0.0);
-                    rsunUserStarLevel.setXzNum(0.0);
+                if(getname!=null && !"".equals(getname)){
+                    RsunUserStarLevel rsunUserStarLevel = new RsunUserStarLevel();
+                    rsunUserStarLevel.setName(getname);//姓名
+                    rsunUserStarLevel.setZhanghao(value);//账号
+                    RsunUserStarLevell rsunUserStarLevell = rsunUserStarlLevelService.get(value);
+                    if(rsunUserStarLevell==null){
+                        rsunUserStarLevel.setPjStarId(0);
+                        rsunUserStarLevel.setTotalCoin(0.0);
+                        rsunUserStarLevel.setXzNum(0.0);
+                    }else {
+                        rsunUserStarLevel.setPjStarId(rsunUserStarLevell.getPjStarId());
+                        rsunUserStarLevel.setTotalCoin(rsunUserStarLevell.getTotalCoin());
+                        rsunUserStarLevel.setXzNum(rsunUserStarLevell.getXzNum());
+                    }
+                    list.add(rsunUserStarLevel);
                 }else {
-                    rsunUserStarLevel.setPjStarId(rsunUserStarLevell.getPjStarId());
-                    rsunUserStarLevel.setTotalCoin(rsunUserStarLevell.getTotalCoin());
-                    rsunUserStarLevel.setXzNum(rsunUserStarLevell.getXzNum());
+
                 }
-                list.add(rsunUserStarLevel);
+                //通过姓名查找账号
+                List<UcUser> ucUser = ucUserService.getzh(value);
+                if(ucUser!=null && ucUser.size()>0){
+                    for(UcUser ucUser1 : ucUser){
+                    RsunUserStarLevel rsunUserStarLevel = new RsunUserStarLevel();
+                    rsunUserStarLevel.setName(value);//姓名
+                    rsunUserStarLevel.setUcUserId(ucUser1.getAccount());//账号
+                    RsunUserStarLevell rsunUserStarLevell = rsunUserStarlLevelService.get(ucUser1.getAccount());
+                    if(rsunUserStarLevell==null){
+                        rsunUserStarLevel.setPjStarId(0);
+                        rsunUserStarLevel.setTotalCoin(0.0);
+                        rsunUserStarLevel.setXzNum(0.0);
+                    }else {
+                        rsunUserStarLevel.setPjStarId(rsunUserStarLevell.getPjStarId());
+                        rsunUserStarLevel.setTotalCoin(rsunUserStarLevell.getTotalCoin());
+                        rsunUserStarLevel.setXzNum(rsunUserStarLevell.getXzNum());
+                    }
+                    list.add(rsunUserStarLevel);
+                    }
+                }else {
+
+                }
+
             }
             PageList<RsunUserStarLevel> pageList = new PageList<>();
-            pageList.setTotal(queryFilter.getQuerys().size());
+            pageList.setTotal(list.size());
             pageList.setPage(1);
             pageList.setPageSize(20);
             pageList.setRows(list);
@@ -86,9 +112,10 @@ public class  RsunUserStarLevelController extends BaseController {
                 //给rsunUserStarLevel存值
                 rsunUserStarLevel.setName(ucUser.getFullname());//姓名
                 //根据用户姓名去查询金币表中是否有数据,如果有数据就获取等级金币账号
-                RsunUserStarLevell rsunUserStarLevell = rsunUserStarlLevelService.get(ucUser.getAccount());
+                RsunUserStarLevell rsunUserStarLevell = rsunUserStarlLevelService.get(ucUser.getId());
 
-                rsunUserStarLevel.setUcUserId(ucUser.getAccount());//账号
+                rsunUserStarLevel.setUcUserId(ucUser.getId());//账号
+                rsunUserStarLevel.setZhanghao(ucUser.getAccount());
                 if(rsunUserStarLevell==null){
                     rsunUserStarLevel.setPjStarId(0);//默认等级为0
                     rsunUserStarLevel.setTotalCoin(0.0);//默认为0
@@ -127,7 +154,7 @@ public class  RsunUserStarLevelController extends BaseController {
             return new CommonResult(msg);
         }else {
             model.setLevelSyTime(new Date());
-            this.rsunUserStarlLevelService.update(model);
+            rsunUserStarlLevelService.update(model);
             return new CommonResult(msg);
         }
 

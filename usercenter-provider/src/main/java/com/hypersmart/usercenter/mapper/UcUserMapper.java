@@ -85,4 +85,7 @@ public interface  UcUserMapper extends GenericMapper<UcUser> {
     void updatemoney(@Param("reward") rsunJbHiReward reward);
 
     String getname(@Param("reward") String ucUserId);
+
+    List<UcUser> getzh(@Param("getname") String getname);
+
 }

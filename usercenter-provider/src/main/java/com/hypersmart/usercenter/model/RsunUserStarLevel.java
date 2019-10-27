@@ -13,11 +13,21 @@ import java.util.Date;
 public class  RsunUserStarLevel {
 
     /*@Column(name = "uc_user_id")
-    @ApiModelProperty("账号")*/
+    @ApiModelProperty("id")*/
     private String ucUserId;
 
+    private String zhanghao;
+
+    public String getZhanghao() {
+        return zhanghao;
+    }
+
+    public void setZhanghao(String zhanghao) {
+        this.zhanghao = zhanghao;
+    }
+
     /* @Column(name = "pj_star_id")
-     @ApiModelProperty("等级")*/
+         @ApiModelProperty("等级")*/
     private Integer pjStarId;
 
     /*@Column(name = "level_sy_time")
@@ -96,6 +106,7 @@ public class  RsunUserStarLevel {
     public String toString() {
         return "RsunUserStarLevel{" +
                 "ucUserId='" + ucUserId + '\'' +
+                ", zhanghao='" + zhanghao + '\'' +
                 ", pjStarId=" + pjStarId +
                 ", levelSyTime=" + levelSyTime +
                 ", totalCoin=" + totalCoin +

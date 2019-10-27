@@ -91,5 +91,7 @@ public interface  UcUserService extends IGenericService<String, UcUser> {
     void updatemoney(rsunJbHiReward reward);
 
     String getname(String ucUserId);
+
+    List<UcUser> getzh(String getname);
 }
 

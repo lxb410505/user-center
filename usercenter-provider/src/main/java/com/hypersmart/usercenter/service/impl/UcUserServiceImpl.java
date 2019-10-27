@@ -795,6 +795,11 @@ public class  UcUserServiceImpl extends GenericService<String, UcUser> implement
         return ucUserMapper.getname(ucUserId);
     }
 
+    @Override
+    public List<UcUser> getzh(String getname) {
+        return ucUserMapper.getzh(getname);
+    }
+
     public List<String> getSkillCodebyCategory(String category){
         return ucUserMapper.getSkillCodebyCategory(category);
     }

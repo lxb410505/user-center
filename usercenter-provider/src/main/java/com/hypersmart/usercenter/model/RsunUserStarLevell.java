@@ -14,7 +14,7 @@ import java.util.Date;
 public class  RsunUserStarLevell implements Serializable {
     @Id
     @Column(name = "uc_user_id")
-    @ApiModelProperty("账号")
+    @ApiModelProperty("id")
     private String ucUserId;
 
     @Column(name = "pj_star_id")
