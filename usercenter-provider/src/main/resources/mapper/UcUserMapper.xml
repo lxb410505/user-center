@@ -403,4 +403,8 @@
     <select id="getzh" parameterType="java.lang.String" resultType="com.hypersmart.usercenter.model.UcUser">
         SELECT ID_ id , FULLNAME_ fullname ,PASSWORD_ password , ACCOUNT_ account FROM uc.uc_user WHERE FULLNAME_ = #{getname}
     </select>
+
+    <select id="getid" resultType="java.lang.String" parameterType="java.lang.String">
+        SELECT ID_ id FROM uc.uc_user WHERE ACCOUNT_ = #{zhanghao}
+    </select>
 </mapper>

@@ -800,6 +800,11 @@ public class  UcUserServiceImpl extends GenericService<String, UcUser> implement
         return ucUserMapper.getzh(getname);
     }
 
+    @Override
+    public String getid(String value) {
+       return ucUserMapper.getid(value);
+    }
+
     public List<String> getSkillCodebyCategory(String category){
         return ucUserMapper.getSkillCodebyCategory(category);
     }

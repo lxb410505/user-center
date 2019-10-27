@@ -50,7 +50,10 @@ public class  RsunUserStarLevelController extends BaseController {
                     RsunUserStarLevel rsunUserStarLevel = new RsunUserStarLevel();
                     rsunUserStarLevel.setName(getname);//姓名
                     rsunUserStarLevel.setZhanghao(value);//账号
-                    RsunUserStarLevell rsunUserStarLevell = rsunUserStarlLevelService.get(value);
+                    //通过账号去查找id
+                    String getid = ucUserService.getid(value);
+                    rsunUserStarLevel.setUcUserId(getid);
+                    RsunUserStarLevell rsunUserStarLevell = rsunUserStarlLevelService.get(getid);
                     if(rsunUserStarLevell==null){
                         rsunUserStarLevel.setPjStarId(0);
                         rsunUserStarLevel.setTotalCoin(0.0);
@@ -111,8 +114,8 @@ public class  RsunUserStarLevelController extends BaseController {
                 //根据用户姓名去查询金币表中是否有数据,如果有数据就获取等级金币账号
                 RsunUserStarLevell rsunUserStarLevell = rsunUserStarlLevelService.get(ucUser.getId());
 
-                rsunUserStarLevel.setUcUserId(ucUser.getId());//账号
-                rsunUserStarLevel.setZhanghao(ucUser.getAccount());
+                rsunUserStarLevel.setUcUserId(ucUser.getId());//id
+                rsunUserStarLevel.setZhanghao(ucUser.getAccount());//账号
                 if(rsunUserStarLevell==null){
                     rsunUserStarLevel.setPjStarId(0);//默认等级为0
                     rsunUserStarLevel.setTotalCoin(0.0);//默认为0

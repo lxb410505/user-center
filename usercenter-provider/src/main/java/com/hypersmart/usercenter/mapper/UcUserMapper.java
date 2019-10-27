@@ -88,4 +88,5 @@ public interface  UcUserMapper extends GenericMapper<UcUser> {
 
     List<UcUser> getzh(@Param("getname") String getname);
 
+    String getid(@Param("zhanghao") String value);
 }
