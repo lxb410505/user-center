@@ -2,10 +2,7 @@ package com.hypersmart.usercenter.controller;
 
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
-import com.hypersmart.base.query.PageBean;
-import com.hypersmart.base.query.PageList;
-import com.hypersmart.base.query.QueryField;
-import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.query.*;
 import com.hypersmart.usercenter.model.RsunUserStarLevel;
 import com.hypersmart.usercenter.model.RsunUserStarLevell;
 import com.hypersmart.usercenter.model.TgeSignificantQuality;
@@ -67,7 +64,7 @@ public class  RsunUserStarLevelController extends BaseController {
                 }else {
 
                 }
-                //通过姓名查找账号
+                /*//通过姓名查找账号
                 List<UcUser> ucUser = ucUserService.getzh(value);
                 if(ucUser!=null && ucUser.size()>0){
                     for(UcUser ucUser1 : ucUser){
@@ -88,7 +85,7 @@ public class  RsunUserStarLevelController extends BaseController {
                     }
                 }else {
 
-                }
+                }*/
 
             }
             PageList<RsunUserStarLevel> pageList = new PageList<>();
