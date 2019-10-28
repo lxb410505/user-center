@@ -381,7 +381,7 @@
     </select>
 
     <select id="getUserCoinHisRecordByUserCode" resultType="com.hypersmart.usercenter.model.JinBiJiLv" parameterType="java.lang.String">
-        select gd_code workOrderCode ,gcoin_val coinNum ,jb_jl_reason coinObtainReason, jb_jl_time coinObtainTime from uc.rsun_jb_hi_reward where uc_user_id='${userCode}' ORDER BY jb_jl_time DESC
+        select gd_code workOrderCode ,gcoin_val coinNum ,jb_jl_reason coinObtainReason, jb_jl_time date2 from uc.rsun_jb_hi_reward where uc_user_id='${userCode}' ORDER BY jb_jl_time DESC
     </select>
 
     <select id="getaa" resultType="com.hypersmart.usercenter.model.UcUser">

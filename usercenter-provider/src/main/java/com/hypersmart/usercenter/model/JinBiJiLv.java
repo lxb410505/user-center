@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class  JinBiJiLv {
 
-    private Double workOrderCode; //工单id
+    private String workOrderCode; //工单id
 
     private Double coinNum; //金币数量
 
@@ -14,11 +14,13 @@ public class  JinBiJiLv {
 
     private String  coinObtainTime; //金币获取时间
 
-    public Double getWorkOrderCode() {
+    private Date date2;
+
+    public String getWorkOrderCode() {
         return workOrderCode;
     }
 
-    public void setWorkOrderCode(Double workOrderCode) {
+    public void setWorkOrderCode(String workOrderCode) {
         this.workOrderCode = workOrderCode;
     }
 
@@ -46,13 +48,22 @@ public class  JinBiJiLv {
         this.coinObtainTime = coinObtainTime;
     }
 
+    public Date getDate2() {
+        return date2;
+    }
+
+    public void setDate2(Date date2) {
+        this.date2 = date2;
+    }
+
     @Override
     public String toString() {
         return "JinBiJiLv{" +
-                "workOrderCode=" + workOrderCode +
+                "workOrderCode='" + workOrderCode + '\'' +
                 ", coinNum=" + coinNum +
-                ", coinObtainReason=" + coinObtainReason +
-                ", coinObtainTime=" + coinObtainTime +
+                ", coinObtainReason='" + coinObtainReason + '\'' +
+                ", coinObtainTime='" + coinObtainTime + '\'' +
+                ", date2=" + date2 +
                 '}';
     }
 }
