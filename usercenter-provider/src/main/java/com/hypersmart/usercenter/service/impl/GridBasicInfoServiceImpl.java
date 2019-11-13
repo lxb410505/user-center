@@ -344,7 +344,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 }
             }
             // 调用K2
-            commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
+             commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
 
             if (num > 0) {
                 if (GridTypeConstants.PUBLIC_AREA_GRID.equals(gridBasicInfoDTO.getGridType())) {//公区网格
@@ -632,8 +632,24 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
             }
         }
 
+        // 变更覆盖范围>>>记录历史>>>更新数据
+        GridBasicInfo grid = gridBasicInfoService.get(gridBasicInfoDTO.getId());
+        gridBasicInfoHistoryService.saveGridBasicInfoHistory(grid, 1);
+        grid.setGridRange(gridBasicInfoDTO.getGridRange());
+        grid.setUpdateTimes(grid.getUpdateTimes() + 1);
+        grid.setUpdationDate(new Date());
+        grid.setUpdatedBy(  ContextUtil.getCurrentUser().getUserId());
+        int i = gridBasicInfoService.updateSelective(grid);
+        if (i > 0) {
+            if(GridTypeConstants.BUILDING_GRID.equals(gridBasicInfoDTO.getGridType())){
+                gridBasicInfoService.handChangeRange(gridBasicInfoDTO.getId(), gridBasicInfoDTO.getGridRange(), 2);//2 修改
+            }
+        }
+        String[] ids = {gridBasicInfoDTO.getId()};
+        gridRangeService.deleteRangeByGridIds(ids);
+        gridRangeService.recordRange(gridBasicInfoDTO.getGridRange(), gridBasicInfoDTO.getId());
         // 调用K2
-        commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.CHANGE_SCOPE.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
+        //commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.CHANGE_SCOPE.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
         return commonResult;
     }
 
