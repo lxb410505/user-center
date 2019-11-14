@@ -388,10 +388,12 @@
         stage_servicegird_ref s LEFT JOIN grid_basic_info t
         ON t.staging_id = s.staging_id and t.grid_type='service_center_grid'
         where
-        t.staging_id in
-        <foreach collection="massifId" item="dkId" open="(" separator=","  close=")" >
-            #{dkId}
-        </foreach>
+        <if test="isIn">
+            t.staging_id in
+            <foreach collection="massifId" item="dkId" open="(" separator=","  close=")" >
+                #{dkId}
+            </foreach>
+        </if>
         AND  s.is_deleted = 0
         AND s.enabled_flag = 1
         and
@@ -420,10 +422,12 @@
         t.id AS gridId
         from grid_basic_info t
         where
-        t.staging_id in
-        <foreach collection="massifId" item="dkId" open="(" separator=","  close=")" >
-            #{dkId}
-        </foreach>
+        <if test="isIn">
+            t.staging_id in
+            <foreach collection="massifId" item="dkId" open="(" separator=","  close=")" >
+                #{dkId}
+            </foreach>
+        </if>
         AND  t.grid_type !='service_center_grid'
         AND t.is_deleted = 0
         AND t.enabled_flag = 1
