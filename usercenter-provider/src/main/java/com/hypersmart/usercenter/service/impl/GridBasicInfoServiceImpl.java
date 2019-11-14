@@ -964,8 +964,31 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 String[] arr = {bo.getId()};
                 gridBasicInfoDTO.setIds(arr);
                 gridBasicInfoDTO.setGridType(bo.getGridType());
+
                 // 调用K2
-                commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.HOUSEKEEPER_DISASSOCIATED.getOperateType(), bo.getId(), gridBasicInfoDTO);
+               // commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.HOUSEKEEPER_DISASSOCIATED.getOperateType(), bo.getId(), gridBasicInfoDTO);
+                gridBasicInfoDTO.setHousekeeperId(null);
+                if(GridTypeEnum.SERVICE_CENTER_GRID.getGridType().equals(gridBasicInfoDTO.getGridType())){
+                    List<GridBasicInfo> gridBasicInfoLists = getGridBasicInfoByServiceGridId(bo.getId());
+                    if(!CollectionUtils.isEmpty(gridBasicInfoLists)){
+                        boolean saveHistory=true;
+                        for (GridBasicInfo info : gridBasicInfoLists) {
+                            updateHouseKeeperId(info,"",gridBasicInfoDTO,saveHistory);
+                            saveHistory=false;
+                        }
+                    }
+                }else{
+                    String[] ids = gridBasicInfoDTO.getIds();
+                    List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getByIds(ids);
+                    if (gridBasicInfoList != null && gridBasicInfoList.size() > 0) {
+                        for (GridBasicInfo grid : gridBasicInfoList) {
+                            updateHouseKeeperId(grid,"",gridBasicInfoDTO,true);
+                        }
+                    }
+                }
+
+
+
                 if (!commonResult.getState()) {
                     return commonResult;
                 }
@@ -973,7 +996,21 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         }
         return commonResult;
     }
-
+    //更新网格管家信息
+    private void updateHouseKeeperId(GridBasicInfo grid,String submitterId,GridBasicInfoDTO dto,boolean saveHistory){
+        if(saveHistory){
+            gridBasicInfoHistoryService.saveGridBasicInfoHistory(grid, 0);
+        }
+        if ("".equals(dto.getHousekeeperId())) {
+            grid.setHousekeeperId(null);
+        } else {
+            grid.setHousekeeperId(dto.getHousekeeperId());
+        }
+        grid.setUpdateTimes(grid.getUpdateTimes() + 1);
+        grid.setUpdationDate(new Date());
+        grid.setUpdatedBy(submitterId);
+        gridBasicInfoService.update(grid);
+    }
     @Override
     public List<RangeDTO> getGridsHouseBymassifId(String massifId) {
         List<RangeDTO> returnList = new ArrayList<>();
