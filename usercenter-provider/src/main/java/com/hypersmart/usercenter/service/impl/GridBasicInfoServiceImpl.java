@@ -24,6 +24,7 @@ import com.hypersmart.usercenter.mapper.*;
 import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.*;
 import com.hypersmart.usercenter.util.GridOperateEnum;
+import com.hypersmart.usercenter.util.GridTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -685,7 +686,30 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 dto.setProjectName(gridBasicInfoDTO.getProjectName());
                 dto.setStagingName(gridBasicInfoDTO.getStagingName());
                 dto.setAccount(gridBasicInfoDTO.getAccount());
-                commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.DISABLE_GRID.getOperateType(), gridInfo.getId(), dto);
+               // commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.DISABLE_GRID.getOperateType(), gridInfo.getId(), dto);
+                // 禁用网格
+                GridBasicInfoBO bo = new GridBasicInfoBO();
+              //  String[] ids = {dto.getId()};
+                bo.setIds(ids);
+                bo.setUpdatedBy("");
+                //服务中心网格
+                if(GridTypeEnum.SERVICE_CENTER_GRID.getGridType().equals(dto.getGridType())){
+                    stageServiceGirdRefMapper.disableServiceCenterGrid(bo);
+                    List<GridBasicInfo> gridBasicInfoLists = getGridBasicInfoByServiceGridId(dto.getId());
+                    if(!CollectionUtils.isEmpty(gridBasicInfoLists)){
+                        for (GridBasicInfo grid : gridBasicInfoLists) {
+                            grid.setUpdatedBy("");
+                            grid.setHousekeeperId(null);
+                            grid.setGridRemark(null);
+                        }
+                        gridBasicInfoService.updateBatch(gridBasicInfoLists);
+
+                    }
+                }else{
+                    //楼栋、公区网格
+                    gridBasicInfoMapper.disableGridInfo(bo);
+                    gridRangeService.deleteRangeByGridIds(ids);
+                }
                 if (!commonResult.getState()) {
                     return commonResult;
                 }
@@ -693,7 +717,28 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         }
         return commonResult;
     }
-
+    //根据服务中心网格id 获取覆盖地块的网格
+    private List<GridBasicInfo> getGridBasicInfoByServiceGridId(String gridId){
+        List<Map<String, Object>> serviceGridByGridId = stageServiceGirdRefMapper.getServiceGridByGridId(gridId);
+        List<GridBasicInfo> gridBasicInfos=new ArrayList<>();
+        if(!CollectionUtils.isEmpty(serviceGridByGridId)){
+            List<String> stagingIds=new ArrayList<>();
+            for(Map<String, Object> serviceGrid:serviceGridByGridId){
+                String stagingId = serviceGrid.get("stagingId") == null ? null : String.valueOf(serviceGrid.get("stagingId"));
+                stagingIds.add(stagingId);
+            }
+            QueryFilter queryFilter=QueryFilter.build(GridBasicInfo.class);
+            queryFilter.addFilter("grid_type",GridTypeEnum.SERVICE_CENTER_GRID.getGridType(), QueryOP.IN, FieldRelation.AND);
+            queryFilter.addFilter("is_deleted",0, QueryOP.EQUAL, FieldRelation.AND);
+            queryFilter.addFilter("enabled_flag",1, QueryOP.EQUAL, FieldRelation.AND);
+            queryFilter.addFilter("staging_id",stagingIds, QueryOP.IN, FieldRelation.AND);
+            PageList<GridBasicInfo> query = gridBasicInfoService.query(queryFilter);
+            if(query!=null){
+                gridBasicInfos=query.getRows();
+            }
+        }
+        return gridBasicInfos;
+    }
     /**
      * 批量删除网格
      *
