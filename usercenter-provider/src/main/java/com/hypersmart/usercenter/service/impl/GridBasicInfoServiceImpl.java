@@ -344,7 +344,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 }
             }
             // 调用K2
-             commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
+            // commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
 
             if (num > 0) {
                 if (GridTypeConstants.PUBLIC_AREA_GRID.equals(gridBasicInfoDTO.getGridType())) {//公区网格
