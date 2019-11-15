@@ -869,10 +869,14 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 dto.setStagingName(gridBasicInfoDTO.getStagingName());
                 dto.setStagingId(gridBasicInfoDTO.getStagingId());
                 dto.setAccount(gridBasicInfoDTO.getAccount());
-                commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.LINK_HOUSEKEEPER.getOperateType(), bo.getId(), dto);
-                if (!commonResult.getState()) {
-                    return commonResult;
-                }
+               commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.LINK_HOUSEKEEPER.getOperateType(), bo.getId(), dto);
+//                if (!commonResult.getState()) {
+//                    return commonResult;
+//                }
+                GridBasicInfo grid = gridBasicInfoService.get(bo.getId());
+                updateHouseKeeperId(grid,"",dto,true);
+                commonResult.setMessage("成功！");
+                commonResult.setState(true);
             }
         }
         return commonResult;
