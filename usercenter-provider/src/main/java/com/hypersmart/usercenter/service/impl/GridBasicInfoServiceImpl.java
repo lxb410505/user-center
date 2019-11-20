@@ -24,6 +24,7 @@ import com.hypersmart.usercenter.mapper.*;
 import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.*;
 import com.hypersmart.usercenter.util.GridOperateEnum;
+import com.hypersmart.usercenter.util.GridTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -344,7 +345,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 }
             }
             // 调用K2
-             commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
+            // commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.NEW_GRID.getOperateType(), gridBasicInfoDTO.getId(), gridBasicInfoDTO);
 
             if (num > 0) {
                 if (GridTypeConstants.PUBLIC_AREA_GRID.equals(gridBasicInfoDTO.getGridType())) {//公区网格
@@ -685,7 +686,30 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 dto.setProjectName(gridBasicInfoDTO.getProjectName());
                 dto.setStagingName(gridBasicInfoDTO.getStagingName());
                 dto.setAccount(gridBasicInfoDTO.getAccount());
-                commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.DISABLE_GRID.getOperateType(), gridInfo.getId(), dto);
+               // commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.DISABLE_GRID.getOperateType(), gridInfo.getId(), dto);
+                // 禁用网格
+                GridBasicInfoBO bo = new GridBasicInfoBO();
+              //  String[] ids = {dto.getId()};
+                bo.setIds(ids);
+                bo.setUpdatedBy("");
+                //服务中心网格
+                if(GridTypeEnum.SERVICE_CENTER_GRID.getGridType().equals(dto.getGridType())){
+                    stageServiceGirdRefMapper.disableServiceCenterGrid(bo);
+                    List<GridBasicInfo> gridBasicInfoLists = getGridBasicInfoByServiceGridId(dto.getId());
+                    if(!CollectionUtils.isEmpty(gridBasicInfoLists)){
+                        for (GridBasicInfo grid : gridBasicInfoLists) {
+                            grid.setUpdatedBy("");
+                            grid.setHousekeeperId(null);
+                            grid.setGridRemark(null);
+                        }
+                        gridBasicInfoService.updateBatch(gridBasicInfoLists);
+
+                    }
+                }else{
+                    //楼栋、公区网格
+                    gridBasicInfoMapper.disableGridInfo(bo);
+                    gridRangeService.deleteRangeByGridIds(ids);
+                }
                 if (!commonResult.getState()) {
                     return commonResult;
                 }
@@ -693,7 +717,28 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         }
         return commonResult;
     }
-
+    //根据服务中心网格id 获取覆盖地块的网格
+    private List<GridBasicInfo> getGridBasicInfoByServiceGridId(String gridId){
+        List<Map<String, Object>> serviceGridByGridId = stageServiceGirdRefMapper.getServiceGridByGridId(gridId);
+        List<GridBasicInfo> gridBasicInfos=new ArrayList<>();
+        if(!CollectionUtils.isEmpty(serviceGridByGridId)){
+            List<String> stagingIds=new ArrayList<>();
+            for(Map<String, Object> serviceGrid:serviceGridByGridId){
+                String stagingId = serviceGrid.get("stagingId") == null ? null : String.valueOf(serviceGrid.get("stagingId"));
+                stagingIds.add(stagingId);
+            }
+            QueryFilter queryFilter=QueryFilter.build(GridBasicInfo.class);
+            queryFilter.addFilter("grid_type",GridTypeEnum.SERVICE_CENTER_GRID.getGridType(), QueryOP.IN, FieldRelation.AND);
+            queryFilter.addFilter("is_deleted",0, QueryOP.EQUAL, FieldRelation.AND);
+            queryFilter.addFilter("enabled_flag",1, QueryOP.EQUAL, FieldRelation.AND);
+            queryFilter.addFilter("staging_id",stagingIds, QueryOP.IN, FieldRelation.AND);
+            PageList<GridBasicInfo> query = gridBasicInfoService.query(queryFilter);
+            if(query!=null){
+                gridBasicInfos=query.getRows();
+            }
+        }
+        return gridBasicInfos;
+    }
     /**
      * 批量删除网格
      *
@@ -824,10 +869,14 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 dto.setStagingName(gridBasicInfoDTO.getStagingName());
                 dto.setStagingId(gridBasicInfoDTO.getStagingId());
                 dto.setAccount(gridBasicInfoDTO.getAccount());
-                commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.LINK_HOUSEKEEPER.getOperateType(), bo.getId(), dto);
-                if (!commonResult.getState()) {
-                    return commonResult;
-                }
+               commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.LINK_HOUSEKEEPER.getOperateType(), bo.getId(), dto);
+//                if (!commonResult.getState()) {
+//                    return commonResult;
+//                }
+                GridBasicInfo grid = gridBasicInfoService.get(bo.getId());
+                updateHouseKeeperId(grid,"",dto,true);
+                commonResult.setMessage("成功！");
+                commonResult.setState(true);
             }
         }
         return commonResult;
@@ -919,8 +968,31 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 String[] arr = {bo.getId()};
                 gridBasicInfoDTO.setIds(arr);
                 gridBasicInfoDTO.setGridType(bo.getGridType());
+
                 // 调用K2
-                commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.HOUSEKEEPER_DISASSOCIATED.getOperateType(), bo.getId(), gridBasicInfoDTO);
+               // commonResult = gridApprovalRecordService.callApproval(GridOperateEnum.HOUSEKEEPER_DISASSOCIATED.getOperateType(), bo.getId(), gridBasicInfoDTO);
+                gridBasicInfoDTO.setHousekeeperId(null);
+                if(GridTypeEnum.SERVICE_CENTER_GRID.getGridType().equals(gridBasicInfoDTO.getGridType())){
+                    List<GridBasicInfo> gridBasicInfoLists = getGridBasicInfoByServiceGridId(bo.getId());
+                    if(!CollectionUtils.isEmpty(gridBasicInfoLists)){
+                        boolean saveHistory=true;
+                        for (GridBasicInfo info : gridBasicInfoLists) {
+                            updateHouseKeeperId(info,"",gridBasicInfoDTO,saveHistory);
+                            saveHistory=false;
+                        }
+                    }
+                }else{
+                    String[] ids = gridBasicInfoDTO.getIds();
+                    List<GridBasicInfo> gridBasicInfoList = gridBasicInfoService.getByIds(ids);
+                    if (gridBasicInfoList != null && gridBasicInfoList.size() > 0) {
+                        for (GridBasicInfo grid : gridBasicInfoList) {
+                            updateHouseKeeperId(grid,"",gridBasicInfoDTO,true);
+                        }
+                    }
+                }
+
+
+
                 if (!commonResult.getState()) {
                     return commonResult;
                 }
@@ -928,7 +1000,21 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         }
         return commonResult;
     }
-
+    //更新网格管家信息
+    private void updateHouseKeeperId(GridBasicInfo grid,String submitterId,GridBasicInfoDTO dto,boolean saveHistory){
+        if(saveHistory){
+            gridBasicInfoHistoryService.saveGridBasicInfoHistory(grid, 0);
+        }
+        if ("".equals(dto.getHousekeeperId())) {
+            grid.setHousekeeperId(null);
+        } else {
+            grid.setHousekeeperId(dto.getHousekeeperId());
+        }
+        grid.setUpdateTimes(grid.getUpdateTimes() + 1);
+        grid.setUpdationDate(new Date());
+        grid.setUpdatedBy(submitterId);
+        gridBasicInfoService.update(grid);
+    }
     @Override
     public List<RangeDTO> getGridsHouseBymassifId(String massifId) {
         List<RangeDTO> returnList = new ArrayList<>();
