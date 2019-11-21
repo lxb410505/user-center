@@ -313,7 +313,20 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         List<UcOrg> orgs = this.query(childQuery).getRows();
         return orgs;
     }
+    @Override
+    public List<UcOrg> queryByParents(String orgId, String grade) {
 
+        UcOrg org = this.get(orgId);
+
+        QueryFilter childQuery = QueryFilter.build();
+//        childQuery.addFilter("path", org.getPath(), QueryOP.RIGHT_LIKE, FieldRelation.AND);
+//        childQuery.addFilter("id", orgId, QueryOP.NOT_EQUAL, FieldRelation.AND);
+//        childQuery.addFilter("grade", grade, QueryOP.EQUAL, FieldRelation.AND);
+        childQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+        childQuery.addFilter("parentId", org.getParentId(), QueryOP.NOT_EQUAL, FieldRelation.AND);
+        List<UcOrg> orgs = this.query(childQuery).getRows();
+        return orgs;
+    }
     @Override
     public List<UcOrg> queryByDemensionCode(String userId, String demensionCode) {
         List<UcDemension> queryByCodeList = ucDemensionService.queryByCode(demensionCode);

@@ -12,6 +12,7 @@ import com.hypersmart.usercenter.dto.RangeDTO;
 import com.hypersmart.usercenter.mapper.UcOrgUserMapper;
 import com.hypersmart.usercenter.mapper.UcUserMapper;
 import com.hypersmart.usercenter.model.Divide;
+import com.hypersmart.usercenter.model.GridRange;
 import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.GridBasicInfoService;
@@ -69,9 +70,14 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
          *
          */
         Object orgId = ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
-
         if (orgId != null) {
-            queryFilter.addFilter("divideId", orgId.toString(), QueryOP.IN, FieldRelation.AND, "two");
+            List<UcOrg> ucOrgs = ucOrgService.queryByParents(orgId.toString(), "");
+            //查询项目级别的管家
+            String projectIds = String.join(",",ucOrgs.stream().map(UcOrg::getId).collect(Collectors.toList()));
+
+            queryFilter.addFilter("divideId", projectIds, QueryOP.IN, FieldRelation.AND, "two");
+
+
         } else {
             PageList<Map<String, Object>> pageList = new PageList();
             pageList.setTotal(0);

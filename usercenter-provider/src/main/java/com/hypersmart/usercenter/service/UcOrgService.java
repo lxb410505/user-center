@@ -35,7 +35,7 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
     List<UcOrg> queryChildrenByOrgId(String orgId,String grade);
 
     List<UcOrg> queryByDemensionCode(String userId,String demensionCode);
-
+     List<UcOrg> queryByParents(String orgId, String grade);
 
     /**
      * 根据组织id获取所有维度的关联组织及当前组织
