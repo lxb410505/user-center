@@ -565,7 +565,7 @@
         FROM
         uc_user u
         JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
-        JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.parent_ID_
         JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
         JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
         JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
