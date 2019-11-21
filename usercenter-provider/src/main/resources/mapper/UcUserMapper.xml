@@ -19,6 +19,7 @@
     </resultMap>
 
     <select id="quertListFive" parameterType="java.util.Map" resultType="java.util.Map">
+
         SELECT * from (
         select
         u.ID_ AS houseKeeperId,
@@ -29,36 +30,36 @@
         post.ID_ AS `postId`,
         post.POST_KEY_ AS `postKey`,
         post.POS_NAME_ AS posName,
-        org_lv5.NAME_ AS corpName,
-        org_lv4.NAME_ AS areaName,
-        org_lv3.NAME_ AS cityName,
-        org_lv2.NAME_ AS projectName,
-        org.NAME_ AS divideName,
-        org_lv5.ID_ AS corpId,
-        org_lv4.ID_ AS areaId,
-        org_lv3.ID_ AS cityId,
-        org_lv2.ID_ AS projectId,
-        org.ID_ AS divideId
+        org_lv4.NAME_ AS corpName,
+        org_lv3.NAME_ AS areaName,
+        org_lv2.NAME_ AS cityName,
+        org.NAME_ AS projectName,
+
+        org_lv4.ID_ AS corpId,
+        org_lv3.ID_ AS areaId,
+        org_lv2.ID_ AS cityId,
+        org.ID_ AS projectId
+
         from uc_user u
         join uc_org_user uou on u.ID_ = uou.USER_ID_
         join uc_org org on uou.ORG_ID_ = org.ID_
         join uc_org org_lv2 on org.PARENT_ID_ = org_lv2.ID_
         join uc_org org_lv3 on org_lv2.PARENT_ID_ = org_lv3.ID_
         join uc_org org_lv4 on org_lv3.PARENT_ID_ = org_lv4.ID_
-        join uc_org org_lv5 on org_lv4.PARENT_ID_ = org_lv5.ID_
+
         join uc_org_post post on uou.POS_ID_ =  post.ID_
         join uc_org_job uoj on post.JOB_ID_ = uoj.ID_
         join uc_demension dem on
         org.DEM_ID_ = dem.ID_ and  org_lv2.DEM_ID_ = dem.ID_ and  org_lv3.DEM_ID_ = dem.ID_
-        and  org_lv4.DEM_ID_ = dem.ID_ and org_lv5.DEM_ID_ = dem.ID_
-        where uoj.CODE_ = 'kfgj' and dem.CODE_ = 'smsf' and org.GRADE_ = 'ORG_DiKuai'
+        and  org_lv4.DEM_ID_ = dem.ID_
+        where uoj.CODE_ = 'kfgj' and dem.CODE_ = 'smsf' and org.GRADE_ = 'ORG_XiangMu'
         and u.IS_DELE_ = 0
         and uou.IS_DELE_ = 0
         and org.IS_DELE_ = 0
         and org_lv2.IS_DELE_ = 0
         and org_lv3.IS_DELE_ = 0
         and org_lv4.IS_DELE_ = 0
-        and org_lv5.IS_DELE_ = 0
+
         and post.IS_DELE_ = 0
         and uoj.IS_DELE_ = 0
         and dem.IS_DELE_ = 0
