@@ -323,7 +323,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
 //        childQuery.addFilter("id", orgId, QueryOP.NOT_EQUAL, FieldRelation.AND);
 //        childQuery.addFilter("grade", grade, QueryOP.EQUAL, FieldRelation.AND);
         childQuery.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
-        childQuery.addFilter("parentId", org.getParentId(), QueryOP.NOT_EQUAL, FieldRelation.AND);
+        childQuery.addFilter("id", org.getParentId(), QueryOP.NOT_EQUAL, FieldRelation.AND);
         List<UcOrg> orgs = this.query(childQuery).getRows();
         return orgs;
     }

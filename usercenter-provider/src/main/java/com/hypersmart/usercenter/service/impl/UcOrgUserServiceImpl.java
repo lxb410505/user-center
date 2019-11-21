@@ -70,12 +70,13 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
          *
          */
         Object orgId = ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
-        if (orgId != null) {
-            List<UcOrg> ucOrgs = ucOrgService.queryByParents(orgId.toString(), "");
-            //查询项目级别的管家
-            String projectIds = String.join(",",ucOrgs.stream().map(UcOrg::getId).collect(Collectors.toList()));
+        List<UcOrg> ucOrgs = ucOrgService.queryByParents(orgId.toString(), "");
 
-            queryFilter.addFilter("divideId", projectIds, QueryOP.IN, FieldRelation.AND, "two");
+        if (orgId != null&&ucOrgs!=null&&ucOrgs.size()>0) {
+            //查询项目级别的管家
+         //   String projectIds = String.join(",",ucOrgs.stream().map(UcOrg::getId).collect(Collectors.toList()));
+
+            queryFilter.addFilter("divideId", ucOrgs.get(0).getId(), QueryOP.IN, FieldRelation.AND, "two");
 
 
         } else {
