@@ -1,5 +1,6 @@
 package com.hypersmart.usercenter.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.query.*;
@@ -70,14 +71,13 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
          *
          */
         Object orgId = ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
-        List<UcOrg> ucOrgs = ucOrgService.queryByParents(orgId.toString(), "");
 
+        List<UcOrg> ucOrgs = ucOrgService.queryByParents(orgId.toString(), "");
         if (orgId != null&&ucOrgs!=null&&ucOrgs.size()>0) {
             //查询项目级别的管家
          //   String projectIds = String.join(",",ucOrgs.stream().map(UcOrg::getId).collect(Collectors.toList()));
-
-            queryFilter.addFilter("divideId", ucOrgs.get(0).getId(), QueryOP.IN, FieldRelation.AND, "two");
-
+            queryFilter.addFilter("projectId", ucOrgs.get(0).getId(), QueryOP.IN, FieldRelation.AND, "two");
+            logger.info("查询项目级别的管家,projectId="+ucOrgs.get(0).getId());
 
         } else {
             PageList<Map<String, Object>> pageList = new PageList();
@@ -188,6 +188,9 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
             String pathpli = path.replace(".", "");
             int num = path.length() - pathpli.length();
             List<Map<String, Object>> query = new ArrayList<>();
+            logger.info("查询项目级别的管家,num="+num);
+            logger.info("查询项目级别的管家,queryFilter.getParams()="+ JSON.toJSONString(queryFilter.getParams()));
+
             switch (num) {
                 case 3:
                     query = this.ucUserMapper.quertListTwo(queryFilter.getParams());
