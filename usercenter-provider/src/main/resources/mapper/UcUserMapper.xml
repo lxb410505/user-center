@@ -105,7 +105,7 @@
         join uc_demension dem on
         org.DEM_ID_ = dem.ID_ and  org_lv2.DEM_ID_ = dem.ID_ and  org_lv3.DEM_ID_ = dem.ID_
         and  org_lv4.DEM_ID_ = dem.ID_
-        where uoj.CODE_ = 'guanjia' and dem.CODE_ = 'smsf' and org.GRADE_ = 'ORG_DiKuai') a
+        where uoj.CODE_ = 'kfgj' and dem.CODE_ = 'smsf' and org.GRADE_ = 'ORG_DiKuai') a
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
@@ -143,7 +143,7 @@
         join uc_demension dem on
         org.DEM_ID_ = dem.ID_
         and  org_lv4.DEM_ID_ = dem.ID_ and org_lv5.DEM_ID_ = dem.ID_
-        where uoj.CODE_ = 'guanjia' and dem.CODE_ = 'smsf' and org.GRADE_ = 'ORG_DiKuai'
+        where uoj.CODE_ = 'kfgj' and dem.CODE_ = 'smsf' and org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0
         and uou.IS_DELE_ = 0
         and org.IS_DELE_ = 0
@@ -185,7 +185,7 @@
         join uc_org_job uoj on post.JOB_ID_ = uoj.ID_ and uoj.IS_DELE_ = 0
         join uc_demension dem on
         org.DEM_ID_ = dem.ID_ and  org_lv2.DEM_ID_ = dem.ID_
-        where uoj.CODE_ = 'guanjia' and dem.CODE_ = 'smsf' and org.GRADE_ = 'ORG_DiKuai') a
+        where uoj.CODE_ = 'kfgj' and dem.CODE_ = 'smsf' and org.GRADE_ = 'ORG_DiKuai') a
         <where>
             <if test="whereSql!=null">
                 ${whereSql}
@@ -228,7 +228,7 @@
         WHERE
             gr.range_type = #{unitType}
         AND gr.resource_id = #{unitId}
-        AND uoj.CODE_ = 'guanjia'
+        AND uoj.CODE_ = 'kfgj'
         AND dem.CODE_ = 'smsf'
         AND org.ID_ = info.staging_id
         AND org.GRADE_ = 'ORG_DiKuai'
@@ -342,7 +342,7 @@
         JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
         JOIN grid_basic_info info ON u.ID_ = info.housekeeper_id
         WHERE
-        uoj.CODE_ = 'guanjia'
+        uoj.CODE_ = 'kfgj'
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
