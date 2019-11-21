@@ -42,7 +42,7 @@
 
         from uc_user u
         join uc_org_user uou on u.ID_ = uou.USER_ID_
-        join uc_org org on uou.ORG_ID_ = org.ID_
+        join uc_org org on uou.ORG_ID_ = org.parent_ID_
         join uc_org org_lv2 on org.PARENT_ID_ = org_lv2.ID_
         join uc_org org_lv3 on org_lv2.PARENT_ID_ = org_lv3.ID_
         join uc_org org_lv4 on org_lv3.PARENT_ID_ = org_lv4.ID_
@@ -96,7 +96,7 @@
         org.ID_ AS divideId
         from uc_user u
         join uc_org_user uou on u.ID_ = uou.USER_ID_
-        join uc_org org on uou.ORG_ID_ = org.ID_
+        join uc_org org on uou.ORG_ID_ = org.parent_ID_
         join uc_org org_lv2 on org.PARENT_ID_ = org_lv2.ID_
         join uc_org org_lv3 on org_lv2.PARENT_ID_ = org_lv3.ID_
         join uc_org org_lv4 on org_lv3.PARENT_ID_ = org_lv4.ID_
@@ -135,7 +135,7 @@
         org.ID_ AS divideId
         from uc_user u
         join uc_org_user uou on u.ID_ = uou.USER_ID_
-        join uc_org org on uou.ORG_ID_ = org.ID_
+        join uc_org org on uou.ORG_ID_ = org.parent_ID_
         join uc_org org_lv4 on org.PARENT_ID_ = org_lv4.ID_
         join uc_org org_lv5 on org_lv4.PARENT_ID_ = org_lv5.ID_
         join uc_org_post post on uou.POS_ID_ =  post.ID_
@@ -179,7 +179,7 @@
         org.ID_ AS divideId
         from uc_user u
         join uc_org_user uou on u.ID_ = uou.USER_ID_ and uou.IS_DELE_ = 0
-        join uc_org org on uou.ORG_ID_ = org.ID_ and org.IS_DELE_ = 0
+        join uc_org org on uou.ORG_ID_ = org.parent_ID_ and org.IS_DELE_ = 0
         join uc_org org_lv2 on org.PARENT_ID_ = org_lv2.ID_ and org_lv2.IS_DELE_ = 0
         join uc_org_post post on uou.POS_ID_ =  post.ID_ and post.IS_DELE_ = 0
         join uc_org_job uoj on post.JOB_ID_ = uoj.ID_ and uoj.IS_DELE_ = 0
@@ -221,7 +221,7 @@
         JOIN grid_basic_info info ON u.ID_ = info.housekeeper_id
         JOIN grid_range gr ON info.id = gr.grid_id
         JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
-        JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.parent_ID_
         JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
         JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
         JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
@@ -336,7 +336,7 @@
         u.ID_,u.FULLNAME_,u.PHOTO_
         FROM uc_user u
         JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
-        JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.parent_ID_
         JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
         JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
         JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
