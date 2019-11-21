@@ -42,7 +42,7 @@
 
         from uc_user u
         join uc_org_user uou on u.ID_ = uou.USER_ID_
-        join uc_org org on uou.ORG_ID_ = org.parent_ID_
+        join uc_org org on uou.ORG_ID_ = org.ID_
         join uc_org org_lv2 on org.PARENT_ID_ = org_lv2.ID_
         join uc_org org_lv3 on org_lv2.PARENT_ID_ = org_lv3.ID_
         join uc_org org_lv4 on org_lv3.PARENT_ID_ = org_lv4.ID_
