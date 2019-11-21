@@ -71,7 +71,6 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
          *
          */
         Object orgId = ContextUtils.get().getGlobalVariable(ContextUtils.DIVIDE_ID_KEY);
-
         List<UcOrg> ucOrgs = ucOrgService.queryByParents(orgId.toString(), "");
         if (orgId != null&&ucOrgs!=null&&ucOrgs.size()>0) {
             //查询项目级别的管家
