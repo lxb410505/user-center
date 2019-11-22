@@ -1010,7 +1010,7 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
         } else {
             grid.setHousekeeperId(dto.getHousekeeperId());
         }
-        grid.setUpdateTimes(grid.getUpdateTimes() + 1);
+        grid.setUpdateTimes(1);
         grid.setUpdationDate(new Date());
         grid.setUpdatedBy(submitterId);
         gridBasicInfoService.update(grid);

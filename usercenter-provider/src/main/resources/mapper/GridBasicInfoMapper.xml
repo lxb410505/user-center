@@ -256,12 +256,12 @@
         FROM
         uc_user u
         JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
-        JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.parent_ID_
         JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
         JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
         JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
         WHERE
-        uoj.CODE_ = 'guanjia'
+        uoj.CODE_ = 'kfgj'
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
         AND u.IS_DELE_ = 0
@@ -452,12 +452,12 @@
         FROM
         uc_user u
         JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
-        JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.parent_ID_
         JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
         JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
         JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
         WHERE
-        uoj.CODE_ = 'guanjia'
+        uoj.CODE_ = 'kfgj'
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
@@ -565,12 +565,12 @@
         FROM
         uc_user u
         JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
-        JOIN uc_org org ON uou.ORG_ID_ = org.ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.parent_ID_
         JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
         JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
         JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
         WHERE
-        uoj.CODE_ = 'guanjia'
+        uoj.CODE_ = 'kfgj'
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
@@ -705,7 +705,7 @@
         JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
         JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
         where
-         uoj.CODE_ = 'guanjia'
+         uoj.CODE_ = 'kfgj'
         AND dem.CODE_ = 'smsf'
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
