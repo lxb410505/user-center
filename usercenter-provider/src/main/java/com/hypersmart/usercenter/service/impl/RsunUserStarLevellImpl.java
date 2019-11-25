@@ -137,7 +137,7 @@ public class  RsunUserStarLevellImpl extends GenericService<String, RsunUserStar
             }
             List<Map<String, Object>> query = new ArrayList<>();
             Map<String, Object> params = queryFilter.getParams();
-            if(StringUtils.isRealEmpty(params.get("month").toString())){
+            if(params.get("month")==null||StringUtils.isRealEmpty(params.get("month").toString())){
                 logger.info("查询全年");
 
                 query = this.rsunUserStarLevellMapper.queryYear(null);
@@ -276,7 +276,7 @@ public class  RsunUserStarLevellImpl extends GenericService<String, RsunUserStar
             }
             List<Map<String, Object>> query = new ArrayList<>();
             Map<String, Object> params = queryFilter.getParams();
-            if(StringUtils.isRealEmpty(params.get("year").toString())){
+            if(params.get("month")==null||StringUtils.isRealEmpty(params.get("month").toString())){
                 logger.info("查询全年");
 
                 query = this.rsunUserStarLevellMapper.queryYear4Badge(null);
