@@ -17,14 +17,14 @@
         <!--order by a.total_coin-->
 
         select * from uc.user_gold_year
-        order by sort desc
+        order by sort
 
     </select>
 
     <select id="queryMonth" resultType="java.util.Map" parameterType="java.util.Map">
 
         select * from uc.user_gold_year where year= #{year} and month = #{month}
-        order by sort desc
+        order by sort
 
     </select>
 
@@ -38,7 +38,7 @@
         and c.name_ <> '']]>
 
         group by a.uc_user_id
-        order by a.total_coin
+        order by a.total_coin desc
 
     </select>
     <select id="queryMonth4job" resultType="java.util.Map" parameterType="java.lang.String" >
@@ -49,7 +49,7 @@
         where
         DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s}]]>
         group by uc_user_id
-        order by  s desc
+        order by  s
 
 
     </select>
@@ -85,7 +85,7 @@
         <!--order by a.total_coin-->
 
         select * from uc.user_gold_year
-        order by sort desc
+        order by sort
 
     </select>
 
@@ -93,7 +93,7 @@
 
         select * from uc.user_Badge_year where year= #{year} and month = #{month}
 
-        order by sort desc
+        order by sort
 
     </select>
 
@@ -107,7 +107,7 @@
         and c.name_ <> '']]>
 
         group by a.uc_user_id
-        order by a.total_coin
+        order by a.total_coin desc
 
     </select>
     <select id="queryMonth4job4Badge" resultType="java.util.Map" parameterType="java.lang.String" >
@@ -118,7 +118,7 @@
         where
         DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s}]]>
         group by uc_user_id
-        order by  s desc
+        order by  s
 
 
     </select>
