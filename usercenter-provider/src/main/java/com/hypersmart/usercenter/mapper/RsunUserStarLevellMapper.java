@@ -12,6 +12,11 @@ import java.util.Map;
 @Mapper
 public interface  RsunUserStarLevellMapper extends GenericMapper<RsunUserStarLevell> {
 
+    /**
+     * 金币相关
+     * @param map
+     * @return
+     */
     List<Map<String, Object>> queryYear(Map<String, Object> map);
     List<Map<String, Object>> queryMonth(Map<String, Object> map);
 
@@ -21,5 +26,25 @@ public interface  RsunUserStarLevellMapper extends GenericMapper<RsunUserStarLev
     int insertMonth(Map map);
     int deleteGoldYear();
     int deleteGoldMonth();
+
+    /**
+     * 徽章相关
+     * @param map
+     * @return
+     */
+    List<Map<String, Object>> queryYear4Badge(Map<String, Object> map);
+    List<Map<String, Object>> queryMonth4Badge(Map<String, Object> map);
+
+    List<Map<String, Object>> queryYear4job4Badge();
+    List<Map<String, Object>> queryMonth4job4Badge(@Param("S") String s);
+    int insertYear4Badge(Map map);
+    int insertMonth4Badge(Map map);
+    int deleteGoldYear4Badge();
+    int deleteGoldMonth4Badge();
+    int insertGoldRecord(Map<String, Object> map);
+    int updateSingleRecord(Map<String, Object> map);
+    int insertBadgeHistory(Map<String, Object> map);
+
+
 
 }

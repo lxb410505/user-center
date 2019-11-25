@@ -68,4 +68,100 @@
         delete from user_gold_month;
     </delete>
 
+
+
+
+    <select id="queryYear4Badge" resultType="java.util.Map" parameterType="java.util.Map">
+
+
+        <!--<![CDATA[   select a.*,c .name_ from uc.rsun_user_star_level a-->
+        <!--left join uc_org_user b on b.user_Id_ = a.uc_user_id-->
+        <!--left join uc_org c on c.id_= b.org_ID_-->
+        <!--WHERE-->
+        <!--DATE_FORMAT(a.level_sy_time, '%Y-%m') = #{time}-->
+        <!--and c.name_ <> '']]>-->
+
+        <!--group by a.uc_user_id-->
+        <!--order by a.total_coin-->
+
+        select * from uc.user_gold_year
+        order by sort desc
+
+    </select>
+
+    <select id="queryMonth4Badge" resultType="java.util.Map" parameterType="java.util.Map">
+
+        select * from uc.user_Badge_year where year= #{year} and month = #{month}
+
+        order by sort desc
+
+    </select>
+
+    <select id="queryYear4job4Badge" resultType="java.util.Map" >
+
+
+        <![CDATA[   select a.*,c .name_ ,d.fullname_from uc.rsun_user_star_level a
+        left join uc_org_user b on b.user_Id_ = a.uc_user_id
+        left join uc_org c on c.id_= b.org_ID_
+      left join uc_user d on d.id_ = a.uc_user_id
+        and c.name_ <> '']]>
+
+        group by a.uc_user_id
+        order by a.total_coin
+
+    </select>
+    <select id="queryMonth4job4Badge" resultType="java.util.Map" parameterType="java.lang.String" >
+
+        <![CDATA[
+
+        select sum(gcoin_val) s ,uc_user_id  from uc.rsun_Badge_hi_reward a
+        where
+        DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s}]]>
+        group by uc_user_id
+        order by  s desc
+
+
+    </select>
+    <insert id="insertYear4Badge" parameterType="java.util.Map" >
+        insert into uc.user_Badge_year  values (#{id},#{sort},#{user_name},#{project},#{gold},#{year},#{sort_name})
+
+    </insert>
+    <insert id="insertMonth4Badge" parameterType="java.util.Map" >
+        insert into uc.user_Badge_year  values (#{id},#{sort},#{user_name},#{project},#{gold},#{year},#{month},#{sort_name})
+
+    </insert>
+    <delete id="deleteGoldYear4Badge">
+        delete from user_Badge_year;
+    </delete>
+    <delete id="deleteGoldMonth4Badge">
+        delete from user_Badge_month;
+    </delete>
+
+<insert id="insertGoldRecord" parameterType="java.util.Map">
+    insert into uc.gold_badge_task_record values (
+
+     #{id},
+     #{row_time},
+     #{state},
+     #{message},
+     #{type},
+     #{end_time}
+     )
+</insert>
+
+    <update id ="updateSingleRecord" parameterType="java.util.Map">
+        update uc.gold_badge_task_record set state= #{state},message= #{message}, end_time=#{end_time}
+        where id = #{id}
+    </update>
+
+    <insert id="insertBadgeHistory" parameterType="java.util.Map">
+      insert into `uc`.`rsun_badge_hi_reward` values (
+      #{uc_user_id} ,
+      #{jb_jl_reason} ,
+      #{jb_jl_time} ,
+      #{gcoin_val} ,
+      #{jb_originnal_time}
+
+      );
+    </insert>
 </mapper>
