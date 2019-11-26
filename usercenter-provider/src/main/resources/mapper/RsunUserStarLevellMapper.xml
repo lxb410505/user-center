@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.RsunUserStarLevellMapper">
+
+<select id="getRsunUserStarLevelList" parameterType="java.util.Map" resultType="com.hypersmart.usercenter.model.RsunUserStarLevel">
+    SELECT a.pj_star_id  pjStarId,a.total_coin totalCoin,a.uc_user_id ucUserId,a.xz_num xzNum,b.FULLNAME_ fullName,b.ACCOUNT_ account FROM uc.rsun_user_star_level a RIGHT JOIN uc.uc_user b on a.uc_user_id=b.ID_
+    <where>
+        <if test="whereSql!=null">
+            ${whereSql}
+        </if>
+    </where>
+    <if test="orderBySql!=null">
+        ORDER BY ${orderBySql}
+    </if>
+</select>
+
+
+</mapper>
