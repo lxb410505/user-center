@@ -27,16 +27,16 @@
 
     @Resource
     RsunUserStarlLevelService rsunUserStarlLevelService;
-    /**
-     * 查询员工金币数和勋章数
-     * @param queryFilter
-     * @return
-     */
-    @PostMapping({"/moneylist"})
-    @ApiOperation(value = "用户金币等级列表}", httpMethod = "POST", notes = "获取用户管理列表")
-    public PageList<RsunUserStarLevel> moneylistt(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
-        return rsunUserStarlLevelService.moneylist(queryFilter);
-    }
+//    /**
+//     * 查询员工金币数和勋章数
+//     * @param queryFilter
+//     * @return
+//     */
+//    @PostMapping({"/moneylist"})
+//    @ApiOperation(value = "用户金币等级列表}", httpMethod = "POST", notes = "获取用户管理列表")
+//    public PageList<RsunUserStarLevel> moneylistt(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+//        return rsunUserStarlLevelService.moneylist(queryFilter);
+//    }
 
 
     @PutMapping({"/update"})

@@ -13,7 +13,7 @@ import java.util.Map;
 @Service
 public interface  RsunUserStarlLevelService extends IGenericService<String, RsunUserStarLevell> {
 
-    PageList<RsunUserStarLevel> moneylist(QueryFilter queryFilter);
+   // PageList<RsunUserStarLevel> moneylist(QueryFilter queryFilter);
 
     public PageList<Map<String, Object>> quertList(QueryFilter queryFilterqueryFilter);
     public PageList<Map<String, Object>> quertList4Badge(QueryFilter queryFilterqueryFilter);
