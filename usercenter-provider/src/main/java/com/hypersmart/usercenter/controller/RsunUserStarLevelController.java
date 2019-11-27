@@ -72,7 +72,16 @@ public class RsunUserStarLevelController extends BaseController {
 
     @PostMapping({"/add/badge"})
     @ApiOperation(value = "管家列表", httpMethod = "POST", notes = "管家列表")
+
     public int getbadge(@ApiParam(name = "queryFilter", value = "查询条件") @RequestBody Map map) {
+        if(map == null){
+            return -1;
+        }
+        if(map.get("uc_user_id") == null || (String)map.get("uc_user_id") == ""){
+            if(map.get("account") == null || (String)map.get("account") == ""){
+                return -1;
+            }
+        }
         return rsunUserStarlLevelService.insertBadge(map);
     }
 }

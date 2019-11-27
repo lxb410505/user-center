@@ -383,6 +383,14 @@ public class  RsunUserStarLevellImpl extends GenericService<String, RsunUserStar
     }
     @Override
     public int insertBadge(Map map){
+        //判断用户ID是否存在  不存在则查询userID
+        if(map.get("uc_user_id") == null || (String)map.get("uc_user_id") == "") {
+            String userId = rsunUserStarLevellMapper.getUserIdByAccount((String) map.get("account"));
+            if (StringUtil.isEmpty(userId)) {
+                return -1;
+            }
+            map.put("uc_user_id",userId);
+        }
         map.put("jb_jl_time",new Date());
         map.put("jb_originnal_time",new Date());
 
