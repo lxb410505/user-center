@@ -13,7 +13,15 @@ import java.util.Map;
 
 @Mapper
 public interface  RsunUserStarLevellMapper extends GenericMapper<RsunUserStarLevell> {
+
+
     List<RsunUserStarLevel> getRsunUserStarLevelList(Map<String, Object> params);
+    /**
+     * 根据员工账号查询userId
+     * @param account
+     * @return
+     */
+    String getUserIdByAccount(String account);
 
     /**
      * 金币相关

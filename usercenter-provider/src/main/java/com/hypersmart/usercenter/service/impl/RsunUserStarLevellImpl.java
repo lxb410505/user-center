@@ -2,22 +2,18 @@ package com.hypersmart.usercenter.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
+import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
-import com.hypersmart.framework.mapper.GenericMapper;
+import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.framework.utils.StringUtils;
-import com.hypersmart.usercenter.controller.GridApprovalRecordController;
 import com.hypersmart.usercenter.mapper.RsunUserStarLevellMapper;
-import com.hypersmart.usercenter.mapper.UcUserMapper;
 import com.hypersmart.usercenter.model.RsunUserStarLevel;
 import com.hypersmart.usercenter.model.RsunUserStarLevell;
-import com.hypersmart.usercenter.model.UcUser;
 import com.hypersmart.usercenter.service.RsunUserStarlLevelService;
-import com.hypersmart.usercenter.service.UcUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -26,6 +22,7 @@ import java.util.*;
 
 @Service("rsunUserStarLevellImpl")
 public class  RsunUserStarLevellImpl extends GenericService<String, RsunUserStarLevell> implements RsunUserStarlLevelService {
+
 
     private static final Logger logger = LoggerFactory.getLogger(RsunUserStarLevellImpl.class);
 
@@ -60,6 +57,59 @@ public class  RsunUserStarLevellImpl extends GenericService<String, RsunUserStar
         pageList.setPageSize(20);
         pageList.setPage(1);
         return new PageList<>();
+    }
+
+
+    /**
+     * 修改员工等级
+     * @param modelMap
+     * @return
+     */
+    @Override
+    public CommonResult updateInfo(Map<String, Object> modelMap) {
+        //判断入参是否存在userId  不存在 根据账号查出userId 直接新增
+        if(modelMap.get("ucUserId") == null || (String)modelMap.get("ucUserId") == ""){
+            //新增
+            String userId = rsunUserStarLevellMapper.getUserIdByAccount((String)modelMap.get("account"));
+            if(StringUtil.isEmpty(userId)){
+                return new CommonResult(false,"该账号用户信息有异常，请联系管理员");
+            }
+            RsunUserStarLevell rsunUserStarLevell=new RsunUserStarLevell();
+            rsunUserStarLevell.setLevelSyTime(new Date());
+            rsunUserStarLevell.setTotalCoin(0.0);
+            rsunUserStarLevell.setUcUserId(userId);
+            if(modelMap.get("pjStarIdNew") != null ){
+                rsunUserStarLevell.setPjStarId((Integer)modelMap.get("pjStarIdNew"));
+            }else{
+                rsunUserStarLevell.setPjStarId(0);
+            }
+            if(modelMap.get("xzNumNew") != null ){
+                rsunUserStarLevell.setXzNum((Double) modelMap.get("xzNumNew"));
+            }else{
+                rsunUserStarLevell.setXzNum(0.0);
+            }
+            this.insert(rsunUserStarLevell);
+        }else{
+            //修改
+            RsunUserStarLevell rsunUserStarLevell=new RsunUserStarLevell();
+            if(modelMap.get("xzNumNew") != null ){
+                rsunUserStarLevell.setLevelSyTime(new Date());
+            }
+            rsunUserStarLevell.setTotalCoin((Double)modelMap.get("totalCoin"));
+            rsunUserStarLevell.setUcUserId((String)modelMap.get("ucUserId"));
+            if(modelMap.get("pjStarIdNew") != null ){
+                rsunUserStarLevell.setPjStarId((Integer)modelMap.get("pjStarIdNew"));
+            }else{
+                rsunUserStarLevell.setPjStarId((Integer)modelMap.get("pjStarIdNew"));
+            }
+            if(modelMap.get("xzNumNew") != null ){
+                rsunUserStarLevell.setXzNum((Double) modelMap.get("xzNumNew"));
+            }else{
+                rsunUserStarLevell.setXzNum((Double) modelMap.get("xzNum"));
+            }
+            this.update(rsunUserStarLevell);
+        }
+        return new CommonResult(true,"修改成功");
     }
 
     //全年金币job

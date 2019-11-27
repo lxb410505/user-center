@@ -3,17 +3,23 @@
 
 <mapper namespace="com.hypersmart.usercenter.mapper.RsunUserStarLevellMapper">
 
-<select id="getRsunUserStarLevelList" parameterType="java.util.Map" resultType="com.hypersmart.usercenter.model.RsunUserStarLevel">
-    SELECT a.pj_star_id  pjStarId,a.total_coin totalCoin,a.uc_user_id ucUserId,a.xz_num xzNum,b.FULLNAME_ fullName,b.ACCOUNT_ account FROM uc.rsun_user_star_level a RIGHT JOIN uc.uc_user b on a.uc_user_id=b.ID_
-    <where>
-        <if test="whereSql!=null">
-            ${whereSql}
+    <select id="getRsunUserStarLevelList" parameterType="java.util.Map"
+            resultType="com.hypersmart.usercenter.model.RsunUserStarLevel">
+        SELECT a.pj_star_id pjStarId,a.total_coin totalCoin,a.uc_user_id ucUserId,a.xz_num xzNum,b.FULLNAME_
+        fullName,b.ACCOUNT_ account FROM uc.rsun_user_star_level a RIGHT JOIN uc.uc_user b on a.uc_user_id=b.ID_
+        <where>
+            <if test="whereSql!=null">
+                ${whereSql}
+            </if>
+        </where>
+        <if test="orderBySql!=null">
+            ORDER BY ${orderBySql}
         </if>
-    </where>
-    <if test="orderBySql!=null">
-        ORDER BY ${orderBySql}
-    </if>
-</select>
+    </select>
+
+    <select id="getUserIdByAccount" parameterType="java.lang.String" resultType="java.lang.String">
+        select ID_ from uc.uc_user where ACCOUNT_ =#{account}
+    </select>
 
 
 </mapper>
