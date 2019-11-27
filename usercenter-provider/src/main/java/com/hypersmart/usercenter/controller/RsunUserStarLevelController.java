@@ -18,6 +18,7 @@
     import java.util.ArrayList;
     import java.util.Date;
     import java.util.List;
+    import java.util.Map;
 
     @RestController
     @RequestMapping(value = {"/api/usercenter/v1/rsunUserStarLevel"}, produces = {"application/json;charset=UTF-8"})
@@ -58,5 +59,22 @@
 
 
         }
+        @PostMapping({"/query/gold"})
+        @ApiOperation(value = "管家列表", httpMethod = "POST", notes = "管家列表")
+        public PageList<Map<String, Object>> getGoldNoun(@ApiParam(name = "queryFilter", value = "查询条件") @RequestBody QueryFilter queryFilter) {
+            return rsunUserStarlLevelService.quertList(queryFilter);
+        }
 
+        @PostMapping({"/query/badge"})
+        @ApiOperation(value = "管家列表", httpMethod = "POST", notes = "管家列表")
+        public PageList<Map<String, Object>> getbadge(@ApiParam(name = "queryFilter", value = "查询条件") @RequestBody QueryFilter queryFilter) {
+            return rsunUserStarlLevelService.quertList4Badge(queryFilter);
+        }
+
+
+        @PostMapping({"/add/badge"})
+        @ApiOperation(value = "管家列表", httpMethod = "POST", notes = "管家列表")
+        public int getbadge(@ApiParam(name = "queryFilter", value = "查询条件") @RequestBody Map map) {
+            return rsunUserStarlLevelService.insertBadge(map);
+        }
     }
