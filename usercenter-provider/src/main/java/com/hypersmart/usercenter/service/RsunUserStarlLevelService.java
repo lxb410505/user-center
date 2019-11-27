@@ -8,9 +8,14 @@ import com.hypersmart.usercenter.model.RsunUserStarLevell;
 import com.hypersmart.usercenter.model.Satisfaction;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public interface  RsunUserStarlLevelService extends IGenericService<String, RsunUserStarLevell> {
 
     PageList<RsunUserStarLevel> moneylist(QueryFilter queryFilter);
 
+    public PageList<Map<String, Object>> quertList(QueryFilter queryFilterqueryFilter);
+    public PageList<Map<String, Object>> quertList4Badge(QueryFilter queryFilterqueryFilter);
+    int insertBadge(Map map);
 }

@@ -1,28 +1,28 @@
-package com.hypersmart.usercenter.controller;
+    package com.hypersmart.usercenter.controller;
 
-import com.hypersmart.base.controller.BaseController;
-import com.hypersmart.base.model.CommonResult;
-import com.hypersmart.base.query.*;
-import com.hypersmart.usercenter.model.RsunUserStarLevel;
-import com.hypersmart.usercenter.model.RsunUserStarLevell;
-import com.hypersmart.usercenter.model.TgeSignificantQuality;
-import com.hypersmart.usercenter.model.UcUser;
-import com.hypersmart.usercenter.service.RsunUserStarlLevelService;
-import com.hypersmart.usercenter.service.UcUserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.springframework.web.bind.annotation.*;
+    import com.hypersmart.base.controller.BaseController;
+    import com.hypersmart.base.model.CommonResult;
+    import com.hypersmart.base.query.*;
+    import com.hypersmart.usercenter.model.RsunUserStarLevel;
+    import com.hypersmart.usercenter.model.RsunUserStarLevell;
+    import com.hypersmart.usercenter.model.TgeSignificantQuality;
+    import com.hypersmart.usercenter.model.UcUser;
+    import com.hypersmart.usercenter.service.RsunUserStarlLevelService;
+    import com.hypersmart.usercenter.service.UcUserService;
+    import io.swagger.annotations.Api;
+    import io.swagger.annotations.ApiOperation;
+    import io.swagger.annotations.ApiParam;
+    import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+    import javax.annotation.Resource;
+    import java.util.ArrayList;
+    import java.util.Date;
+    import java.util.List;
 
-@RestController
-@RequestMapping(value = {"/api/usercenter/v1/rsunUserStarLevel"}, produces = {"application/json;charset=UTF-8"})
-@Api(tags = {"rsunUserStarLevelController"})
-public class  RsunUserStarLevelController extends BaseController {
+    @RestController
+    @RequestMapping(value = {"/api/usercenter/v1/rsunUserStarLevel"}, produces = {"application/json;charset=UTF-8"})
+    @Api(tags = {"rsunUserStarLevelController"})
+    public class  RsunUserStarLevelController extends BaseController {
 
 
     @Resource
@@ -57,6 +57,6 @@ public class  RsunUserStarLevelController extends BaseController {
         }
 
 
-    }
+        }
 
-}
+    }
