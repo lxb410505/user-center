@@ -14,7 +14,7 @@ public class  RsunUserStarLevel {
 
     private Double totalCoin; //金币
 
-    private Double xzNum;  //勋章数
+    private Integer xzNum;  //勋章数
 
     private String fullName; //姓名
 

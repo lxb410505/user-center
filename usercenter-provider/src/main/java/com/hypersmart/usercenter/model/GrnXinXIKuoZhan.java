@@ -8,7 +8,7 @@ public class  GrnXinXIKuoZhan {
 
     private Double userStarLeve; //用户星级
 
-    private Double userMedalLeve; //勋章数
+    private Integer userMedalLeve; //勋章数
 
     public Double getUserTotalCoin() {
         return userTotalCoin;
@@ -34,11 +34,11 @@ public class  GrnXinXIKuoZhan {
         this.userStarLeve = userStarLeve;
     }
 
-    public Double getUserMedalLeve() {
+    public Integer getUserMedalLeve() {
         return userMedalLeve;
     }
 
-    public void setUserMedalLeve(Double userMedalLeve) {
+    public void setUserMedalLeve(Integer userMedalLeve) {
         this.userMedalLeve = userMedalLeve;
     }
 

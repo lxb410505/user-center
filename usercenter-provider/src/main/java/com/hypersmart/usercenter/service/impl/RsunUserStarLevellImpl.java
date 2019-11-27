@@ -84,9 +84,9 @@ public class  RsunUserStarLevellImpl extends GenericService<String, RsunUserStar
                 rsunUserStarLevell.setPjStarId(0);
             }
             if(modelMap.get("xzNumNew") != null ){
-                rsunUserStarLevell.setXzNum((Double) modelMap.get("xzNumNew"));
+                rsunUserStarLevell.setXzNum((Integer) modelMap.get("xzNumNew"));
             }else{
-                rsunUserStarLevell.setXzNum(0.0);
+                rsunUserStarLevell.setXzNum(0);
             }
             this.insert(rsunUserStarLevell);
         }else{
@@ -103,9 +103,9 @@ public class  RsunUserStarLevellImpl extends GenericService<String, RsunUserStar
                 rsunUserStarLevell.setPjStarId((Integer)modelMap.get("pjStarIdNew"));
             }
             if(modelMap.get("xzNumNew") != null ){
-                rsunUserStarLevell.setXzNum((Double) modelMap.get("xzNumNew"));
+                rsunUserStarLevell.setXzNum((Integer) modelMap.get("xzNumNew"));
             }else{
-                rsunUserStarLevell.setXzNum((Double) modelMap.get("xzNum"));
+                rsunUserStarLevell.setXzNum((Integer) modelMap.get("xzNum"));
             }
             this.update(rsunUserStarLevell);
         }

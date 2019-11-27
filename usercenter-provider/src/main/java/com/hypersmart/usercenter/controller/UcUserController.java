@@ -103,7 +103,7 @@ public class  UcUserController extends BaseController {
                 grnXinXIKuoZhan.setUserTotalCoin(rsunUserStarLevel.getTotalCoin());//个人金币总额
             }
             if(rsunUserStarLevel.getXzNum()==null){
-                grnXinXIKuoZhan.setUserMedalLeve(0.0);
+                grnXinXIKuoZhan.setUserMedalLeve(0);
             }else {
                 grnXinXIKuoZhan.setUserMedalLeve(rsunUserStarLevel.getXzNum());//用户勋章数
             }
@@ -119,7 +119,7 @@ public class  UcUserController extends BaseController {
             rsunUserStarLevell.setUcUserId(UserCode);
             rsunUserStarLevell.setPjStarId(0);
             rsunUserStarLevell.setTotalCoin(0.0);
-            rsunUserStarLevell.setXzNum(0.0);
+            rsunUserStarLevell.setXzNum(0);
             rsunUserStarLevell.setLevelSyTime(new Date());
             rsunUserStarlLevelService.insert(rsunUserStarLevell);
 
@@ -128,7 +128,7 @@ public class  UcUserController extends BaseController {
             grnXinXIKuoZhan.setUserTotalCoin(0.0);
             grnXinXIKuoZhan.setCurMonthCoin(0.0);
             grnXinXIKuoZhan.setUserStarLeve(1.0);
-            grnXinXIKuoZhan.setUserMedalLeve(0.0);
+            grnXinXIKuoZhan.setUserMedalLeve(0);
             return grnXinXIKuoZhan;
         }
 
