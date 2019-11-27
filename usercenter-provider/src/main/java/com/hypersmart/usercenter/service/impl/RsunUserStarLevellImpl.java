@@ -95,7 +95,7 @@ public class  RsunUserStarLevellImpl extends GenericService<String, RsunUserStar
             if(modelMap.get("xzNumNew") != null ){
                 rsunUserStarLevell.setLevelSyTime(new Date());
             }else{
-                rsunUserStarLevell.setLevelSyTime((Date)modelMap.get("levelSyTime"));
+                rsunUserStarLevell.setLevelSyTime(new Date((Long)modelMap.get("levelSyTime")));
             }
             rsunUserStarLevell.setTotalCoin(Double.valueOf((String)modelMap.get("totalCoin")));
             rsunUserStarLevell.setUcUserId((String)modelMap.get("ucUserId"));
