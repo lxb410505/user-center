@@ -2,6 +2,8 @@ package com.hypersmart.usercenter.model;
 
 import lombok.Data;
 
+import java.util.Date;
+
 
 @Data
 public class  RsunUserStarLevel {
@@ -17,5 +19,7 @@ public class  RsunUserStarLevel {
     private Integer xzNum;  //勋章数
 
     private String fullName; //姓名
+
+    private Date levelSyTime; //等级授予时间
 
 }
