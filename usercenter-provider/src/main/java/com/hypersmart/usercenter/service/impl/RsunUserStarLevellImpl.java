@@ -312,7 +312,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
         boolean status = false;
         StringBuffer message = new StringBuffer("");
         String replaceId = UUID.randomUUID().toString().replace("-", "");
-        String type = "金币全年";
+        String type = "徽章全年";
 
         Map record = new HashMap();
         record.put("id", replaceId);
