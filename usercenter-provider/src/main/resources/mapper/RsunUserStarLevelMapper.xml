@@ -38,20 +38,24 @@
         and c.name_ <> '' ]]>
 
         group by a.uc_user_id
-        order by a.total_coin desc
+        order by a.total_coin
 
     </select>
     <select id="queryMonth4job" resultType="java.util.Map" parameterType="java.lang.String" >
-
- <![CDATA[
-
-        select sum(gcoin_val) s ,uc_user_id  from uc.rsun_jb_hi_reward a
+        <![CDATA[
+   select sum(gcoin_val) s ,uc_user_id ,c .name_ ,d.fullname_  from uc.rsun_jb_hi_reward a
+        left join uc_org_user b on b.user_Id_ = a.uc_user_id
+        left join uc_org c on c.id_= b.org_ID_
+        left join uc_user d on d.id_ = a.uc_user_id
+        and c.name_  <> ''
         where
         DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s} and jb_jl_type <>'appeal'
         or
-        DATE_FORMAT(a.jb_originnal_time, '%Y-%m') =#{s}  and jb_jl_type ='appeal' ]]>
+        DATE_FORMAT(a.jb_originnal_time, '%Y-%m') =#{s}  and jb_jl_type ='appeal'
         group by uc_user_id
         order by  s
+     ]]>
+
 
 
     </select>
