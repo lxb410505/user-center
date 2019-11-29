@@ -365,7 +365,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
 
         String month = cal.get(Calendar.MONTH) + 1 + "";
         int year = cal.get(Calendar.YEAR);
-        String s = year + "" + (month.length() == 1 ? "0" + month : month);
+        String s = year + "-" + (month.length() == 1 ? "0" + month : month);
         List<Map<String, Object>> maps1 = rsunUserStarLevellMapper.queryMonth4job4Badge(s);
         for (int i = 0; i < maps1.size(); i++) {
 
