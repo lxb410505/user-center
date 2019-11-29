@@ -39,6 +39,6 @@ public class RsunJbHiReward implements Serializable {
 
     @Column(name = "jb_originnal_time")
     @ApiModelProperty("申诉的公区报修工单创建时间")
-    private Double jbOriginnalTime;
+    private Date jbOriginnalTime;
 
 }
