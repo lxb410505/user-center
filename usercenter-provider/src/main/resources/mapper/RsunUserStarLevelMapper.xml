@@ -110,7 +110,7 @@
         ]]>
 
         group by a.uc_user_id
-        order by a.total_coin desc
+        order by a.xz_num desc
 
     </select>
     <select id="queryMonth4job4Badge" resultType="java.util.Map" parameterType="java.lang.String" >
