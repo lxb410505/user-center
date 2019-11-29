@@ -49,7 +49,7 @@
         where
         DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s} and jb_jl_type <>'appeal'
         or
-        DATE_FORMAT(a.jb_originnal_time, '%Y-%m') =#{s}  and jb_jl_type=='appeal' ]]>
+        DATE_FORMAT(a.jb_originnal_time, '%Y-%m') =#{s}  and jb_jl_type ='appeal' ]]>
         group by uc_user_id
         order by  s
 
