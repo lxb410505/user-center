@@ -31,11 +31,10 @@
     <select id="queryYear4job" resultType="java.util.Map" >
 
 
-        <![CDATA[   select a.*,c .name_ ,d.fullname_ from uc.rsun_user_star_level a
-        left join uc_org_user b on b.user_Id_ = a.uc_user_id
-        left join uc_org c on c.id_= b.org_ID_
+        <![CDATA[   select a.*,d.fullname_ from uc.rsun_user_star_level a
+
       left join uc_user d on d.id_ = a.uc_user_id
-        and c.name_ <> '' ]]>
+        ]]>
 
         group by a.uc_user_id
         order by a.total_coin desc
@@ -43,11 +42,10 @@
     </select>
     <select id="queryMonth4job" resultType="java.util.Map" parameterType="java.lang.String" >
         <![CDATA[
-   select sum(gcoin_val) s ,a.uc_user_id ,c .name_ name_,d.fullname_  fullname_ from uc.rsun_jb_hi_reward a
-        left join uc_org_user b on b.user_Id_ = a.uc_user_id
-        left join uc_org c on c.id_= b.org_ID_
+   select sum(gcoin_val) s ,a.uc_user_id ,d.fullname_  fullname_ from uc.rsun_jb_hi_reward a
+
         left join uc_user d on d.id_ = a.uc_user_id
-        and c.name_  <> ''
+
         where
         DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s} and jb_jl_type <>'appeal'
         or
@@ -106,11 +104,10 @@
     <select id="queryYear4job4Badge" resultType="java.util.Map" >
 
 
-        <![CDATA[   select a.*,c .name_ ,d.fullname_ from uc.rsun_user_star_level a
-        left join uc_org_user b on b.user_Id_ = a.uc_user_id
-        left join uc_org c on c.id_= b.org_ID_
+        <![CDATA[   select a.*,d.fullname_ from uc.rsun_user_star_level a
+
       left join uc_user d on d.id_ = a.uc_user_id
-        and c.name_ <> '']]>
+        ]]>
 
         group by a.uc_user_id
         order by a.total_coin desc
