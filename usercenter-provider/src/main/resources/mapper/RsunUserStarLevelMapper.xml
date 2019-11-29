@@ -117,12 +117,15 @@
 
         <![CDATA[
 
-        select sum(gcoin_val) s ,uc_user_id  from uc.rsun_Badge_hi_reward a
-        where
-        DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s}]]>
-        group by uc_user_id
-        order by  s
+                select sum(gcoin_val) s ,a.uc_user_id ,d.fullname_  fullname_ from uc.rsun_Badge_hi_reward a
 
+                left join uc_user d on d.id_ = a.uc_user_id
+          where
+                DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s}
+
+                group by uc_user_id
+                order by  s desc
+        ]]>
 
     </select>
     <insert id="insertYear4Badge" parameterType="java.util.Map" >
