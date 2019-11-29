@@ -84,4 +84,13 @@ public class RsunUserStarLevelController extends BaseController {
         }
         return rsunUserStarlLevelService.insertBadge(map);
     }
+    @GetMapping({"/job/gold"})
+    public void doGoldJob (){
+        rsunUserStarlLevelService.doGoldJob4Gold();
+    }
+
+    @GetMapping({"/job/badge"})
+    public void doBadgeJob (){
+        rsunUserStarlLevelService.doGoldJob4Badge();
+    }
 }

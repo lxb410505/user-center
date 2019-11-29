@@ -30,4 +30,8 @@ public interface  RsunUserStarlLevelService extends IGenericService<String, Rsun
     public PageList<Map<String, Object>> quertList(QueryFilter queryFilterqueryFilter);
     public PageList<Map<String, Object>> quertList4Badge(QueryFilter queryFilterqueryFilter);
     int insertBadge(Map map);
+
+    public void doGoldJob4Gold();
+    public void doGoldJob4Badge();
+
 }
