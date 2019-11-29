@@ -136,7 +136,9 @@
         delete from user_Badge_year;
     </delete>
     <delete id="deleteGoldMonth4Badge">
-        delete from user_Badge_month ;
+--         delete from user_Badge_month   where DATE_FORMAT(new , '%Y-%m') ;
+        delete from user_Badge_month   where year =DATE_FORMAT(now(), '%Y')
+                and month =DATE_FORMAT(now(), '%m')
     </delete>
 
 <insert id="insertGoldRecord" parameterType="java.util.Map">
