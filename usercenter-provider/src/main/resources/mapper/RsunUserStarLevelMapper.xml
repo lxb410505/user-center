@@ -88,7 +88,7 @@
         <!--group by a.uc_user_id-->
         <!--order by a.total_coin-->
 
-        select * from uc.user_gold_year
+        select * from uc.user_badge_year
         order by sort
 
     </select>
