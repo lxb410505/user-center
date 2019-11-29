@@ -18,40 +18,40 @@ public class CoinStatisticsListDTO {
     private  String userNumber;
 
     //一月金币数
-    private Integer january;
+    private Double january;
 
     //二月金币数
-    private Integer february;
+    private Double february;
 
     //三月金币数
-    private Integer march;
+    private Double march;
 
     //四月金币数
-    private Integer april;
+    private Double april;
 
     //五月金币数
-    private Integer may;
+    private Double may;
 
     //六月金币数
-    private Integer june;
+    private Double june;
 
     //七月金币数
-    private Integer july;
+    private Double july;
 
     //八月金币数
-    private Integer angust;
+    private Double angust;
 
     //九月金币数
-    private Integer september;
+    private Double september;
 
     //十月金币数
-    private Integer october;
+    private Double october;
 
     //十一月金币数
-    private Integer november;
+    private Double november;
 
     //十二月金币数
-    private Integer december;
+    private Double december;
 
 
 }
