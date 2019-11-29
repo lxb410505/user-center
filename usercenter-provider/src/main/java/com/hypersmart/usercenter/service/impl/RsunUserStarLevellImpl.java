@@ -219,7 +219,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
         rsunUserStarLevellMapper.insertGoldRecord(record);
         String month = cal.get(Calendar.MONTH) + 1 + "";
         int year = cal.get(Calendar.YEAR);
-        String s = year + "" + (month.length() == 1 ? "0" + month : month);
+        String s = year + "-" + (month.length() == 1 ? "0" + month : month);
         Map mapTime = new HashMap();
         mapTime.put("year",year);
         mapTime.put("month",Integer.valueOf(month));
