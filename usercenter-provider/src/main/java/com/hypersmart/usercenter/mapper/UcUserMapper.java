@@ -1,6 +1,5 @@
 package com.hypersmart.usercenter.mapper;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.hypersmart.base.query.PageBean;
 import com.hypersmart.usercenter.dto.rsunJbDTO;
 import com.hypersmart.usercenter.model.*;
@@ -74,7 +73,7 @@ public interface  UcUserMapper extends GenericMapper<UcUser> {
 
     RsunUserStarLevel getxzjb( @Param("UserCode") String UserCode);
 
-    List<rsunJbHiReward> getmoney( HashMap<String, String> map);
+    List<RsunJbHiReward> getmoney(HashMap<String, String> map);
 
     List<JinBiJiLv> getUserCoinHisRecordByUserCode(@Param("userCode") String userCode);
 
@@ -82,7 +81,7 @@ public interface  UcUserMapper extends GenericMapper<UcUser> {
 
     Boolean insertadd(rsunJbDTO reward);
 
-    void updatemoney(@Param("reward") rsunJbHiReward reward);
+    void updatemoney(@Param("reward") RsunJbHiReward reward);
 
     String getname(@Param("reward") String ucUserId);
 
