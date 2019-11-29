@@ -91,7 +91,7 @@
         <!--order by a.total_coin-->
 
         select * from uc.user_gold_year
-        order by sort desc
+        order by sort
 
     </select>
 
@@ -99,7 +99,7 @@
 
         select * from uc.user_Badge_month where year= #{year} and month = #{month}
 
-        order by sort desc
+        order by sort
 
     </select>
 
