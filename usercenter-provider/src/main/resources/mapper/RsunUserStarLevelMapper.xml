@@ -60,7 +60,7 @@
 
     </insert>
     <insert id="insertMonth" parameterType="java.util.Map" >
-        insert into uc.user_gold_year  values (#{id},#{sort},#{user_name},#{project},#{gold},#{year},#{month},#{sort_name})
+        insert into uc.user_gold_month  values (#{id},#{sort},#{user_name},#{project},#{gold},#{year},#{month},#{sort_name})
 
     </insert>
     <delete id="deleteGoldYear">
