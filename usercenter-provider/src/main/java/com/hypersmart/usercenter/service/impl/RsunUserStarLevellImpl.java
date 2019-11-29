@@ -153,7 +153,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
             rsunUserStarLevellMapper.insertYear(map);
 
             maps2.add(map);
-            message.append("执行金币job，插入一条数据，数据具体为" + JSON.toJSONString(map) + "\\n");
+            //message.append("执行金币job，插入一条数据，数据具体为" + JSON.toJSONString(map) + "\\n");
         }
         logger.info("执行job: month,结束，共" + maps.size() + "条个人全年数据");
         message.append("执行job: month,结束，共" + maps.size() + "条个人全年数据\\n");
