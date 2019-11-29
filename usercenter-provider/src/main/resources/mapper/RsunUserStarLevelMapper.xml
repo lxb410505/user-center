@@ -31,11 +31,11 @@
     <select id="queryYear4job" resultType="java.util.Map" >
 
 
-        <![CDATA[   select a.*,c .name_ ,d.fullname_from uc.rsun_user_star_level a
+        <![CDATA[   select a.*,c .name_ ,d.fullname_ from uc.rsun_user_star_level a
         left join uc_org_user b on b.user_Id_ = a.uc_user_id
         left join uc_org c on c.id_= b.org_ID_
       left join uc_user d on d.id_ = a.uc_user_id
-        and c.name_ <> '']]>
+        and c.name_ <> '' ]]>
 
         group by a.uc_user_id
         order by a.total_coin desc
@@ -136,7 +136,7 @@
         delete from user_Badge_year;
     </delete>
     <delete id="deleteGoldMonth4Badge">
-        delete from user_Badge_month;
+        delete from user_Badge_month ;
     </delete>
 
 <insert id="insertGoldRecord" parameterType="java.util.Map">
