@@ -32,11 +32,11 @@ public interface  RsunUserStarLevellMapper extends GenericMapper<RsunUserStarLev
     List<Map<String, Object>> queryMonth(Map<String, Object> map);
 
     List<Map<String, Object>> queryYear4job();
-    List<Map<String, Object>> queryMonth4job(@Param("S") String s);
+    List<Map<String, Object>> queryMonth4job(@Param("S") String s,@Param("S") String s2);
     int insertYear(Map map);
     int insertMonth(Map map);
     int deleteGoldYear();
-    int deleteGoldMonth();
+    int deleteGoldMonth(Map map);
 
     /**
      * 徽章相关

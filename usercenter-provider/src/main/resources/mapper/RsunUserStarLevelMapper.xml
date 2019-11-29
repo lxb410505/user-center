@@ -47,7 +47,9 @@
 
         select sum(gcoin_val) s ,uc_user_id  from uc.rsun_jb_hi_reward a
         where
-        DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s}]]>
+        DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s} and jb_jl_type <>'appeal'
+        or
+        DATE_FORMAT(a.jb_originnal_time, '%Y-%m') =#{s}  and jb_jl_type=='appeal' ]]>
         group by uc_user_id
         order by  s
 
@@ -64,8 +66,8 @@
     <delete id="deleteGoldYear">
         delete from user_gold_year;
     </delete>
-    <delete id="deleteGoldMonth">
-        delete from user_gold_month;
+    <delete id="deleteGoldMonth" parameterType="java.util.Map">
+        delete from user_gold_month where year=#{year} and month=#{month};
     </delete>
 
 
