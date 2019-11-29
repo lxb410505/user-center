@@ -1,9 +1,12 @@
 package com.hypersmart.usercenter.dto;
 
 
+import lombok.Data;
+
 /**
  * 查询员工各月份金币数对象
  */
+@Data
 public class CoinStatisticsListDTO {
     //员工Id
     private String userId;

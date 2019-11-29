@@ -40,7 +40,8 @@ public class RsunJbHiRewardController  extends BaseController {
     @PostMapping({"/coinStatisticsList"})
     @ApiOperation(value = "员工各月份金币数列表}", httpMethod = "POST", notes = "获取员工各月份金币数列表")
     public PageList<CoinStatisticsListDTO> coinStatisticsList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
-        return rsunJbHiRewardService.coinStatisticsList(queryFilter);
+        PageList<CoinStatisticsListDTO> coin= rsunJbHiRewardService.coinStatisticsList(queryFilter);
+        return coin;
     }
 
 

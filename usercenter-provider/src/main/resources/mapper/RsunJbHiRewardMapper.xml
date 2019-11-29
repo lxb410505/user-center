@@ -4,8 +4,8 @@
 <mapper namespace="com.hypersmart.usercenter.mapper.RsunJbHiRewardMapper">
 
     <select id="getCoinStatisticsList" parameterType="java.util.Map" resultType="com.hypersmart.usercenter.dto.CoinStatisticsListDTO">
-        SELECT u.ID_ userId,u.FULLNAME_ fullName,u.USER_NUMBER_ userNumber,
-        SUM(CASE
+        SELECT u.FULLNAME_ fullName,u.USER_NUMBER_ userNumber,rsum.* FROM
+        (SELECT SUM(CASE
         WHEN DATE_FORMAT(r.jb_originnal_time ,'%m')=01 THEN
         1
         ELSE
@@ -88,11 +88,18 @@
         ELSE
         0
         END
-        ) december
-        FROM  uc.rsun_jb_hi_reward r RIGHT JOIN uc.uc_user u ON r.uc_user_id=u.ID_
+        ) december,
+        r.uc_user_id userId
+        FROM  uc.rsun_jb_hi_reward r
+<!--        <where>-->
+<!--            <if test="">-->
+
+<!--            </if>-->
+<!--        </where>-->
+         GROUP  BY userId) rsum RIGHT JOIN uc.uc_user u ON rsum.userId=u.ID_
         <where>
-            <if test="whereSql!=null">
-                ${whereSql}
+            <if test="FULLNAME_ != null">
+                u.FULLNAME_ like concat('%',#{FULLNAME_},'%')
             </if>
         </where>
         <if test="orderBySql!=null">
