@@ -56,7 +56,7 @@ public class  RsunUserStarLevellImpl extends GenericService<String, RsunUserStar
         pageList.setTotal(0);
         pageList.setPageSize(20);
         pageList.setPage(1);
-        return new PageList<>();
+        return pageList;
     }
 
 

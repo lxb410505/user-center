@@ -1,9 +1,7 @@
 package com.hypersmart.usercenter.service.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.pagehelper.PageHelper;
-import com.hypersmart.base.exception.RequiredException;
 import com.hypersmart.base.feign.PortalFeignService;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.BeanUtils;
@@ -11,7 +9,6 @@ import com.hypersmart.base.util.JsonUtil;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.base.util.UniqueIdUtil;
 import com.hypersmart.framework.service.GenericService;
-import com.hypersmart.uc.api.impl.model.Org;
 import com.hypersmart.usercenter.dto.*;
 import com.hypersmart.usercenter.mapper.*;
 import com.hypersmart.usercenter.model.*;
@@ -22,7 +19,6 @@ import net.sourceforge.pinyin4j.PinyinHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.hypersmart.base.feign.UCFeignService;
 
@@ -31,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 用户管理
@@ -756,7 +751,7 @@ public class  UcUserServiceImpl extends GenericService<String, UcUser> implement
     }
 
     @Override
-    public List<rsunJbHiReward> getmoney(String userCode) {
+    public List<RsunJbHiReward> getmoney(String userCode) {
         HashMap<String, String> map = new HashMap<>();
         map.put("userCode",userCode);
         Date date = new Date();
@@ -793,7 +788,7 @@ public class  UcUserServiceImpl extends GenericService<String, UcUser> implement
     }
 
     @Override
-    public void updatemoney(rsunJbHiReward reward) {
+    public void updatemoney(RsunJbHiReward reward) {
         ucUserMapper.updatemoney(reward);
     }
 

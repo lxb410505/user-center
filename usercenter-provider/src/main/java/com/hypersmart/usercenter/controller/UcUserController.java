@@ -2,19 +2,15 @@ package com.hypersmart.usercenter.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.pagehelper.PageHelper;
-import com.hypersmart.base.aop.norepeat.NoRepeatSubmit;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.exception.RequiredException;
 import com.hypersmart.base.feign.UCFeignService;
 import com.hypersmart.base.model.CommonResult;
-import com.hypersmart.base.query.PageBean;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.query.QueryOP;
-import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.ContextUtils;
 import com.hypersmart.base.util.StringUtil;
-import com.hypersmart.framework.utils.StringUtils;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.dto.*;
@@ -23,8 +19,6 @@ import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.RsunJbHiRewardService;
 import com.hypersmart.usercenter.service.RsunUserStarlLevelService;
 import com.hypersmart.usercenter.service.UcOrgService;
-import com.hypersmart.usercenter.util.ImportExcelUtil;
-import com.hypersmart.usercenter.util.ResourceErrorCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -33,11 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 import com.hypersmart.usercenter.service.UcUserService;
-import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
 
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -88,10 +79,10 @@ public class  UcUserController extends BaseController {
         RsunUserStarLevel rsunUserStarLevel = ucUserService.getxzjb(UserCode);
         if(rsunUserStarLevel!=null){
             //获取当月金币
-            List<rsunJbHiReward> list = ucUserService.getmoney(UserCode);
+            List<RsunJbHiReward> list = ucUserService.getmoney(UserCode);
 
             Double money = 0.0;
-            for (rsunJbHiReward r : list) {
+            for (RsunJbHiReward r : list) {
                 if(r.getGcoinVal()!=null){
                     money += r.getGcoinVal();
                 }
@@ -170,7 +161,7 @@ public class  UcUserController extends BaseController {
      * @return
      */
     @PostMapping({"/addUserCoinHisRecordByUserCode"})
-    public boolean addUserCoinHisRecordByUserCode(@RequestBody rsunJbHiReward reward) {
+    public boolean addUserCoinHisRecordByUserCode(@RequestBody RsunJbHiReward reward) {
         try {
             //保存金币记录
             reward.setJbJlTime(new Date());

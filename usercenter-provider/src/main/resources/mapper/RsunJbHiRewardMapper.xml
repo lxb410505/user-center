@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hypersmart.usercenter.mapper.RsunJbHiRewardMapper">
+
+    <select id="getCoinStatisticsList" parameterType="java.util.Map" resultType="com.hypersmart.usercenter.dto.CoinStatisticsListDTO">
+        SELECT u.ID_ userId,u.FULLNAME_ fullName,u.USER_NUMBER_ userNumber,
+        SUM(CASE
+        WHEN DATE_FORMAT(r.jb_originnal_time ,'%m')=01 THEN
+        1
+        ELSE
+        0
+        END
+        ) january,
+        SUM(CASE
+        WHEN DATE_FORMAT(r.jb_originnal_time ,'%m')=02 THEN
+        1
+        ELSE
+        0
+        END
+        ) february,
+        SUM(CASE
+        WHEN DATE_FORMAT(r.jb_originnal_time ,'%m')=03 THEN
+        1
+        ELSE
+        0
+        END
+        ) march,
+        SUM(CASE
+        WHEN DATE_FORMAT(r.jb_originnal_time ,'%m')=04 THEN
+        1
+        ELSE
+        0
+        END
+        ) april,
+        SUM(CASE
+        WHEN DATE_FORMAT(r.jb_originnal_time ,'%m')=05 THEN
+        1
+        ELSE
+        0
+        END
+        ) may,
+        SUM(CASE
+        WHEN DATE_FORMAT(r.jb_originnal_time ,'%m')=06 THEN
+        1
+        ELSE
+        0
+        END
+        ) june,
+        SUM(CASE
+        WHEN DATE_FORMAT(r.jb_originnal_time ,'%m')=07 THEN
+        1
+        ELSE
+        0
+        END
+        ) july,
+        SUM(CASE
+        WHEN DATE_FORMAT(r.jb_originnal_time ,'%m')=08 THEN
+        1
+        ELSE
+        0
+        END
+        ) angust,
+        SUM(CASE
+        WHEN DATE_FORMAT(r.jb_originnal_time ,'%m')=09 THEN
+        1
+        ELSE
+        0
+        END
+        ) september,
+        SUM(CASE
+        WHEN DATE_FORMAT(r.jb_originnal_time ,'%m')=10 THEN
+        1
+        ELSE
+        0
+        END
+        ) october,
+        SUM(CASE
+        WHEN DATE_FORMAT(r.jb_originnal_time ,'%m')=11 THEN
+        1
+        ELSE
+        0
+        END
+        ) november,
+        SUM(CASE
+        WHEN DATE_FORMAT(r.jb_originnal_time ,'%m')=12 THEN
+        1
+        ELSE
+        0
+        END
+        ) december
+        FROM  uc.rsun_jb_hi_reward r RIGHT JOIN uc.uc_user u ON r.uc_user_id=u.ID_
+        <where>
+            <if test="whereSql!=null">
+                ${whereSql}
+            </if>
+        </where>
+        <if test="orderBySql!=null">
+            ORDER BY ${orderBySql}
+        </if>
+    </select>
+
+
+</mapper>
