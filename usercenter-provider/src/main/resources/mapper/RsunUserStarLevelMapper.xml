@@ -31,41 +31,45 @@
     <select id="queryYear4job" resultType="java.util.Map" >
 
 
-        <![CDATA[   select a.*,c .name_ ,d.fullname_from uc.rsun_user_star_level a
-        left join uc_org_user b on b.user_Id_ = a.uc_user_id
-        left join uc_org c on c.id_= b.org_ID_
+        <![CDATA[   select a.*,d.fullname_ from uc.rsun_user_star_level a
+
       left join uc_user d on d.id_ = a.uc_user_id
-        and c.name_ <> '']]>
+        ]]>
 
         group by a.uc_user_id
         order by a.total_coin desc
 
     </select>
     <select id="queryMonth4job" resultType="java.util.Map" parameterType="java.lang.String" >
+        <![CDATA[
+   select sum(gcoin_val) s ,a.uc_user_id ,d.fullname_  fullname_ from uc.rsun_jb_hi_reward a
 
- <![CDATA[
+        left join uc_user d on d.id_ = a.uc_user_id
 
-        select sum(gcoin_val) s ,uc_user_id  from uc.rsun_jb_hi_reward a
         where
-        DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s}]]>
+        DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s} and jb_jl_type <>'appeal'
+        or
+        DATE_FORMAT(a.jb_originnal_time, '%Y-%m') =#{s}  and jb_jl_type ='appeal'
         group by uc_user_id
-        order by  s
+        order by  s desc
+     ]]>
+
 
 
     </select>
     <insert id="insertYear" parameterType="java.util.Map" >
-        insert into uc.user_gold_year  values (#{sort},#{user_name},#{project},#{gold},#{year},#{sort_name})
+        insert into uc.user_gold_year  values (#{id},#{sort},#{user_name},#{project},#{gold},#{year},#{sort_name})
 
     </insert>
     <insert id="insertMonth" parameterType="java.util.Map" >
-        insert into uc.user_gold_year  values (#{sort},#{user_name},#{project},#{gold},#{year},#{month},#{sort_name})
+        insert into uc.user_gold_month  values (#{id},#{sort},#{user_name},#{project},#{gold},#{year},#{month},#{sort_name})
 
     </insert>
     <delete id="deleteGoldYear">
         delete from user_gold_year;
     </delete>
-    <delete id="deleteGoldMonth">
-        delete from user_gold_month;
+    <delete id="deleteGoldMonth" parameterType="java.util.Map">
+        delete from user_gold_month where year=#{year} and month=#{month};
     </delete>
 
 
@@ -84,7 +88,7 @@
         <!--group by a.uc_user_id-->
         <!--order by a.total_coin-->
 
-        select * from uc.user_gold_year
+        select * from uc.user_badge_year
         order by sort
 
     </select>
@@ -100,11 +104,10 @@
     <select id="queryYear4job4Badge" resultType="java.util.Map" >
 
 
-        <![CDATA[   select a.*,c .name_ ,d.fullname_from uc.rsun_user_star_level a
-        left join uc_org_user b on b.user_Id_ = a.uc_user_id
-        left join uc_org c on c.id_= b.org_ID_
+        <![CDATA[   select a.*,d.fullname_ from uc.rsun_user_star_level a
+
       left join uc_user d on d.id_ = a.uc_user_id
-        and c.name_ <> '']]>
+        ]]>
 
         group by a.uc_user_id
         order by a.total_coin desc
@@ -114,12 +117,15 @@
 
         <![CDATA[
 
-        select sum(gcoin_val) s ,uc_user_id  from uc.rsun_Badge_hi_reward a
-        where
-        DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s}]]>
-        group by uc_user_id
-        order by  s
+                select sum(gcoin_val) s ,a.uc_user_id ,d.fullname_  fullname_ from uc.rsun_Badge_hi_reward a
 
+                left join uc_user d on d.id_ = a.uc_user_id
+          where
+                DATE_FORMAT(a.jb_jl_time, '%Y-%m') =#{s}
+
+                group by uc_user_id
+                order by  s desc
+        ]]>
 
     </select>
     <insert id="insertYear4Badge" parameterType="java.util.Map" >
@@ -127,14 +133,16 @@
 
     </insert>
     <insert id="insertMonth4Badge" parameterType="java.util.Map" >
-        insert into uc.user_Badge_year  values (#{id},#{sort},#{user_name},#{project},#{gold},#{year},#{month},#{sort_name})
+        insert into uc.user_Badge_month  values (#{id},#{sort},#{user_name},#{project},#{gold},#{year},#{month},#{sort_name})
 
     </insert>
     <delete id="deleteGoldYear4Badge">
         delete from user_Badge_year;
     </delete>
     <delete id="deleteGoldMonth4Badge">
-        delete from user_Badge_month;
+--         delete from user_Badge_month   where DATE_FORMAT(new , '%Y-%m') ;
+        delete from user_Badge_month   where year =DATE_FORMAT(now(), '%Y')
+                and month =DATE_FORMAT(now(), '%m')
     </delete>
 
 <insert id="insertGoldRecord" parameterType="java.util.Map">
