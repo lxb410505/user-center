@@ -38,7 +38,7 @@
         and c.name_ <> '' ]]>
 
         group by a.uc_user_id
-        order by a.total_coin
+        order by a.total_coin desc
 
     </select>
     <select id="queryMonth4job" resultType="java.util.Map" parameterType="java.lang.String" >
@@ -91,7 +91,7 @@
         <!--order by a.total_coin-->
 
         select * from uc.user_gold_year
-        order by sort
+        order by sort desc
 
     </select>
 
@@ -99,7 +99,7 @@
 
         select * from uc.user_Badge_month where year= #{year} and month = #{month}
 
-        order by sort
+        order by sort desc
 
     </select>
 
