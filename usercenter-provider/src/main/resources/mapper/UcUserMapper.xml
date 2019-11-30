@@ -376,7 +376,7 @@
         SELECT uc_user_id ucUserId , pj_star_id pjStarId , level_sy_time levelSyTime , total_coin totalCoin , xz_num xzNum FROM uc.rsun_user_star_level WHERE uc_user_id = #{UserCode}
     </select>
 
-    <select id="getmoney" parameterType="java.util.HashMap" resultType="com.hypersmart.usercenter.model.rsunJbHiReward">
+    <select id="getmoney" parameterType="java.util.HashMap" resultType="com.hypersmart.usercenter.model.RsunJbHiReward">
         SELECT uc_user_id ucUserId,jb_jl_reason jbJlReason , jb_jl_time jbJlTime , gd_code gdCode , gcoin_val   gcoinVal FROM uc.rsun_jb_hi_reward WHERE uc_user_id =#{userCode} AND jb_jl_time BETWEEN #{kaishi} AND #{jieshu}
     </select>
 
@@ -392,7 +392,7 @@
         INSERT INTO uc.rsun_jb_hi_reward (uc_user_id,gd_code,gcoin_val,jb_jl_time)VALUES(#{ucUserId},#{gdCode},#{gcoinVal},#{jbJlTime})
     </insert>
 
-    <update id="updatemoney" parameterType="com.hypersmart.usercenter.model.rsunJbHiReward">
+    <update id="updatemoney" parameterType="com.hypersmart.usercenter.model.RsunJbHiReward">
         UPDATE uc.rsun_user_star_level SET total_coin=(total_coin+#{reward.gcoinVal}) WHERE uc_user_id=#{reward.ucUserId}
     </update>
 
