@@ -31,7 +31,7 @@ public class  RsunUserStarLevell implements Serializable {
 
     @Column(name = "xz_num")
     @ApiModelProperty("个人勋章数")
-    private Double xzNum;
+    private Integer xzNum;
 
     public String getUcUserId() {
         return ucUserId;
@@ -65,11 +65,11 @@ public class  RsunUserStarLevell implements Serializable {
         this.totalCoin = totalCoin;
     }
 
-    public Double getXzNum() {
+    public Integer getXzNum() {
         return xzNum;
     }
 
-    public void setXzNum(Double xzNum) {
+    public void setXzNum(Integer xzNum) {
         this.xzNum = xzNum;
     }
 

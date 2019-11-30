@@ -1,6 +1,5 @@
 package com.hypersmart.usercenter.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.hypersmart.base.query.PageBean;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
@@ -12,12 +11,10 @@ import com.hypersmart.usercenter.model.*;
 import com.hypersmart.framework.service.IGenericService;
 import com.hypersmart.usercenter.util.ResourceErrorCode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -80,7 +77,7 @@ public interface  UcUserService extends IGenericService<String, UcUser> {
 
     RsunUserStarLevel getxzjb(String userCode);
 
-    List<rsunJbHiReward> getmoney(String userCode);
+    List<RsunJbHiReward> getmoney(String userCode);
 
     List<JinBiJiLv> getUserCoinHisRecordByUserCode(String userCode);
 
@@ -88,7 +85,7 @@ public interface  UcUserService extends IGenericService<String, UcUser> {
 
     Boolean insertadd(rsunJbDTO reward);
 
-    void updatemoney(rsunJbHiReward reward);
+    void updatemoney(RsunJbHiReward reward);
 
     String getname(String ucUserId);
 
