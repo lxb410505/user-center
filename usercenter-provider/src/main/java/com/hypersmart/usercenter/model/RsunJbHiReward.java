@@ -35,7 +35,7 @@ public class RsunJbHiReward implements Serializable {
 
     @Column(name = "jb_jl_type")
     @ApiModelProperty("金币记录类别：是否为申诉")
-    private Double jbJlType;
+    private String jbJlType;
 
     @Column(name = "jb_originnal_time")
     @ApiModelProperty("申诉的公区报修工单创建时间")
