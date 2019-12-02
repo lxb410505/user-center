@@ -298,11 +298,12 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
         String year = cal.get(Calendar.YEAR) + "";
         int day = cal.get(Calendar.DATE);
         String month = cal.get(Calendar.MONTH) + 1 + "";
-        flag = day < 6 && year.equals(queryFilter.getParams().get("year").toString()) && month.equals(queryFilter.getParams().get("month").toString());
-        //如果查询当月不足6号的数据，直接不用查了。
-        if (flag) {
-            return true;
-        }
+//        flag = day < 6 && year.equals(queryFilter.getParams().get("year").toString()) && month.equals(queryFilter.getParams().get("month").toString());
+//        //如果查询当月不足6号的数据，直接不用查了。
+//        if (flag) {
+//            return true;
+//        }
+//        return false;
         return false;
     }
 
