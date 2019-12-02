@@ -91,11 +91,11 @@
         ) december,
         r.uc_user_id userId
         FROM  uc.rsun_jb_hi_reward r
-<!--        <where>-->
-<!--            <if test="">-->
-
-<!--            </if>-->
-<!--        </where>-->
+        <where>
+            <if test="yearForSearch != null">
+                DATE_FORMAT(r.jb_originnal_time ,'%Y')=#{yearForSearch}
+            </if>
+        </where>
          GROUP  BY userId) rsum RIGHT JOIN uc.uc_user u ON rsum.userId=u.ID_
         <where>
             <if test="FULLNAME_ != null">
