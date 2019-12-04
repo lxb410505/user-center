@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(value = {"/api/usercenter/v1/rsunjbhireward"}, produces = {"application/json;charset=UTF-8"})
@@ -43,6 +44,20 @@ public class RsunJbHiRewardController  extends BaseController {
         PageList<CoinStatisticsListDTO> coin= rsunJbHiRewardService.coinStatisticsList(queryFilter);
         return coin;
     }
+
+    /**
+     * 员工各月份金币数--导出
+     * @param queryFilter
+     * @return
+     */
+    @PostMapping({"/export"})
+    @ApiOperation(value = "员工各月份金币数导出}", httpMethod = "POST", notes = "员工各月份金币数导出")
+    public void export(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter, HttpServletResponse response) throws Exception {
+        this.rsunJbHiRewardService.exportExcel(queryFilter,response);
+    }
+
+
+
 
 
 }

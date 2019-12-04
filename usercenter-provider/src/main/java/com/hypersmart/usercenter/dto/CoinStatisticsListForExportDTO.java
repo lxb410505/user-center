@@ -7,10 +7,7 @@ import lombok.Data;
  * 查询员工各月份金币数对象
  */
 @Data
-public class CoinStatisticsListDTO {
-    //员工Id
-    private String userId;
-
+public class CoinStatisticsListForExportDTO {
     //员工姓名
     private  String fullName;
 
@@ -53,7 +50,7 @@ public class CoinStatisticsListDTO {
     //十二月金币数
     private Double december;
 
-    //十二个月合计
+    //合计
     private Double totalNum;
 
 

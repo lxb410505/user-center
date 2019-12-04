@@ -13,5 +13,7 @@ public interface  RsunJbHiRewardMapper extends GenericMapper<RsunJbHiReward> {
 
     List<CoinStatisticsListDTO>  getCoinStatisticsList(Map<String, Object> params);
 
+    List<CoinStatisticsListDTO>  queryExportExcel(List list);
+
 
 }
