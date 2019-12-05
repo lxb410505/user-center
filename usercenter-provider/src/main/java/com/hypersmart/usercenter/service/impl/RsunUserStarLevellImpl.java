@@ -193,9 +193,9 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
                 Map map = new HashMap();
                 map.put("id", UUID.randomUUID().toString().replace("-", ""));
                 map.put("sort", i + 1);
-                map.put("user_name", maps.get(i).get("fullname_"));
-                map.put("project", maps.get(i).get("name_"));
-                map.put("gold", maps.get(i).get("total_coin"));
+                map.put("user_name", maps1.get(i).get("fullname_"));
+                map.put("project", maps1.get(i).get("name_"));
+                map.put("gold", maps1.get(i).get("total_coin"));
                 map.put("year", 2019);
                 map.put("month", mapTime.get("month"));
                 map.put("sort_name", "第" + (i + 1) + "名");
