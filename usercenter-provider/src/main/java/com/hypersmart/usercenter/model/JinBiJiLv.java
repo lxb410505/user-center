@@ -16,6 +16,16 @@ public class  JinBiJiLv {
 
     private Date date2;
 
+    private String procId;
+
+    public String getProcId() {
+        return procId;
+    }
+
+    public void setProcId(String procId) {
+        this.procId = procId;
+    }
+
     public String getWorkOrderCode() {
         return workOrderCode;
     }
