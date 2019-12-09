@@ -202,7 +202,10 @@ from uc.rsun_jb_hi_reward a
         </if>
 
      <if test="time !=null ">
-         and (DATE_FORMAT(a.jb_jl_time, '%Y-%m') like CONCAT('%',#{time},'%') or DATE_FORMAT(a.jb_originnal_time, '%Y-%m') CONCAT('%',#{time},'%') )
+         and (
+         DATE_FORMAT(a.jb_jl_time, '%Y-%m') like CONCAT('%',#{time},'%') or DATE_FORMAT(a.jb_originnal_time, '%Y-%m') like CONCAT('%',#{time},'%')
+
+         )
 
      </if>
 
