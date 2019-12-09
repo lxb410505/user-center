@@ -424,7 +424,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
 
             //todo 校验项目字段
 
-            query = this.rsunUserStarLevellMapper.get4Part(queryFilter.getParams());
+            query = this.rsunUserStarLevellMapper.get4Part(params);
             return new PageList<>(query);
 
         } else {
