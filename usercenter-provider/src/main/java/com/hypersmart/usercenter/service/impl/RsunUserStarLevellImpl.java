@@ -408,11 +408,11 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
             String year;
             String time ="";
             //设置查询时间
-            if(params.get("year") == null || StringUtils.isRealEmpty(params.get("year").toString())){
+            if(params.get("year") != null &&!StringUtils.isRealEmpty(params.get("year").toString())){
                 year = params.get("year").toString();
                 time +=year;
             }
-            if (params.get("month") == null || StringUtils.isRealEmpty(params.get("month").toString())) {
+            if (params.get("month") != null && !StringUtils.isRealEmpty(params.get("month").toString())) {
                 month = params.get("month").toString();
                 time +="-"+(month.length() == 1 ? "0" + month : month);
             }
