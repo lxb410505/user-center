@@ -176,13 +176,20 @@
 
     <select id="get4Part" parameterType="java.util.Map" resultType="com.hypersmart.usercenter.dto.GoldInfo">
 
-        SELECT (@rowNO := @rowNo+1) AS sort,a.*   from(select sum(gcoin_val) gold ,a.uc_user_id ,d.fullname_  userName
+        SELECT (@rowNO := @rowNo+1) AS sort,a.*   from(select sum(gcoin_val) gold ,
+
+
+          a.uc_user_id ,d.fullname_  userName ,g.name_ project
 from uc.rsun_jb_hi_reward a
 
         left join uc.uc_user d on d.id_ = a.uc_user_id
 		left join bpm.ext_customer_repair b on b.bx_code  = a.gd_code
-
+        left join uc.uc_org_user c on c.USER_ID_ = d.id_
+        left JOIN  uc.uc_org g on  g.id_ = c.ORG_ID_
         where
+        c.IS_DELE_=0
+        and g.GRADE_ ='ORG_XiangMu' and g.IS_DELE_ = 0
+
    (     (
    (a.jb_jl_type is null or a. jb_jl_type ='' )
 )
