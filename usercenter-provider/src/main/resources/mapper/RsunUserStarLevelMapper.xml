@@ -189,7 +189,7 @@ from uc.rsun_jb_hi_reward a
         where
         c.IS_DELE_=0
         and g.GRADE_ ='ORG_XiangMu' and g.IS_DELE_ = 0
-
+  and
    (     (
    (a.jb_jl_type is null or a. jb_jl_type ='' )
 )
