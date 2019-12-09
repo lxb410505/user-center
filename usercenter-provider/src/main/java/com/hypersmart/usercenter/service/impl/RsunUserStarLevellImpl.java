@@ -436,7 +436,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
             return pageList;
         }
 
-        return null;
+
     }
 
     @Override
