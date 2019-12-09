@@ -8,6 +8,7 @@ import com.hypersmart.base.util.BeanUtils;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.framework.utils.StringUtils;
+import com.hypersmart.usercenter.dto.GoldInfo;
 import com.hypersmart.usercenter.mapper.RsunUserStarLevellMapper;
 import com.hypersmart.usercenter.model.RsunUserStarLevel;
 import com.hypersmart.usercenter.model.RsunUserStarLevell;
@@ -391,6 +392,54 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
     }
 
     @Override
+    public PageList<GoldInfo> getUserGold4Part(QueryFilter queryFilter) {
+        logger.info("查询第三方金币数据");
+        if (queryFilter != null) {
+            PageBean pageBean = queryFilter.getPageBean();
+            if (BeanUtils.isEmpty(pageBean)) {
+                PageHelper.startPage(1, Integer.MAX_VALUE, false);
+            } else {
+                PageHelper.startPage(pageBean.getPage().intValue(), pageBean.getPageSize().intValue(),
+                                pageBean.showTotal());
+            }
+            List<GoldInfo> query = new ArrayList<>();
+            Map<String, Object> params = queryFilter.getParams();
+            String month;
+            String year;
+            String time ="";
+            //设置查询时间
+            if(params.get("year") == null || StringUtils.isRealEmpty(params.get("year").toString())){
+                year = params.get("year").toString();
+                time +=year;
+            }
+            if (params.get("month") == null || StringUtils.isRealEmpty(params.get("month").toString())) {
+                month = params.get("month").toString();
+                time +="-"+(month.length() == 1 ? "0" + month : month);
+            }
+            if(time.length()>0){
+                params.put("time",time);
+            }else{
+                params.remove("time");
+            }
+
+            //todo 校验项目字段
+
+            query = this.rsunUserStarLevellMapper.get4Part(queryFilter.getParams());
+            return new PageList<>(query);
+
+        } else {
+            PageList<Map<String, Object>> pageList = new PageList();
+            pageList.setTotal(0);
+            pageList.setPage(1);
+            pageList.setPageSize(10);
+            pageList.setRows(new ArrayList<>());
+            return pageList;
+        }
+
+        return null;
+    }
+
+    @Override
     public PageList<Map<String, Object>> quertList4Badge(QueryFilter queryFilter) {
         logger.info("查询徽章数据");
         if (checkIsHaveData(queryFilter)) return new PageList<>();
@@ -444,4 +493,6 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
 
         return rsunUserStarLevellMapper.insertBadgeHistory(map);
     }
+
+
 }

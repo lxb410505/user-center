@@ -1,6 +1,7 @@
 package com.hypersmart.usercenter.mapper;
 
 import com.hypersmart.framework.mapper.GenericMapper;
+import com.hypersmart.usercenter.dto.GoldInfo;
 import com.hypersmart.usercenter.model.RsunUserStarLevel;
 import com.hypersmart.usercenter.model.RsunUserStarLevel;
 import com.hypersmart.usercenter.model.RsunUserStarLevell;
@@ -45,6 +46,7 @@ public interface  RsunUserStarLevellMapper extends GenericMapper<RsunUserStarLev
      */
     List<Map<String, Object>> queryYear4Badge(Map<String, Object> map);
     List<Map<String, Object>> queryMonth4Badge(Map<String, Object> map);
+    List<GoldInfo> get4Part(Map<String, Object> map);
 
     List<Map<String, Object>> queryYear4job4Badge();
     List<Map<String, Object>> queryMonth4job4Badge(@Param("s") String s);

@@ -172,4 +172,40 @@
 
       );
     </insert>
+
+
+    <select id="get4Part" parameterType="java.util.Map" resultType="com.hypersmart.usercenter.dto.GoldInfo">
+
+        SELECT (@rowNO := @rowNo+1) AS sort,a.*   from(select sum(gcoin_val) gold ,a.uc_user_id ,d.fullname_  userName
+from uc.rsun_jb_hi_reward a
+
+        left join uc.uc_user d on d.id_ = a.uc_user_id
+		left join bpm.ext_customer_repair b on b.bx_code  = a.gd_code
+
+        where
+   (     (
+   (a.jb_jl_type is null or a. jb_jl_type ='' )
+)
+        or
+        ( a.jb_jl_type ='appeal')
+	)
+
+        <if test="list != null and list.size() > 0">
+            and  b.bx_dk_id  in  (
+
+            select a.id_ from uc.uc_org a left join uc.uc_org b on b.id_ = a.parent_id_ where b.code_
+            in  <foreach collection="list" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+            )
+
+        </if>
+
+     <if test="time !=null ">
+         and (DATE_FORMAT(a.jb_jl_time, '%Y-%m') like CONCAT('%',#{time},'%') or DATE_FORMAT(a.jb_originnal_time, '%Y-%m') CONCAT('%',#{time},'%') )
+
+     </if>
+
+        group by a.uc_user_id) a,(SELECT @rowNO :=0) b ORDER BY a.gold DESC
+    </select>
 </mapper>
