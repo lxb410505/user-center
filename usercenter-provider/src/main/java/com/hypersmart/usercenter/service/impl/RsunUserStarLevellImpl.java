@@ -428,7 +428,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
             return new PageList<>(query);
 
         } else {
-            PageList<Map<String, Object>> pageList = new PageList();
+            PageList<GoldInfo> pageList = new PageList();
             pageList.setTotal(0);
             pageList.setPage(1);
             pageList.setPageSize(10);
