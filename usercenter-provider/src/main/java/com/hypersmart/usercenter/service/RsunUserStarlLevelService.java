@@ -4,6 +4,7 @@ import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.framework.service.IGenericService;
+import com.hypersmart.usercenter.dto.GoldInfo;
 import com.hypersmart.usercenter.model.RsunUserStarLevel;
 import com.hypersmart.usercenter.model.RsunUserStarLevell;
 import org.springframework.stereotype.Service;
@@ -33,5 +34,8 @@ public interface  RsunUserStarlLevelService extends IGenericService<String, Rsun
 
     public void doGoldJob4Gold();
     public void doGoldJob4Badge();
+
+    PageList<GoldInfo> getUserGold4Part(QueryFilter queryFilter);
+
 
 }

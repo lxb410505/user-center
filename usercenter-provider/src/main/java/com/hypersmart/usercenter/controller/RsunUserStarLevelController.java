@@ -4,6 +4,7 @@ import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.StringUtil;
+import com.hypersmart.usercenter.dto.GoldInfo;
 import com.hypersmart.usercenter.model.RsunUserStarLevel;
 import com.hypersmart.usercenter.model.RsunUserStarLevell;
 import com.hypersmart.usercenter.model.TgeSignificantQuality;
@@ -92,5 +93,16 @@ public class RsunUserStarLevelController extends BaseController {
     @GetMapping({"/job/badge"})
     public void doBadgeJob (){
         rsunUserStarlLevelService.doGoldJob4Badge();
+    }
+
+    /**
+     * 给第三方  调用的接口
+     * 获取人员
+     *
+     * @return
+     */
+    @PostMapping({"/query/usergold"})
+    public PageList<GoldInfo> getUserGold4Part(@ApiParam(name = "queryFilter", value = "查询条件") @RequestBody QueryFilter queryFilter){
+        return rsunUserStarlLevelService.getUserGold4Part(queryFilter);
     }
 }
