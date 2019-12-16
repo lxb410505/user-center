@@ -765,8 +765,8 @@ public class  UcUserServiceImpl extends GenericService<String, UcUser> implement
     }
 
     @Override
-    public List<JinBiJiLv> getUserCoinHisRecordByUserCode(String userCode) {
-        List<JinBiJiLv> userCoinHisRecordByUserCode = ucUserMapper.getUserCoinHisRecordByUserCode(userCode);
+    public List<JinBiJiLv> getUserCoinHisRecordByUserCode(String userCode,String dateString) {
+        List<JinBiJiLv> userCoinHisRecordByUserCode = ucUserMapper.getUserCoinHisRecordByUserCode(userCode,dateString);
         for(JinBiJiLv jinBiJiLv : userCoinHisRecordByUserCode){
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date = new Date(jinBiJiLv.getDate2().getTime());
