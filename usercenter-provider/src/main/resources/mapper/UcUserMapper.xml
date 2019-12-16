@@ -381,8 +381,8 @@
     </select>
 
     <select id="getUserCoinHisRecordByUserCode" resultType="com.hypersmart.usercenter.model.JinBiJiLv" parameterType="java.lang.String">
-
-        select a.gd_code workOrderCode ,a.gcoin_val coinNum ,a.jb_jl_reason coinObtainReason, a.jb_jl_time date2, b.PROC_INST_ID_  procId
+        select a.gd_code workOrderCode ,a.gcoin_val coinNum ,a.jb_jl_reason coinObtainReason, a.jb_jl_time date2, b.PROC_INST_ID_  procId,
+        b.bx_content bxContent
         from uc.rsun_jb_hi_reward   a
         left join bpm.ext_customer_repair b on b.bx_code =  a.gd_code
 
