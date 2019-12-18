@@ -2,11 +2,15 @@ package com.hypersmart.usercenter.controller;
 
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.model.CommonResult;
+import com.hypersmart.base.query.FieldRelation;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.query.QueryOP;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.usercenter.dto.UcOrgDTO;
+import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.model.UserIdGrade;
+import com.hypersmart.usercenter.service.UcOrgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import com.hypersmart.framework.model.ResponseData;
@@ -18,6 +22,7 @@ import javax.annotation.Resource;
 import com.hypersmart.usercenter.model.PlatformMdmGroupMapping;
 import com.hypersmart.usercenter.service.PlatformMdmGroupMappingService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,12 +39,50 @@ public class PlatformMdmGroupMappingController extends BaseController {
     @Resource
         PlatformMdmGroupMappingService platformMdmGroupMappingService;
 
+    @Resource
+    UcOrgService ucOrgService;
+
     //根据组织级别查询组织信息
     @PostMapping({"/queryByGrade"})
     public List<UcOrgDTO> queryByGrade(@RequestBody UserIdGrade userIdGrade) {
         String userId=userIdGrade.getUserId();
         String grade=userIdGrade.getGrade();
         return platformMdmGroupMappingService.queryByGrade(userId,grade);
+    }
+
+    @GetMapping({"/getOrg}"})
+    @ApiOperation(value = "根据组团id获取平台组织", httpMethod = "GET", notes = "获取单个平台组团映射表记录")
+    public UcOrgDTO getOrg(@ApiParam(name = "grpid", value = "业务对象主键", required = true) @RequestParam String grpid) {
+        QueryFilter queryFilter=QueryFilter.build();
+        queryFilter.addFilter("grpid",grpid, QueryOP.EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("isDele","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
+        PageList<PlatformMdmGroupMapping> pageList= this.platformMdmGroupMappingService.query(queryFilter);
+        if(pageList.getRows()!=null && pageList.getRows().size()>0){
+            PlatformMdmGroupMapping groupMapping = pageList.getRows().get(0);
+            UcOrg org = ucOrgService.get(groupMapping.getOrgid());
+            if (org != null) {
+                UcOrgDTO dto = new UcOrgDTO(org);
+                dto.setGrpname(groupMapping.getGrpname());
+                dto.setGrpid(groupMapping.getGrpid());
+                return dto;
+            }
+        }
+        return null;
+    }
+
+    @GetMapping({"/getMdmList}"})
+    @ApiOperation(value = "根据平台组织id获取主数据组织列表", httpMethod = "GET", notes = "根据平台组织id获取主数据组织列表")
+    public List<PlatformMdmGroupMapping> getMdmList(@ApiParam(name = "orgId", value = "业务对象主键", required = true) @RequestParam String orgId) {
+        QueryFilter queryFilter=QueryFilter.build();
+        queryFilter.addFilter("orgid",orgId, QueryOP.EQUAL, FieldRelation.AND);
+        queryFilter.addFilter("isDele","1",QueryOP.NOT_EQUAL,FieldRelation.AND);
+        PageList<PlatformMdmGroupMapping> pageList= this.platformMdmGroupMappingService.query(queryFilter);
+        if(pageList.getRows()!=null && pageList.getRows().size()>0){
+            return pageList.getRows();
+        }
+        else {
+            return new ArrayList<>();
+        }
     }
 
     @PostMapping({"/list"})
