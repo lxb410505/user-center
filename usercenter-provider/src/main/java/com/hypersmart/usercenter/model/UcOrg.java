@@ -87,7 +87,7 @@ public class UcOrg implements Serializable {
     private Integer level;
 
     @Column(name = "REF_ID_")
-    @ApiModelProperty("级别")
+    @ApiModelProperty("引用Id")
     private String refId;
 
     @Transient
