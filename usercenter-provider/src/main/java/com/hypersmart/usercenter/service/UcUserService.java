@@ -79,7 +79,7 @@ public interface  UcUserService extends IGenericService<String, UcUser> {
 
     List<RsunJbHiReward> getmoney(String userCode);
 
-    List<JinBiJiLv> getUserCoinHisRecordByUserCode(String userCode);
+    List<JinBiJiLv> getUserCoinHisRecordByUserCode(String userCode,String dateString);
 
     List<UcUser> getaa();
 

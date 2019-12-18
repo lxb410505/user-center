@@ -18,6 +18,8 @@ public class  JinBiJiLv {
 
     private String procId;
 
+    private String bxContent;
+
     public String getProcId() {
         return procId;
     }
@@ -64,6 +66,14 @@ public class  JinBiJiLv {
 
     public void setDate2(Date date2) {
         this.date2 = date2;
+    }
+
+    public String getBxContent() {
+        return bxContent;
+    }
+
+    public void setBxContent(String bxContent) {
+        this.bxContent = bxContent;
     }
 
     @Override

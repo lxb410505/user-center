@@ -143,8 +143,13 @@ public class  UcUserController extends BaseController {
             pageSize=reqMap.get("pageSize");
         }
         String UserCode=reqMap.get("UserCode");
+
+        String dateString = null;//根据日期查询金币记录
+        if(reqMap.get("date")!=null){
+            dateString=reqMap.get("date");
+        }
         PageHelper.startPage(Integer.valueOf(page), Integer.valueOf(pageSize), true);
-        List<JinBiJiLv> list = ucUserService.getUserCoinHisRecordByUserCode(UserCode);
+        List<JinBiJiLv> list = ucUserService.getUserCoinHisRecordByUserCode(UserCode,dateString);
         PageList<JinBiJiLv> jinBiJiLvPageList = new PageList<>();
         jinBiJiLvPageList.setPageSize(Integer.valueOf(pageSize));
         jinBiJiLvPageList.setPage(Integer.valueOf(page));
