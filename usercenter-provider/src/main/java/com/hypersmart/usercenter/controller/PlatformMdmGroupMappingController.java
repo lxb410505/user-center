@@ -50,7 +50,7 @@ public class PlatformMdmGroupMappingController extends BaseController {
         return platformMdmGroupMappingService.queryByGrade(userId,grade);
     }
 
-    @GetMapping({"/getOrg}"})
+    @GetMapping({"/getOrg"})
     @ApiOperation(value = "根据组团id获取平台组织", httpMethod = "GET", notes = "获取单个平台组团映射表记录")
     public UcOrgDTO getOrg(@ApiParam(name = "grpid", value = "业务对象主键", required = true) @RequestParam String grpid) {
         QueryFilter queryFilter=QueryFilter.build();
@@ -70,7 +70,7 @@ public class PlatformMdmGroupMappingController extends BaseController {
         return null;
     }
 
-    @GetMapping({"/getMdmList}"})
+    @GetMapping({"/getMdmList"})
     @ApiOperation(value = "根据平台组织id获取主数据组织列表", httpMethod = "GET", notes = "根据平台组织id获取主数据组织列表")
     public List<PlatformMdmGroupMapping> getMdmList(@ApiParam(name = "orgId", value = "业务对象主键", required = true) @RequestParam String orgId) {
         QueryFilter queryFilter=QueryFilter.build();
