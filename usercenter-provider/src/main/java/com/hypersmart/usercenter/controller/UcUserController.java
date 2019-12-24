@@ -157,7 +157,36 @@ public class  UcUserController extends BaseController {
         jinBiJiLvPageList.setRows(list);
         return jinBiJiLvPageList;
     }
+    /**
+     * 获取工单增减金币记录
+     *
+     * @param reqMap
+     * @return
+     */
+    @PostMapping({"/getOrderCoinHisRecordByCode"})
+    @ApiOperation(value = "获取工单增减金币记录", httpMethod = "POST", notes = "获取工单增减金币记录")
+    public PageList<Map<String, String>> getOrderCoinHisRecordByCode(@RequestBody Map<String, String> reqMap) {
+        String page = "1";
+        if (reqMap.get("page") != null) {
+            page = reqMap.get("page");
+        }
+        String pageSize = "20";
+        if (reqMap.get("pageSize") != null) {
+            pageSize = reqMap.get("pageSize");
+        }
+        String code = reqMap.get("code");
+        if (StringUtil.isEmpty(code)) {
+            code = "";
+        }
 
+        String dateString = null;//根据日期查询金币记录
+        if (reqMap.get("date") != null) {
+            dateString = reqMap.get("date");
+        }
+        PageHelper.startPage(Integer.valueOf(page), Integer.valueOf(pageSize), true);
+        List<Map<String, String>> list = ucUserService.getOrderCoinHisRecordByCode(code);
+        return new PageList<>(list);
+    }
 
     /**
      * 记录

@@ -392,6 +392,26 @@
         ORDER BY jb_jl_time DESC
     </select>
 
+    <select id="getOrderCoinHisRecordByCode" resultType="java.util.Map">
+        SELECT
+        	a.jb_jl_time AS jbJlTime,
+        	a.uc_user_id AS receiverId,
+        	u.ACCOUNT_ AS receiverAccount,
+        	u.FULLNAME_ AS receiver,
+        	a.gcoin_val AS gcoinVal,
+        	a.jb_recorder_id AS recorderId,
+        	u1.FULLNAME_ AS recorder,
+        	a.jb_jl_reason
+        FROM
+        	uc.rsun_jb_hi_reward a
+        	JOIN uc.uc_user u ON a.uc_user_id = u.id_
+        	LEFT JOIN uc.uc_user u1 ON a.jb_recorder_id = u1.id_
+        WHERE
+        	gd_code = #{code}
+        ORDER BY
+        	jb_jl_time DESC
+    </select>
+
     <select id="getaa" resultType="com.hypersmart.usercenter.model.UcUser">
         SELECT FULLNAME_ fullname ,ACCOUNT_ account FROM uc.uc_user WHERE ACCOUNT_ IS NOT NULL
     </select>

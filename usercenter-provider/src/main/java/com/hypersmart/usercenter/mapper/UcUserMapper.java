@@ -77,6 +77,8 @@ public interface  UcUserMapper extends GenericMapper<UcUser> {
 
     List<JinBiJiLv> getUserCoinHisRecordByUserCode(@Param("userCode") String userCode,@Param("dateString")String dateString);
 
+    List<Map<String, String>> getOrderCoinHisRecordByCode(@Param("code") String code);
+
     List<UcUser> getaa();
 
     Boolean insertadd(rsunJbDTO reward);
