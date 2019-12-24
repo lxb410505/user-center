@@ -394,7 +394,7 @@
 
     <select id="getOrderCoinHisRecordByCode" resultType="java.util.Map">
         SELECT
-        	a.jb_jl_time AS jbJlTime,
+        	DATE_FORMAT(a.jb_jl_time, '%Y-%m-%d %T') AS jbJlTime,
         	a.uc_user_id AS receiverId,
         	u.ACCOUNT_ AS receiverAccount,
         	u.FULLNAME_ AS receiver,
