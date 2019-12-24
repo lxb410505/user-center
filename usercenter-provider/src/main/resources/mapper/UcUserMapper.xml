@@ -401,7 +401,7 @@
         	a.gcoin_val AS gcoinVal,
         	a.jb_recorder_id AS recorderId,
         	u1.FULLNAME_ AS recorder,
-        	a.jb_jl_reason
+        	a.jb_jl_reason AS reason
         FROM
         	uc.rsun_jb_hi_reward a
         	JOIN uc.uc_user u ON a.uc_user_id = u.id_
