@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -80,6 +81,8 @@ public interface  UcUserService extends IGenericService<String, UcUser> {
     List<RsunJbHiReward> getmoney(String userCode);
 
     List<JinBiJiLv> getUserCoinHisRecordByUserCode(String userCode,String dateString);
+
+    List<Map<String, String>> getOrderCoinHisRecordByCode(String code);
 
     List<UcUser> getaa();
 
