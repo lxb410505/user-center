@@ -82,7 +82,7 @@ public interface  UcUserService extends IGenericService<String, UcUser> {
 
     List<JinBiJiLv> getUserCoinHisRecordByUserCode(String userCode,String dateString);
 
-    List<Map<String, String>> getOrderCoinHisRecordByCode(String code);
+    List<Map<String, String>> getOrderCoinHisRecordByCode(String code, String groupUser);
 
     List<UcUser> getaa();
 

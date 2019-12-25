@@ -179,12 +179,8 @@ public class  UcUserController extends BaseController {
             code = "";
         }
 
-        String dateString = null;//根据日期查询金币记录
-        if (reqMap.get("date") != null) {
-            dateString = reqMap.get("date");
-        }
         PageHelper.startPage(Integer.valueOf(page), Integer.valueOf(pageSize), true);
-        List<Map<String, String>> list = ucUserService.getOrderCoinHisRecordByCode(code);
+        List<Map<String, String>> list = ucUserService.getOrderCoinHisRecordByCode(code, reqMap.getOrDefault("groupUser", ""));
         return new PageList<>(list);
     }
 

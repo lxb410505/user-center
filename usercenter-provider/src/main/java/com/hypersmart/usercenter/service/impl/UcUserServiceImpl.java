@@ -777,8 +777,12 @@ public class  UcUserServiceImpl extends GenericService<String, UcUser> implement
     }
 
     @Override
-    public List<Map<String, String>> getOrderCoinHisRecordByCode(String code) {
-        return ucUserMapper.getOrderCoinHisRecordByCode(code);
+    public List<Map<String, String>> getOrderCoinHisRecordByCode(String code, String groupUser) {
+        if (StringUtil.isEmpty(groupUser)) {
+            return ucUserMapper.getOrderCoinHisRecordByCode(code);
+        } else {
+            return ucUserMapper.getOrderCoinHisUserTotalByCode(code);
+        }
     }
 
     @Override
