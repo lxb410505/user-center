@@ -412,6 +412,28 @@
         	a.jb_jl_time DESC
     </select>
 
+
+    <select id="getOrderCoinHisUserTotalByCode" resultType="java.util.Map">
+        SELECT
+        	a.uc_user_id AS receiverId,
+	        u.ACCOUNT_ AS receiverAccount,
+	        u.FULLNAME_ AS receiver,
+	        ( CASE WHEN vo.last_handler_id = a.uc_user_id THEN 'handler' ELSE 'jointer' END ) AS roleType,
+	        sum( a.gcoin_val ) AS sumGcoinVal
+        FROM
+        	uc.rsun_jb_hi_reward a
+	        JOIN uc.uc_user u ON a.uc_user_id = u.id_
+	        LEFT JOIN uc.uc_user u1 ON a.jb_recorder_id = u1.id_
+	        LEFT JOIN bpm.ext_customer_repair vo ON a.gd_code = vo.bx_code
+        WHERE
+        	a.gd_code = #{code}
+        GROUP BY
+        	a.uc_user_id,
+        	a.gd_code
+        ORDER BY
+        	a.uc_user_id
+    </select>
+
     <select id="getaa" resultType="com.hypersmart.usercenter.model.UcUser">
         SELECT FULLNAME_ fullname ,ACCOUNT_ account FROM uc.uc_user WHERE ACCOUNT_ IS NOT NULL
     </select>
