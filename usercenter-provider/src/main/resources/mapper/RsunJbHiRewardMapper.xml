@@ -109,7 +109,7 @@
                 AND c.ORG_ID_ in ${projectForSearch} AND c.IS_DELE_ !='1'
             </if>
             <if test="jobForSearch != null">
-                AND rel.JOB_ID_ = ${jobForSearch}  and rel.IS_DELE_ !='1'
+                AND rel.JOB_ID_ = #{jobForSearch}  and rel.IS_DELE_ !='1'
             </if>
         </where>
         <if test="orderBySql!=null">
