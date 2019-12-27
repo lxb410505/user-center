@@ -97,20 +97,19 @@
                 DATE_FORMAT(r.jb_originnal_time ,'%Y')=#{yearForSearch}
             </if>
         </where>
-         GROUP  BY userId) rsum RIGHT JOIN uc.uc_user u ON rsum.userId=u.ID_  LEFT JOIN uc.uc_org_user c ON u.ID_=c.USER_ID_
+         GROUP  BY userId) rsum RIGHT JOIN uc.uc_user u ON rsum.userId=u.ID_
+        LEFT JOIN uc.uc_org_user c ON u.ID_=c.USER_ID_
+        LEFT JOIN uc.uc_org_post rel ON c.POS_ID_ = rel.ID_
         <where>
-            1=1
+            u.IS_DELE_!='1'
             <if test="FULLNAME_ != null">
                 AND u.FULLNAME_ like concat('%',#{FULLNAME_},'%')
             </if>
             <if test="projectForSearch != null">
-                AND c.ORG_ID_ in ${projectForSearch}
+                AND c.ORG_ID_ in ${projectForSearch} AND c.IS_DELE_ !='1'
             </if>
             <if test="jobForSearch != null">
-                AND c.POS_ID_ in ${jobForSearch}
-            </if>
-            <if test="jobForSearch != null or projectForSearch != null">
-                AND c.IS_DELE_=0
+                AND rel.JOB_ID_ = #{jobForSearch}  and rel.IS_DELE_ !='1'
             </if>
         </where>
         <if test="orderBySql!=null">
@@ -210,8 +209,9 @@
         FROM  uc.rsun_jb_hi_reward r
         GROUP  BY userId) rsum RIGHT JOIN uc.uc_user u ON rsum.userId=u.ID_  LEFT JOIN uc.uc_org_user c ON u.ID_=c.USER_ID_
         <where>
+            u.IS_DELE_!='1'
             <if test="list != null and list.size() > 0">
-                u.ID_ in
+              and  u.ID_ in
                 <foreach collection="list" item="userId" open="(" close=")" separator=",">
                     #{userId}
                 </foreach>
