@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service("rsunUserStarLevellImpl")
@@ -149,7 +150,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
             map.put("user_name", maps.get(i).get("fullname_"));
             map.put("project", maps.get(i).get("name_"));
             map.put("gold", maps.get(i).get("total_coin"));
-            map.put("year", 2019);
+            map.put("year", LocalDateTime.now().getYear());
             map.put("sort_name", "第" + (i + 1) + "名");
             rsunUserStarLevellMapper.insertYear(map);
 
@@ -197,7 +198,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
                 map.put("user_name", maps1.get(i).get("fullname_"));
                 map.put("project", maps1.get(i).get("name_"));
                 map.put("gold", maps1.get(i).get("s"));
-                map.put("year", 2019);
+                map.put("year", LocalDateTime.now().getYear());
                 map.put("month", mapTime.get("month"));
                 map.put("sort_name", "第" + (i + 1) + "名");
                 rsunUserStarLevellMapper.insertMonth(map);
@@ -236,7 +237,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
             map.put("user_name", maps1.get(i).get("fullname_"));
             map.put("project", maps1.get(i).get("name_"));
             map.put("gold", maps1.get(i).get("s"));
-            map.put("year", 2019);
+            map.put("year", LocalDateTime.now().getYear());
             map.put("month", month);
             map.put("sort_name", "第" + (i + 1) + "名");
             rsunUserStarLevellMapper.insertMonth(map);
@@ -341,7 +342,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
             map.put("user_name", maps.get(i).get("fullname_"));
             map.put("project", maps.get(i).get("name_"));
             map.put("gold", maps.get(i).get("xz_num"));
-            map.put("year", 2019);
+            map.put("year", LocalDateTime.now().getYear());
             map.put("sort_name", "第" + (i + 1) + "名");
             rsunUserStarLevellMapper.insertYear4Badge(map);
 
@@ -377,7 +378,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
             map.put("user_name", maps1.get(i).get("fullname_"));
             map.put("project", maps1.get(i).get("name_"));
             map.put("gold", maps1.get(i).get("s"));
-            map.put("year", 2019);
+            map.put("year", LocalDateTime.now().getYear());
             map.put("month", month);
             map.put("sort_name", "第" + (i + 1) + "名");
             rsunUserStarLevellMapper.insertMonth4Badge(map);
