@@ -214,7 +214,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
                 map.put("user_name", maps1.get(i).get("fullname_"));
                 map.put("project", maps1.get(i).get("name_"));
                 map.put("gold", maps1.get(i).get("s"));
-                map.put("year", LocalDateTime.now().getYear());
+                map.put("year", now.getYear());
                 map.put("month", mapTime.get("month"));
                 map.put("sort_name", "第" + (i + 1) + "名");
                 rsunUserStarLevellMapper.insertMonth(map);
@@ -516,7 +516,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
         now = now.plusMonths(-1);
         Month month = now.getMonth();
         System.out.println(month.getValue());
-        System.out.println(now.toString());
+        System.out.println(now.getYear());
     }
 
 }
