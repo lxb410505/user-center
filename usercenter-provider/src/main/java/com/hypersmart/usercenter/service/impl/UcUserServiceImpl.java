@@ -757,8 +757,8 @@ public class  UcUserServiceImpl extends GenericService<String, UcUser> implement
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
         String format = simpleDateFormat.format(date);
-        String kaishi = format+"-01";
-        String jieshu = format+"-31";
+        String kaishi = format+"-01 00:00:00";
+        String jieshu = format+"-31 23:59:59";
         map.put("kaishi",kaishi);
         map.put("jieshu",jieshu);
         return ucUserMapper.getmoney(map);
