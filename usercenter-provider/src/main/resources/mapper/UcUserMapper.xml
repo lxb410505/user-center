@@ -377,7 +377,7 @@
     </select>
 
     <select id="getmoney" parameterType="java.util.HashMap" resultType="com.hypersmart.usercenter.model.RsunJbHiReward">
-        SELECT uc_user_id ucUserId,jb_jl_reason jbJlReason , jb_jl_time jbJlTime , gd_code gdCode , gcoin_val   gcoinVal FROM uc.rsun_jb_hi_reward WHERE uc_user_id =#{userCode} AND jb_jl_time BETWEEN #{kaishi} AND #{jieshu}
+        SELECT uc_user_id ucUserId,jb_jl_reason jbJlReason , jb_jl_time jbJlTime , gd_code gdCode , gcoin_val   gcoinVal FROM uc.rsun_jb_hi_reward WHERE uc_user_id =#{userCode} AND jb_originnal_time BETWEEN #{kaishi} AND #{jieshu}
     </select>
 
     <select id="getUserCoinHisRecordByUserCode" resultType="com.hypersmart.usercenter.model.JinBiJiLv" parameterType="java.lang.String">
