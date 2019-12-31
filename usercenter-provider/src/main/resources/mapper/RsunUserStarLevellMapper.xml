@@ -5,7 +5,7 @@
 
     <select id="getRsunUserStarLevelList" parameterType="java.util.Map"
             resultType="com.hypersmart.usercenter.model.RsunUserStarLevel">
-        SELECT a.pj_star_id pjStarId,a.total_coin totalCoin,a.uc_user_id ucUserId,a.xz_num xzNum,b.FULLNAME_
+        SELECT a.pj_star_id pjStarId,a.total_coin totalCoin,a.uc_user_id ucUserId,a.xz_num xzNum,xz_reason as xzReason,a.xz_attachment as xzAttachment,b.FULLNAME_
         fullName,b.ACCOUNT_ account,a.level_sy_time levelSyTime FROM uc.rsun_user_star_level a RIGHT JOIN uc.uc_user b on a.uc_user_id=b.ID_
         <where>
             <if test="whereSql!=null">
