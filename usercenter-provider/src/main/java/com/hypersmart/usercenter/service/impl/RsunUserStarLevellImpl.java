@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.*;
 
 @Service("rsunUserStarLevellImpl")
@@ -182,13 +183,15 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
 
         if (day <= 6) {
             //生成上个月的数据
-
-            String month = cal.get(Calendar.MONTH) + 1 + "";
-            int year = cal.get(Calendar.YEAR);
+            LocalDateTime now = LocalDateTime.now();
+            now = now.plusMonths(-1);
+            String month = String.valueOf(now.getMonth().getValue());
+            int year = now.getYear();
 
             Map mapTime = new HashMap();
             mapTime.put("year",year);
-            mapTime.put("month",Integer.valueOf(month)-1);
+
+            mapTime.put("month",month);
             rsunUserStarLevellMapper.deleteGoldMonth(mapTime);
             message = new StringBuffer("");
             message.append("生成上个月的数据,month:"+mapTime.get("month"));
@@ -508,5 +511,12 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
         return rsunUserStarLevellMapper.insertBadgeHistory(map);
     }
 
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        now = now.plusMonths(-1);
+        Month month = now.getMonth();
+        System.out.println(month.getValue());
+        System.out.println(now.toString());
+    }
 
 }
