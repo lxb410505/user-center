@@ -180,7 +180,7 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
         record.put("end_time", new Date());
         rsunUserStarLevellMapper.updateSingleRecord(record);
 
-        if (day == 6) {
+        if (day <= 6) {
             //生成上个月的数据
 
             String month = cal.get(Calendar.MONTH) + 1 + "";
