@@ -22,4 +22,8 @@ public class  RsunUserStarLevel {
 
     private Date levelSyTime; //等级授予时间
 
+    private String xzReason;//原因
+
+    private String xzAttachment;//附件
+
 }

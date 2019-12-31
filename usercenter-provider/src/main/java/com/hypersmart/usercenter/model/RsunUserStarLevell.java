@@ -33,6 +33,15 @@ public class  RsunUserStarLevell implements Serializable {
     @ApiModelProperty("个人勋章数")
     private Integer xzNum;
 
+    @Column(name = "xz_reason")
+    @ApiModelProperty("原因")
+    private String xzReason;
+
+    @Column(name = "xz_attachment")
+    @ApiModelProperty("附件")
+    private String xzAttachment;
+
+
     public String getUcUserId() {
         return ucUserId;
     }
@@ -73,6 +82,22 @@ public class  RsunUserStarLevell implements Serializable {
         this.xzNum = xzNum;
     }
 
+    public String getXzReason() {
+        return xzReason;
+    }
+
+    public void setXzReason(String xzReason) {
+        this.xzReason = xzReason;
+    }
+
+    public String getXzAttachment() {
+        return xzAttachment;
+    }
+
+    public void setXzAttachment(String xzAttachment) {
+        this.xzAttachment = xzAttachment;
+    }
+
     @Override
     public String toString() {
         return "RsunUserStarLevell{" +
@@ -81,6 +106,8 @@ public class  RsunUserStarLevell implements Serializable {
                 ", levelSyTime=" + levelSyTime +
                 ", totalCoin=" + totalCoin +
                 ", xzNum=" + xzNum +
+                ", xzReason=" + xzReason +
+                ", xzAttachment=" + xzAttachment +
                 '}';
     }
 }

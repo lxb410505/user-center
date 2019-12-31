@@ -91,6 +91,12 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
             } else {
                 rsunUserStarLevell.setXzNum(0);
             }
+            if(modelMap.get("xzReason") != null){
+                rsunUserStarLevell.setXzReason(String.valueOf(modelMap.get("xzReason")));
+            }
+            if(modelMap.get("xzAttachment") != null){
+                rsunUserStarLevell.setXzAttachment(String.valueOf(modelMap.get("xzAttachment")));
+            }
             this.insert(rsunUserStarLevell);
         } else {
             //修改
@@ -112,6 +118,13 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
             } else {
                 rsunUserStarLevell.setXzNum((Integer) modelMap.get("xzNum"));
             }
+            if(modelMap.get("xzReason") != null){
+                rsunUserStarLevell.setXzReason(String.valueOf(modelMap.get("xzReason")));
+            }
+            if(modelMap.get("xzAttachment") != null){
+                rsunUserStarLevell.setXzAttachment(String.valueOf(modelMap.get("xzAttachment")));
+            }
+
             this.update(rsunUserStarLevell);
         }
         return new CommonResult(true, "修改成功");
