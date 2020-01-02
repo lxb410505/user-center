@@ -288,7 +288,8 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
                 return new PageList<>(query);
             } else {
                 logger.info("查询月份");
-
+                int month_ = Integer.valueOf(params.get("month").toString());//单月份去掉0
+                params.put("month",month_);
                 query = this.rsunUserStarLevellMapper.queryMonth(queryFilter.getParams());
                 return new PageList<>(query);
             }
@@ -503,8 +504,50 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
         }
         map.put("jb_jl_time", new Date());
         map.put("jb_originnal_time", new Date());
+        //历史记录增加字段
+        if(null==map.get("xz_reason")){
+            map.put("xz_reason", null);
+        }
+        if(null==map.get("xz_attachment")){
+            map.put("xz_attachment", null);
+        }
 
         return rsunUserStarLevellMapper.insertBadgeHistory(map);
+    }
+
+    /**
+     * 获取勋章记录列表
+     * @param queryFilter
+     * @return
+     */
+    @Override
+    public PageList<Map<String, Object>> getUserMedalRecordList(QueryFilter queryFilter) {
+        if (queryFilter != null) {
+            PageBean pageBean = queryFilter.getPageBean();
+            if (!com.hypersmart.base.util.BeanUtils.isEmpty(pageBean)) {
+                PageHelper.startPage(pageBean.getPage(), pageBean.getPageSize(), pageBean.showTotal());
+            } else {
+                PageHelper.startPage(1, Integer.MAX_VALUE, false);
+            }
+            Map<String, Object> paramMap = queryFilter.getParams();
+            List<Map<String, Object>> list = rsunUserStarLevellMapper.getUserMedalRecordList(paramMap);
+            if (!CollectionUtils.isEmpty(list)) {
+                return new PageList(list);
+            } else {
+                PageList<Map<String, Object>> pageList = new PageList<>();
+                pageList.setRows(new ArrayList<>());
+                pageList.setTotal(0);
+                pageList.setPageSize(20);
+                pageList.setPage(1);
+                return pageList;
+            }
+        }
+        PageList<Map<String, Object>> pageList = new PageList<>();
+        pageList.setRows(new ArrayList<>());
+        pageList.setTotal(0);
+        pageList.setPageSize(20);
+        pageList.setPage(1);
+        return pageList;
     }
 
 

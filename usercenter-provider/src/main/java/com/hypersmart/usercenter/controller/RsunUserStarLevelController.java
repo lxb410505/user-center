@@ -105,4 +105,16 @@ public class RsunUserStarLevelController extends BaseController {
     public PageList<GoldInfo> getUserGold4Part(@ApiParam(name = "queryFilter", value = "查询条件") @RequestBody QueryFilter queryFilter){
         return rsunUserStarlLevelService.getUserGold4Part(queryFilter);
     }
+
+    /**
+     * 查询勋章获取记录、照片、原因
+     * @param queryFilter
+     * @return
+     */
+    @PostMapping({"/getUserMedalRecordList"})
+    @ApiOperation(value = "获取勋章获取记录}", httpMethod = "POST", notes = "获取勋章获取记录列表")
+    public PageList<Map<String, Object>> getUserMedalRecordList(@ApiParam(name = "queryFilter", value = "查询对象") @RequestBody QueryFilter queryFilter) {
+        return rsunUserStarlLevelService.getUserMedalRecordList(queryFilter);
+    }
+
 }
