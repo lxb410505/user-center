@@ -226,6 +226,7 @@ from uc.rsun_jb_hi_reward a
         jb_jl_time,
         gcoin_val,
         jb_originnal_time,
+        xz_reason,
         xz_attachment
         FROM
         uc.rsun_badge_hi_reward

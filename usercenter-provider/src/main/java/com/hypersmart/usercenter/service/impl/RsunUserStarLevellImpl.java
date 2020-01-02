@@ -542,7 +542,11 @@ public class RsunUserStarLevellImpl extends GenericService<String, RsunUserStarL
                 PageHelper.startPage(1, Integer.MAX_VALUE, false);
             }
             Map<String, Object> paramMap = queryFilter.getParams();
-            List<Map<String, Object>> list = rsunUserStarLevellMapper.getUserMedalRecordList(paramMap);
+
+            List<Map<String, Object>> list = null;
+            if (null != paramMap.get("uc_user_id")&& StringUtils.isRealEmpty(paramMap.get("uc_user_id").toString())) {
+                list = rsunUserStarLevellMapper.getUserMedalRecordList(paramMap);
+            }
             if (!CollectionUtils.isEmpty(list)) {
                 return new PageList(list);
             } else {
