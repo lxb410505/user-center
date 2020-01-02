@@ -37,5 +37,12 @@ public interface  RsunUserStarlLevelService extends IGenericService<String, Rsun
 
     PageList<GoldInfo> getUserGold4Part(QueryFilter queryFilter);
 
+    /**
+     * 获取勋章获取记录
+     * @param queryFilter
+     * @return
+     */
+    PageList<Map<String, Object>> getUserMedalRecordList(QueryFilter queryFilter);
+
 
 }
