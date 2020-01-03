@@ -1,17 +1,22 @@
 package com.hypersmart.usercenter.service.impl;
 
 import com.github.pagehelper.PageHelper;
+import com.hypersmart.base.feign.PortalFeignService;
 import com.hypersmart.base.query.PageBean;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryField;
 import com.hypersmart.base.query.QueryFilter;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
+import com.hypersmart.usercenter.bo.EngineeringGrabOrdersDataInsightBO;
 import com.hypersmart.usercenter.dto.CoinStatisticsListDTO;
 import com.hypersmart.usercenter.dto.CoinStatisticsListForExportDTO;
 import com.hypersmart.usercenter.mapper.RsunJbHiRewardMapper;
 import com.hypersmart.usercenter.model.RsunJbHiReward;
+import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.service.RsunJbHiRewardService;
+import com.hypersmart.usercenter.service.UcOrgService;
+import com.hypersmart.usercenter.util.DateUtil;
 import com.hypersmart.usercenter.util.ExportExcel;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -22,11 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import tk.mybatis.mapper.code.ORDER;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service("rsunJbHiRewardServiceImpl")
 public class RsunJbHiRewardServiceImpl extends GenericService<String, RsunJbHiReward> implements RsunJbHiRewardService {
@@ -35,6 +42,11 @@ public class RsunJbHiRewardServiceImpl extends GenericService<String, RsunJbHiRe
     @Autowired
     private RsunJbHiRewardMapper rsunJbHiRewardMapper;
 
+    @Autowired
+    private PortalFeignService portalFeignService;
+
+    @Autowired
+    private UcOrgService ucOrgService;
 
     private static final Logger logger = LoggerFactory.getLogger(RsunUserStarLevellImpl.class);
 
@@ -217,5 +229,78 @@ public class RsunJbHiRewardServiceImpl extends GenericService<String, RsunJbHiRe
         response.flushBuffer();
     }
 
+
+    /**
+     * 工程抢单数据洞察
+     * @param jsonobject
+     * @return
+     */
+    public HashMap<String,Object> getEngineeringGrabOrdersDataInsight(EngineeringGrabOrdersDataInsightBO bo) {
+        HashMap<String, Object> map = new HashMap<>();
+        LinkedList<String> legendList = new LinkedList<String>();//项目名称
+        List<String> xAxisList = new ArrayList<>();
+        LinkedList<HashMap<String,Object>> seriesList = new LinkedList<HashMap<String,Object>>();//{name:String type:String  data:[]}
+        //查询参数检查  项目ids  开始年月  截至年月
+        if(null!=bo){
+            //如果没有传入项目id 默认查询一个项目
+            if(CollectionUtils.isEmpty(bo.getProjectIdList())){
+                //获取可以抢单地块
+                String idString = portalFeignService.getPropertyByAlias("grabOrderList");
+                if(StringUtil.isNotEmpty(idString)) {
+                    String[] ids  = idString.split(",");
+                    for(String pid:ids){
+                        UcOrg org = ucOrgService.get(ids[0]);
+                        if(null!=org){
+                            bo.setProjectIdList(Arrays.asList(org.getParentId()));
+                            break;//默认查第一个
+                        }
+                    }
+                }
+            }
+            String startDate = "";
+            String endDate = "";
+            if(StringUtil.isEmpty(bo.getStartYears()) || StringUtil.isEmpty(bo.getEndYears())){
+                startDate = DateUtil.getPastNumMonth(6) + " 00:00:00";
+                endDate = DateUtil.getMonthEnd() + " 23:59:59";
+            }else{
+                startDate = bo.getStartYears() + "-01 00:00:00";
+                endDate = bo.getEndYears() + "-31 23:59:59";
+            }
+            xAxisList = DateUtil.getMonthBetweenDate(startDate.substring(0,7),endDate.substring(0,7));//x轴 所选日期范围  YYYY-MM
+            //查询数据
+            List<HashMap<String,String>> pList = rsunJbHiRewardMapper.getEngineeringGrabOrdersDataInsight(startDate,endDate, bo.getProjectIdList());
+            if(!CollectionUtils.isEmpty(pList)) {
+                List<HashMap<String, String>> dataList = pList.stream().filter(o -> StringUtil.isNotEmpty(o.get("u_project"))).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(dataList)) {
+                    //按项目分组 --  遍历数据  -- 按年月取值 没有则赋值0 -- 封装数据
+                    Map<String, List<HashMap<String, String>>> pMap = pList.stream().collect(Collectors.groupingBy(o -> o.get("u_project")));
+                    for (Map.Entry<String, List<HashMap<String, String>>> entry : pMap.entrySet()) {
+                        legendList.add(entry.getKey());
+                        HashMap<String, Object> seriesMap = new HashMap<String, Object>();
+                        seriesMap.put("name", entry.getKey());
+                        seriesMap.put("type", "line");
+                        List<HashMap<String, String>> projectList = entry.getValue();//数据
+                        List<String> data = new ArrayList<String>();
+                        for (String yyyyMM : xAxisList) {
+                            //年月
+                            Optional<HashMap<String, String>> optional = projectList.stream().filter(o -> o.get("years").equals(yyyyMM)).findAny();
+                            if (optional.isPresent()) {
+                                data.add(optional.get().get("gcoin_val"));
+                            } else {
+                                data.add("0");
+                            }
+                        }
+                        seriesMap.put("data", data);
+                        seriesList.add(seriesMap);
+                    }
+
+                }
+            }
+        }
+        map.put("legendList ",legendList);
+        map.put("xAxisList",xAxisList);
+        map.put("seriesList ",seriesList);
+        return map;
+    }
 
 }

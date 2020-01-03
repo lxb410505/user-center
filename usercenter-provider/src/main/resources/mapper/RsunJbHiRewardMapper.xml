@@ -219,4 +219,29 @@
         </where>
     </select>
 
+    <select id="getEngineeringGrabOrdersDataInsight" resultType="java.util.Map">
+        SELECT
+        b.u_project_id,
+        b.u_project,
+        sum( a.gcoin_val ) gcoin_val,
+        DATE_FORMAT( a.jb_jl_time, '%Y-%m' ) years,
+        YEAR ( a.jb_jl_time ) year,
+        MONTH ( a.jb_jl_time ) month
+        FROM
+        uc.rsun_jb_hi_reward a
+        JOIN bpm.ext_customer_repair b ON a.gd_code = b.bx_code
+        AND b.bx_area_id = 'outdoor'
+        AND a.jb_jl_time <![CDATA[ >= ]]> #{startDate}
+        AND a.jb_jl_time <![CDATA[ <= ]]> #{endDate}
+        <if test="list != null and list.size() > 0">
+        and b.u_project_id in <foreach collection="list" item="item" open="(" close=")" separator=",">#{item}</foreach>
+        </if>
+        GROUP BY
+        `u_project_id`,
+        `YEAR`,
+        `MONTH`
+        ORDER BY
+        jb_jl_time;
+    </select>
+
 </mapper>

@@ -1,8 +1,11 @@
 package com.hypersmart.usercenter.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.hypersmart.base.controller.BaseController;
+import com.hypersmart.base.model.CommonResult;
 import com.hypersmart.base.query.PageList;
 import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.usercenter.bo.EngineeringGrabOrdersDataInsightBO;
 import com.hypersmart.usercenter.dto.CoinStatisticsListDTO;
 import com.hypersmart.usercenter.model.RsunJbHiReward;
 import com.hypersmart.usercenter.model.RsunUserStarLevel;
@@ -10,13 +13,11 @@ import com.hypersmart.usercenter.service.RsunJbHiRewardService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping(value = {"/api/usercenter/v1/rsunjbhireward"}, produces = {"application/json;charset=UTF-8"})
@@ -57,7 +58,18 @@ public class RsunJbHiRewardController  extends BaseController {
     }
 
 
-
-
+    /**
+     * 工程抢单数据洞察  抢单地块金币统计
+     * @param queryFilter
+     * @return
+     */
+    @PostMapping({"/getEngineeringGrabOrdersDataInsight"})
+    @ApiOperation(value = "工程抢单数据洞察}", httpMethod = "POST", notes = "工程抢单数据洞察")
+    public CommonResult<HashMap<String,Object>> getEngineeringGrabOrdersDataInsight(@RequestBody EngineeringGrabOrdersDataInsightBO bo){
+        CommonResult<HashMap<String,Object>> commonResult = new CommonResult<>();
+        HashMap<String,Object> map = this.rsunJbHiRewardService.getEngineeringGrabOrdersDataInsight(bo);
+        commonResult.setValue(map);
+        return commonResult;
+    }
 
 }
