@@ -297,9 +297,9 @@ public class RsunJbHiRewardServiceImpl extends GenericService<String, RsunJbHiRe
                 }
             }
         }
-        map.put("legendList ",legendList);
+        map.put("legendList",legendList);
         map.put("xAxisList",xAxisList);
-        map.put("seriesList ",seriesList);
+        map.put("seriesList",seriesList);
         return map;
     }
 
