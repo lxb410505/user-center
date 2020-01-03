@@ -164,8 +164,9 @@
       #{jb_jl_reason} ,
       #{jb_jl_time} ,
       #{gcoin_val} ,
-      #{jb_originnal_time}
-
+      #{jb_originnal_time},
+      #{xz_reason},
+      #{xz_attachment}
       );
     </insert>
 
@@ -215,5 +216,27 @@ from uc.rsun_jb_hi_reward a
      </if>
 
         group by a.uc_user_id) a,(SELECT @rowNO :=0) b ORDER BY a.gold DESC
+    </select>
+
+    <!-- 获取员工勋章记录列表 -->
+    <select id="getUserMedalRecordList" parameterType="java.util.Map" resultType="java.util.Map" >
+        SELECT
+        uc_user_id,
+        jb_jl_reason,
+        jb_jl_time,
+        gcoin_val,
+        jb_originnal_time,
+        xz_reason,
+        xz_attachment
+        FROM
+        uc.rsun_badge_hi_reward
+        <where>
+            <if test="whereSql!=null">
+                ${whereSql}
+            </if>
+        </where>
+        <if test="orderBySql!=null">
+            ORDER BY ${orderBySql}
+        </if>
     </select>
 </mapper>

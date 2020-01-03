@@ -58,6 +58,5 @@ public interface  RsunUserStarLevellMapper extends GenericMapper<RsunUserStarLev
     int updateSingleRecord(Map<String, Object> map);
     int insertBadgeHistory(Map<String, Object> map);
 
-
-
+    List<Map<String, Object>> getUserMedalRecordList(Map<String, Object> params);
 }
