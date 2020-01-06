@@ -2,10 +2,7 @@ package com.hypersmart.usercenter.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.feign.PortalFeignService;
-import com.hypersmart.base.query.PageBean;
-import com.hypersmart.base.query.PageList;
-import com.hypersmart.base.query.QueryField;
-import com.hypersmart.base.query.QueryFilter;
+import com.hypersmart.base.query.*;
 import com.hypersmart.base.util.StringUtil;
 import com.hypersmart.framework.service.GenericService;
 import com.hypersmart.usercenter.bo.EngineeringGrabOrdersDataInsightBO;
@@ -14,8 +11,10 @@ import com.hypersmart.usercenter.dto.CoinStatisticsListForExportDTO;
 import com.hypersmart.usercenter.mapper.RsunJbHiRewardMapper;
 import com.hypersmart.usercenter.model.RsunJbHiReward;
 import com.hypersmart.usercenter.model.UcOrg;
+import com.hypersmart.usercenter.model.UcOrgUser;
 import com.hypersmart.usercenter.service.RsunJbHiRewardService;
 import com.hypersmart.usercenter.service.UcOrgService;
+import com.hypersmart.usercenter.service.UcOrgUserService;
 import com.hypersmart.usercenter.util.DateUtil;
 import com.hypersmart.usercenter.util.ExportExcel;
 import org.apache.poi.ss.usermodel.Row;
@@ -47,6 +46,9 @@ public class RsunJbHiRewardServiceImpl extends GenericService<String, RsunJbHiRe
 
     @Autowired
     private UcOrgService ucOrgService;
+
+    @Autowired
+    UcOrgUserService ucOrgUserService;
 
     private static final Logger logger = LoggerFactory.getLogger(RsunUserStarLevellImpl.class);
 
@@ -267,33 +269,34 @@ public class RsunJbHiRewardServiceImpl extends GenericService<String, RsunJbHiRe
                 endDate = bo.getEndYears() + "-31 23:59:59";
             }
             xAxisList = DateUtil.getMonthBetweenDate(startDate.substring(0,7),endDate.substring(0,7));//x轴 所选日期范围  YYYY-MM
-            //查询数据
-            List<HashMap<String,String>> pList = rsunJbHiRewardMapper.getEngineeringGrabOrdersDataInsight(startDate,endDate, bo.getProjectIdList());
-            if(!CollectionUtils.isEmpty(pList)) {
-                List<HashMap<String, String>> dataList = pList.stream().filter(o -> StringUtil.isNotEmpty(o.get("u_project"))).collect(Collectors.toList());
-                if (!CollectionUtils.isEmpty(dataList)) {
-                    //按项目分组 --  遍历数据  -- 按年月取值 没有则赋值0 -- 封装数据
-                    Map<String, List<HashMap<String, String>>> pMap = pList.stream().collect(Collectors.groupingBy(o -> o.get("u_project")));
-                    for (Map.Entry<String, List<HashMap<String, String>>> entry : pMap.entrySet()) {
-                        legendList.add(entry.getKey());
-                        HashMap<String, Object> seriesMap = new HashMap<String, Object>();
-                        seriesMap.put("name", entry.getKey());
-                        seriesMap.put("type", "line");
-                        List<HashMap<String, String>> projectList = entry.getValue();//数据
-                        List<String> data = new ArrayList<String>();
-                        for (String yyyyMM : xAxisList) {
-                            //年月
-                            Optional<HashMap<String, String>> optional = projectList.stream().filter(o -> o.get("years").equals(yyyyMM)).findAny();
-                            if (optional.isPresent()) {
-                                data.add(optional.get().get("gcoin_val"));
-                            } else {
-                                data.add("0");
+            //查询数据 -- 必须传入一个项目id
+            if(!CollectionUtils.isEmpty(bo.getProjectIdList())) {
+                List<HashMap<String, String>> pList = rsunJbHiRewardMapper.getEngineeringGrabOrdersDataInsight(startDate, endDate, bo.getProjectIdList());
+                if (!CollectionUtils.isEmpty(pList)) {
+                    List<HashMap<String, String>> dataList = pList.stream().filter(o -> StringUtil.isNotEmpty(o.get("u_project"))).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(dataList)) {
+                        //按项目分组 --  遍历数据  -- 按年月取值 没有则赋值0 -- 封装数据
+                        Map<String, List<HashMap<String, String>>> pMap = pList.stream().collect(Collectors.groupingBy(o -> o.get("u_project")));
+                        for (Map.Entry<String, List<HashMap<String, String>>> entry : pMap.entrySet()) {
+                            legendList.add(entry.getKey());
+                            HashMap<String, Object> seriesMap = new HashMap<String, Object>();
+                            seriesMap.put("name", entry.getKey());
+                            seriesMap.put("type", "line");
+                            List<HashMap<String, String>> projectList = entry.getValue();//数据
+                            List<String> data = new ArrayList<String>();
+                            for (String yyyyMM : xAxisList) {
+                                //年月
+                                Optional<HashMap<String, String>> optional = projectList.stream().filter(o -> o.get("years").equals(yyyyMM)).findAny();
+                                if (optional.isPresent()) {
+                                    data.add(optional.get().get("gcoin_val"));
+                                } else {
+                                    data.add("0");
+                                }
                             }
+                            seriesMap.put("data", data);
+                            seriesList.add(seriesMap);
                         }
-                        seriesMap.put("data", data);
-                        seriesList.add(seriesMap);
                     }
-
                 }
             }
         }
@@ -301,6 +304,61 @@ public class RsunJbHiRewardServiceImpl extends GenericService<String, RsunJbHiRe
         map.put("xAxisList",xAxisList);
         map.put("seriesList",seriesList);
         return map;
+    }
+
+
+    //获取用户抢单项目组织
+    public List<UcOrg> getGrabOrderList(String userId) {
+        //获取可以抢单地块
+        String idString = portalFeignService.getPropertyByAlias("grabOrderList");
+        if(StringUtil.isEmpty(idString)) {
+            return new ArrayList<>();
+        }
+        //根据组织id获取组织信息
+        QueryFilter orgQuery = QueryFilter.build();
+        orgQuery.addFilter("id", idString, QueryOP.IN, FieldRelation.AND);
+        orgQuery.addFilter("isDele", "0", QueryOP.EQUAL, FieldRelation.AND);
+        List<UcOrg> returnList = ucOrgService.query(orgQuery).getRows();
+        //根据组织查询父级组织
+        List<UcOrg> set = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
+        for (UcOrg ucOrg : returnList) {
+            String[] paths = ucOrg.getPath().split("\\.");
+            for (int i = 0; i < paths.length; i++) {
+                QueryFilter query = QueryFilter.build();
+                query.addFilter("id", paths[i], QueryOP.EQUAL, FieldRelation.AND);
+                query.addFilter("isDele", "1", QueryOP.NOT_EQUAL, FieldRelation.AND);
+                List<UcOrg> voList = ucOrgService.query(query).getRows();
+                for (UcOrg vo : voList) {
+                    if (!ids.contains(vo.getId())) {
+                        vo.setDisabled("2");
+                        set.add(vo);
+                        ids.add(vo.getId());
+                    }
+                }
+            }
+        }
+        Set<String> xingZhengList=new HashSet<>();
+        for(UcOrg item:set){
+            if ("ORG_XingZheng".equals(item.getGrade())) {
+                xingZhengList.add(item.getId());
+            }
+        }
+        List<UcOrg> resultSet = new ArrayList<>();
+        for(UcOrg item:set){
+            Boolean isUnder=false;
+            for(String xzId:xingZhengList){
+                if(item.getPath().contains(xzId)){
+                    isUnder=true;
+                    break;
+                }
+            }
+            if(!isUnder){
+                resultSet.add(item);
+            }
+        }
+        resultSet=resultSet.stream().sorted(Comparator.comparing(a -> null ==a.getOrderNo()?1000:a.getOrderNo())).collect(Collectors.toList());
+        return resultSet;
     }
 
 }

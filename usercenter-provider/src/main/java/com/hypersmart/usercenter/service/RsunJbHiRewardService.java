@@ -7,10 +7,12 @@ import com.hypersmart.framework.service.IGenericService;
 import com.hypersmart.usercenter.bo.EngineeringGrabOrdersDataInsightBO;
 import com.hypersmart.usercenter.dto.CoinStatisticsListDTO;
 import com.hypersmart.usercenter.model.RsunJbHiReward;
+import com.hypersmart.usercenter.model.UcOrg;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public interface  RsunJbHiRewardService extends IGenericService<String, RsunJbHiReward>  {
@@ -23,4 +25,7 @@ public interface  RsunJbHiRewardService extends IGenericService<String, RsunJbHi
 
     //工程抢单数据洞察
     HashMap<String,Object> getEngineeringGrabOrdersDataInsight(EngineeringGrabOrdersDataInsightBO bo);
+
+    //获取抢单地块项目组织
+    List<UcOrg> getGrabOrderList(String userId);
 }
