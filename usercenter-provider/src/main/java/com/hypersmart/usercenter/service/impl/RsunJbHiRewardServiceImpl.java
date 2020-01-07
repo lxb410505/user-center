@@ -245,20 +245,40 @@ public class RsunJbHiRewardServiceImpl extends GenericService<String, RsunJbHiRe
         //查询参数检查  项目ids  开始年月  截至年月
         if(null!=bo){
             //如果没有传入项目id 默认查询一个项目
+//            if(CollectionUtils.isEmpty(bo.getProjectIdList())){
+//                //获取可以抢单地块
+//                String idString = portalFeignService.getPropertyByAlias("grabOrderList");
+//                if(StringUtil.isNotEmpty(idString)) {
+//                    String[] ids  = idString.split(",");
+//                    for(String pid:ids){
+//                        UcOrg org = ucOrgService.get(pid);
+//                        if(null!=org){
+//                            bo.setProjectIdList(Arrays.asList(org.getParentId()));
+//                            break;//默认查第一个
+//                        }
+//                    }
+//                }
+//            }
+            //如果没有传入项目id 查询所有
             if(CollectionUtils.isEmpty(bo.getProjectIdList())){
                 //获取可以抢单地块
                 String idString = portalFeignService.getPropertyByAlias("grabOrderList");
                 if(StringUtil.isNotEmpty(idString)) {
                     String[] ids  = idString.split(",");
+                    List<String> pIdArray = new ArrayList<String>();
                     for(String pid:ids){
-                        UcOrg org = ucOrgService.get(ids[0]);
+                        UcOrg org = ucOrgService.get(pid);
                         if(null!=org){
-                            bo.setProjectIdList(Arrays.asList(org.getParentId()));
-                            break;//默认查第一个
+                            pIdArray.add(org.getParentId());
+                            if(null==bo.getQueryAll()||!"true".equals(bo.getQueryAll())){
+                                break;//只查询一个
+                            }
                         }
                     }
+                    bo.setProjectIdList(pIdArray);
                 }
             }
+
             String startDate = "";
             String endDate = "";
             if(StringUtil.isEmpty(bo.getStartYears()) || StringUtil.isEmpty(bo.getEndYears())){
@@ -269,7 +289,7 @@ public class RsunJbHiRewardServiceImpl extends GenericService<String, RsunJbHiRe
                 endDate = bo.getEndYears() + "-31 23:59:59";
             }
             xAxisList = DateUtil.getMonthBetweenDate(startDate.substring(0,7),endDate.substring(0,7));//x轴 所选日期范围  YYYY-MM
-            //查询数据 -- 必须传入一个项目id
+            //查询数据 -- 必须传入项目id
             if(!CollectionUtils.isEmpty(bo.getProjectIdList())) {
                 List<HashMap<String, String>> pList = rsunJbHiRewardMapper.getEngineeringGrabOrdersDataInsight(startDate, endDate, bo.getProjectIdList());
                 if (!CollectionUtils.isEmpty(pList)) {

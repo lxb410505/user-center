@@ -6,6 +6,7 @@ public class EngineeringGrabOrdersDataInsightBO {
     private String startYears;
     private String endYears;
     private List<String> projectIdList;
+    private String queryAll="true";
 
     public String getStartYears() {
         return startYears;
@@ -29,5 +30,13 @@ public class EngineeringGrabOrdersDataInsightBO {
 
     public void setProjectIdList(List<String> projectIdList) {
         this.projectIdList = projectIdList;
+    }
+
+    public String getQueryAll() {
+        return queryAll;
+    }
+
+    public void setQueryAll(String queryAll) {
+        this.queryAll = queryAll;
     }
 }
