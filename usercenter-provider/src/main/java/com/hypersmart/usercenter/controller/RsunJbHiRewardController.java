@@ -9,6 +9,7 @@ import com.hypersmart.usercenter.bo.EngineeringGrabOrdersDataInsightBO;
 import com.hypersmart.usercenter.dto.CoinStatisticsListDTO;
 import com.hypersmart.usercenter.model.RsunJbHiReward;
 import com.hypersmart.usercenter.model.RsunUserStarLevel;
+import com.hypersmart.usercenter.model.UcOrg;
 import com.hypersmart.usercenter.service.RsunJbHiRewardService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = {"/api/usercenter/v1/rsunjbhireward"}, produces = {"application/json;charset=UTF-8"})
@@ -70,6 +72,12 @@ public class RsunJbHiRewardController  extends BaseController {
         HashMap<String,Object> map = this.rsunJbHiRewardService.getEngineeringGrabOrdersDataInsight(bo);
         commonResult.setValue(map);
         return commonResult;
+    }
+
+    @GetMapping({"/getGrabOrderList/{id}"})
+    @ApiOperation(value = "获取抢单地块项目组织}", httpMethod = "GET", notes = "获取抢单地块项目组织")
+    public List<UcOrg> getGrabOrderList(@PathVariable("id") String userId) {
+        return rsunJbHiRewardService.getGrabOrderList(userId);
     }
 
 }
