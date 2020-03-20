@@ -408,7 +408,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         List<UcOrgUser> list = new ArrayList<>();
         List<UcOrgUser> list1 = ucOrgUserService.getUserDefaultOrg(userId);
 
-        //查询用户所在非默认维度组织的引用默认组织（查询用户所在条线对应的默认组织，只查询地块级别）
+        //查询用户所在非默认维度组织的引用默认组织（查询用户所在条线对应的默认组织，只查询地块级别） -- 2020-03-20 修改，制查询已交付
         List<UcOrgUser> list2 = ucOrgUserService.getUserDefaultOrgByRef(userId);
         if (list1 != null && list1.size() > 0) {
             list.addAll(list1);
