@@ -504,7 +504,64 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         resultSet=resultSet.stream().sorted(Comparator.comparing(a -> null ==a.getOrderNo()?1000:a.getOrderNo())).collect(Collectors.toList());
         return resultSet;
     }
+    public List<UcOrg> getUserOrgListMergeAll(String userId) {
+        QueryFilter queryFilter = QueryFilter.build();
+        //查询用户所在默认维度组织
+        List<UcOrgUser> list = new ArrayList<>();
+        List<UcOrgUser> list1 = ucOrgUserService.getUserDefaultOrgAll(userId);
 
+        //查询用户所在非默认维度组织的引用默认组织（查询用户所在条线对应的默认组织，只查询地块级别） -- 2020-03-20 修改，制查询已交付
+        List<UcOrgUser> list2 = ucOrgUserService.getUserDefaultOrgByRefAll(userId);
+        if (list1 != null && list1.size() > 0) {
+            list.addAll(list1);
+        }
+        if (list2 != null && list2.size() > 0) {
+            list.addAll(list2);
+        }
+
+        if (null == list || list.size() <= 0) {
+            return new ArrayList<>();
+        }
+        String orgIds = "";
+        //去重
+        List<String> fullOrgIds = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            String tempId = list.get(i).getOrgId();
+            if (!fullOrgIds.contains(tempId)) {
+                if (i == 0) {
+                    orgIds = tempId;
+                } else {
+                    orgIds = orgIds + "," + tempId;
+                }
+                fullOrgIds.add(tempId);
+            }
+        }
+
+        List<UcOrg> set=getAuthOrgListByOrgIds(fullOrgIds);
+
+        Set<String> xingZhengList=new HashSet<>();
+        for(UcOrg item:set){
+            if ("ORG_XingZheng".equals(item.getGrade())) {
+                xingZhengList.add(item.getId());
+            }
+        }
+
+        List<UcOrg> resultSet = new ArrayList<>();
+        for(UcOrg item:set){
+            Boolean isUnder=false;
+            for(String xzId:xingZhengList){
+                if(item.getPath().contains(xzId)){
+                    isUnder=true;
+                    break;
+                }
+            }
+            if(!isUnder){
+                resultSet.add(item);
+            }
+        }
+        resultSet=resultSet.stream().sorted(Comparator.comparing(a -> null ==a.getOrderNo()?1000:a.getOrderNo())).collect(Collectors.toList());
+        return resultSet;
+    }
 
     public List<UcOrg> queryChildrenByCondition(String userId, String orgId, String grade) {
 

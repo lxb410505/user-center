@@ -133,6 +133,15 @@
         where u.USER_ID_ =#{userId} and d.IS_DEFAULT_=1
         and  u.IS_DELE_ !=1 and o.IS_DELE_ !=1 and d.IS_DELE_!=1
     </select>
+    <select id="getUserDefaultOrgAll" resultMap="UcOrgUser">
+         select
+        u.ID_, u.ORG_ID_,u.USER_ID_
+        from uc_org_user u
+        INNER JOIN  uc_org o on u.ORG_ID_=o.ID_
+		INNER JOIN uc_demension d on d.ID_=o.DEM_ID_
+        where u.USER_ID_ =#{userId} and d.IS_DEFAULT_=1
+        and  u.IS_DELE_ !=1 and o.IS_DELE_ !=1 and d.IS_DELE_!=1
+    </select>
 
     <!--查询用户非默认维度组织且层级为地块，项目的关联默认组织  2020-03-20修改  只查询已交付  -->
     <select id="getUserDefaultOrgByRef" resultMap="UcOrgUser">
@@ -142,6 +151,15 @@
         INNER JOIN  uc_org o on u.ORG_ID_=o.ID_
         INNER JOIN uc_demension d on d.ID_=o.DEM_ID_
         INNER JOIN uc_org_params uop on o.ID_ = uop.ORG_ID_ and uop.code_ = 'is_delivery' and uop.is_dele_ = 0 and uop.value_ = 1
+        where u.USER_ID_ =#{userId} and d.IS_DEFAULT_!=1 and (o.GRADE_='LINE_DIKUAI' || o.GRADE_='LINE_PROJECT' )
+        and  u.IS_DELE_ !=1 and o.IS_DELE_ !=1 and d.IS_DELE_!=1
+    </select>
+    <select id="getUserDefaultOrgByRefAll" resultMap="UcOrgUser">
+      select distinct
+        o.REF_ID_ as ORG_ID_ ,u.USER_ID_
+        from uc_org_user u
+        INNER JOIN  uc_org o on u.ORG_ID_=o.ID_
+        INNER JOIN uc_demension d on d.ID_=o.DEM_ID_
         where u.USER_ID_ =#{userId} and d.IS_DEFAULT_!=1 and (o.GRADE_='LINE_DIKUAI' || o.GRADE_='LINE_PROJECT' )
         and  u.IS_DELE_ !=1 and o.IS_DELE_ !=1 and d.IS_DELE_!=1
 

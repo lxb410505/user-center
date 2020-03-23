@@ -46,6 +46,8 @@ public interface UcOrgService extends IGenericService<String, UcOrg> {
 
     //获取用户默认维度组织，以及条线对应的默认组织的合集
     List<UcOrg> getUserOrgListMerge(String userId);
+    List<UcOrg> getUserOrgListMergeAll(String userId);
+
 
     List<UcOrg> queryChildrenByCondition(String userId,String orgId,String grade);
 
