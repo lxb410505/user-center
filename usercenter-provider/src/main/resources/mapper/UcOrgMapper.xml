@@ -36,7 +36,7 @@
         ID_,NAME_,PARENT_ID_,PATH_
     </sql>
     <sql id="BaseTable">
-        uc_org
+        (select uc_org.* from uc_org INNER JOIN uc_org_params uop on uc_org.ID_ = uop.ORG_ID_ and uop.code_ = 'is_delivery' and uop.is_dele_ = 0 and (uop.value_ = 1 or uop.value_  is null) ) uc_org
     </sql>
 
     <select id="getOrgList" resultMap="UcOrg">
@@ -207,6 +207,7 @@
         *
         from
         <include refid="BaseTable"/>
+        INNER JOIN uc_org_params uop on uc_org.ID_ = uop.ORG_ID_ and uop.code_ = 'is_delivery' and uop.is_dele_ = 0 and uop.value_ = 1
         where IS_DELE_ = '0'
     </select>
 
