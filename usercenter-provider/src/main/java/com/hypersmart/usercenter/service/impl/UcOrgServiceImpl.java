@@ -232,7 +232,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         return set;
     }
     public List<UcOrg> getAuthOrgListByOrgIdsAll(List<String> orgIds) {
-        List<UcOrg>  allOrgList= ucOrgMapper.getAllOrgs();
+        List<UcOrg>  allOrgList= ucOrgMapper.getAllOrgsAll();
         //根据组织id获取组织信息
         List<UcOrg> set = new ArrayList<>();
         List<UcOrg> returnList = new ArrayList<>();
