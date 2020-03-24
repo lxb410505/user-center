@@ -2,6 +2,7 @@ package com.hypersmart.usercenter.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.pagehelper.PageHelper;
+import com.hypersmart.base.aop.norepeat.NoRepeatSubmit;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.exception.RequiredException;
 import com.hypersmart.base.feign.UCFeignService;
@@ -455,6 +456,18 @@ public class  UcUserController extends BaseController {
 //        this.ucUserService.delete(aryIds);
 //        return new CommonResult(true, "批量删除成功");
 //    }
+
+    @PatchMapping({"/associateMobileToWx"})
+    @NoRepeatSubmit
+    @ApiOperation(value = "关联微信号", httpMethod = "PATCH", notes = "关联微信号")
+    public CommonResult<String> associateMobileToWx(@ApiParam(name = "ucUser", value = "关联微信号", required = true) @RequestBody UcUser model) {
+        String msg = "更新用户管理成功";
+        UcUser ucUser = new UcUser();
+        ucUser.setId(model.getId());
+        ucUser.setMobileToWx(model.getMobileToWx());
+        this.ucUserService.updateSelective(ucUser);
+        return new CommonResult(msg);
+    }
 
 
 }
