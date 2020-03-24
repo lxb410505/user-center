@@ -720,22 +720,23 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     private ICache<String> iCache;
     public List<UcOrg> getAllOrgs() {
         String key=RedisKeys.UC_ORRG+".getAllOrgs";
-        if (iCache.containKey(key)) {
-            List<UcOrg> ucOrgList= null;
-            try {
-                ucOrgList = JsonUtil.toBean(iCache.getByKey(key),new TypeReference<List<UcOrg>>() {});
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            logger.info("*************** from CACHE  KEY:" + key);
-            return ucOrgList;
-        }
+//        if (iCache.containKey(key)) {
+//            List<UcOrg> ucOrgList= null;
+//            try {
+//                ucOrgList = JsonUtil.toBean(iCache.getByKey(key),new TypeReference<List<UcOrg>>() {});
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            logger.info("*************** from CACHE  KEY:" + key);
+//            return ucOrgList;
+//        }
         List<UcOrg> ucOrgList2= ucOrgMapper.getAllOrgs();
         try {
             iCache.add(key, JsonUtil.toJson(ucOrgList2));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        logger.info("*************** update to CACHE  KEY:" + key);
         return ucOrgList2;
     }
 
