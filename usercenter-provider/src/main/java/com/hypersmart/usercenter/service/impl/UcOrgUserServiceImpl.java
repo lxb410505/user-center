@@ -245,18 +245,10 @@ public class UcOrgUserServiceImpl extends GenericService<String, UcOrgUser> impl
     public List<UcOrgUser> getUserDefaultOrg(String userId) {
         return ucOrgUserMapper.getUserDefaultOrg(userId);
     }
-    @Override
-    public List<UcOrgUser> getUserDefaultOrgAll(String userId) {
-        return ucOrgUserMapper.getUserDefaultOrgAll(userId);
-    }
 
     @Override
     public List<UcOrgUser> getUserDefaultOrgByRef(String userId) {
         return ucOrgUserMapper.getUserDefaultOrgByRef(userId);
-    }
-    @Override
-    public List<UcOrgUser> getUserDefaultOrgByRefAll(String userId) {
-        return ucOrgUserMapper.getUserDefaultOrgByRefAll(userId);
     }
 
     @Override

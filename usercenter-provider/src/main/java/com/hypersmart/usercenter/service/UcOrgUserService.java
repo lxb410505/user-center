@@ -33,9 +33,7 @@ public interface UcOrgUserService extends IGenericService<String, UcOrgUser> {
     UcOrgUser getByUserIdAndOrgId(String housekeeperId, String stagingId);
 
     List<UcOrgUser> getUserDefaultOrg(String userId);
-    List<UcOrgUser> getUserDefaultOrgAll(String userId);
     List<UcOrgUser> getUserDefaultOrgByRef(String userId);
-    List<UcOrgUser> getUserDefaultOrgByRefAll(String userId);
 
 
     /**

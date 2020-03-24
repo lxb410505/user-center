@@ -231,6 +231,47 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         }
         return set;
     }
+    public List<UcOrg> getAuthOrgListByOrgIdsAll(List<String> orgIds) {
+        List<UcOrg>  allOrgList= ucOrgMapper.getAllOrgs();
+        //根据组织id获取组织信息
+        List<UcOrg> set = new ArrayList<>();
+        List<UcOrg> returnList = new ArrayList<>();
+        //1、获取关联组织
+        for(UcOrg org:allOrgList){
+            if(orgIds.contains(org.getId())){
+                returnList.add(org);
+            }
+        }
+
+        //2、获取子级
+        List<String> ids = new ArrayList<>();
+        for (UcOrg ucOrg : returnList) {
+            List<UcOrg> childList= getChildListByPath(allOrgList,ucOrg.getPath());
+            for (UcOrg child : childList) {
+                if (!ids.contains(child.getId())) {
+                    child.setDisabled("1");
+                    set.add(child);
+                    ids.add(child.getId());
+                }
+            }
+        }
+
+        //3、根据组织查询父级组织
+        for (UcOrg ucOrg : returnList) {
+            String[] paths = ucOrg.getPath().split("\\.");
+            for (int i = 0; i < paths.length; i++) {
+                UcOrg anceOrg= getOrgById(allOrgList,paths[i]);
+                if(anceOrg!=null){
+                    if (!ids.contains(anceOrg.getId())) {
+                        anceOrg.setDisabled("2");
+                        set.add(anceOrg);
+                        ids.add(anceOrg.getId());
+                    }
+                }
+            }
+        }
+        return set;
+    }
 
     //根据userId和组织父级id查询组织信息
     public List<UcOrgDTO> queryChildrenByUserId(String userId, String parentOrgId) {
@@ -508,10 +549,10 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         QueryFilter queryFilter = QueryFilter.build();
         //查询用户所在默认维度组织
         List<UcOrgUser> list = new ArrayList<>();
-        List<UcOrgUser> list1 = ucOrgUserService.getUserDefaultOrgAll(userId);
+        List<UcOrgUser> list1 = ucOrgUserService.getUserDefaultOrg(userId);
 
         //查询用户所在非默认维度组织的引用默认组织（查询用户所在条线对应的默认组织，只查询地块级别） -- 2020-03-20 修改，制查询已交付
-        List<UcOrgUser> list2 = ucOrgUserService.getUserDefaultOrgByRefAll(userId);
+        List<UcOrgUser> list2 = ucOrgUserService.getUserDefaultOrgByRef(userId);
         if (list1 != null && list1.size() > 0) {
             list.addAll(list1);
         }
@@ -537,7 +578,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
             }
         }
 
-        List<UcOrg> set=getAuthOrgListByOrgIds(fullOrgIds);
+        List<UcOrg> set=getAuthOrgListByOrgIdsAll(fullOrgIds);
 
         Set<String> xingZhengList=new HashSet<>();
         for(UcOrg item:set){

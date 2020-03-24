@@ -26,11 +26,8 @@ public interface UcOrgUserMapper extends GenericMapper<UcOrgUser> {
     List<String> getPostIdByjobCode(@Param("code") String joCode);
 
     List<UcOrgUser> getUserDefaultOrg(@Param("userId") String userId);
-    List<UcOrgUser> getUserDefaultOrgAll(@Param("userId") String userId);
 
     List<UcOrgUser> getUserDefaultOrgByRef(@Param("userId") String userId);
-    List<UcOrgUser> getUserDefaultOrgByRefAll(@Param("userId") String userId);
-
 
     /**
      * 根据用户和区域查询其下所有地块
