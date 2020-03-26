@@ -231,6 +231,47 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         }
         return set;
     }
+    public List<UcOrg> getAuthOrgListByOrgIdsAll(List<String> orgIds) {
+        List<UcOrg>  allOrgList= ucOrgMapper.getAllOrgsAll();
+        //根据组织id获取组织信息
+        List<UcOrg> set = new ArrayList<>();
+        List<UcOrg> returnList = new ArrayList<>();
+        //1、获取关联组织
+        for(UcOrg org:allOrgList){
+            if(orgIds.contains(org.getId())){
+                returnList.add(org);
+            }
+        }
+
+        //2、获取子级
+        List<String> ids = new ArrayList<>();
+        for (UcOrg ucOrg : returnList) {
+            List<UcOrg> childList= getChildListByPath(allOrgList,ucOrg.getPath());
+            for (UcOrg child : childList) {
+                if (!ids.contains(child.getId())) {
+                    child.setDisabled("1");
+                    set.add(child);
+                    ids.add(child.getId());
+                }
+            }
+        }
+
+        //3、根据组织查询父级组织
+        for (UcOrg ucOrg : returnList) {
+            String[] paths = ucOrg.getPath().split("\\.");
+            for (int i = 0; i < paths.length; i++) {
+                UcOrg anceOrg= getOrgById(allOrgList,paths[i]);
+                if(anceOrg!=null){
+                    if (!ids.contains(anceOrg.getId())) {
+                        anceOrg.setDisabled("2");
+                        set.add(anceOrg);
+                        ids.add(anceOrg.getId());
+                    }
+                }
+            }
+        }
+        return set;
+    }
 
     //根据userId和组织父级id查询组织信息
     public List<UcOrgDTO> queryChildrenByUserId(String userId, String parentOrgId) {
@@ -408,7 +449,7 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         List<UcOrgUser> list = new ArrayList<>();
         List<UcOrgUser> list1 = ucOrgUserService.getUserDefaultOrg(userId);
 
-        //查询用户所在非默认维度组织的引用默认组织（查询用户所在条线对应的默认组织，只查询地块级别）
+        //查询用户所在非默认维度组织的引用默认组织（查询用户所在条线对应的默认组织，只查询地块级别） -- 2020-03-20 修改，制查询已交付
         List<UcOrgUser> list2 = ucOrgUserService.getUserDefaultOrgByRef(userId);
         if (list1 != null && list1.size() > 0) {
             list.addAll(list1);
@@ -504,7 +545,64 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
         resultSet=resultSet.stream().sorted(Comparator.comparing(a -> null ==a.getOrderNo()?1000:a.getOrderNo())).collect(Collectors.toList());
         return resultSet;
     }
+    public List<UcOrg> getUserOrgListMergeAll(String userId) {
+        QueryFilter queryFilter = QueryFilter.build();
+        //查询用户所在默认维度组织
+        List<UcOrgUser> list = new ArrayList<>();
+        List<UcOrgUser> list1 = ucOrgUserService.getUserDefaultOrg(userId);
 
+        //查询用户所在非默认维度组织的引用默认组织（查询用户所在条线对应的默认组织，只查询地块级别） -- 2020-03-20 修改，制查询已交付
+        List<UcOrgUser> list2 = ucOrgUserService.getUserDefaultOrgByRef(userId);
+        if (list1 != null && list1.size() > 0) {
+            list.addAll(list1);
+        }
+        if (list2 != null && list2.size() > 0) {
+            list.addAll(list2);
+        }
+
+        if (null == list || list.size() <= 0) {
+            return new ArrayList<>();
+        }
+        String orgIds = "";
+        //去重
+        List<String> fullOrgIds = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            String tempId = list.get(i).getOrgId();
+            if (!fullOrgIds.contains(tempId)) {
+                if (i == 0) {
+                    orgIds = tempId;
+                } else {
+                    orgIds = orgIds + "," + tempId;
+                }
+                fullOrgIds.add(tempId);
+            }
+        }
+
+        List<UcOrg> set=getAuthOrgListByOrgIdsAll(fullOrgIds);
+
+        Set<String> xingZhengList=new HashSet<>();
+        for(UcOrg item:set){
+            if ("ORG_XingZheng".equals(item.getGrade())) {
+                xingZhengList.add(item.getId());
+            }
+        }
+
+        List<UcOrg> resultSet = new ArrayList<>();
+        for(UcOrg item:set){
+            Boolean isUnder=false;
+            for(String xzId:xingZhengList){
+                if(item.getPath().contains(xzId)){
+                    isUnder=true;
+                    break;
+                }
+            }
+            if(!isUnder){
+                resultSet.add(item);
+            }
+        }
+        resultSet=resultSet.stream().sorted(Comparator.comparing(a -> null ==a.getOrderNo()?1000:a.getOrderNo())).collect(Collectors.toList());
+        return resultSet;
+    }
 
     public List<UcOrg> queryChildrenByCondition(String userId, String orgId, String grade) {
 
@@ -663,22 +761,23 @@ public class UcOrgServiceImpl extends GenericService<String, UcOrg> implements U
     private ICache<String> iCache;
     public List<UcOrg> getAllOrgs() {
         String key=RedisKeys.UC_ORRG+".getAllOrgs";
-        if (iCache.containKey(key)) {
-            List<UcOrg> ucOrgList= null;
-            try {
-                ucOrgList = JsonUtil.toBean(iCache.getByKey(key),new TypeReference<List<UcOrg>>() {});
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            logger.info("*************** from CACHE  KEY:" + key);
-            return ucOrgList;
-        }
+//        if (iCache.containKey(key)) {
+//            List<UcOrg> ucOrgList= null;
+//            try {
+//                ucOrgList = JsonUtil.toBean(iCache.getByKey(key),new TypeReference<List<UcOrg>>() {});
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            logger.info("*************** from CACHE  KEY:" + key);
+//            return ucOrgList;
+//        }
         List<UcOrg> ucOrgList2= ucOrgMapper.getAllOrgs();
         try {
             iCache.add(key, JsonUtil.toJson(ucOrgList2));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        logger.info("*************** update to CACHE  KEY:" + key);
         return ucOrgList2;
     }
 

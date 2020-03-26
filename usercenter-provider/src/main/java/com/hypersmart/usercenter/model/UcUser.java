@@ -139,6 +139,11 @@ private static final long serialVersionUID=1L;
     @ApiModelProperty("版本号")
         private Integer version;
 
+    @Column(name = "MOBILE_TO_WX_")
+    @ApiModelProperty("微信关联手机号码")
+    private String mobileToWx;
+
+
 
         public void setId(String id) {
             this.id = id;
@@ -315,6 +320,15 @@ private static final long serialVersionUID=1L;
         public Integer getVersion() {
             return this.version;
         }
+
+    public String getMobileToWx() {
+        return mobileToWx;
+    }
+
+    public void setMobileToWx(String mobileToWx) {
+        this.mobileToWx = mobileToWx;
+    }
+
     public String toString(){
         return
         new ToStringBuilder(this)
@@ -343,6 +357,7 @@ private static final long serialVersionUID=1L;
                 .append("updateTime",this.updateTime)
                 .append("isDele",this.isDele)
                 .append("version",this.version)
+                .append("mobileToWx",this.mobileToWx)
             .toString();
     }
 }

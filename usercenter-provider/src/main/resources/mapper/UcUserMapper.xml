@@ -16,6 +16,7 @@
         <result column="ID_CARD_" jdbcType="VARCHAR" property="idCard"></result>
         <result column="BIRTHDAY_" jdbcType="DATE" property="birthday"></result>
         <result column="EDUCATION_" jdbcType="VARCHAR" property="education"></result>
+        <result column="MOBILE_TO_WX_" jdbcType="VARCHAR" property="mobileToWx"></result>
     </resultMap>
 
     <select id="quertListFive" parameterType="java.util.Map" resultType="java.util.Map">
@@ -26,6 +27,7 @@
         u.FULLNAME_ AS fullName,
         u.MOBILE_ AS mobile,
         u.ACCOUNT_ AS account,
+        u.MOBILE_TO_WX_ AS mobileToWx,
         post.ID_ AS `postId`,
         post.POST_KEY_ AS `postKey`,
         post.POS_NAME_ AS posName,
@@ -81,6 +83,7 @@
         u.FULLNAME_ AS fullName,
         u.MOBILE_ AS mobile,
         u.ACCOUNT_ AS account,
+        u.MOBILE_TO_WX_ AS mobileToWx,
         post.ID_ AS `postId`,
         post.POS_NAME_ AS posName,
         org_lv4.NAME_ AS corpName,
@@ -123,6 +126,7 @@
         u.FULLNAME_ AS fullName,
         u.MOBILE_ AS mobile,
         u.ACCOUNT_ AS account,
+        u.MOBILE_TO_WX_ AS mobileToWx,
         post.ID_ AS `postId`,
         post.POST_KEY_ AS `postKey`,
         post.POS_NAME_ AS posName,
@@ -170,6 +174,7 @@
         u.FULLNAME_ AS fullName,
         u.MOBILE_ AS mobile,
         u.ACCOUNT_ AS account,
+        u.MOBILE_TO_WX_ AS mobileToWx,
         post.ID_ AS `postId`,
         post.POS_NAME_ AS posName,
         org_lv2.NAME_ AS corpName,

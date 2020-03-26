@@ -36,7 +36,7 @@
         ID_,NAME_,PARENT_ID_,PATH_
     </sql>
     <sql id="BaseTable">
-        uc_org
+        (select uc_org.* from uc_org INNER JOIN uc_org_params uop on uc_org.ID_ = uop.ORG_ID_ and uop.code_ = 'is_delivery' and uop.is_dele_ = 0 and (uop.value_ = 1 or uop.value_  is null) ) uc_org
     </sql>
 
     <select id="getOrgList" resultMap="UcOrg">
@@ -163,6 +163,7 @@
         LEVEL_ as level,
         REF_ID_ as refId
         from uc_org
+        INNER JOIN (select ORG_ID_ as UOP_ORG_ID_ from uc_org_params where code_ = 'is_delivery' and is_dele_ = 0 and (value_ = 1 or value_ is null)) uop on uc_org.ID_ = uop.UOP_ORG_ID_
         <where>
             IS_DELE_ = '0'
             <if test="orgName!=null and orgName!=''">
@@ -191,6 +192,7 @@
         LEVEL_ as level,
         REF_ID_ as refId
         from uc_org
+        INNER JOIN (select ORG_ID_ as UOP_ORG_ID_ from uc_org_params where code_ = 'is_delivery' and is_dele_ = 0 and (value_ = 1 or value_ is null)) uop on uc_org.ID_ = uop.UOP_ORG_ID_
         <where>
             IS_DELE_ = '0'
             <if test="orgName!=null and orgName!=''">
@@ -207,6 +209,13 @@
         *
         from
         <include refid="BaseTable"/>
+        where IS_DELE_ = '0'
+    </select>
+    <select id="getAllOrgsAll" resultMap="OrgFullMap">
+        select
+        *
+        from
+        uc_org
         where IS_DELE_ = '0'
     </select>
 
@@ -228,6 +237,7 @@
         LEVEL_ as level,
         REF_ID_ as refId
         from uc_org
+        INNER JOIN (select ORG_ID_ as UOP_ORG_ID_ from uc_org_params where code_ = 'is_delivery' and is_dele_ = 0 and (value_ = 1 or value_ is null)) uop on uc_org.ID_ = uop.UOP_ORG_ID_
         <where>
             IS_DELE_ = '0' and  locate('测试',NAME_)=0
             <if test="grade!=null and grade!=''">
@@ -250,7 +260,7 @@
         o.IS_DELE_ AS isDele,
         o.VERSION_ AS version
         from uc_org_user u
-        LEFT JOIN uc_org o on o.ID_ = u.ORG_ID_
+        LEFT JOIN (select uc_org.* from uc_org INNER JOIN uc_org_params uop on uc_org.ID_ = uop.ORG_ID_ and uop.code_ = 'is_delivery' and uop.is_dele_ = 0 and (uop.value_ = 1 or uop.value_  is null) ) o on o.ID_ = u.ORG_ID_
         where u.IS_DELE_ = 0  and o.IS_DELE_=0
         and (o.GRADE_ = 'ORG_ZongBu' or o.GRADE_ = 'ORG_QuYu' or o.GRADE_ = 'ORG_ChengQu' or o.GRADE_ = 'ORG_XiangMu' or o.GRADE_ = 'ORG_DiKuai')
         and u.USER_ID_ = #{userId}
