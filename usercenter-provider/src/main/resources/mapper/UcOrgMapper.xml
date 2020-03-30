@@ -66,26 +66,26 @@
     </select>
 
     <select id="getAllDimOrgListByOrg" parameterType="com.hypersmart.usercenter.bo.UcOrgBO" resultMap="OrgExtMap">
-        select o.* ,d.CODE_ as DEM_CODE_ ,d.DEM_NAME_ as DEM_NAME_
+        select uc_org.* ,d.CODE_ as DEM_CODE_ ,d.DEM_NAME_ as DEM_NAME_
         from
-        <include refid="BaseTable"/> o
-        LEFT JOIN  uc_demension d on o.DEM_ID_ = d.ID_
-        where o.IS_DELE_!=1  AND
+        <include refid="BaseTable"/>
+        LEFT JOIN  uc_demension d on uc_org.DEM_ID_ = d.ID_
+        where uc_org.IS_DELE_!=1  AND
         <choose>
             <when test="orgIdList!=null and orgIdList.size > 0">
                 (
-                o.ID_ in
+                uc_org.ID_ in
                 <foreach collection="orgIdList" item="iOrgId" open="(" separator="," close=")">
                     #{iOrgId}
                 </foreach>
-                or o.REF_ID_ in
+                or uc_org.REF_ID_ in
                 <foreach collection="orgIdList" item="iOrgId" open="(" separator="," close=")">
                     #{iOrgId}
                 </foreach>
                 )
             </when>
             <otherwise>
-                ( o.ID_ =#{orgId} OR o.REF_ID_=#{orgId} )
+                ( uc_org.ID_ =#{orgId} OR uc_org.REF_ID_=#{orgId} )
             </otherwise>
         </choose>
         <if test="dimCode!=null">
