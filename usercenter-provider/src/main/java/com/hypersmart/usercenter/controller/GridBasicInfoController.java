@@ -237,7 +237,7 @@ public class GridBasicInfoController extends BaseController {
 							nameList.add(x.getHousekeeperMasterName());
 						}
 					}
-					m.put("housekeeperMasterName",(null!=nameList&&nameList.size()>0)? com.sun.deploy.util.StringUtils.join(nameList,"、"):"");
+					m.put("housekeeperMasterName",(null!=nameList&&nameList.size()>0)? String.join("、",nameList):"");
 					//20200819 增加管家师傅 wmc  end ---
 				}
 			}
