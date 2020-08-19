@@ -315,6 +315,13 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 } else {
                     gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
                 }
+                //wmc 20200819 新增 管家师傅 start ----
+                if ("".equals(gridBasicInfoDTO.getHousekeeperMasterId())) {
+                    gridBasicInfo.setHousekeeperMasterId(null);
+                } else {
+                    gridBasicInfo.setHousekeeperMasterId(gridBasicInfoDTO.getHousekeeperMasterId());
+                }
+                //wmc 20200819 新增 管家师傅 end ---
                 gridBasicInfo.setFormatAttribute(gridBasicInfoDTO.getFormatAttribute());
                 gridBasicInfo.setSecondFormatAttribute(gridBasicInfoDTO.getSecondFormatAttribute());
                 gridBasicInfo.setThirdFormatAttribute(gridBasicInfoDTO.getThirdFormatAttribute());
@@ -582,6 +589,14 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                         } else {
                             gridBasicInfo.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
                         }
+                        // wmc 20200819 新增 管家师傅id的更新 start---
+                        if (StringUtils.isEmpty(gridBasicInfoDTO.getHousekeeperMasterId()))
+                        {
+                            gridBasicInfo.setHousekeeperMasterId(null);
+                        }else {
+                            gridBasicInfo.setHousekeeperMasterId(gridBasicInfoDTO.getHousekeeperMasterId());
+                        }
+                        // wmc 20200819 新增 管家师傅id的更新 end ---
                         Integer updateTimes = grid.getUpdateTimes();
                         gridBasicInfo.setUpdateTimes(updateTimes == null ? 0 : updateTimes + 1);
                         gridBasicInfo.setUpdationDate(new Date());
@@ -596,6 +611,14 @@ public class GridBasicInfoServiceImpl extends GenericService<String, GridBasicIn
                 } else {
                     grid.setHousekeeperId(gridBasicInfoDTO.getHousekeeperId());
                 }
+                // 20200819 wmc 新增管家师傅更新 start ---
+                if ("".equals(gridBasicInfoDTO.getHousekeeperMasterId()))
+                {
+                    grid.setHousekeeperMasterId(null);
+                }else {
+                    grid.setHousekeeperMasterId(gridBasicInfoDTO.getHousekeeperMasterId());
+                }
+                // 20200819 wmc 新增管家师傅更新 end ----
                 Integer updateTimes = grid.getUpdateTimes();
                 grid.setUpdateTimes(updateTimes == null ? 0 : updateTimes + 1);
                 grid.setUpdationDate(new Date());

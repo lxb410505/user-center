@@ -7,6 +7,24 @@ public class GridBasicInfoSimpleDTO {
     private String housekeeperId;
     private String gridType;
     private String gridId;
+    private String housekeeperMasterId;
+    private String housekeeperMasterName;
+
+    public String getHousekeeperMasterId() {
+        return housekeeperMasterId;
+    }
+
+    public void setHousekeeperMasterId(String housekeeperMasterId) {
+        this.housekeeperMasterId = housekeeperMasterId;
+    }
+
+    public String getHousekeeperMasterName() {
+        return housekeeperMasterName;
+    }
+
+    public void setHousekeeperMasterName(String housekeeperMasterName) {
+        this.housekeeperMasterName = housekeeperMasterName;
+    }
 
     public String getId() {
         return id;
