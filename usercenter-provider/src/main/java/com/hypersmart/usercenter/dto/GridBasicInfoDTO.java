@@ -70,6 +70,9 @@ public class GridBasicInfoDTO extends GenericDTO<String> implements Serializable
 	//管家ID（主数据用户主键）
 	private String housekeeperId;
 
+	// wmc 20200819 新增 管家师傅ID
+	private String housekeeperMasterId;
+
 	//管家姓名
 	private String housekeeperName;
 
@@ -463,5 +466,13 @@ public class GridBasicInfoDTO extends GenericDTO<String> implements Serializable
 
 	public void setServiceGridId(String serviceGridId) {
 		this.serviceGridId = serviceGridId;
+	}
+
+	public String getHousekeeperMasterId() {
+		return housekeeperMasterId;
+	}
+
+	public void setHousekeeperMasterId(String housekeeperMasterId) {
+		this.housekeeperMasterId = housekeeperMasterId;
 	}
 }

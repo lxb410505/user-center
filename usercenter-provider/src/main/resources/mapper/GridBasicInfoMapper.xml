@@ -42,7 +42,9 @@
         a.staging_id,
         a.housekeeper_id,
         a.grid_type,
-        a.grid_id
+        a.grid_id,
+        a.housekeeperMasterId,
+        a.housekeeperMasterName
         FROM
         (
         SELECT * from
@@ -51,6 +53,8 @@
         t.id AS id,
         s.service_grid_name AS grid_name,
         t.housekeeper_id AS housekeeper_id,
+        t.housekeeper_master_id as housekeeperMasterId,
+        `user`.FULLNAME_ as housekeeperMasterName,
         s.staging_id AS staging_id,
         s.creation_date AS creation_date,
         t.grid_type AS grid_type,
@@ -58,6 +62,7 @@
         FROM
         stage_servicegird_ref s LEFT JOIN grid_basic_info t
         ON t.staging_id = s.staging_id and t.grid_type='service_center_grid'
+        LEFT JOIN uc_user user on `user`.ID_ = t.housekeeper_master_id
         where
         <foreach collection="houseKeeperBO" index="index" item="houseKeeper" open="(" separator="or" close=")">
             (t.housekeeper_id =#{houseKeeper.houseKeeperId} and t.staging_id = #{houseKeeper.divideId})
@@ -72,11 +77,14 @@
         t.id AS id,
         t.grid_name AS grid_name,
         t.housekeeper_id AS housekeeper_id,
+        t.housekeeper_master_id as housekeeperMasterId,
+        `user`.FULLNAME_ as housekeeperMasterName,
         t.staging_id AS staging_id,
         t.creation_date AS creation_date,
         t.grid_type AS grid_type,
         t.id AS grid_id
         from grid_basic_info t
+        LEFT JOIN uc_user user on `user`.ID_ = t.housekeeper_master_id
         where
         <foreach collection="houseKeeperBO" index="index" item="houseKeeper" open="(" separator="or" close=")">
             (t.housekeeper_id =#{houseKeeper.houseKeeperId} and t.staging_id = #{houseKeeper.divideId})
@@ -151,7 +159,8 @@
         WHERE
         ID_ = g.stagingId
         ) AS stagingName,
-        k.fullName AS housekeeperName
+        k.fullName AS housekeeperName,
+        l.fullName AS housekeeperMasterName
         FROM
         (
         SELECT * from
@@ -178,6 +187,7 @@
         else NULL
         end
         AS housekeeperId,
+        t.housekeeper_master_id as housekeeperMasterId,
         t.format_attribute AS formatAttribute,
         t.second_format_attribute AS secondFormatAttribute,
         t.third_format_attribute AS thirdFormatAttribute,
@@ -218,6 +228,7 @@
         t.staging_id AS massifId,
         t.staging_id AS divideId,
         t.housekeeper_id AS housekeeperId,
+        t.housekeeper_master_id as housekeeperMasterId,
         t.format_attribute AS formatAttribute,
         t.second_format_attribute AS secondFormatAttribute,
         t.third_format_attribute AS thirdFormatAttribute,
@@ -271,7 +282,36 @@
         AND uoj.IS_DELE_ = 0
         AND dem.IS_DELE_ = 0
         ) AS k ON  g.housekeeperId = k.houseKeeperId  and g.stagingId = k.divideId
-        ) AS t
+        LEFT JOIN (
+        SELECT
+        u.ID_ AS houseKeeperId,
+        uou.ID_ AS id,
+        u.FULLNAME_ AS fullName,
+        u.MOBILE_ AS mobile,
+        u.ACCOUNT_ AS account,
+        post.ID_ AS `postId`,
+        post.POS_NAME_ AS posName,
+        org.NAME_ AS divideName,
+        org.ID_ AS divideId
+        FROM
+        uc_user u
+        JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
+        JOIN uc_org org ON uou.ORG_ID_ = org.parent_ID_
+        JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
+        JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
+        JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
+        WHERE
+        uoj.CODE_ = 'kfgj'
+        AND dem.CODE_ = 'smsf'
+        AND org.GRADE_ = 'ORG_DiKuai'
+        AND u.IS_DELE_ = 0
+        AND uou.IS_DELE_ = 0
+        AND org.IS_DELE_ = 0
+        AND post.IS_DELE_ = 0
+        AND uoj.IS_DELE_ = 0
+        AND dem.IS_DELE_ = 0
+        ) AS l ON g.housekeeperMasterId = l.houseKeeperId
+        AND g.stagingId = l.divideId	) AS t
         LEFT JOIN (
         SELECT
         gr.grid_id,
@@ -495,7 +535,7 @@
 
     <select id="getGridById" parameterType="java.lang.String" resultType="java.util.Map">
         select DISTINCT g.*,
-        k.fullName as housekeeperName
+        k.fullName as housekeeperName,l.fullName as housekeeperMasterName
         from
          (
         select
@@ -511,6 +551,7 @@
         g.staging_id as stagingId,
         g.staging_id as divideId,
         g.housekeeper_id as housekeeperId,
+        g.housekeeper_master_id as housekeeperMasterId,
         g.format_attribute as formatAttribute,
         g.second_format_attribute as secondFormatAttribute,
         g.third_format_attribute as thirdFormatAttribute,
@@ -540,6 +581,7 @@
         g.staging_id as stagingId,
         g.staging_id as divideId,
         g.housekeeper_id as housekeeperId,
+        g.housekeeper_master_id as housekeeperMasterId,
         g.format_attribute as formatAttribute,
         g.second_format_attribute as secondFormatAttribute,
         g.third_format_attribute as thirdFormatAttribute,
@@ -575,6 +617,37 @@
         AND org.GRADE_ = 'ORG_DiKuai'
         and u.IS_DELE_ = 0 and u.STATUS_ = 1 and uou.IS_DELE_ = 0 and org.IS_DELE_ = 0 and post.IS_DELE_ = 0 and uoj.IS_DELE_ = 0 and dem.IS_DELE_ = 0
         ) as k on g.stagingId = k.divideId and g.housekeeperId = k.houseKeeperId
+        LEFT JOIN (
+	SELECT
+		u.ID_ AS houseKeeperId,
+		uou.ID_ AS id,
+		u.FULLNAME_ AS fullName,
+		u.MOBILE_ AS mobile,
+		u.ACCOUNT_ AS account,
+		post.ID_ AS `postId`,
+		post.POS_NAME_ AS posName,
+		org.NAME_ AS divideName,
+		org.ID_ AS divideId
+	FROM
+		uc_user u
+	JOIN uc_org_user uou ON u.ID_ = uou.USER_ID_
+	JOIN uc_org org ON uou.ORG_ID_ = org.parent_ID_
+	JOIN uc_org_post post ON uou.POS_ID_ = post.ID_
+	JOIN uc_org_job uoj ON post.JOB_ID_ = uoj.ID_
+	JOIN uc_demension dem ON org.DEM_ID_ = dem.ID_
+	WHERE
+		uoj.CODE_ = 'kfgj'
+	AND dem.CODE_ = 'smsf'
+	AND org.GRADE_ = 'ORG_DiKuai'
+	AND u.IS_DELE_ = 0
+	AND u.STATUS_ = 1
+	AND uou.IS_DELE_ = 0
+	AND org.IS_DELE_ = 0
+	AND post.IS_DELE_ = 0
+	AND uoj.IS_DELE_ = 0
+	AND dem.IS_DELE_ = 0
+) AS l ON g.stagingId = l.divideId
+AND g.housekeeperMasterId = l.houseKeeperId
     </select>
 
     <update id="disableGridInfo" parameterType="com.hypersmart.usercenter.bo.GridBasicInfoBO">

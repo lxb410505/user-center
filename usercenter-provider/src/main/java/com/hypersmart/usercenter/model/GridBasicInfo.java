@@ -80,6 +80,11 @@ private static final long serialVersionUID=1L;
     @ApiModelProperty("管家ID（主数据用户主键）")
     private String housekeeperId;
 
+    //wmc 20200819 新增管家师傅的ID主键
+    @Column(name = "housekeeper_master_id")
+    @ApiModelProperty("管家师傅ID(主数据用户主键)")
+    private String housekeeperMasterId;
+
     @Column(name = "update_times")
     @ApiModelProperty("网格更新次数：只记录产生过历史记录/工单的次数")
     private Integer updateTimes;
@@ -351,6 +356,14 @@ private static final long serialVersionUID=1L;
 
     public void setThirdFormatAttribute(String thirdFormatAttribute) {
         this.thirdFormatAttribute = thirdFormatAttribute;
+    }
+
+    public String getHousekeeperMasterId() {
+        return housekeeperMasterId;
+    }
+
+    public void setHousekeeperMasterId(String housekeeperMasterId) {
+        this.housekeeperMasterId = housekeeperMasterId;
     }
 
     public String toString(){

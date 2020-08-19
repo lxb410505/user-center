@@ -222,6 +222,23 @@ public class GridBasicInfoController extends BaseController {
 							.collect(Collectors.toList()).stream().collect(Collectors.groupingBy(GridBasicInfoSimpleDTO::getStagingId));
 					List<GridBasicInfoSimpleDTO> gridBasicInfoSimpleDTOList = map.get(m.get("divideId").toString());
 					m.put("gridList", gridBasicInfoSimpleDTOList);
+					//20200819 增加管家师傅 wmc start ---
+					if (gridBasicInfoSimpleDTOList == null || gridBasicInfoSimpleDTOList.size()<=0)
+					{
+						m.put("housekeeperMasterName","");
+						continue;
+					}
+					List<GridBasicInfoSimpleDTO> housekeeperMasterNameList = gridBasicInfoSimpleDTOList.stream().filter(x -> StringUtils.isNotEmpty(x.getHousekeeperMasterName())).collect(Collectors.toList());
+					List<String> nameList = new ArrayList<>();
+					if (housekeeperMasterNameList!=null&&housekeeperMasterNameList.size()>0)
+					{
+						for (GridBasicInfoSimpleDTO x : housekeeperMasterNameList)
+						{
+							nameList.add(x.getHousekeeperMasterName());
+						}
+					}
+					m.put("housekeeperMasterName",(null!=nameList&&nameList.size()>0)? com.sun.deploy.util.StringUtils.join(nameList,"、"):"");
+					//20200819 增加管家师傅 wmc  end ---
 				}
 			}
 		}
