@@ -389,7 +389,7 @@
         select a.gd_code workOrderCode ,a.gcoin_val coinNum ,a.jb_jl_reason coinObtainReason, a.jb_jl_time date2, b.PROC_INST_ID_  procId,
         b.bx_content bxContent
         from uc.rsun_jb_hi_reward   a
-        left join bpm.ext_customer_repair b on b.bx_code =  a.gd_code
+        left join bpm.ext_customer_repair b on b.bx_code =  convert(a.gd_code using utf8 )
         where uc_user_id='${userCode}'
         <if test="dateString!=null and dateString!=''">
         and DATE_FORMAT(a.jb_jl_time, '%Y-%m-%d')=#{dateString}
