@@ -529,14 +529,18 @@ public class UcOrgController extends BaseController {
             "application/json; charset=utf-8" })
     @ApiOperation(value = "根据角色获取用户组织（战图定制）", httpMethod = "GET", notes = "根据角色获取用户组织（战图定制）")
     public List<UcOrg> getOrgByUserAndRole(
-            @ApiParam(name = "userId", value = "用户帐号", required = true) @RequestParam String userId)
+            @ApiParam(name = "userId", value = "用户帐号", required = false) @RequestParam Optional<String> userId)
             throws Exception {
-        if(com.hypersmart.base.util.StringUtil.isEmpty(userId)){
+        String paramUserId=null;
+        if(!userId.isPresent() || com.hypersmart.base.util.StringUtil.isEmpty(userId.get())){
             IUser iUser = ContextUtil.getCurrentUser();
-            userId=iUser.getUserId();
+            paramUserId=iUser.getUserId();
+        }
+        else {
+            paramUserId=userId.get();
         }
         //先获取当前用户角色列表
-        List<UcRole> roleList = this.ucRoleService.getRolesByUserId(userId);
+        List<UcRole> roleList = this.ucRoleService.getRolesByUserId(paramUserId);
         //当前用户有城市公司的组织ids
         HashSet<String> cityList=new HashSet<>();
         for(UcRole role:roleList){
