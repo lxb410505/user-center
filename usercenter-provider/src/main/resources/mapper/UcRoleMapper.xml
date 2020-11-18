@@ -2,6 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.hypersmart.usercenter.mapper.UcRoleMapper">
+
+    <resultMap id="BaseResultMap" type="com.hypersmart.usercenter.model.UcRole">
+        <id property="id" column="ID_" jdbcType="VARCHAR"/>
+        <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+        <result property="code" column="CODE_" jdbcType="VARCHAR"/>
+        <result property="enabled" column="ENABLED_" jdbcType="NUMERIC"/>
+        <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="UPDATE_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="version" column="VERSION_" jdbcType="NUMERIC"/>
+        <result property="createBy" column="CREATE_BY_" jdbcType="VARCHAR"/>
+        <result property="updateBy" column="UPDATE_BY_" jdbcType="VARCHAR"/>
+        <result property="createOrgId" column="CREATE_ORG_ID_" jdbcType="VARCHAR"/>
+    </resultMap>
+
     <select id="getUcRoleByName" resultType="com.hypersmart.usercenter.model.UcRole" parameterType="java.lang.String">
         select 	ID_ as id,
          NAME_ as name,
@@ -22,4 +36,10 @@
             </if>
         </where>
     </select>
+
+    <select id="getRolesByUserId" parameterType="java.lang.String" resultMap="BaseResultMap" >
+		SELECT DISTINCT r.* FROM UC_ROLE r INNER JOIN uc_user_role ur
+		ON r.ID_ = ur.ROLE_ID_  INNER JOIN uc_user u ON u.ID_ = ur.USER_ID_ WHERE u.ID_ = #{userId}
+		AND r.IS_DELE_!=1 AND u.IS_DELE_!=1 AND ur.IS_DELE_!=1
+	</select>
 </mapper>

@@ -3,6 +3,7 @@ package com.hypersmart.usercenter.controller;
 import com.github.pagehelper.PageHelper;
 import com.hypersmart.base.controller.BaseController;
 import com.hypersmart.base.query.*;
+import com.hypersmart.base.util.JsonUtil;
 import com.hypersmart.uc.api.impl.util.ContextUtil;
 import com.hypersmart.uc.api.model.IUser;
 import com.hypersmart.usercenter.bo.UcOrgBO;
@@ -12,10 +13,15 @@ import com.hypersmart.usercenter.model.*;
 import com.hypersmart.usercenter.service.UcOrgParamsService;
 import com.hypersmart.usercenter.service.UcOrgService;
 import com.hypersmart.usercenter.service.UcOrgUserService;
+import com.hypersmart.usercenter.service.UcRoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import tk.mybatis.mapper.util.StringUtil;
 
@@ -33,6 +39,9 @@ import java.util.*;
 @RequestMapping(value = {"/api/usercenter/v1/ucOrg"}, produces = {"application/json;charset=UTF-8"})
 @Api(tags = {"ucOrgController"})
 public class UcOrgController extends BaseController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UcOrgController.class);
+
     @Resource
     UcOrgService ucOrgService;
 
@@ -41,6 +50,9 @@ public class UcOrgController extends BaseController {
 
     @Resource
     UcOrgParamsService ucOrgParamsService;
+
+    @Autowired
+    UcRoleService ucRoleService;
 
     /*
     *   根据地块id与当前用户信息，获取它及它以上的组织信息
@@ -510,5 +522,55 @@ public class UcOrgController extends BaseController {
     @ApiOperation(value = "根据组织id集合获取组织信息}", httpMethod = "POST", notes = "根据组织id集合获取组织信息")
     public List<UcOrg> queryAllOrgsByUserId( @RequestBody String userId) {
         return this.ucOrgService.queryAllOrgsByUserId(userId);
+    }
+
+    @RequestMapping(value = { "getOrgByUserAndRole" }, method = {
+            org.springframework.web.bind.annotation.RequestMethod.GET }, produces = {
+            "application/json; charset=utf-8" })
+    @ApiOperation(value = "根据角色获取用户组织（战图定制）", httpMethod = "GET", notes = "根据角色获取用户组织（战图定制）")
+    public List<UcOrg> getOrgByUserAndRole(
+            @ApiParam(name = "userId", value = "用户帐号", required = false) @RequestParam Optional<String> userId)
+            throws Exception {
+        String paramUserId=null;
+        if(!userId.isPresent() || com.hypersmart.base.util.StringUtil.isEmpty(userId.get())){
+            IUser iUser = ContextUtil.getCurrentUser();
+            paramUserId=iUser.getUserId();
+        }
+        else {
+            paramUserId=userId.get();
+        }
+        //先获取当前用户角色列表
+        List<UcRole> roleList = this.ucRoleService.getRolesByUserId(paramUserId);
+        //当前用户有城市公司的组织ids
+        HashSet<String> cityList=new HashSet<>();
+        for(UcRole role:roleList){
+            if(role.getCode().startsWith("ZT_")){
+                //战图角色
+                String desc=role.getDescription();
+                if(StringUtil.isNotEmpty(desc)){
+                    try {
+                        Map<String, Object> orgMap = JsonUtil.toMap(desc);
+                        String orgid = String.valueOf(orgMap.get("orgid"));
+                        logger.error("getOrgByUserRole:orgid="+orgid);
+                        cityList.add(orgid);
+                    }
+                    catch (Exception ex){
+                        logger.error("getOrgByUserAndRole:"+role.getCode());
+                    }
+                }
+            }
+        }
+
+        if(!CollectionUtils.isEmpty(cityList)){
+            //根据cityId获取组织列表
+            String[] ids = new String[cityList.size()];
+            cityList.toArray(ids);
+            List<UcOrg> orgList = this.ucOrgService.getByIds(ids);
+            return orgList;
+        }
+        else {
+            return new ArrayList<>();
+        }
+
     }
 }
