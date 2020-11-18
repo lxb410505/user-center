@@ -564,6 +564,7 @@ public class UcOrgController extends BaseController {
         if(!CollectionUtils.isEmpty(cityList)){
             //根据cityId获取组织列表
             String[] ids = new String[cityList.size()];
+            cityList.toArray(ids);
             List<UcOrg> orgList = this.ucOrgService.getByIds(ids);
             return orgList;
         }
