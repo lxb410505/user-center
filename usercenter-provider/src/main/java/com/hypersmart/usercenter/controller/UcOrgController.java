@@ -21,6 +21,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import tk.mybatis.mapper.util.StringUtil;
 
@@ -556,9 +557,15 @@ public class UcOrgController extends BaseController {
             }
         }
 
-        //根据cityId获取组织列表
-        String[] ids = new String[cityList.size()];
-        List<UcOrg> orgList = this.ucOrgService.getByIds(ids);
-        return orgList;
+        if(!CollectionUtils.isEmpty(cityList)){
+            //根据cityId获取组织列表
+            String[] ids = new String[cityList.size()];
+            List<UcOrg> orgList = this.ucOrgService.getByIds(ids);
+            return orgList;
+        }
+        else {
+            return new ArrayList<>();
+        }
+
     }
 }
