@@ -95,5 +95,7 @@ public interface  UcUserService extends IGenericService<String, UcUser> {
     List<UcUser> getzh(String getname);
 
     String getid(String value);
+
+    UcUser getByAccount(String account);
 }
 
