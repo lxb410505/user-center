@@ -75,8 +75,10 @@ public class IosDistributionController extends BaseController {
             query.addFilter("bindAccount", account, QueryOP.EQUAL, FieldRelation.AND);
             PageList<IosDistribution> page = iosDistributionService.query(query);
             String code="";
+            String msg = "";
             if (page!=null && page.getRows()!=null && page.getRows().size()>0) {
                 code=page.getRows().get(0).getCode();
+                msg= page.getRows().get(0).getCodeLink();
             }
             else {
                 //获取一条记录，然后更新进去
@@ -94,12 +96,14 @@ public class IosDistributionController extends BaseController {
                     iosDistributionService.updateSelective(avItem);
 
                     code = avItem.getCode();
+                    msg= avItem.getCodeLink();
+
                 }else {
                     return new CommonResult<>(false,"当前没有可用的下载码");
                 }
             }
 
-            return new CommonResult<>(true,"",code);
+            return new CommonResult<>(true,msg,code);
         }
         catch (Exception ex){
             logger.error("getCode:"+ex.getMessage());
